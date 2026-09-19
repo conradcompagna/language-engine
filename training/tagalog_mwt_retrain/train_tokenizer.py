@@ -21,10 +21,10 @@ SAVE_DIR = HERE.parent / "trankit_save_tgl_v2"
 training_config = {
     "category": "tagalog-v2",
     "task": "tokenize",
-    "train_txt_fpath":   str(HERE / "tgl-train.txt"),
+    "train_txt_fpath": str(HERE / "tgl-train.txt"),
     "train_conllu_fpath": str(HERE / "tgl-train.conllu"),
-    "dev_txt_fpath":     str(HERE / "tgl-dev.txt"),
-    "dev_conllu_fpath":  str(HERE / "tgl-dev.conllu"),
+    "dev_txt_fpath": str(HERE / "tgl-dev.txt"),
+    "dev_conllu_fpath": str(HERE / "tgl-dev.conllu"),
     "save_dir": str(SAVE_DIR),
     "embedding": "xlm-roberta-base",
     "max_epoch": 50,

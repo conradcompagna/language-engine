@@ -6,6 +6,7 @@ Output: /tmp/sa_lemma_mismatches.log
   - summary counts
   - aggregated (lemma_id, dict_headword, conllu_lemma, count)
 """
+
 import csv
 import os
 import re
@@ -68,11 +69,12 @@ def main():
     total_tokens = 0
     match = 0
     mismatch = 0
-    missing_lemma_id = 0       # LemmaId not in CSV
-    empty_conllu_lemma = 0     # conllu lemma col is '_' or ''
-    mismatches = Counter()     # (lemma_id, dict_hw, conllu_lemma) -> count
+    missing_lemma_id = 0  # LemmaId not in CSV
+    empty_conllu_lemma = 0  # conllu lemma col is '_' or ''
+    mismatches = Counter()  # (lemma_id, dict_hw, conllu_lemma) -> count
 
     import time
+
     t0 = time.time()
 
     for idx, fp in enumerate(files):
@@ -111,7 +113,7 @@ def main():
             print(f"  err in {fp}: {e}", flush=True)
 
         if (idx + 1) % 2000 == 0:
-            print(f"  {idx+1}/{len(files)}  elapsed={time.time()-t0:.0f}s", flush=True)
+            print(f"  {idx + 1}/{len(files)}  elapsed={time.time() - t0:.0f}s", flush=True)
 
     print()
     print("=" * 80)

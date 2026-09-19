@@ -75,7 +75,9 @@ def _entry_has_morph_tag(entry: dict[str, Any] | None, tag_text: str) -> bool:
     return target in _split_morph_tags(entry.get("morph_info"))
 
 
-def _clone_entry_with_morph_tag(entry: dict[str, Any] | None, tag_text: str) -> dict[str, Any] | None:
+def _clone_entry_with_morph_tag(
+    entry: dict[str, Any] | None, tag_text: str
+) -> dict[str, Any] | None:
     tag = str(tag_text or "").strip()
     if not isinstance(entry, dict):
         return entry
@@ -216,7 +218,12 @@ def _build_resolution_actual(
         lemma_exact_count = 0
 
     compare_kind = ""
-    if category_key in {"exact_lemma_match", "greedy_lemma_match", "lemma_override", "lemma_partial_override"}:
+    if category_key in {
+        "exact_lemma_match",
+        "greedy_lemma_match",
+        "lemma_override",
+        "lemma_partial_override",
+    }:
         compare_kind = "surface"
     elif lemma_oracle_used:
         compare_kind = "lemma"
@@ -297,7 +304,11 @@ class SQLiteDictionarySegmenter:
             self.db_paths = [Path(p) for p in db_paths]
         else:
             all_paths = _resolve_all_db_paths(self.lang_code)
-            self.db_paths = _filter_db_paths(all_paths, self.lang_code, list(sources or [])) if sources else all_paths
+            self.db_paths = (
+                _filter_db_paths(all_paths, self.lang_code, list(sources or []))
+                if sources
+                else all_paths
+            )
         if not self.db_paths:
             raise FileNotFoundError(f"No SQLite dictionary for language {self.lang_code!r}")
         self.include_custom_entries = include_custom_entries
@@ -399,7 +410,9 @@ class SQLiteDictionarySegmenter:
     def lookup_all(self, text: str, *, trace: bool = False) -> list[dict[str, Any]]:
         query_text = str(text or "").strip()
         if trace:
-            with trace_scope("lookup_all", label="Lookup All", text=query_text, lang=self.lang_code):
+            with trace_scope(
+                "lookup_all", label="Lookup All", text=query_text, lang=self.lang_code
+            ):
                 key = self._normalize_cached(query_text)
                 record_normalization(
                     raw_text=query_text,
@@ -419,7 +432,9 @@ class SQLiteDictionarySegmenter:
                     return cached
 
                 candidates = self._get_candidate_entries_for_key(key, trace=trace)
-                entries = self._materialize_candidates_for_lookup(candidates, query_text, query_key=key, trace=trace)
+                entries = self._materialize_candidates_for_lookup(
+                    candidates, query_text, query_key=key, trace=trace
+                )
                 self._lookup_cache[cache_key] = entries
                 record_segmenter_event(
                     "lookup_all_result",
@@ -434,11 +449,15 @@ class SQLiteDictionarySegmenter:
         if cached is not None:
             return cached
         candidates = self._get_candidate_entries_for_key(key, trace=False)
-        entries = self._materialize_candidates_for_lookup(candidates, query_text, query_key=key, trace=False)
+        entries = self._materialize_candidates_for_lookup(
+            candidates, query_text, query_key=key, trace=False
+        )
         self._lookup_cache[cache_key] = entries
         return entries
 
-    def _get_candidate_entries_for_key(self, normalized_key: str, *, trace: bool = False) -> list[dict[str, Any]]:
+    def _get_candidate_entries_for_key(
+        self, normalized_key: str, *, trace: bool = False
+    ) -> list[dict[str, Any]]:
         key = str(normalized_key or "").strip()
         if not key:
             return []
@@ -452,7 +471,9 @@ class SQLiteDictionarySegmenter:
         entry_id = str(entry.get("entry_id") or "").strip()
         source = str(entry.get("source") or "").strip().lower()
         storage_kind = str(entry.get("_storage_kind") or "").strip().lower()
-        storage_db_alias = str(entry.get("_storage_db_alias") or entry.get("_storage_db_path") or "").strip()
+        storage_db_alias = str(
+            entry.get("_storage_db_alias") or entry.get("_storage_db_path") or ""
+        ).strip()
         storage_row_id = int(entry.get("_storage_row_id") or 0)
         if storage_kind and storage_row_id:
             return ("storage", storage_kind, storage_db_alias, storage_row_id)
@@ -530,7 +551,7 @@ class SQLiteDictionarySegmenter:
                             marker = parsed[idx]
                             if isinstance(marker, dict) and marker.get("_source"):
                                 entry["_source"] = str(marker.get("_source") or "")
-                                parsed = parsed[:idx] + parsed[idx + 1:]
+                                parsed = parsed[:idx] + parsed[idx + 1 :]
                                 entry["glosses"] = json.dumps(parsed, ensure_ascii=False)
                                 break
                         entry["senses_full"] = parsed
@@ -559,7 +580,9 @@ class SQLiteDictionarySegmenter:
         return {
             "match_key": str(entry.get("match_key") or entry.get("_match_key") or "").strip(),
             "_storage_kind": str(entry.get("_storage_kind") or "").strip().lower(),
-            "_storage_db_alias": str(entry.get("_storage_db_alias") or entry.get("_storage_db_path") or "").strip(),
+            "_storage_db_alias": str(
+                entry.get("_storage_db_alias") or entry.get("_storage_db_path") or ""
+            ).strip(),
             "_storage_row_id": int(entry.get("_storage_row_id") or 0),
             "_match_kind": str(entry.get("_match_kind") or "").strip().lower(),
             "_form_row_id": int(entry.get("_form_row_id") or 0),
@@ -570,7 +593,9 @@ class SQLiteDictionarySegmenter:
             ],
         }
 
-    def _hydrate_candidate_entry(self, candidate: dict[str, Any], hydrated_row: dict[str, Any]) -> None:
+    def _hydrate_candidate_entry(
+        self, candidate: dict[str, Any], hydrated_row: dict[str, Any]
+    ) -> None:
         if not isinstance(candidate, dict) or not isinstance(hydrated_row, dict):
             return
         match_state = self._capture_candidate_match_state(candidate)
@@ -581,7 +606,9 @@ class SQLiteDictionarySegmenter:
         candidate.clear()
         candidate.update(refreshed)
 
-    def _ensure_candidates_hydrated(self, entries: Sequence[dict[str, Any]], *, trace: bool = False) -> None:
+    def _ensure_candidates_hydrated(
+        self, entries: Sequence[dict[str, Any]], *, trace: bool = False
+    ) -> None:
         missing: list[dict[str, Any]] = []
         seen_refs: set[tuple[str, str, int]] = set()
         for entry in list(entries or []):
@@ -620,7 +647,13 @@ class SQLiteDictionarySegmenter:
         query = str(query_text or "").strip()
         key = str(query_key or self._normalize_cached(query) or "").strip()
         if trace:
-            with trace_scope("materialize_candidates", label="Materialize Candidates", text=query, normalized_key=key, candidate_count=len(list(candidates or []))):
+            with trace_scope(
+                "materialize_candidates",
+                label="Materialize Candidates",
+                text=query,
+                normalized_key=key,
+                candidate_count=len(list(candidates or [])),
+            ):
                 self._ensure_candidates_hydrated(candidates, trace=trace)
                 entries: list[dict[str, Any]] = []
                 seen: set[tuple[Any, ...]] = set()
@@ -667,7 +700,9 @@ class SQLiteDictionarySegmenter:
         entry["_forms_data"] = forms_data
         return forms_data
 
-    def _get_language_form_index_texts(self, form_text: str, tags: Sequence[Any] | None = None) -> list[str]:
+    def _get_language_form_index_texts(
+        self, form_text: str, tags: Sequence[Any] | None = None
+    ) -> list[str]:
         text = str(form_text or "").strip()
         if not text:
             return []
@@ -683,7 +718,9 @@ class SQLiteDictionarySegmenter:
                         return [ch]
         return [text]
 
-    def _apply_language_form_rules(self, entry: dict[str, Any], form_text: str, tags: Sequence[Any] | None = None) -> None:
+    def _apply_language_form_rules(
+        self, entry: dict[str, Any], form_text: str, tags: Sequence[Any] | None = None
+    ) -> None:
         text = str(form_text or "").strip()
         if not text or not isinstance(entry, dict):
             return
@@ -761,31 +798,43 @@ class SQLiteDictionarySegmenter:
                     form_roman = str(form[2] or "").strip()
             elif isinstance(form, dict):
                 form_text = str(form.get("form") or form.get("text") or "").strip()
-                tags = [tag for tag in _split_morph_tags(form.get("tags") or form.get("label") or form.get("commentary")) if tag]
-                form_roman = str(form.get("romanization") or form.get("reading") or form.get("pronunciation") or "").strip()
+                tags = [
+                    tag
+                    for tag in _split_morph_tags(
+                        form.get("tags") or form.get("label") or form.get("commentary")
+                    )
+                    if tag
+                ]
+                form_roman = str(
+                    form.get("romanization")
+                    or form.get("reading")
+                    or form.get("pronunciation")
+                    or ""
+                ).strip()
             if not form_text:
                 continue
             self._apply_language_form_rules(entry, form_text, tags)
             index_texts = self._get_language_form_index_texts(form_text, tags)
             index_keys = [
                 key
-                for key in (
-                    self._normalize_cached(index_text)
-                    for index_text in index_texts
-                )
+                for key in (self._normalize_cached(index_text) for index_text in index_texts)
                 if key
             ]
-            forms_out.append({
-                "form_text": form_text,
-                "display_text": form_text,
-                "form_roman": form_roman,
-                "tags": tags,
-                "index_texts": index_texts,
-                "index_keys": index_keys,
-            })
+            forms_out.append(
+                {
+                    "form_text": form_text,
+                    "display_text": form_text,
+                    "form_roman": form_roman,
+                    "tags": tags,
+                    "index_texts": index_texts,
+                    "index_keys": index_keys,
+                }
+            )
         return forms_out
 
-    def _build_form_match_entry(self, entry: dict[str, Any], query_text: str, matching_forms: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    def _build_form_match_entry(
+        self, entry: dict[str, Any], query_text: str, matching_forms: Sequence[dict[str, Any]]
+    ) -> dict[str, Any]:
         surface = str(query_text or "").strip()
         clone = dict(entry)
         if not matching_forms:
@@ -821,7 +870,9 @@ class SQLiteDictionarySegmenter:
             elif surface:
                 register_surface(surface)
             if form_roman:
-                if (not best_form_roman) or ((has_eumhun or is_eumhun) and len(form_roman) > len(best_form_roman)):
+                if (not best_form_roman) or (
+                    (has_eumhun or is_eumhun) and len(form_roman) > len(best_form_roman)
+                ):
                     best_form_roman = form_roman
             if is_eumhun:
                 has_eumhun = True
@@ -887,8 +938,12 @@ class SQLiteDictionarySegmenter:
             return self._build_form_match_entry(entry, query, matching_forms)
         return None
 
-    def _prefetch_candidate_keys(self, normalized_keys: Sequence[str] | str, *, trace: bool = False) -> None:
-        source = [normalized_keys] if isinstance(normalized_keys, str) else list(normalized_keys or [])
+    def _prefetch_candidate_keys(
+        self, normalized_keys: Sequence[str] | str, *, trace: bool = False
+    ) -> None:
+        source = (
+            [normalized_keys] if isinstance(normalized_keys, str) else list(normalized_keys or [])
+        )
         keys = [str(key or "").strip() for key in source if str(key or "").strip()]
         if not keys:
             return
@@ -897,7 +952,9 @@ class SQLiteDictionarySegmenter:
         if not missing:
             return
         if trace:
-            with trace_scope("prefetch_candidate_keys", label="Prefetch Candidate Keys", key_count=len(missing)):
+            with trace_scope(
+                "prefetch_candidate_keys", label="Prefetch Candidate Keys", key_count=len(missing)
+            ):
                 record_segmenter_event(
                     "prefetch_candidate_keys",
                     {"lang": self.lang_code, "requested_keys": list(missing)},
@@ -926,7 +983,9 @@ class SQLiteDictionarySegmenter:
                     {
                         "lang": self.lang_code,
                         "requested_keys": list(missing),
-                        "result_counts": {key: len(self._candidate_cache.get(key) or []) for key in missing},
+                        "result_counts": {
+                            key: len(self._candidate_cache.get(key) or []) for key in missing
+                        },
                     },
                 )
                 return
@@ -959,9 +1018,13 @@ class SQLiteDictionarySegmenter:
                 keys.add(key)
         self._prefetch_candidate_keys(sorted(keys), trace=trace)
 
-    def _build_span_key_matrix(self, word: str, *, trace: bool = False) -> tuple[list[list[str]], list[str]]:
+    def _build_span_key_matrix(
+        self, word: str, *, trace: bool = False
+    ) -> tuple[list[list[str]], list[str]]:
         if trace:
-            with trace_scope("build_span_key_matrix", label="Build Span Key Matrix", word=word, length=len(word)):
+            with trace_scope(
+                "build_span_key_matrix", label="Build Span Key Matrix", word=word, length=len(word)
+            ):
                 n = len(word)
                 span_keys: list[list[str]] = [[""] * (n + 1) for _ in range(n)]
                 unique_keys: set[str] = set()
@@ -974,7 +1037,14 @@ class SQLiteDictionarySegmenter:
                         if key:
                             unique_keys.add(key)
                         if len(span_pairs) < 600:
-                            span_pairs.append({"text": raw_piece, "normalized_key": key, "start": start, "end": end})
+                            span_pairs.append(
+                                {
+                                    "text": raw_piece,
+                                    "normalized_key": key,
+                                    "start": start,
+                                    "end": end,
+                                }
+                            )
                 record_segmenter_event(
                     "span_key_matrix",
                     {
@@ -1019,7 +1089,9 @@ class SQLiteDictionarySegmenter:
         xpos: str = "",
         debug: bool = False,
     ) -> dict[str, Any]:
-        return self.build_surface_lemma_aware_lookup(surface, lemma, upos=upos, xpos=xpos, debug=debug)
+        return self.build_surface_lemma_aware_lookup(
+            surface, lemma, upos=upos, xpos=xpos, debug=debug
+        )
 
     def build_surface_lemma_aware_lookup(
         self,
@@ -1041,7 +1113,9 @@ class SQLiteDictionarySegmenter:
             if lemma_oracle_used
             else {"entries": [], "matches": []}
         )
-        exact_preferred_entries = exact_match_info["entries"][:] if exact_match_info["entries"] else exact_entries[:]
+        exact_preferred_entries = (
+            exact_match_info["entries"][:] if exact_match_info["entries"] else exact_entries[:]
+        )
 
         def _attach_resolution_compat(
             payload: dict[str, Any],
@@ -1081,13 +1155,19 @@ class SQLiteDictionarySegmenter:
                     fallback_xpos=xpos,
                 )
                 exact_outcome = "exact_kept_with_lemma_promotion"
-                exact_fill_mode = str((exact_fill or {}).get("mode") or "exact_lemma_promoted").strip().lower()
+                exact_fill_mode = (
+                    str((exact_fill or {}).get("mode") or "exact_lemma_promoted").strip().lower()
+                )
                 resolution_meta = _build_resolution_meta(
                     "exact_lemma_match",
                     "surface_exact_lemma_match",
                     [
-                        _resolution_route_step("surface_exact_lookup", "surface exact lookup matched"),
-                        _resolution_route_step("lemma_check", "lemma check found an underlying lemma match"),
+                        _resolution_route_step(
+                            "surface_exact_lookup", "surface exact lookup matched"
+                        ),
+                        _resolution_route_step(
+                            "lemma_check", "lemma check found an underlying lemma match"
+                        ),
                     ],
                     "surface",
                     exact_fill_mode,
@@ -1100,7 +1180,9 @@ class SQLiteDictionarySegmenter:
                 ]
                 if lemma_oracle_used:
                     exact_route_steps.append(
-                        _resolution_route_step("lemma_check", "lemma check kept the surface exact result")
+                        _resolution_route_step(
+                            "lemma_check", "lemma check kept the surface exact result"
+                        )
                     )
                 resolution_meta = _build_resolution_meta(
                     "exact_match",
@@ -1148,17 +1230,35 @@ class SQLiteDictionarySegmenter:
                         "lemma_partial_override",
                         "surface_no_match_then_partial_lemma_exact_then_gap_greedy",
                         [
-                            _resolution_route_step("surface_exact_lookup", "surface exact lookup missed"),
-                            _resolution_route_step("lemma_exact_parts", "exact lemma parts were aligned onto the surface"),
+                            _resolution_route_step(
+                                "surface_exact_lookup", "surface exact lookup missed"
+                            ),
+                            _resolution_route_step(
+                                "lemma_exact_parts",
+                                "exact lemma parts were aligned onto the surface",
+                            ),
                             _resolution_route_step(
                                 "lemma_gap_greedy",
-                                "greedy DP filled the remaining uncovered spans" if partial_gap_count > 0 else "no uncovered spans remained after exact lemma-part alignment",
+                                "greedy DP filled the remaining uncovered spans"
+                                if partial_gap_count > 0
+                                else "no uncovered spans remained after exact lemma-part alignment",
                             ),
                         ],
                         "lemma_partial_override",
-                        str((aligned.get("fill") or {}).get("mode") or "lemma_partial_greedy").strip().lower(),
+                        str((aligned.get("fill") or {}).get("mode") or "lemma_partial_greedy")
+                        .strip()
+                        .lower(),
                         True,
-                        str(aligned.get("lemma_oracle_outcome") or ("lemma_partial_exact_gaps" if partial_gap_count > 0 else "lemma_partial_exact_only")).strip().lower(),
+                        str(
+                            aligned.get("lemma_oracle_outcome")
+                            or (
+                                "lemma_partial_exact_gaps"
+                                if partial_gap_count > 0
+                                else "lemma_partial_exact_only"
+                            )
+                        )
+                        .strip()
+                        .lower(),
                         {
                             "partial_exact_lemma_count": partial_exact_count,
                             "partial_missing_lemma_count": partial_missing_count,
@@ -1170,19 +1270,31 @@ class SQLiteDictionarySegmenter:
                         "lemma_override",
                         "surface_no_match_then_lemma_exact_parts",
                         [
-                            _resolution_route_step("surface_exact_lookup", "surface exact lookup missed"),
-                            _resolution_route_step("lemma_exact_parts", "all lemma parts resolved by exact lookup"),
-                            _resolution_route_step("lemma_override", "lemma exact-part alignment selected"),
+                            _resolution_route_step(
+                                "surface_exact_lookup", "surface exact lookup missed"
+                            ),
+                            _resolution_route_step(
+                                "lemma_exact_parts", "all lemma parts resolved by exact lookup"
+                            ),
+                            _resolution_route_step(
+                                "lemma_override", "lemma exact-part alignment selected"
+                            ),
                         ],
                         "lemma_override",
-                        str((aligned.get("fill") or {}).get("mode") or "lemma_override").strip().lower(),
+                        str((aligned.get("fill") or {}).get("mode") or "lemma_override")
+                        .strip()
+                        .lower(),
                         True,
                         "lemma_override_exact_parts",
                     )
                 return _attach_resolution_compat(
                     aligned,
-                    aligned.get("resolution_meta") if isinstance(aligned.get("resolution_meta"), dict) else None,
-                    (aligned.get("fill") or {}).get("fills") if isinstance(aligned.get("fill"), dict) else None,
+                    aligned.get("resolution_meta")
+                    if isinstance(aligned.get("resolution_meta"), dict)
+                    else None,
+                    (aligned.get("fill") or {}).get("fills")
+                    if isinstance(aligned.get("fill"), dict)
+                    else None,
                     int(aligned.get("exact_lemma_match_count") or 0),
                     partial_gap_count=partial_gap_count,
                     partial_exact_lemma_count=partial_exact_count,
@@ -1195,26 +1307,36 @@ class SQLiteDictionarySegmenter:
         fill = self.fill_token(surface, fill_opts)
 
         if fill and fill.get("has_known"):
-            promoted = self._collect_promoted_fill_entries(fill) if fill.get("has_lemma_promotion") else []
+            promoted = (
+                self._collect_promoted_fill_entries(fill) if fill.get("has_lemma_promotion") else []
+            )
             all_entries = promoted if promoted else self._collect_fill_entries(fill)
             if all_entries:
                 fill_mode = str((fill or {}).get("mode") or "greedy").strip().lower()
                 resolution_category = "greedy_lemma_match" if promoted else "greedy_segmentation"
-                resolution_route_code = "surface_greedy_lemma_match" if promoted else "surface_greedy"
+                resolution_route_code = (
+                    "surface_greedy_lemma_match" if promoted else "surface_greedy"
+                )
                 resolution_route_steps = [
                     _resolution_route_step("surface_exact_lookup", "surface exact lookup missed")
                 ]
                 if promoted:
                     resolution_route_steps.append(
-                        _resolution_route_step("lemma_greedy", "lemma-aware greedy DP selected lemma-linked pieces")
+                        _resolution_route_step(
+                            "lemma_greedy", "lemma-aware greedy DP selected lemma-linked pieces"
+                        )
                     )
                 elif lemma_oracle_used:
                     resolution_route_steps.append(
-                        _resolution_route_step("lemma_greedy", "lemma-aware greedy DP selected a surface path")
+                        _resolution_route_step(
+                            "lemma_greedy", "lemma-aware greedy DP selected a surface path"
+                        )
                     )
                 else:
                     resolution_route_steps.append(
-                        _resolution_route_step("surface_greedy", "surface greedy DP selected the final path")
+                        _resolution_route_step(
+                            "surface_greedy", "surface greedy DP selected the final path"
+                        )
                     )
                 lemma_outcome = (
                     "lemma_promoted"
@@ -1236,7 +1358,9 @@ class SQLiteDictionarySegmenter:
                         "fill": fill,
                         "all_entries": all_entries[:],
                         "preferred_entries": all_entries[:],
-                        "dict_head": str(all_entries[0].get("headword") or surface) if promoted else surface,
+                        "dict_head": str(all_entries[0].get("headword") or surface)
+                        if promoted
+                        else surface,
                         "resolved_via": "lemma_promoted" if promoted else "surface",
                         "lemma_hint_data": hint_data,
                         "lemma_oracle_used": lemma_oracle_used,
@@ -1255,7 +1379,9 @@ class SQLiteDictionarySegmenter:
                 _resolution_route_step("surface_exact_lookup", "surface exact lookup missed"),
                 _resolution_route_step(
                     "lemma_greedy" if lemma_oracle_used else "surface_greedy",
-                    "lemma-aware greedy DP found no known dictionary path" if lemma_oracle_used else "surface greedy DP found no known dictionary path",
+                    "lemma-aware greedy DP found no known dictionary path"
+                    if lemma_oracle_used
+                    else "surface greedy DP found no known dictionary path",
                 ),
             ],
             "surface",
@@ -1306,12 +1432,16 @@ class SQLiteDictionarySegmenter:
         )
 
         lemma_text = self._lemma_to_text_for_override(lemma)
-        if not lemma_text or self._normalize_visible_comparison_text(lemma_text) == self._normalize_visible_comparison_text(surface):
+        if not lemma_text or self._normalize_visible_comparison_text(
+            lemma_text
+        ) == self._normalize_visible_comparison_text(surface):
             if surface_result is not None:
                 surface_result["resolved_via"] = "surface"
             return surface_result
 
-        lemma_result = self._resolve_lemma_override(surface, lemma_text, upos=upos, xpos=xpos, debug=debug)
+        lemma_result = self._resolve_lemma_override(
+            surface, lemma_text, upos=upos, xpos=xpos, debug=debug
+        )
         if lemma_result is None:
             if surface_result is not None:
                 surface_result["resolved_via"] = "surface"
@@ -1400,8 +1530,14 @@ class SQLiteDictionarySegmenter:
     # DP segmenter port
     # ------------------------------------------------------------------
 
-    def fill_token(self, word: str, allow_exact_or_opts: bool | dict[str, Any] = True, exclude_whole: bool = False,
-                   upos: str = "", debug: bool = False) -> dict[str, Any]:
+    def fill_token(
+        self,
+        word: str,
+        allow_exact_or_opts: bool | dict[str, Any] = True,
+        exclude_whole: bool = False,
+        upos: str = "",
+        debug: bool = False,
+    ) -> dict[str, Any]:
         if isinstance(allow_exact_or_opts, dict):
             opts = dict(allow_exact_or_opts)
         else:
@@ -1481,7 +1617,9 @@ class SQLiteDictionarySegmenter:
                         break
                 if promoted_lemma:
                     exact_fill["_lemma_promoted"] = promoted_lemma
-                    exact_fill["_lemma_promoted_headword"] = str(exact_entries[0].get("headword") or "")
+                    exact_fill["_lemma_promoted_headword"] = str(
+                        exact_entries[0].get("headword") or ""
+                    )
                     if promoted_meta and promoted_meta.get("upos"):
                         exact_fill["_lemma_upos_hint"] = str(promoted_meta.get("upos") or "")
                     if promoted_meta and promoted_meta.get("xpos"):
@@ -1495,7 +1633,7 @@ class SQLiteDictionarySegmenter:
                 }
 
         n = len(word)
-        inf = 10 ** 9
+        inf = 10**9
         dp_unknown = [inf] * (n + 1)
         dp_pieces = [inf] * (n + 1)
         dp_promoted = [0] * (n + 1)
@@ -1547,7 +1685,11 @@ class SQLiteDictionarySegmenter:
             hint_texts = self._get_lemma_hint_texts(raw_hint, engine_lang)
             if not hint_texts:
                 continue
-            lemma_key = self._normalize_cached(hint) or self._normalize_cached(hint_texts[0]) or hint_texts[0]
+            lemma_key = (
+                self._normalize_cached(hint)
+                or self._normalize_cached(hint_texts[0])
+                or hint_texts[0]
+            )
             if not lemma_key:
                 continue
             has_lemma_promotion = True
@@ -1580,7 +1722,9 @@ class SQLiteDictionarySegmenter:
             for entry in tagged_entries:
                 entry.pop(lp_tag, None)
 
-        def filter_entries_for_lemma_reuse(entries: Sequence[dict[str, Any]], used_lemma_keys: dict[str, bool] | None) -> list[dict[str, Any]]:
+        def filter_entries_for_lemma_reuse(
+            entries: Sequence[dict[str, Any]], used_lemma_keys: dict[str, bool] | None
+        ) -> list[dict[str, Any]]:
             if not entries:
                 return []
             if not used_lemma_keys:
@@ -1597,7 +1741,9 @@ class SQLiteDictionarySegmenter:
                         break
             return out
 
-        def check_candidates_for_promotion(entries: Sequence[dict[str, Any]], used_lemma_keys: dict[str, bool] | None) -> LemmaPromotion | None:
+        def check_candidates_for_promotion(
+            entries: Sequence[dict[str, Any]], used_lemma_keys: dict[str, bool] | None
+        ) -> LemmaPromotion | None:
             if not has_lemma_promotion or not entries:
                 return None
             for idx, entry in enumerate(entries):
@@ -1618,7 +1764,9 @@ class SQLiteDictionarySegmenter:
                     )
             return None
 
-        def build_boundary_data(raw_boundaries: Sequence[int] | None) -> tuple[list[int] | None, set[int] | None]:
+        def build_boundary_data(
+            raw_boundaries: Sequence[int] | None,
+        ) -> tuple[list[int] | None, set[int] | None]:
             if raw_boundaries is None:
                 return None, None
             values = [0, n]
@@ -1636,8 +1784,18 @@ class SQLiteDictionarySegmenter:
 
         boundary_list, boundary_set = build_boundary_data(boundaries)
 
-        def is_better(c_promoted_here: int, c_promoted: int, c_unknown: int, c_pieces: int, c_span_len: int,
-                      b_promoted_here: int, b_promoted: int, b_unknown: int, b_pieces: int, b_span_len: int) -> bool:
+        def is_better(
+            c_promoted_here: int,
+            c_promoted: int,
+            c_unknown: int,
+            c_pieces: int,
+            c_span_len: int,
+            b_promoted_here: int,
+            b_promoted: int,
+            b_unknown: int,
+            b_pieces: int,
+            b_span_len: int,
+        ) -> bool:
             if bool(c_promoted_here) != bool(b_promoted_here):
                 return bool(c_promoted_here)
             if c_promoted_here and b_promoted_here and c_span_len != b_span_len:
@@ -1687,17 +1845,23 @@ class SQLiteDictionarySegmenter:
                 "lemma_promotion": None,
                 "used_lemma_keys": None,
             }
-            step_trace = {
-                "index": i,
-                "accepted": [],
-                "rejected": [],
-                "unknown_fallback": None,
-                "selected": None,
-            } if debug else None
+            step_trace = (
+                {
+                    "index": i,
+                    "accepted": [],
+                    "rejected": [],
+                    "unknown_fallback": None,
+                    "selected": None,
+                }
+                if debug
+                else None
+            )
 
             for end in range(i + 1, n + 1):
                 piece = word[i:end]
-                piece_key = span_keys[i][end] if i < len(span_keys) and end < len(span_keys[i]) else ""
+                piece_key = (
+                    span_keys[i][end] if i < len(span_keys) and end < len(span_keys[i]) else ""
+                )
                 if exclude_whole and n > 1 and i == 0 and end == n:
                     continue
                 if dp_unknown[end] >= inf:
@@ -1706,14 +1870,16 @@ class SQLiteDictionarySegmenter:
                     continue
                 if crosses_restricted_boundary(i, end):
                     if step_trace is not None:
-                        step_trace["rejected"].append({
-                            "kind": "known",
-                            "start": i,
-                            "end": end,
-                            "piece": piece,
-                            "reason": "crosses_lemma_boundary",
-                            "detail": "boundary_cross",
-                        })
+                        step_trace["rejected"].append(
+                            {
+                                "kind": "known",
+                                "start": i,
+                                "end": end,
+                                "piece": piece,
+                                "reason": "crosses_lemma_boundary",
+                                "detail": "boundary_cross",
+                            }
+                        )
                     continue
 
                 cached_entries = list(self._candidate_cache.get(piece_key) or [])
@@ -1723,14 +1889,16 @@ class SQLiteDictionarySegmenter:
                 available_entries = filter_entries_for_lemma_reuse(cached_entries, used_lemma_keys)
                 if not available_entries:
                     if step_trace is not None:
-                        step_trace["rejected"].append({
-                            "kind": "known",
-                            "start": i,
-                            "end": end,
-                            "piece": piece,
-                            "reason": "lemma_already_consumed",
-                            "lemma_keys": sorted((used_lemma_keys or {}).keys()),
-                        })
+                        step_trace["rejected"].append(
+                            {
+                                "kind": "known",
+                                "start": i,
+                                "end": end,
+                                "piece": piece,
+                                "reason": "lemma_already_consumed",
+                                "lemma_keys": sorted((used_lemma_keys or {}).keys()),
+                            }
+                        )
                     continue
 
                 c_unknown = dp_unknown[end]
@@ -1745,21 +1913,25 @@ class SQLiteDictionarySegmenter:
                     next_used_lemma_keys[promotion.lemma_key] = True
 
                 if step_trace is not None:
-                    step_trace["accepted"].append({
-                        "kind": "known",
-                        "start": i,
-                        "end": end,
-                        "piece": piece,
-                        "entry_count": len(available_entries),
-                        "score_promoted_here": promoted_here,
-                        "score_unknown": c_unknown,
-                        "score_pieces": c_pieces,
-                        "score_promoted": c_promoted,
-                        "lemma_promoted": promotion.lemma if promotion else None,
-                        "lemma_promoted_headword": str(promotion.entry.get("headword") or "") if promotion else None,
-                        "lemma_promoted_upos": promotion.upos if promotion else "",
-                        "lemma_promoted_xpos": promotion.xpos if promotion else "",
-                    })
+                    step_trace["accepted"].append(
+                        {
+                            "kind": "known",
+                            "start": i,
+                            "end": end,
+                            "piece": piece,
+                            "entry_count": len(available_entries),
+                            "score_promoted_here": promoted_here,
+                            "score_unknown": c_unknown,
+                            "score_pieces": c_pieces,
+                            "score_promoted": c_promoted,
+                            "lemma_promoted": promotion.lemma if promotion else None,
+                            "lemma_promoted_headword": str(promotion.entry.get("headword") or "")
+                            if promotion
+                            else None,
+                            "lemma_promoted_upos": promotion.upos if promotion else "",
+                            "lemma_promoted_xpos": promotion.xpos if promotion else "",
+                        }
+                    )
 
                 if is_better(
                     promoted_here,
@@ -1773,20 +1945,22 @@ class SQLiteDictionarySegmenter:
                     best_state["pieces"],
                     best_state["span_len"],
                 ):
-                    best_state.update({
-                        "promoted_here": promoted_here,
-                        "promoted": c_promoted,
-                        "unknown": c_unknown,
-                        "pieces": c_pieces,
-                        "end": end,
-                        "entries": available_entries,
-                        "lookup_key": piece_key,
-                        "kind": "known",
-                        "span_len": span_len,
-                        "xpos_hint": "",
-                        "lemma_promotion": promotion,
-                        "used_lemma_keys": next_used_lemma_keys,
-                    })
+                    best_state.update(
+                        {
+                            "promoted_here": promoted_here,
+                            "promoted": c_promoted,
+                            "unknown": c_unknown,
+                            "pieces": c_pieces,
+                            "end": end,
+                            "entries": available_entries,
+                            "lookup_key": piece_key,
+                            "kind": "known",
+                            "span_len": span_len,
+                            "xpos_hint": "",
+                            "lemma_promotion": promotion,
+                            "used_lemma_keys": next_used_lemma_keys,
+                        }
+                    )
 
             unknown_end = i + 1
             if unknown_end <= n and dp_unknown[unknown_end] < inf:
@@ -1794,16 +1968,20 @@ class SQLiteDictionarySegmenter:
                 u_unknown = unknown_span + dp_unknown[unknown_end]
                 u_pieces = 1 + dp_pieces[unknown_end]
                 u_promoted = dp_promoted[unknown_end]
-                unknown_trace = {
-                    "kind": "unknown",
-                    "start": i,
-                    "end": unknown_end,
-                    "piece": word[i:unknown_end],
-                    "score_promoted_here": 0,
-                    "score_unknown": u_unknown,
-                    "score_pieces": u_pieces,
-                    "score_promoted": u_promoted,
-                } if debug else None
+                unknown_trace = (
+                    {
+                        "kind": "unknown",
+                        "start": i,
+                        "end": unknown_end,
+                        "piece": word[i:unknown_end],
+                        "score_promoted_here": 0,
+                        "score_unknown": u_unknown,
+                        "score_pieces": u_pieces,
+                        "score_promoted": u_promoted,
+                    }
+                    if debug
+                    else None
+                )
                 if step_trace is not None:
                     step_trace["unknown_fallback"] = unknown_trace
                 if is_better(
@@ -1818,20 +1996,22 @@ class SQLiteDictionarySegmenter:
                     best_state["pieces"],
                     best_state["span_len"],
                 ):
-                    best_state.update({
-                        "promoted_here": 0,
-                        "promoted": u_promoted,
-                        "unknown": u_unknown,
-                        "pieces": u_pieces,
-                        "end": unknown_end,
-                        "entries": None,
-                        "lookup_key": "",
-                        "kind": "unknown",
-                        "span_len": unknown_span,
-                        "xpos_hint": "",
-                        "lemma_promotion": None,
-                        "used_lemma_keys": dp_used_lemma_keys[unknown_end],
-                    })
+                    best_state.update(
+                        {
+                            "promoted_here": 0,
+                            "promoted": u_promoted,
+                            "unknown": u_unknown,
+                            "pieces": u_pieces,
+                            "end": unknown_end,
+                            "entries": None,
+                            "lookup_key": "",
+                            "kind": "unknown",
+                            "span_len": unknown_span,
+                            "xpos_hint": "",
+                            "lemma_promotion": None,
+                            "used_lemma_keys": dp_used_lemma_keys[unknown_end],
+                        }
+                    )
 
             if best_state["end"] >= 0 and best_state["kind"]:
                 dp_unknown[i] = best_state["unknown"]
@@ -1851,7 +2031,7 @@ class SQLiteDictionarySegmenter:
                         "kind": best_state["kind"],
                         "start": i,
                         "end": best_state["end"],
-                        "piece": word[i:best_state["end"]],
+                        "piece": word[i : best_state["end"]],
                         "score_promoted_here": best_state["promoted_here"],
                         "score_unknown": best_state["unknown"],
                         "score_pieces": best_state["pieces"],
@@ -1859,7 +2039,9 @@ class SQLiteDictionarySegmenter:
                     }
                     if best_state["lemma_promotion"] is not None:
                         selected["lemma_promoted"] = best_state["lemma_promotion"].lemma
-                        selected["lemma_promoted_headword"] = str(best_state["lemma_promotion"].entry.get("headword") or "")
+                        selected["lemma_promoted_headword"] = str(
+                            best_state["lemma_promotion"].entry.get("headword") or ""
+                        )
                     step_trace["selected"] = selected
                     trace_steps[i] = step_trace
 
@@ -1872,14 +2054,16 @@ class SQLiteDictionarySegmenter:
                 cleanup_lp_tags()
                 fallback = {
                     "mode": "greedy",
-                    "fills": [{
-                        "text": word,
-                        "head": word,
-                        "roman": "",
-                        "senses": [],
-                        "pos": "",
-                        "source": "UNKNOWN",
-                    }],
+                    "fills": [
+                        {
+                            "text": word,
+                            "head": word,
+                            "roman": "",
+                            "senses": [],
+                            "pos": "",
+                            "source": "UNKNOWN",
+                        }
+                    ],
                     "has_known": False,
                     "has_unknown": True,
                     "has_lemma_promotion": False,
@@ -1893,7 +2077,7 @@ class SQLiteDictionarySegmenter:
                     }
                 return fallback
 
-            seg_text = word[idx:step["end"]]
+            seg_text = word[idx : step["end"]]
             if step["kind"] == "known" and step["entries"]:
                 lookup_key = str(step.get("lookup_key") or "").strip()
                 resolved_entries = self._materialize_candidates_for_lookup(
@@ -1903,14 +2087,16 @@ class SQLiteDictionarySegmenter:
                     trace=debug,
                 )
                 if not resolved_entries:
-                    fills.append({
-                        "text": seg_text,
-                        "head": seg_text,
-                        "roman": "",
-                        "senses": [],
-                        "pos": "",
-                        "source": "UNKNOWN",
-                    })
+                    fills.append(
+                        {
+                            "text": seg_text,
+                            "head": seg_text,
+                            "roman": "",
+                            "senses": [],
+                            "pos": "",
+                            "source": "UNKNOWN",
+                        }
+                    )
                     idx = step["end"]
                     continue
                 fill = self._entry_to_fill(resolved_entries[0], seg_text)
@@ -1922,21 +2108,25 @@ class SQLiteDictionarySegmenter:
                     has_any_promotion = True
                     fill["_lemma_promoted"] = promotion.lemma
                     fill["_lemma_promoted_headword"] = str(promotion.entry.get("headword") or "")
-                    fill["_lemma_promoted_pos"] = str(promotion.entry.get("pos_raw") or promotion.entry.get("pos") or "")
+                    fill["_lemma_promoted_pos"] = str(
+                        promotion.entry.get("pos_raw") or promotion.entry.get("pos") or ""
+                    )
                     if promotion.upos:
                         fill["_lemma_upos_hint"] = promotion.upos
                     if promotion.xpos:
                         fill["_lemma_xpos_hint"] = promotion.xpos
                 fills.append(fill)
             else:
-                fills.append({
-                    "text": seg_text,
-                    "head": seg_text,
-                    "roman": "",
-                    "senses": [],
-                    "pos": "",
-                    "source": "UNKNOWN",
-                })
+                fills.append(
+                    {
+                        "text": seg_text,
+                        "head": seg_text,
+                        "roman": "",
+                        "senses": [],
+                        "pos": "",
+                        "source": "UNKNOWN",
+                    }
+                )
             idx = step["end"]
 
         has_known = any(f.get("source") != "UNKNOWN" for f in fills)
@@ -1978,7 +2168,10 @@ class SQLiteDictionarySegmenter:
             return None
         if state["exact_part_count"] <= 0:
             return None
-        if state["exact_part_count"] < state["total_part_count"] and not _ENABLE_PARTIAL_EXACT_LEMMA_GAP_FILL:
+        if (
+            state["exact_part_count"] < state["total_part_count"]
+            and not _ENABLE_PARTIAL_EXACT_LEMMA_GAP_FILL
+        ):
             return None
 
         fill_rows: list[dict[str, Any]] = []
@@ -2010,13 +2203,16 @@ class SQLiteDictionarySegmenter:
                 if part["exact"] and part["entries"]:
                     exact_part_ids.append(pid)
                 else:
-                    gap_hint_objects.append(self._clone_lemma_hint_object(
-                        part.get("hint_object") or {
-                            "text": part.get("text"),
-                            "upos": part.get("upos"),
-                            "xpos": part.get("xpos"),
-                        }
-                    ))
+                    gap_hint_objects.append(
+                        self._clone_lemma_hint_object(
+                            part.get("hint_object")
+                            or {
+                                "text": part.get("text"),
+                                "upos": part.get("upos"),
+                                "xpos": part.get("xpos"),
+                            }
+                        )
+                    )
 
             if exact_part_ids:
                 exact_parts = [state["parts"][part_id] for part_id in exact_part_ids]
@@ -2030,12 +2226,23 @@ class SQLiteDictionarySegmenter:
                     part_entries = list(exact_part.get("entries") or [])
                     if not part_entries:
                         continue
-                    span_meta = exact_spans[local_idx] if local_idx < len(exact_spans) else {"start": start, "end": end, "text": surface_slice}
-                    piece_text = str(span_meta.get("text") or exact_part.get("text") or surface_slice or "")
+                    span_meta = (
+                        exact_spans[local_idx]
+                        if local_idx < len(exact_spans)
+                        else {"start": start, "end": end, "text": surface_slice}
+                    )
+                    piece_text = str(
+                        span_meta.get("text") or exact_part.get("text") or surface_slice or ""
+                    )
                     piece_start = int(span_meta.get("start") or start)
                     piece_end = int(span_meta.get("end") or end)
-                    best = self._choose_entry(piece_text or exact_part["text"], part_entries) or part_entries[0]
-                    fill_row = self._build_fill_piece_from_entry(piece_text or surface_slice, best, part_entries)
+                    best = (
+                        self._choose_entry(piece_text or exact_part["text"], part_entries)
+                        or part_entries[0]
+                    )
+                    fill_row = self._build_fill_piece_from_entry(
+                        piece_text or surface_slice, best, part_entries
+                    )
                     if exact_part.get("text"):
                         fill_row["head"] = exact_part["text"]
                     fill_row["_lemma_override"] = exact_part["text"]
@@ -2049,13 +2256,15 @@ class SQLiteDictionarySegmenter:
                         fill_row["_lemma_xpos_hint"] = exact_part["xpos"]
                     fill_rows.append(fill_row)
             elif surface_slice:
-                gap_segments.append({
-                    "start": start,
-                    "end": end,
-                    "text": surface_slice,
-                    "part_ids": part_ids[:],
-                    "hint_objects": gap_hint_objects[:],
-                })
+                gap_segments.append(
+                    {
+                        "start": start,
+                        "end": end,
+                        "text": surface_slice,
+                        "part_ids": part_ids[:],
+                        "hint_objects": gap_hint_objects[:],
+                    }
+                )
 
         if not fill_rows:
             return None
@@ -2072,37 +2281,45 @@ class SQLiteDictionarySegmenter:
             gap_rows_src = (
                 list(gap_fill.get("fills") or [])
                 if gap_fill and gap_fill.get("fills")
-                else [{
-                    "text": gap_text,
-                    "head": gap_text,
-                    "roman": "",
-                    "senses": [],
-                    "pos": "",
-                    "source": "UNKNOWN",
-                }]
+                else [
+                    {
+                        "text": gap_text,
+                        "head": gap_text,
+                        "roman": "",
+                        "senses": [],
+                        "pos": "",
+                        "source": "UNKNOWN",
+                    }
+                ]
             )
-            offset_rows = self._clone_fill_rows_with_surface_offsets(gap_rows_src, gap_text, int(gap["start"]))
+            offset_rows = self._clone_fill_rows_with_surface_offsets(
+                gap_rows_src, gap_text, int(gap["start"])
+            )
             if not offset_rows:
                 return None
             fill_rows.extend(offset_rows)
             if debug:
-                gap_debug.append({
-                    "start": int(gap["start"]),
-                    "end": int(gap["end"]),
-                    "text": gap_text,
-                    "part_ids": list(gap.get("part_ids") or []),
-                    "mode": str(gap_fill.get("mode") or "greedy") if gap_fill else "greedy",
-                    "has_known": bool(gap_fill.get("has_known")) if gap_fill else False,
-                    "has_unknown": bool(gap_fill.get("has_unknown")) if gap_fill else True,
-                    "fills": copy.deepcopy(gap_rows_src),
-                    "dp_debug": copy.deepcopy(gap_fill.get("dp_debug")) if gap_fill else None,
-                })
+                gap_debug.append(
+                    {
+                        "start": int(gap["start"]),
+                        "end": int(gap["end"]),
+                        "text": gap_text,
+                        "part_ids": list(gap.get("part_ids") or []),
+                        "mode": str(gap_fill.get("mode") or "greedy") if gap_fill else "greedy",
+                        "has_known": bool(gap_fill.get("has_known")) if gap_fill else False,
+                        "has_unknown": bool(gap_fill.get("has_unknown")) if gap_fill else True,
+                        "fills": copy.deepcopy(gap_rows_src),
+                        "dp_debug": copy.deepcopy(gap_fill.get("dp_debug")) if gap_fill else None,
+                    }
+                )
 
-        fill_rows.sort(key=lambda row: (
-            int(row.get("_surface_start", 0) or 0),
-            int(row.get("_surface_end", 0) or 0),
-            int(row.get("_lemma_part_index", 10 ** 9) or 10 ** 9),
-        ))
+        fill_rows.sort(
+            key=lambda row: (
+                int(row.get("_surface_start", 0) or 0),
+                int(row.get("_surface_end", 0) or 0),
+                int(row.get("_lemma_part_index", 10**9) or 10**9),
+            )
+        )
 
         is_partial = state["exact_part_count"] < state["total_part_count"]
         fill_mode = "lemma_partial_greedy" if is_partial else "lemma_override"
@@ -2161,7 +2378,9 @@ class SQLiteDictionarySegmenter:
         }
         if is_partial:
             result["partial_exact_lemma_count"] = state["exact_part_count"]
-            result["partial_missing_lemma_count"] = state["total_part_count"] - state["exact_part_count"]
+            result["partial_missing_lemma_count"] = (
+                state["total_part_count"] - state["exact_part_count"]
+            )
             result["partial_gap_count"] = len(gap_segments)
         return result
 
@@ -2245,7 +2464,9 @@ class SQLiteDictionarySegmenter:
         for variant in list(hint.get("variants") or []):
             push_text(variant)
         if not out and self._is_persian_language_code(self.lang_code):
-            for variant in self._split_persian_lemma_variants(str(hint.get("text") or hint.get("lemma") or "")):
+            for variant in self._split_persian_lemma_variants(
+                str(hint.get("text") or hint.get("lemma") or "")
+            ):
                 push_text(variant)
         if not out:
             push_text(hint.get("text") or hint.get("lemma") or "")
@@ -2260,7 +2481,9 @@ class SQLiteDictionarySegmenter:
         text = str(raw_hint or "").strip()
         return {"text": text} if text else {}
 
-    def _lemma_to_text_for_override(self, lemma: str | Sequence[str] | Sequence[dict[str, Any]] | None) -> str:
+    def _lemma_to_text_for_override(
+        self, lemma: str | Sequence[str] | Sequence[dict[str, Any]] | None
+    ) -> str:
         if lemma is None:
             return ""
         if isinstance(lemma, str):
@@ -2304,7 +2527,14 @@ class SQLiteDictionarySegmenter:
                 hint = {
                     "text": text,
                     "upos": str((upos_parts[idx] if has_split_upos else upos) or "").strip(),
-                    "xpos": str((xpos_parts[idx] if has_split_xpos else (xpos if allow_token_level_xpos_fallback else "")) or "").strip(),
+                    "xpos": str(
+                        (
+                            xpos_parts[idx]
+                            if has_split_xpos
+                            else (xpos if allow_token_level_xpos_fallback else "")
+                        )
+                        or ""
+                    ).strip(),
                 }
                 if self._is_persian_language_code(lang):
                     variants = self._split_persian_lemma_variants(text)
@@ -2318,7 +2548,8 @@ class SQLiteDictionarySegmenter:
         elif isinstance(lemma, str):
             lemma_value = lemma.strip()
             differs = bool(lemma_value) and (
-                self._normalize_visible_comparison_text(lemma_value) != self._normalize_visible_comparison_text(surface_value)
+                self._normalize_visible_comparison_text(lemma_value)
+                != self._normalize_visible_comparison_text(surface_value)
             )
             raw_parts = self._split_compound_lemma(lemma_value) if differs else []
             if differs and not raw_parts:
@@ -2345,9 +2576,19 @@ class SQLiteDictionarySegmenter:
                         continue
                     obj = self._clone_lemma_hint_object(item)
                     if not str(obj.get("upos") or "").strip():
-                        obj["upos"] = str((upos_parts[idx] if has_split_upos and idx < len(upos_parts) else upos) or "").strip()
+                        obj["upos"] = str(
+                            (upos_parts[idx] if has_split_upos and idx < len(upos_parts) else upos)
+                            or ""
+                        ).strip()
                     if not str(obj.get("xpos") or "").strip():
-                        obj["xpos"] = str((xpos_parts[idx] if has_split_xpos and idx < len(xpos_parts) else (xpos if allow_token_level_xpos_fallback else "")) or "").strip()
+                        obj["xpos"] = str(
+                            (
+                                xpos_parts[idx]
+                                if has_split_xpos and idx < len(xpos_parts)
+                                else (xpos if allow_token_level_xpos_fallback else "")
+                            )
+                            or ""
+                        ).strip()
                     if self._is_persian_language_code(lang) and not obj.get("variants"):
                         variants = self._split_persian_lemma_variants(text)
                         if variants:
@@ -2359,8 +2600,18 @@ class SQLiteDictionarySegmenter:
                         continue
                     hint = {
                         "text": text,
-                        "upos": str((upos_parts[idx] if has_split_upos and idx < len(upos_parts) else upos) or "").strip(),
-                        "xpos": str((xpos_parts[idx] if has_split_xpos and idx < len(xpos_parts) else (xpos if allow_token_level_xpos_fallback else "")) or "").strip(),
+                        "upos": str(
+                            (upos_parts[idx] if has_split_upos and idx < len(upos_parts) else upos)
+                            or ""
+                        ).strip(),
+                        "xpos": str(
+                            (
+                                xpos_parts[idx]
+                                if has_split_xpos and idx < len(xpos_parts)
+                                else (xpos if allow_token_level_xpos_fallback else "")
+                            )
+                            or ""
+                        ).strip(),
                     }
                     if self._is_persian_language_code(lang):
                         variants = self._split_persian_lemma_variants(text)
@@ -2368,12 +2619,20 @@ class SQLiteDictionarySegmenter:
                             hint["variants"] = variants[:]
                     parts.append(hint)
             hint_objects = parts
-            raw_parts = [str(obj.get("text") or obj.get("lemma") or "").strip() for obj in parts if str(obj.get("text") or obj.get("lemma") or "").strip()]
+            raw_parts = [
+                str(obj.get("text") or obj.get("lemma") or "").strip()
+                for obj in parts
+                if str(obj.get("text") or obj.get("lemma") or "").strip()
+            ]
             lemma_value = " + ".join(raw_parts)
 
         differs = bool(raw_parts) and (
             len(raw_parts) > 1
-            or any(self._normalize_visible_comparison_text(part) != self._normalize_visible_comparison_text(surface_value) for part in raw_parts)
+            or any(
+                self._normalize_visible_comparison_text(part)
+                != self._normalize_visible_comparison_text(surface_value)
+                for part in raw_parts
+            )
         )
         if not differs:
             raw_parts = []
@@ -2386,7 +2645,9 @@ class SQLiteDictionarySegmenter:
             "lemma_hint_objects": hint_objects,
         }
 
-    def _find_lemma_hint_match_for_entry(self, entry: dict[str, Any], lemma_hint_objects: Sequence[Any]) -> dict[str, Any] | None:
+    def _find_lemma_hint_match_for_entry(
+        self, entry: dict[str, Any], lemma_hint_objects: Sequence[Any]
+    ) -> dict[str, Any] | None:
         if not entry or not lemma_hint_objects:
             return None
         candidate_texts: list[str] = []
@@ -2411,26 +2672,38 @@ class SQLiteDictionarySegmenter:
                 candidate_keys.add(key)
 
         for raw_hint in lemma_hint_objects:
-            raw_hint_text = str((raw_hint.get("text") if isinstance(raw_hint, dict) else raw_hint) or "").strip()
+            raw_hint_text = str(
+                (raw_hint.get("text") if isinstance(raw_hint, dict) else raw_hint) or ""
+            ).strip()
             for hint_text in self._get_lemma_hint_candidate_texts(raw_hint):
                 if hint_text in seen_texts:
                     return {
                         "text": hint_text,
                         "source_text": raw_hint_text or hint_text,
-                        "upos": str(raw_hint.get("upos") or "") if isinstance(raw_hint, dict) else "",
-                        "xpos": str(raw_hint.get("xpos") or "") if isinstance(raw_hint, dict) else "",
+                        "upos": str(raw_hint.get("upos") or "")
+                        if isinstance(raw_hint, dict)
+                        else "",
+                        "xpos": str(raw_hint.get("xpos") or "")
+                        if isinstance(raw_hint, dict)
+                        else "",
                     }
                 hint_key = self._normalize_cached(hint_text)
                 if hint_key and hint_key in candidate_keys:
                     return {
                         "text": hint_text,
                         "source_text": raw_hint_text or hint_text,
-                        "upos": str(raw_hint.get("upos") or "") if isinstance(raw_hint, dict) else "",
-                        "xpos": str(raw_hint.get("xpos") or "") if isinstance(raw_hint, dict) else "",
+                        "upos": str(raw_hint.get("upos") or "")
+                        if isinstance(raw_hint, dict)
+                        else "",
+                        "xpos": str(raw_hint.get("xpos") or "")
+                        if isinstance(raw_hint, dict)
+                        else "",
                     }
         return None
 
-    def _collect_entries_matching_lemma_hints(self, entries: Sequence[dict[str, Any]], lemma_hint_objects: Sequence[Any]) -> dict[str, Any]:
+    def _collect_entries_matching_lemma_hints(
+        self, entries: Sequence[dict[str, Any]], lemma_hint_objects: Sequence[Any]
+    ) -> dict[str, Any]:
         matched_entries: list[dict[str, Any]] = []
         matches: list[dict[str, Any]] = []
         for entry in entries:
@@ -2511,7 +2784,9 @@ class SQLiteDictionarySegmenter:
             "hint_object": hint,
         }
 
-    def _build_lemma_hint_alignment_state(self, surface_text: str, lemma_hint_objects: Sequence[Any]) -> dict[str, Any] | None:
+    def _build_lemma_hint_alignment_state(
+        self, surface_text: str, lemma_hint_objects: Sequence[Any]
+    ) -> dict[str, Any] | None:
         surface = str(surface_text or "").strip()
         hints = list(lemma_hint_objects or [])
         if not surface or not hints:
@@ -2530,7 +2805,9 @@ class SQLiteDictionarySegmenter:
         if not parts:
             return None
 
-        alignment = self._build_generic_surface_part_alignment(surface, [part["text"] for part in parts])
+        alignment = self._build_generic_surface_part_alignment(
+            surface, [part["text"] for part in parts]
+        )
         if alignment is None or not alignment.get("groups"):
             return None
 
@@ -2557,7 +2834,7 @@ class SQLiteDictionarySegmenter:
             if missing_pid in present_part_ids:
                 continue
             best_group_index = -1
-            best_distance = 10 ** 9
+            best_distance = 10**9
             for gidx, group in enumerate(alignment_groups):
                 if not group["part_ids"]:
                     continue
@@ -2574,7 +2851,9 @@ class SQLiteDictionarySegmenter:
                         best_group_index = gidx
             if best_group_index >= 0:
                 alignment_groups[best_group_index]["part_ids"].append(missing_pid)
-                alignment_groups[best_group_index]["part_ids"] = sorted(set(alignment_groups[best_group_index]["part_ids"]))
+                alignment_groups[best_group_index]["part_ids"] = sorted(
+                    set(alignment_groups[best_group_index]["part_ids"])
+                )
                 present_part_ids.add(missing_pid)
 
         return {
@@ -2602,15 +2881,22 @@ class SQLiteDictionarySegmenter:
                 unit_to_char.append(index)
             offset_start = code_unit_offset
             code_unit_offset += len(ch)
-            chars.append({
-                "index": index,
-                "offset_start": offset_start,
-                "offset_end": code_unit_offset,
-                "char": ch,
-                "unit_start": start_unit,
-                "unit_end": len(units),
-            })
-        return {"chars": chars, "units": units, "unit_to_char": unit_to_char, "text_length": len(str(text or ""))}
+            chars.append(
+                {
+                    "index": index,
+                    "offset_start": offset_start,
+                    "offset_end": code_unit_offset,
+                    "char": ch,
+                    "unit_start": start_unit,
+                    "unit_end": len(units),
+                }
+            )
+        return {
+            "chars": chars,
+            "units": units,
+            "unit_to_char": unit_to_char,
+            "text_length": len(str(text or "")),
+        }
 
     def _build_groups_from_unit_part_ids(
         self,
@@ -2642,30 +2928,36 @@ class SQLiteDictionarySegmenter:
             if not same_as_prev and gi > 0:
                 prev_char = surface_map["chars"][gi - 1]
                 start_char = surface_map["chars"][group_start]
-                groups.append({
-                    "start": start_char["offset_start"],
-                    "end": prev_char["offset_end"],
-                    "part_ids": char_part_ids[gi - 1][:],
-                    "part_count": len(char_part_ids[gi - 1]),
-                    "unit_start": start_char["unit_start"],
-                    "unit_end": prev_char["unit_end"],
-                })
+                groups.append(
+                    {
+                        "start": start_char["offset_start"],
+                        "end": prev_char["offset_end"],
+                        "part_ids": char_part_ids[gi - 1][:],
+                        "part_count": len(char_part_ids[gi - 1]),
+                        "unit_start": start_char["unit_start"],
+                        "unit_end": prev_char["unit_end"],
+                    }
+                )
                 boundaries.append(prev_char["offset_end"])
                 group_start = gi
         if surface_map["chars"]:
             last_char = surface_map["chars"][-1]
             first_char = surface_map["chars"][group_start]
-            groups.append({
-                "start": first_char["offset_start"],
-                "end": last_char["offset_end"],
-                "part_ids": char_part_ids[-1][:] if char_part_ids else [],
-                "part_count": len(char_part_ids[-1]) if char_part_ids else 0,
-                "unit_start": first_char["unit_start"],
-                "unit_end": last_char["unit_end"],
-            })
+            groups.append(
+                {
+                    "start": first_char["offset_start"],
+                    "end": last_char["offset_end"],
+                    "part_ids": char_part_ids[-1][:] if char_part_ids else [],
+                    "part_count": len(char_part_ids[-1]) if char_part_ids else 0,
+                    "unit_start": first_char["unit_start"],
+                    "unit_end": last_char["unit_end"],
+                }
+            )
         return {"boundaries": boundaries, "groups": groups, "match_basis": match_basis}
 
-    def _build_proportional_alignment(self, surface_map: dict[str, Any], normalized_parts: Sequence[str]) -> dict[str, Any]:
+    def _build_proportional_alignment(
+        self, surface_map: dict[str, Any], normalized_parts: Sequence[str]
+    ) -> dict[str, Any]:
         total_lemma_len = sum(len(part) for part in normalized_parts)
         num_chars = len(surface_map["chars"])
         unit_part_ids = [-1] * len(surface_map["units"])
@@ -2689,9 +2981,13 @@ class SQLiteDictionarySegmenter:
         for unit_index, value in enumerate(unit_part_ids):
             if value < 0:
                 unit_part_ids[unit_index] = last_part
-        return self._build_groups_from_unit_part_ids(surface_map, unit_part_ids, normalized_parts, "proportional")
+        return self._build_groups_from_unit_part_ids(
+            surface_map, unit_part_ids, normalized_parts, "proportional"
+        )
 
-    def _build_generic_surface_part_alignment(self, surface: str, part_texts: Sequence[str]) -> dict[str, Any] | None:
+    def _build_generic_surface_part_alignment(
+        self, surface: str, part_texts: Sequence[str]
+    ) -> dict[str, Any] | None:
         surface_text = str(surface or "")
         if not surface_text:
             return None
@@ -2702,7 +2998,9 @@ class SQLiteDictionarySegmenter:
         if len(parts) == 1:
             return {
                 "boundaries": [],
-                "groups": [{"start": 0, "end": len(surface_text), "part_ids": [0], "part_count": 1}],
+                "groups": [
+                    {"start": 0, "end": len(surface_text), "part_ids": [0], "part_count": 1}
+                ],
                 "match_basis": "single",
             }
 
@@ -2713,7 +3011,9 @@ class SQLiteDictionarySegmenter:
             cursor = 0
             for idx, part in enumerate(parts):
                 next_cursor = cursor + len(part)
-                groups.append({"start": cursor, "end": next_cursor, "part_ids": [idx], "part_count": 1})
+                groups.append(
+                    {"start": cursor, "end": next_cursor, "part_ids": [idx], "part_count": 1}
+                )
                 cursor = next_cursor
                 if idx < len(parts) - 1:
                     boundaries.append(next_cursor)
@@ -2735,7 +3035,9 @@ class SQLiteDictionarySegmenter:
         l_len = len(lemma_units)
 
         if s_len == l_len and all(surface_units[i] == lemma_units[i] for i in range(s_len)):
-            return self._build_groups_from_unit_part_ids(surface_map, lemma_unit_part_id, parts, "codepoint")
+            return self._build_groups_from_unit_part_ids(
+                surface_map, lemma_unit_part_id, parts, "codepoint"
+            )
 
         match_score = 2
         mismatch_score = -1
@@ -2747,7 +3049,9 @@ class SQLiteDictionarySegmenter:
             score[0][j] = j * gap_score
         for i in range(1, s_len + 1):
             for j in range(1, l_len + 1):
-                diag = score[i - 1][j - 1] + (match_score if surface_units[i - 1] == lemma_units[j - 1] else mismatch_score)
+                diag = score[i - 1][j - 1] + (
+                    match_score if surface_units[i - 1] == lemma_units[j - 1] else mismatch_score
+                )
                 up = score[i - 1][j] + gap_score
                 left = score[i][j - 1] + gap_score
                 score[i][j] = max(diag, up, left)
@@ -2758,7 +3062,9 @@ class SQLiteDictionarySegmenter:
         match_count = 0
         while ti > 0 and tj > 0:
             current = score[ti][tj]
-            diag_val = score[ti - 1][tj - 1] + (match_score if surface_units[ti - 1] == lemma_units[tj - 1] else mismatch_score)
+            diag_val = score[ti - 1][tj - 1] + (
+                match_score if surface_units[ti - 1] == lemma_units[tj - 1] else mismatch_score
+            )
             if current == diag_val:
                 if surface_units[ti - 1] == lemma_units[tj - 1]:
                     surface_part_id[ti - 1] = lemma_unit_part_id[tj - 1]
@@ -2811,7 +3117,9 @@ class SQLiteDictionarySegmenter:
             while ui < len(unmatched_parts):
                 u_part = unmatched_parts[ui]
                 prev_matched = next((p for p in range(u_part - 1, -1, -1) if part_has_match[p]), -1)
-                next_matched = next((p for p in range(u_part + 1, len(parts)) if part_has_match[p]), -1)
+                next_matched = next(
+                    (p for p in range(u_part + 1, len(parts)) if part_has_match[p]), -1
+                )
                 if prev_matched >= 0 and next_matched >= 0:
                     region_start = part_max_unit[prev_matched] + 1
                     region_end = part_min_unit[next_matched]
@@ -2826,7 +3134,9 @@ class SQLiteDictionarySegmenter:
                     region_end = s_len
                 if region_start < region_end:
                     consecutive = [u_part]
-                    while ui + 1 < len(unmatched_parts) and unmatched_parts[ui + 1] < (next_matched if next_matched >= 0 else len(parts)):
+                    while ui + 1 < len(unmatched_parts) and unmatched_parts[ui + 1] < (
+                        next_matched if next_matched >= 0 else len(parts)
+                    ):
                         ui += 1
                         consecutive.append(unmatched_parts[ui])
                     total_len = sum(len(parts[p]) for p in consecutive)
@@ -2836,7 +3146,9 @@ class SQLiteDictionarySegmenter:
                         if idx == len(consecutive) - 1:
                             unit_count = region_end - r_cursor
                         else:
-                            unit_count = max(1, round((region_end - region_start) * share / (total_len or 1)))
+                            unit_count = max(
+                                1, round((region_end - region_start) * share / (total_len or 1))
+                            )
                         assign_end = min(r_cursor + unit_count, region_end)
                         for unit_index in range(r_cursor, assign_end):
                             final_part_id[unit_index] = pid
@@ -2877,7 +3189,9 @@ class SQLiteDictionarySegmenter:
                 fill["morph_base"] = lemma_head
         return fill
 
-    def _build_fill_piece_from_entry(self, surface_text: str, entry: dict[str, Any], all_entries: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    def _build_fill_piece_from_entry(
+        self, surface_text: str, entry: dict[str, Any], all_entries: Sequence[dict[str, Any]]
+    ) -> dict[str, Any]:
         surface = str(surface_text or "")
         lemma_head = str(entry.get("headword") or "")
         head = surface or lemma_head
@@ -2911,7 +3225,9 @@ class SQLiteDictionarySegmenter:
                 fill["morph_base"] = lemma_head
         return fill
 
-    def _build_fill_result(self, text: str, entries: Sequence[dict[str, Any]], mode: str) -> dict[str, Any]:
+    def _build_fill_result(
+        self, text: str, entries: Sequence[dict[str, Any]], mode: str
+    ) -> dict[str, Any]:
         best = entries[0]
         fill_entry = self._build_fill_piece_from_entry(text, best, list(entries))
         return {
@@ -2924,7 +3240,9 @@ class SQLiteDictionarySegmenter:
             },
         }
 
-    def _choose_entry(self, surface: str, entries: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
+    def _choose_entry(
+        self, surface: str, entries: Sequence[dict[str, Any]]
+    ) -> dict[str, Any] | None:
         if not entries:
             return None
         if not surface:
@@ -2963,7 +3281,9 @@ class SQLiteDictionarySegmenter:
     def _get_fill_piece_surface_text(self, row: dict[str, Any]) -> str:
         return str(row.get("text") or row.get("head") or "")
 
-    def _clone_fill_rows_with_surface_offsets(self, fills: Sequence[dict[str, Any]], expected_text: str, start_offset: int) -> list[dict[str, Any]] | None:
+    def _clone_fill_rows_with_surface_offsets(
+        self, fills: Sequence[dict[str, Any]], expected_text: str, start_offset: int
+    ) -> list[dict[str, Any]] | None:
         rows = list(fills or [])
         surface_text = str(expected_text or "")
         offset_base = int(start_offset or 0)
@@ -2973,7 +3293,7 @@ class SQLiteDictionarySegmenter:
             piece_text = self._get_fill_piece_surface_text(row)
             if not piece_text:
                 return None
-            if surface_text[cursor:cursor + len(piece_text)] != piece_text:
+            if surface_text[cursor : cursor + len(piece_text)] != piece_text:
                 return None
             clone = dict(row)
             clone["_surface_start"] = offset_base + cursor
@@ -2995,7 +3315,9 @@ class SQLiteDictionarySegmenter:
         if not surface or not parts:
             return []
 
-        def proportional_ranges(start: int, end: int, local_parts: Sequence[str], local_ids: Sequence[int]) -> dict[int, tuple[int, int]]:
+        def proportional_ranges(
+            start: int, end: int, local_parts: Sequence[str], local_ids: Sequence[int]
+        ) -> dict[int, tuple[int, int]]:
             width = max(0, int(end) - int(start))
             if not local_ids:
                 return {}
@@ -3020,7 +3342,10 @@ class SQLiteDictionarySegmenter:
         alignment = self._build_generic_surface_part_alignment(surface, parts)
         ranges: dict[int, tuple[int, int]] = {}
         if alignment and alignment.get("groups"):
-            for group in sorted(list(alignment.get("groups") or []), key=lambda row: (int(row.get("start") or 0), int(row.get("end") or 0))):
+            for group in sorted(
+                list(alignment.get("groups") or []),
+                key=lambda row: (int(row.get("start") or 0), int(row.get("end") or 0)),
+            ):
                 local_ids: list[int] = []
                 seen: set[int] = set()
                 for raw in list(group.get("part_ids") or []):
@@ -3039,7 +3364,9 @@ class SQLiteDictionarySegmenter:
                 group_end = int(group.get("end") or 0)
                 if group_end <= group_start:
                     continue
-                for local_id, local_range in proportional_ranges(group_start, group_end, parts, local_ids).items():
+                for local_id, local_range in proportional_ranges(
+                    group_start, group_end, parts, local_ids
+                ).items():
                     ranges[local_id] = local_range
 
         if len(ranges) != len(parts):
@@ -3050,13 +3377,14 @@ class SQLiteDictionarySegmenter:
             local_start, local_end = ranges.get(local_idx, (0, len(surface)))
             local_start = max(0, min(local_start, len(surface)))
             local_end = max(local_start, min(local_end, len(surface)))
-            out.append({
-                "start": int(start_offset) + local_start,
-                "end": int(start_offset) + local_end,
-                "text": surface[local_start:local_end],
-            })
+            out.append(
+                {
+                    "start": int(start_offset) + local_start,
+                    "end": int(start_offset) + local_end,
+                    "text": surface[local_start:local_end],
+                }
+            )
         return out
-
 
     def _result_match_count(self, result: dict[str, Any] | None) -> int:
         if not isinstance(result, dict):

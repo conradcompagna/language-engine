@@ -40,13 +40,35 @@ FILE_PAIRS = [
 
 # ── Proper noun blocklist: these should NEVER be MWT-split ──
 PROPER_NOUN_BLOCKLIST = {
-    "كورونا", "فيسبوك", "حمدوك", "تويتر", "يوتيوب", "أردوغان",
-    "أوباما", "ماكرون", "بوتين", "ترامب", "نتنياهو", "أنقرة",
-    "بروكسل", "كوريغرافي", "ميلوني", "ماسوني",
+    "كورونا",
+    "فيسبوك",
+    "حمدوك",
+    "تويتر",
+    "يوتيوب",
+    "أردوغان",
+    "أوباما",
+    "ماكرون",
+    "بوتين",
+    "ترامب",
+    "نتنياهو",
+    "أنقرة",
+    "بروكسل",
+    "كوريغرافي",
+    "ميلوني",
+    "ماسوني",
     # Place names wrongly split as verb+pronoun
-    "تبوك", "دهوك", "شبوة", "وستبروك", "تازروك",
+    "تبوك",
+    "دهوك",
+    "شبوة",
+    "وستبروك",
+    "تازروك",
     # Nouns wrongly analyzed as verb+pronoun
-    "هواة", "عنوة", "غفوة", "جذوة", "فروة", "قراوة",
+    "هواة",
+    "عنوة",
+    "غفوة",
+    "جذوة",
+    "فروة",
+    "قراوة",
 }
 
 # Words where MWT sub-tokens have wrong form but the split is valid.
@@ -64,6 +86,7 @@ PREP_ALIF_MAQSURA = {"على": "علي", "لدى": "لدي", "إلى": "إلي"}
 
 # ── Helpers ──
 
+
 def strip_diacritics(s):
     return re.sub(r"[\u064B-\u0652\u0670\u0640\u0651]", "", s)
 
@@ -74,7 +97,7 @@ def _is_prefixed_proper_noun(surface_clean):
     """
     for pfx in PREFIXES:
         if surface_clean.startswith(pfx):
-            remainder = surface_clean[len(pfx):]
+            remainder = surface_clean[len(pfx) :]
             if remainder in PROPER_NOUN_BLOCKLIST:
                 return True
     return False
@@ -186,6 +209,7 @@ def fix_prep_pronoun(surface, subs):
 
 # ── Parse CoNLL-U into sentence blocks ──
 
+
 def parse_conllu(path):
     """Parse CoNLL-U into list of sentence blocks.
     Each block is a dict with 'meta' (list of comment lines) and 'tokens' (list of token dicts).
@@ -209,18 +233,20 @@ def parse_conllu(path):
             else:
                 parts = line.split("\t")
                 if len(parts) == 10:
-                    current_tokens.append({
-                        "id": parts[0],
-                        "form": parts[1],
-                        "lemma": parts[2],
-                        "upos": parts[3],
-                        "xpos": parts[4],
-                        "feats": parts[5],
-                        "head": parts[6],
-                        "deprel": parts[7],
-                        "deps": parts[8],
-                        "misc": parts[9],
-                    })
+                    current_tokens.append(
+                        {
+                            "id": parts[0],
+                            "form": parts[1],
+                            "lemma": parts[2],
+                            "upos": parts[3],
+                            "xpos": parts[4],
+                            "feats": parts[5],
+                            "head": parts[6],
+                            "deprel": parts[7],
+                            "deps": parts[8],
+                            "misc": parts[9],
+                        }
+                    )
                 else:
                     # Malformed line, keep as-is
                     current_tokens.append({"raw": line})
@@ -234,10 +260,20 @@ def parse_conllu(path):
 def token_to_line(tok):
     if "raw" in tok:
         return tok["raw"]
-    return "\t".join([
-        tok["id"], tok["form"], tok["lemma"], tok["upos"], tok["xpos"],
-        tok["feats"], tok["head"], tok["deprel"], tok["deps"], tok["misc"],
-    ])
+    return "\t".join(
+        [
+            tok["id"],
+            tok["form"],
+            tok["lemma"],
+            tok["upos"],
+            tok["xpos"],
+            tok["feats"],
+            tok["head"],
+            tok["deprel"],
+            tok["deps"],
+            tok["misc"],
+        ]
+    )
 
 
 def get_sent_id(sent):
@@ -250,11 +286,12 @@ def get_sent_id(sent):
 def get_text(sent):
     for m in sent["meta"]:
         if m.startswith("# text = "):
-            return m[len("# text = "):]
+            return m[len("# text = ") :]
     return ""
 
 
 # ── Main fix logic ──
+
 
 def fix_sentence(sent):
     """Apply all fixes to a sentence. Returns (fixed_sent, stats_dict)."""
@@ -364,7 +401,7 @@ def fix_sentence(sent):
                 t_copy = dict(t)
                 if "-" in t_copy["id"]:
                     r = t_copy["id"].split("-")
-                    t_copy["id"] = f"{int(r[0])-id_shift}-{int(r[1])-id_shift}"
+                    t_copy["id"] = f"{int(r[0]) - id_shift}-{int(r[1]) - id_shift}"
                 else:
                     try:
                         old_id = int(t_copy["id"])
@@ -544,8 +581,9 @@ def convert_txt_to_paragraphs(sentences, txt_in, txt_out):
 
 # ── Main ──
 
+
 def process_file_pair(conllu_in, txt_in, conllu_out, txt_out):
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Processing: {os.path.basename(conllu_in)}")
     print(f"Parsing CoNLL-U...")
     sentences = parse_conllu(conllu_in)
@@ -622,7 +660,7 @@ def process_file_pair(conllu_in, txt_in, conllu_out, txt_out):
 
     print(f"  MWT total: {mwt_total}")
     print(f"  MWT reconstruction OK: {mwt_total - mwt_fail}")
-    print(f"  MWT reconstruction FAIL: {mwt_fail} ({mwt_fail/max(mwt_total,1)*100:.1f}%)")
+    print(f"  MWT reconstruction FAIL: {mwt_fail} ({mwt_fail / max(mwt_total, 1) * 100:.1f}%)")
 
     # Check token ID continuity
     id_errors = 0
@@ -644,7 +682,9 @@ def process_file_pair(conllu_in, txt_in, conllu_out, txt_out):
 
     # Check zero NOANs
     noan_remaining = sum(
-        1 for sent in fixed_sents for tok in sent["tokens"]
+        1
+        for sent in fixed_sents
+        for tok in sent["tokens"]
         if "raw" not in tok and "NOAN" in tok.get("form", "")
     )
     print(f"  NOAN remaining: {noan_remaining}")

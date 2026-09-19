@@ -22,18 +22,22 @@ for split in ("train", "dev", "test"):
     with open(conllu_path, "r", encoding="utf-8") as f:
         for ln in f:
             if ln.startswith("# text = "):
-                texts.append(ln[len("# text = "):].rstrip("\n"))
+                texts.append(ln[len("# text = ") :].rstrip("\n"))
     conllu_flat = "\n".join(texts)
 
     match = txt_flat == conllu_flat
-    print(f"[{split}] txt_flat_len={len(txt_flat)}, conllu_flat_len={len(conllu_flat)}, match={match}, sents_in_conllu={len(texts)}")
+    print(
+        f"[{split}] txt_flat_len={len(txt_flat)}, conllu_flat_len={len(conllu_flat)}, match={match}, sents_in_conllu={len(texts)}"
+    )
     if not match:
         # Find first divergence
         for i, (a, b) in enumerate(zip(txt_flat, conllu_flat)):
             if a != b:
-                print(f"  first diff at char {i}: txt={a!r}({ord(a):04x}) conllu={b!r}({ord(b):04x})")
-                print(f"  txt context:    ...{txt_flat[max(0,i-30):i+30]!r}")
-                print(f"  conllu context: ...{conllu_flat[max(0,i-30):i+30]!r}")
+                print(
+                    f"  first diff at char {i}: txt={a!r}({ord(a):04x}) conllu={b!r}({ord(b):04x})"
+                )
+                print(f"  txt context:    ...{txt_flat[max(0, i - 30) : i + 30]!r}")
+                print(f"  conllu context: ...{conllu_flat[max(0, i - 30) : i + 30]!r}")
                 break
         if len(txt_flat) != len(conllu_flat):
             print(f"  length diff: {len(txt_flat) - len(conllu_flat)}")

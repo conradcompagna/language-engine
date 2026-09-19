@@ -239,12 +239,7 @@ def build_misc(parts: Iterable[str]) -> str:
 
 
 def sanitize_misc_value(value: str) -> str:
-    return (
-        str(value or "")
-        .replace("%", "%25")
-        .replace("|", "%7C")
-        .replace(" ", "%20")
-    )
+    return str(value or "").replace("%", "%25").replace("|", "%7C").replace(" ", "%20")
 
 
 def clean_token_text(value: str) -> str:
@@ -362,8 +357,7 @@ def convert_sentence(
     orig_to_new: dict[int, int] = {}
     kept_ids: set[int] = set()
     direct_heads = {
-        int(word.get("id")): parse_head_value(word.get("head") or "")
-        for word in all_words
+        int(word.get("id")): parse_head_value(word.get("head") or "") for word in all_words
     }
     for word in words:
         orig_tok_id = int(word.get("id"))

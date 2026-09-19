@@ -1,13 +1,7 @@
-"""
-Language registry — central dispatch for all language-specific resources.
+"""Language dispatch, model configuration, and shared Trankit lifecycle.
 
-To add a new language:
-1. Add an entry to LANGUAGE_REGISTRY below.
-2. Create <folder>/dictionary.py with a dict class implementing lookup/lookup_all/fill_token.
-3. Create <folder>/pipeline.py exporting a HOOKS object (see LanguageHooks).
-4. Create <folder>/lang_config.json.
-5. Add character ranges to universal_normalization.py.
-6. Create static/reader_<code>.js frontend adapter.
+Dictionary indexes and hydration are handled by dict_lookup_sqlite. Language
+display settings are loaded from wiktionary_general/lang_config_*.json.
 """
 
 from __future__ import annotations
@@ -25,41 +19,6 @@ APP_ROOT = Path(__file__).resolve().parent
 # Language hooks — each language module provides one of these
 # ---------------------------------------------------------------------------
 
-@dataclass
-class LanguageHooks:
-    """Language-specific callbacks used by the generic pipeline."""
-
-    # Return the dict key that holds the romanization (e.g. "pinyin", "reading")
-    reading_key: str = "roman"
-
-    # build_g2p(word, dictionary, fallback_roman) -> dict | None
-    build_g2p: Optional[Callable] = None
-
-    # attach_forms(entry_dict, surface, entries_list) -> None  (mutates entry_dict)
-    attach_forms: Optional[Callable] = None
-
-    # choose_entry(surface, entries_list) -> dict | None
-    choose_entry: Optional[Callable] = None
-
-    # fill_token_with_lemma(word, lemma, dictionary) -> dict | None
-    # Called when the segment itself has no exact dict match.
-    fill_token_with_lemma: Optional[Callable] = None
-
-    # filter_entries_for_upos(entries, upos, dictionary) -> list[dict]
-    # Optional language-specific filtering of dictionary entries by UPOS.
-    filter_entries_for_upos: Optional[Callable] = None
-
-    # deconjugate(surface, lemma, all_pos_or_entry) -> dict | None
-    # Optional language-specific inflection analysis for grammar popup metadata.
-    deconjugate: Optional[Callable] = None
-
-    # build_subsegments(token, dictionary, decompose) -> dict | None
-    # If None, the /subsegments route returns unsupported for this language.
-    build_subsegments: Optional[Callable] = None
-
-    # Optional startup preloader (e.g. hanzi decomposition tables)
-    preload: Optional[Callable] = None
-
 
 # ---------------------------------------------------------------------------
 # Registry definition
@@ -73,31 +32,41 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "folder": "wiktionary_general",
         "trankit_name": "chinese",
         "aliases": ["chinese"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-chinese.tsv",
         "dict_kwargs": {"lang_code": "zh"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_zh.json",
         "dict_sources": {
-            "wiktionary": {"label": "Wiktionary", "dict_file": "wiktionary general pipeline/converted_tsv/dict-chinese.tsv"},
-            "cc-cedict": {"label": "CC-CEDICT", "dict_file": "wiktionary general pipeline/converted_tsv/dict-chinese-cc-cedict.tsv"},
+            "wiktionary": {
+                "label": "Wiktionary",
+                "dict_file": "wiktionary general pipeline/converted_tsv/dict-chinese.tsv",
+            },
+            "cc-cedict": {
+                "label": "CC-CEDICT",
+                "dict_file": "wiktionary general pipeline/converted_tsv/dict-chinese-cc-cedict.tsv",
+            },
         },
     },
     "ja": {
         "folder": "wiktionary_general",
         "trankit_name": "customized-ner",
-        "trankit_cache_dir": str(Path(__file__).resolve().parent / "training" / "trankit_save_ja_ner_v2"),
+        "trankit_cache_dir": str(
+            Path(__file__).resolve().parent / "training" / "trankit_save_ja_ner_v2"
+        ),
         "trankit_treebank": "UD_Japanese-GSD",
         "has_ner": True,
         "aliases": ["japanese"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-japanese.tsv",
         "dict_kwargs": {"lang_code": "ja"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_ja.json",
         "dict_sources": {
-            "wiktionary": {"label": "Wiktionary", "dict_file": "wiktionary general pipeline/converted_tsv/dict-japanese.tsv"},
-            "jmdict": {"label": "JMDict", "dict_file": "wiktionary general pipeline/converted_tsv/dict-japanese-jmdict.tsv"},
+            "wiktionary": {
+                "label": "Wiktionary",
+                "dict_file": "wiktionary general pipeline/converted_tsv/dict-japanese.tsv",
+            },
+            "jmdict": {
+                "label": "JMDict",
+                "dict_file": "wiktionary general pipeline/converted_tsv/dict-japanese-jmdict.tsv",
+            },
         },
     },
     "ko": {
@@ -106,14 +75,18 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_treebank": "UD_Korean-Kaist",
         "has_ner": True,
         "aliases": ["korean"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-korean.tsv",
         "dict_kwargs": {"lang_code": "ko"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_ko.json",
         "dict_sources": {
-            "wiktionary": {"label": "Wiktionary", "dict_file": "wiktionary general pipeline/converted_tsv/dict-korean.tsv"},
-            "krdict": {"label": "KRDict", "dict_file": "wiktionary general pipeline/converted_tsv/dict-korean-krdict.tsv"},
+            "wiktionary": {
+                "label": "Wiktionary",
+                "dict_file": "wiktionary general pipeline/converted_tsv/dict-korean.tsv",
+            },
+            "krdict": {
+                "label": "KRDict",
+                "dict_file": "wiktionary general pipeline/converted_tsv/dict-korean-krdict.tsv",
+            },
         },
     },
     "vi": {
@@ -121,10 +94,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "vietnamese",
         "has_ner": True,
         "aliases": ["vietnamese"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-vietnamese.tsv",
         "dict_kwargs": {"lang_code": "vi"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_vi.json",
     },
     "lzh": {
@@ -132,14 +103,15 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "classical-chinese",
         "has_ner": True,
         "aliases": ["classical"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-classical-chinese.tsv",
         "dict_kwargs": {"lang_code": "lzh"},
         "default_dict_source": "chinese-notes",
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_lzh.json",
         "dict_sources": {
-            "chinese-notes": {"label": "Chinese Notes", "dict_file": "wiktionary general pipeline/converted_tsv/dict-classical-chinese.tsv"},
+            "chinese-notes": {
+                "label": "Chinese Notes",
+                "dict_file": "wiktionary general pipeline/converted_tsv/dict-classical-chinese.tsv",
+            },
         },
     },
     # ----- Wiktionary general pipeline languages (existing, now TSV) -----
@@ -148,10 +120,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "turkish",
         "has_ner": True,
         "aliases": ["turkish"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-turkish.tsv",
         "dict_kwargs": {"lang_code": "tr"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_tr.json",
     },
     # "te": Telugu — temporarily excluded (no converted TSV yet)
@@ -161,10 +131,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "persian",
         "has_ner": True,
         "aliases": ["persian"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-persian.tsv",
         "dict_kwargs": {"lang_code": "fa"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_fa.json",
     },
     "id": {
@@ -172,10 +140,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "indonesian",
         "has_ner": True,
         "aliases": ["indonesian"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-indonesian.tsv",
         "dict_kwargs": {"lang_code": "id"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_id.json",
     },
     "hi": {
@@ -183,10 +149,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "hindi",
         "has_ner": True,
         "aliases": ["hindi"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-hindi.tsv",
         "dict_kwargs": {"lang_code": "hi"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_hi.json",
     },
     "ar": {
@@ -196,10 +160,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "has_mwt": True,
         "tokenizer_path": "native",
         "aliases": ["arabic"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-arabic.tsv",
         "dict_kwargs": {"lang_code": "ar"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_ar.json",
     },
     "th": {
@@ -210,10 +172,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "identity_lemma": True,
         "char_level_tokenize": True,
         "aliases": ["thai"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-thai.tsv",
         "dict_kwargs": {"lang_code": "th"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_th.json",
     },
     "sa": {
@@ -223,14 +183,15 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "has_mwt": True,
         "has_ner": True,
         "aliases": ["sanskrit"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-sanskrit-dcs-compact.tsv",
         "dict_kwargs": {"lang_code": "sa"},
         "default_dict_source": "dcs",
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_sa.json",
         "dict_sources": {
-            "dcs": {"label": "DCS (Digital Corpus of Sanskrit)", "dict_file": "wiktionary general pipeline/converted_tsv/dict-sanskrit-dcs-compact.tsv"},
+            "dcs": {
+                "label": "DCS (Digital Corpus of Sanskrit)",
+                "dict_file": "wiktionary general pipeline/converted_tsv/dict-sanskrit-dcs-compact.tsv",
+            },
         },
     },
     "ang": {
@@ -239,11 +200,9 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_treebank": "UD_Customized",
         "has_ner": True,
         "aliases": ["oldenglish", "old-english", "old english"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-oldenglish.tsv",
         "dict_kwargs": {"lang_code": "ang"},
         "default_dict_source": "wiktionary",
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_ang.json",
         "dict_sources": {
             "wiktionary": {"label": "Wiktionary"},
@@ -254,10 +213,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "folder": "wiktionary_general",
         "trankit_name": "french",  # UD_French-GSD (default, CC license)
         "aliases": ["french"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-french.tsv",
         "dict_kwargs": {"lang_code": "fr"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_fr.json",
     },
     "it": {
@@ -266,10 +223,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_treebank": "UD_Italian-TWITTIRO",
         "has_ner": True,
         "aliases": ["italian"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-italian.tsv",
         "dict_kwargs": {"lang_code": "it"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_it.json",
     },
     "ru": {
@@ -277,10 +232,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "russian-gsd",  # UD_Russian-GSD (CC license)
         "trankit_treebank": "UD_Russian-GSD",
         "aliases": ["russian"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-russian.tsv",
         "dict_kwargs": {"lang_code": "ru"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_ru.json",
     },
     "es": {
@@ -288,30 +241,24 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "spanish-gsd",  # UD_Spanish-GSD (CC license)
         "trankit_treebank": "UD_Spanish-GSD",
         "aliases": ["spanish"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-spanish.tsv",
         "dict_kwargs": {"lang_code": "es"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_es.json",
     },
     "de": {
         "folder": "wiktionary_general",
         "trankit_name": "german",  # UD_German-GSD
         "aliases": ["german"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-german.tsv",
         "dict_kwargs": {"lang_code": "de"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_de.json",
     },
     "nl": {
         "folder": "wiktionary_general",
         "trankit_name": "dutch",  # UD_Dutch-Alpino
         "aliases": ["dutch"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-dutch.tsv",
         "dict_kwargs": {"lang_code": "nl"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_nl.json",
     },
     "pt": {
@@ -319,10 +266,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "portuguese",  # UD_Portuguese-Bosque
         "has_ner": True,
         "aliases": ["portuguese"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-portuguese.tsv",
         "dict_kwargs": {"lang_code": "pt"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_pt.json",
     },
     "la": {
@@ -330,10 +275,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "latin",  # UD_Latin-ITTB
         "has_ner": True,
         "aliases": ["latin"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-latin.tsv",
         "dict_kwargs": {"lang_code": "la"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_la.json",
     },
     "el": {
@@ -341,10 +284,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "greek",  # UD_Greek-GDT
         "has_ner": True,
         "aliases": ["greek"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-greek.tsv",
         "dict_kwargs": {"lang_code": "el"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_el.json",
     },
     "hy": {
@@ -352,10 +293,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "armenian",  # UD_Armenian-ArmTDP
         "has_ner": True,
         "aliases": ["armenian"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-armenian.tsv",
         "dict_kwargs": {"lang_code": "hy"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_hy.json",
     },
     "grc": {
@@ -363,14 +302,15 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "ancient-greek",  # UD_Ancient_Greek-PROIEL
         "has_ner": True,
         "aliases": ["ancient-greek", "ancientgreek"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-ancientgreek.tsv",
         "dict_kwargs": {"lang_code": "grc"},
         "default_dict_source": "wiktionary",
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_grc.json",
         "dict_sources": {
-            "wiktionary": {"label": "Wiktionary", "dict_file": "wiktionary general pipeline/converted_tsv/dict-ancientgreek.tsv"},
+            "wiktionary": {
+                "label": "Wiktionary",
+                "dict_file": "wiktionary general pipeline/converted_tsv/dict-ancientgreek.tsv",
+            },
         },
     },
     "he": {
@@ -378,10 +318,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "hebrew",  # UD_Hebrew-HTB
         "has_ner": True,
         "aliases": ["hebrew"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-hebrew.tsv",
         "dict_kwargs": {"lang_code": "he"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_he.json",
     },
     # ----- New custom-trained languages -----
@@ -392,10 +330,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "has_mwt": True,
         "has_ner": True,
         "aliases": ["tagalog", "filipino"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-tagalog.tsv",
         "dict_kwargs": {"lang_code": "tl"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_tl.json",
     },
     "sw": {
@@ -404,10 +340,8 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_treebank": "UD_Swahili-Custom",
         "has_ner": True,
         "aliases": ["swahili", "kiswahili"],
-        "dict_class": "wiktionary_general.dictionary:WiktionaryDict",
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-swahili.tsv",
         "dict_kwargs": {"lang_code": "sw"},
-        "hooks_path": "wiktionary_general.pipeline:HOOKS",
         "lang_config_file": "wiktionary_general/lang_config_sw.json",
     },
 }
@@ -423,6 +357,7 @@ for _code, _info in LANGUAGE_REGISTRY.items():
 # ---------------------------------------------------------------------------
 # Public helpers
 # ---------------------------------------------------------------------------
+
 
 def resolve_lang_code(raw: str) -> Optional[str]:
     """Normalize a raw language string to a registry code, or None."""
@@ -459,6 +394,7 @@ _trankit_onnx_live_report: Dict[str, Any] = {}
 def _record_trankit_timing(lang_code: str, wait_ms: float, run_ms: float) -> None:
     try:
         from analytics import record_trankit_timing
+
         record_trankit_timing(lang_code, wait_ms, run_ms)
     except Exception:
         pass
@@ -493,7 +429,13 @@ def init_trankit():
         print("[INFO] NEWPIPELINE=1: forcing Trankit load onto CPU for ONNX runtime.")
 
     from trankit import Pipeline
-    from trankit.utils.tbinfo import lang2treebank, supported_langs, langwithner, tbname2training_id, treebank2lang
+    from trankit.utils.tbinfo import (
+        lang2treebank,
+        supported_langs,
+        langwithner,
+        tbname2training_id,
+        treebank2lang,
+    )
 
     def _registry_has_ner(info: Dict[str, Any]) -> bool:
         if info.get("has_ner", False):
@@ -503,12 +445,13 @@ def init_trankit():
         name = str(info.get("trankit_name", "") or "").strip()
         if not name:
             return False
-        cache_root = Path(info.get("trankit_cache_dir") or (APP_ROOT / "training" / "trankit_save_ja_ner_v2"))
-        model_dir = cache_root / "xlm-roberta-base" / name
-        return (
-            (model_dir / f"{name}.ner-vocab.json").exists()
-            and (model_dir / f"{name}.ner.mdl").exists()
+        cache_root = Path(
+            info.get("trankit_cache_dir") or (APP_ROOT / "training" / "trankit_save_ja_ner_v2")
         )
+        model_dir = cache_root / "xlm-roberta-base" / name
+        return (model_dir / f"{name}.ner-vocab.json").exists() and (
+            model_dir / f"{name}.ner.mdl"
+        ).exists()
 
     def _add_lang_with_ner(name: str) -> None:
         if not name:
@@ -526,7 +469,9 @@ def init_trankit():
         name = info.get("trankit_name", "")
         treebank = info.get("trankit_treebank")
         if treebank and name and name not in supported_langs:
-            supported_langs.add(name) if isinstance(supported_langs, set) else supported_langs.append(name)
+            supported_langs.add(name) if isinstance(
+                supported_langs, set
+            ) else supported_langs.append(name)
             # Only register for NER if this language has a trained NER model.
             if _registry_has_ner(info):
                 _add_lang_with_ner(name)
@@ -556,6 +501,7 @@ def init_trankit():
     from trankit.models.lemma_model import LemmaWrapper
     from trankit.models.mwt_model import MWTWrapper
     from trankit.utils.conll import EXPANDED, ID, MISC, TEXT, TOKENS, UPOS
+
     _identity_treebanks = {
         info["trankit_treebank"]
         for info in LANGUAGE_REGISTRY.values()
@@ -563,27 +509,36 @@ def init_trankit():
     }
     # Patch __init__: skip loading a model file for identity-lemma languages.
     _orig_lemma_init = LemmaWrapper.__init__
+
     def _patched_lemma_init(self, config, treebank_name, use_gpu, evaluate=True):
         self._identity_lemma_runtime = False
         if evaluate and treebank_name in _identity_treebanks:
             language = treebank2lang[treebank_name]
-            model_path = Path(config._cache_dir) / config.embedding_name / language / f"{language}_lemmatizer.pt"
+            model_path = (
+                Path(config._cache_dir)
+                / config.embedding_name
+                / language
+                / f"{language}_lemmatizer.pt"
+            )
             # Fallback to identity lemma only when a trained lemmatizer is absent.
             if model_path.exists():
                 self._identity_lemma_runtime = False
                 return _orig_lemma_init(self, config, treebank_name, use_gpu, evaluate)
             from trankit.models.lemma_model import get_identity_lemma_model
+
             self.config = config
             self.treebank_name = treebank_name
             self.args = get_identity_lemma_model()
             self._identity_lemma_runtime = True
-            print('Loading lemmatizer for {}'.format(treebank2lang[treebank_name]))
+            print("Loading lemmatizer for {}".format(treebank2lang[treebank_name]))
             return
         self._identity_lemma_runtime = False
         _orig_lemma_init(self, config, treebank_name, use_gpu, evaluate)
+
     LemmaWrapper.__init__ = _patched_lemma_init
     # Patch predict: treat identity-lemma treebanks the same as Vietnamese.
     _orig_lemma_predict = LemmaWrapper.predict
+
     def _lemma_dict_lookup(trainer: Any, word: Any, pos: Any) -> Tuple[bool, Any]:
         composite = getattr(trainer, "composite_dict", {}) or {}
         word_dict = getattr(trainer, "word_dict", {}) or {}
@@ -608,19 +563,28 @@ def init_trankit():
     def _patched_lemma_predict(self, tagged_doc, obmit_tag):
         if getattr(self, "_identity_lemma_runtime", False):
             from trankit.models.lemma_model import set_lemma
-            preds = [t[TEXT] for sentence in tagged_doc for t in sentence[TOKENS]
-                     if type(t[ID]) == int or len(t[ID]) == 1]
+
+            preds = [
+                t[TEXT]
+                for sentence in tagged_doc
+                for t in sentence[TOKENS]
+                if type(t[ID]) == int or len(t[ID]) == 1
+            ]
             return set_lemma(tagged_doc, preds, obmit_tag)
         try:
             from trankit.iterators.lemmatizer_iterators import LemmaDataLoader
             from trankit.models.lemma_model import set_lemma
 
-            if self.treebank_name in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB', 'UD_Vietnamese-VLSP']:
+            if self.treebank_name in [
+                "UD_Old_French-SRCMF",
+                "UD_Vietnamese-VTB",
+                "UD_Vietnamese-VLSP",
+            ]:
                 return _orig_lemma_predict(self, tagged_doc, obmit_tag)
 
             batch = LemmaDataLoader(
                 tagged_doc,
-                self.args['batch_size'],
+                self.args["batch_size"],
                 self.loaded_args,
                 vocab=self.vocab,
                 evaluation=True,
@@ -654,7 +618,7 @@ def init_trankit():
             if miss_indices:
                 miss_batch = LemmaDataLoader(
                     miss_doc,
-                    self.args['batch_size'],
+                    self.args["batch_size"],
                     self.loaded_args,
                     vocab=self.vocab,
                     evaluation=True,
@@ -662,7 +626,7 @@ def init_trankit():
                 miss_preds: List[Any] = []
                 miss_edits: List[Any] = []
                 for b in miss_batch:
-                    preds, edits = self.model.predict(b, self.args['beam_size'])
+                    preds, edits = self.model.predict(b, self.args["beam_size"])
                     miss_preds += preds
                     if edits is not None:
                         miss_edits += edits
@@ -692,9 +656,11 @@ def init_trankit():
             self._lemma_early_exit_last = {"error": str(exc)}
             return _orig_lemma_predict(self, tagged_doc, obmit_tag)
         return _orig_lemma_predict(self, tagged_doc, obmit_tag)
+
     LemmaWrapper.predict = _patched_lemma_predict
 
     _orig_mwt_predict = MWTWrapper.predict
+
     def _patched_mwt_predict(self, tokenized_doc):
         try:
             from copy import deepcopy as _mwt_deepcopy
@@ -703,7 +669,7 @@ def init_trankit():
 
             batch = MWTDataLoader(
                 tokenized_doc,
-                self.args['batch_size'],
+                self.args["batch_size"],
                 self.loaded_args,
                 vocab=self.vocab,
                 evaluation=True,
@@ -722,16 +688,18 @@ def init_trankit():
                     final_preds[idx] = expansion
                     continue
                 miss_indices.append(idx)
-                miss_doc[0][TOKENS].append({
-                    ID: (len(miss_doc[0][TOKENS]) + 1, len(miss_doc[0][TOKENS]) + 1),
-                    TEXT: candidate,
-                    MISC: "MWT=Yes",
-                })
+                miss_doc[0][TOKENS].append(
+                    {
+                        ID: (len(miss_doc[0][TOKENS]) + 1, len(miss_doc[0][TOKENS]) + 1),
+                        TEXT: candidate,
+                        MISC: "MWT=Yes",
+                    }
+                )
 
             if miss_indices:
                 miss_batch = MWTDataLoader(
                     miss_doc,
-                    self.args['batch_size'],
+                    self.args["batch_size"],
                     self.loaded_args,
                     vocab=self.vocab,
                     evaluation=True,
@@ -757,6 +725,7 @@ def init_trankit():
         except Exception as exc:
             self._mwt_early_exit_last = {"error": str(exc)}
             return _orig_mwt_predict(self, tokenized_doc)
+
     MWTWrapper.predict = _patched_mwt_predict
 
     # Patch the tokenizer to:
@@ -780,24 +749,24 @@ def init_trankit():
     # before the model sees the text. This is a 1-for-1 char swap (position-
     # aligned with sent_labels) and massively improves sentence splitting.
     _cjk_punct_to_ascii = {
-        "。": ".",   # U+3002 ideographic full stop
-        "？": "?",   # U+FF1F fullwidth question mark
-        "！": "!",   # U+FF01 fullwidth exclamation
-        "；": ";",   # U+FF1B fullwidth semicolon
-        "：": ":",   # U+FF1A fullwidth colon
-        "，": ",",   # U+FF0C fullwidth comma
-        "、": ",",   # U+3001 ideographic comma
-        "｡":  ".",   # U+FF61 halfwidth ideographic full stop
-        "･":  ",",   # U+FF65 halfwidth katakana middle dot (clause separator)
-        "·":  ",",   # U+00B7 middle dot (occasional clause separator)
+        "。": ".",  # U+3002 ideographic full stop
+        "？": "?",  # U+FF1F fullwidth question mark
+        "！": "!",  # U+FF01 fullwidth exclamation
+        "；": ";",  # U+FF1B fullwidth semicolon
+        "：": ":",  # U+FF1A fullwidth colon
+        "，": ",",  # U+FF0C fullwidth comma
+        "、": ",",  # U+3001 ideographic comma
+        "｡": ".",  # U+FF61 halfwidth ideographic full stop
+        "･": ",",  # U+FF65 halfwidth katakana middle dot (clause separator)
+        "·": ",",  # U+00B7 middle dot (occasional clause separator)
     }
     # Devanagari/Indic marks that appear in Vedic/Sanskrit editions. The two
     # dandas are sentence-final; the others are clause/verse-level and also
     # help XLM-R segment. Mapped to ASCII to pull them into pretraining-space.
     _devanagari_punct_to_ascii = {
-        "।":  ".",   # U+0964 danda
-        "॥":  ".",   # U+0965 double danda
-        "॰":  ".",   # U+0970 abbreviation sign
+        "।": ".",  # U+0964 danda
+        "॥": ".",  # U+0965 double danda
+        "॰": ".",  # U+0970 abbreviation sign
     }
     _sentence_final_marker_map = {
         # Classical Chinese — UD_Classical_Chinese-Kyoto has no punctuation in
@@ -807,21 +776,24 @@ def init_trankit():
         # Vedic Sanskrit — same story: UD_Vedic_Sanskrit-Vedic was stripped of
         # dandas/punctuation during annotation. Map dandas + any Latin-ish
         # punctuation that leaks in from editorial sources.
-        "UD_Vedic_Sanskrit-Vedic":    dict(_devanagari_punct_to_ascii),
+        "UD_Vedic_Sanskrit-Vedic": dict(_devanagari_punct_to_ascii),
         # Other Indic treebanks — danda → period only (they were trained with
         # punctuation intact, so we don't need the wider map).
-        "UD_Hindi-HDTB":              {"।": ".", "॥": "."},
+        "UD_Hindi-HDTB": {"।": ".", "॥": "."},
         # Arabic-script question mark / full stop → ASCII
-        "UD_Arabic-PADT":             {"؟": "?"},
-        "UD_Persian-Seraji":          {"؟": "?"},
+        "UD_Arabic-PADT": {"؟": "?"},
+        "UD_Persian-Seraji": {"؟": "?"},
         # Hebrew sof pasuq / paseq → ASCII
-        "UD_Hebrew-HTB":              {"׃": "."},
+        "UD_Hebrew-HTB": {"׃": "."},
     }
     if _char_level_treebanks or _sentence_final_marker_map:
         import trankit.utils.tokenizer_utils as _tok_utils
+
         _orig_wp_tokenize = _tok_utils.wordpiece_tokenize_from_raw_text
-        def _patched_wp_tokenize(wordpiece_splitter, sent_text, sent_labels,
-                                 sent_position_in_paragraph, treebank_name):
+
+        def _patched_wp_tokenize(
+            wordpiece_splitter, sent_text, sent_labels, sent_position_in_paragraph, treebank_name
+        ):
             replacements = _sentence_final_marker_map.get(treebank_name)
             if replacements:
                 for old, new in replacements.items():
@@ -830,14 +802,21 @@ def init_trankit():
             if treebank_name in _char_level_treebanks:
                 # Force character-level pseudo-tokens, same as Chinese/Japanese
                 treebank_name = "UD_Chinese-GSD"
-            return _orig_wp_tokenize(wordpiece_splitter, sent_text, sent_labels,
-                                     sent_position_in_paragraph, treebank_name)
+            return _orig_wp_tokenize(
+                wordpiece_splitter,
+                sent_text,
+                sent_labels,
+                sent_position_in_paragraph,
+                treebank_name,
+            )
+
         _tok_utils.wordpiece_tokenize_from_raw_text = _patched_wp_tokenize
 
     # Bump the per-treebank tokenizer cap to XLM-R's actual 512 ceiling for
     # every registered treebank — languages that fell back to 400 no longer
     # get long paragraphs cut mid-sentence.
     import trankit.utils.tbinfo as _tbinfo
+
     for _info in LANGUAGE_REGISTRY.values():
         _tb = _info.get("trankit_treebank")
         if _tb:
@@ -852,62 +831,73 @@ def init_trankit():
     # word encountered; at hard_cap (max_input_length - 10) we break
     # unconditionally (original behavior).
     import trankit.iterators.tagger_iterators as _tagger_iters
+
     _tagger_get_examples = _tagger_iters.get_examples_from_conllu
     from trankit.utils.conll import (
-        LEMMA as _LEMMA, UPOS as _UPOS, XPOS as _XPOS,
-        FEATS as _FEATS, HEAD as _HEAD, DEPREL as _DEPREL,
+        LEMMA as _LEMMA,
+        UPOS as _UPOS,
+        XPOS as _XPOS,
+        FEATS as _FEATS,
+        HEAD as _HEAD,
+        DEPREL as _DEPREL,
     )
     import json as _json
     from copy import deepcopy as _deepcopy
+
     _sentence_break_chars = set(".?!;।॥؟۔׃·。？！")
+
     def _is_sentence_break_word(w):
         if not w:
             return False
         s = w.strip()
         return bool(s) and all(ch in _sentence_break_chars for ch in s)
+
     def _patched_tagger_load_data(self):
         with open(self.vocabs_fpath) as _f:
             self.vocabs = _json.load(_f)
         self.data, self.conllu_doc = _tagger_get_examples(
-            self.wordpiece_splitter, self.max_input_length, self.tokenized_doc,
+            self.wordpiece_splitter,
+            self.max_input_length,
+            self.tokenized_doc,
         )
-        _keys = ['words', 'word_ids', _LEMMA, _UPOS, _XPOS, _FEATS, _HEAD, _DEPREL]
+        _keys = ["words", "word_ids", _LEMMA, _UPOS, _XPOS, _FEATS, _HEAD, _DEPREL]
         hard_cap = self.max_input_length - 10
         soft_cap = self.max_input_length - 60
         new_data = []
         for inst in self.data:
-            words = inst['words']
-            pieces = [[p for p in self.wordpiece_splitter.tokenize(w) if p != '▁'] for w in words]
+            words = inst["words"]
+            pieces = [[p for p in self.wordpiece_splitter.tokenize(w) if p != "▁"] for w in words]
             for ps in pieces:
                 if len(ps) == 0:
-                    ps += ['-']
+                    ps += ["-"]
             flat_pieces = [p for ps in pieces for p in ps]
             if len(flat_pieces) <= self.max_input_length - 2:
                 new_data.append(inst)
                 continue
             sub_insts = []
             cur_inst = _deepcopy(inst)
-            for _k in _keys + ['flat_pieces']:
+            for _k in _keys + ["flat_pieces"]:
                 cur_inst[_k] = []
             for i in range(len(words)):
                 for _k in _keys:
                     cur_inst[_k].append(inst[_k][i])
-                cur_inst['flat_pieces'].extend(pieces[i])
-                pc = len(cur_inst['flat_pieces'])
+                cur_inst["flat_pieces"].extend(pieces[i])
+                pc = len(cur_inst["flat_pieces"])
                 if pc >= hard_cap:
                     sub_insts.append(cur_inst)
                     cur_inst = _deepcopy(inst)
-                    for _k in _keys + ['flat_pieces']:
+                    for _k in _keys + ["flat_pieces"]:
                         cur_inst[_k] = []
                 elif pc >= soft_cap and _is_sentence_break_word(words[i]):
                     sub_insts.append(cur_inst)
                     cur_inst = _deepcopy(inst)
-                    for _k in _keys + ['flat_pieces']:
+                    for _k in _keys + ["flat_pieces"]:
                         cur_inst[_k] = []
-            if len(cur_inst['flat_pieces']) > 0:
+            if len(cur_inst["flat_pieces"]) > 0:
                 sub_insts.append(cur_inst)
             new_data.extend(sub_insts)
         self.data = new_data
+
     _tagger_iters.TaggerDatasetLive.load_data = _patched_tagger_load_data
 
     # Sanskrit NER is trained on sandhi/compound-split MWT children. Trankit's
@@ -942,7 +932,10 @@ def init_trankit():
                 treebank = str(getattr(self._config, "treebank_name", "") or "")
                 if active not in getattr(self, "_ner_model", {}):
                     return False
-                return active in {"sanskrit-vedic", "sanskrit", "sa"} or treebank == "UD_Vedic_Sanskrit-Vedic"
+                return (
+                    active in {"sanskrit-vedic", "sanskrit", "sa"}
+                    or treebank == "UD_Vedic_Sanskrit-Vedic"
+                )
 
             def _ner_word_text(row: Dict[str, Any]) -> str:
                 text = str((row or {}).get(_TEXT, "") or "").strip()
@@ -1001,7 +994,9 @@ def init_trankit():
                 )
                 test_set.numberize()
                 self._load_adapter_weights(model_name="ner")
-                eval_batch_size = _tbname2tagbatchsize.get(self._config.treebank_name, self._tagbatchsize)
+                eval_batch_size = _tbname2tagbatchsize.get(
+                    self._config.treebank_name, self._tagbatchsize
+                )
                 if self._config.embedding_name == "xlm-roberta-large":
                     eval_batch_size = int(eval_batch_size / 3)
                 if eval_batch_size < 1:
@@ -1014,7 +1009,9 @@ def init_trankit():
                     collate_fn=test_set.collate_fn,
                 ):
                     word_reprs, _cls_reprs = self._embedding_layers.get_tagger_inputs(batch)
-                    pred_entity_labels = self._ner_model[self._config.active_lang].predict(batch, word_reprs)
+                    pred_entity_labels = self._ner_model[self._config.active_lang].predict(
+                        batch, word_reprs
+                    )
 
                     batch_size = len(batch.word_num)
                     for bid in range(batch_size):
@@ -1055,10 +1052,12 @@ def init_trankit():
                     return _orig_ner_sent(self, in_sent)
                 if type(in_sent) == str:
                     in_sent = self._tokenize_sent(in_sent)
-                dner_doc = [{
-                    _ID: 1,
-                    _TOKENS: _ner_deepcopy(in_sent),
-                }]
+                dner_doc = [
+                    {
+                        _ID: 1,
+                        _TOKENS: _ner_deepcopy(in_sent),
+                    }
+                ]
                 out_doc = _run_sanskrit_child_ner_doc(self, dner_doc)
                 return out_doc[0].get(_TOKENS, []) if out_doc else []
 
@@ -1081,7 +1080,7 @@ def init_trankit():
     # Pipeline() constructor accepts cache_dir, but .add() does not.
     codes = sorted(
         LANGUAGE_REGISTRY.keys(),
-        key=lambda c: (0 if LANGUAGE_REGISTRY[c].get("trankit_cache_dir") else 1),
+        key=lambda c: 0 if LANGUAGE_REGISTRY[c].get("trankit_cache_dir") else 1,
     )
     first_code = codes[0]
     first_info = LANGUAGE_REGISTRY[first_code]
@@ -1115,6 +1114,7 @@ def init_trankit():
     # decoder width (beam=1). Pure in-memory override — reverts on restart.
     try:
         from trankit_mwt_expansion import set_mwt_decoding_headroom
+
         applied = set_mwt_decoding_headroom(_trankit_pipeline, max_dec_len=400, beam_size=1)
         if applied:
             print(f"[INFO] MWT decoder: max_dec_len=400, beam_size=1 for {len(applied)} languages.")
@@ -1137,22 +1137,25 @@ def init_trankit():
 
     print("[INFO] Trankit pipeline ready.")
 
+
 _MANUAL_SENTENCE_STOP_CHARS: Dict[str, frozenset[str]] = {
     # Sanskrit sources may mark dandas as native Devanagari signs or ASCII
     # pipe characters; repeated stop chars are coalesced below, so "|" covers
     # both single and double danda pipe forms.
-    "sa": frozenset(".!?;|\uFF1B\u2026\u3002\uFF1F\uFF01\uFF61\u0964\u0965"),
+    "sa": frozenset(".!?;|\uff1b\u2026\u3002\uff1f\uff01\uff61\u0964\u0965"),
     # Classical Chinese Kyoto training data is effectively clause-segmented,
     # so we chunk lzh on clause punctuation as well as sentence-final marks.
-    "lzh": frozenset(",.:;!?\uFF0C\uFF1A\uFF1B\u2026\u3001\u3002\uFF1F\uFF01\uFF61\uFE50\uFE51"),
+    "lzh": frozenset(",.:;!?\uff0c\uff1a\uff1b\u2026\u3001\u3002\uff1f\uff01\uff61\ufe50\ufe51"),
 }
 
 _MANUAL_SENTENCE_TRAILING_CLOSERS = frozenset(
-    "\"'\u201d\u2019\u00bb\u203a\uFF09)]\uFF5D}\u3009\u300B\u300D\u300F\u3011\u3015\u3017\u3019\u301B"
+    "\"'\u201d\u2019\u00bb\u203a\uff09)]\uff5d}\u3009\u300b\u300d\u300f\u3011\u3015\u3017\u3019\u301b"
 )
 
 
-def _split_text_for_manual_sentence_segmentation(text: str, lang_code: str) -> List[Tuple[int, int]]:
+def _split_text_for_manual_sentence_segmentation(
+    text: str, lang_code: str
+) -> List[Tuple[int, int]]:
     stop_chars = _MANUAL_SENTENCE_STOP_CHARS.get(str(lang_code or "").strip().lower())
     if not stop_chars:
         return [(0, len(text))] if text and text.strip() else []
@@ -1292,13 +1295,15 @@ def _tokenize_manual_sentence_spans_batched(
         chunk_model_text = chunk_model_text.rstrip()
         if not chunk_model_text.strip():
             continue
-        records.append({
-            "start": start,
-            "end": end,
-            "chunk": chunk,
-            "model_text": chunk_model_text,
-            "context": chunk_context,
-        })
+        records.append(
+            {
+                "start": start,
+                "end": end,
+                "chunk": chunk,
+                "model_text": chunk_model_text,
+                "context": chunk_context,
+            }
+        )
 
     if not records:
         return []
@@ -1318,7 +1323,9 @@ def _tokenize_manual_sentence_spans_batched(
     from trankit.utils.tokenizer_utils import get_output_sentence, normalize_token
 
     config = pipeline._config
-    eval_batch_size = tbname2tokbatchsize.get(lang2treebank[pipeline.active_lang], pipeline._tokbatchsize)
+    eval_batch_size = tbname2tokbatchsize.get(
+        lang2treebank[pipeline.active_lang], pipeline._tokbatchsize
+    )
     if config.embedding_name == "xlm-roberta-large":
         eval_batch_size = int(eval_batch_size / 2)
 
@@ -1350,7 +1357,9 @@ def _tokenize_manual_sentence_spans_batched(
     wordpiece_pred_labels = []
     wordpiece_ends = []
     paragraph_indexes = []
-    for batch in DataLoader(test_set, batch_size=eval_batch_size, shuffle=False, collate_fn=test_set.collate_fn):
+    for batch in DataLoader(
+        test_set, batch_size=eval_batch_size, shuffle=False, collate_fn=test_set.collate_fn
+    ):
         wordpiece_reprs = pipeline._embedding_layers.get_tokenizer_inputs(batch)
         predictions = pipeline._tokenizer[config.active_lang].predict(batch, wordpiece_reprs)
         wp_pred_labels, wp_ends, para_ids = predictions[0], predictions[1], predictions[2]
@@ -1365,8 +1374,7 @@ def _tokenize_manual_sentence_spans_batched(
     para_id_to_wp_pred_labels = defaultdict(list)
     for wp_pred_ls, wp_es, p_index in zip(wordpiece_pred_labels, wordpiece_ends, paragraph_indexes):
         para_id_to_wp_pred_labels[p_index].extend(
-            (pred, char_position)
-            for pred, char_position in zip(wp_pred_ls, wp_es)
+            (pred, char_position) for pred, char_position in zip(wp_pred_ls, wp_es)
         )
 
     combined_wp_preds = [0 for _ in combined_text]
@@ -1454,12 +1462,14 @@ def _tokenize_manual_sentence_spans_batched(
         tokens = _shift_trankit_offsets(tokens, int(record["start"]))
         if not isinstance(tokens, list) or not tokens:
             continue
-        tokenized_doc.append({
-            "id": len(tokenized_doc) + 1,
-            "text": record["chunk"],
-            "tokens": tokens,
-            "dspan": (record["start"], record["end"]),
-        })
+        tokenized_doc.append(
+            {
+                "id": len(tokenized_doc) + 1,
+                "text": record["chunk"],
+                "tokens": tokens,
+                "dspan": (record["start"], record["end"]),
+            }
+        )
 
     if tbname2training_id[config.treebank_name] % 2 == 1:
         tokenized_doc = pipeline._mwt_expand(tokenized_doc)
@@ -1581,7 +1591,6 @@ def run_trankit(
     try:
         _trankit_pipeline.set_active(trankit_name)
         with _trankit_inference_context():
-
             if manual_sentence_segmentation and lang_code in _MANUAL_SENTENCE_STOP_CHARS:
                 return _run_trankit_with_manual_sentence_segmentation(
                     _trankit_pipeline,
@@ -1596,7 +1605,9 @@ def run_trankit(
             if lang_code == "ar":
                 tokenizer_path = get_tokenizer_path(lang_code)
                 if tokenizer_path == "cameltools":
-                    from camel_tools_arabic_tokenizer import run_trankit_with_camel_tools_tokenization
+                    from camel_tools_arabic_tokenizer import (
+                        run_trankit_with_camel_tools_tokenization,
+                    )
 
                     return run_trankit_with_camel_tools_tokenization(_trankit_pipeline, text)
                 if tokenizer_path != "native":
@@ -1647,12 +1658,14 @@ def _tokenized_sentences_from_doc(tokenized_doc: Any, fallback_text: str) -> Lis
         return [sent for sent in sentences if isinstance(sent, dict)]
     tokens = tokenized_doc.get("tokens")
     if isinstance(tokens, list) and tokens:
-        return [{
-            "id": 1,
-            "text": fallback_text,
-            "tokens": tokens,
-            "dspan": (0, len(fallback_text)),
-        }]
+        return [
+            {
+                "id": 1,
+                "text": fallback_text,
+                "tokens": tokens,
+                "dspan": (0, len(fallback_text)),
+            }
+        ]
     return []
 
 
@@ -1717,8 +1730,7 @@ def run_trankit_chunk_boundaries(
                     continue
 
                 offset_map = [
-                    _coerce_chunk_offset(v)
-                    for v in list((raw_chunk or {}).get("offset_map") or [])
+                    _coerce_chunk_offset(v) for v in list((raw_chunk or {}).get("offset_map") or [])
                 ]
                 if not offset_map:
                     start = _coerce_chunk_offset((raw_chunk or {}).get("start")) or 0
@@ -1726,7 +1738,7 @@ def run_trankit_chunk_boundaries(
                 if len(offset_map) < len(chunk_text):
                     offset_map.extend([None] * (len(chunk_text) - len(offset_map)))
                 elif len(offset_map) > len(chunk_text):
-                    offset_map = offset_map[:len(chunk_text)]
+                    offset_map = offset_map[: len(chunk_text)]
 
                 chunk_sentences = _tokenize_trankit_chunk_locked(
                     _trankit_pipeline,
@@ -1754,7 +1766,9 @@ def run_trankit_chunk_boundaries(
 
             tagged_doc = _trankit_pipeline._posdep_doc(tokenized_doc)
             out = _trankit_pipeline._lemmatize_doc(tagged_doc)
-            if _trankit_pipeline._config.active_lang in getattr(_trankit_pipeline, "_ner_model", {}):
+            if _trankit_pipeline._config.active_lang in getattr(
+                _trankit_pipeline, "_ner_model", {}
+            ):
                 out = _trankit_pipeline._ner_doc(out)
     finally:
         run_ms = (time.perf_counter() - run_started) * 1000.0
@@ -1796,8 +1810,7 @@ def run_trankit_chunked(
             if not chunk_text.strip():
                 continue
             offset_map = [
-                _coerce_chunk_offset(v)
-                for v in list((raw_chunk or {}).get("offset_map") or [])
+                _coerce_chunk_offset(v) for v in list((raw_chunk or {}).get("offset_map") or [])
             ]
             if not offset_map:
                 start = _coerce_chunk_offset((raw_chunk or {}).get("start")) or 0
@@ -1805,7 +1818,7 @@ def run_trankit_chunked(
             if len(offset_map) < len(chunk_text):
                 offset_map.extend([None] * (len(chunk_text) - len(offset_map)))
             elif len(offset_map) > len(chunk_text):
-                offset_map = offset_map[:len(chunk_text)]
+                offset_map = offset_map[: len(chunk_text)]
 
             chunk_doc = _run_trankit_chunk_locked(
                 _trankit_pipeline,
@@ -1844,37 +1857,6 @@ def _run_trankit_lzh_sentencewise(pipeline, text: str) -> dict:
 # Dictionaries — one per language, loaded at startup
 # ---------------------------------------------------------------------------
 
-_dictionaries: Dict[str, Any] = {}
-
-
-def _import_class(path: str):
-    """Import 'module.path:ClassName' and return the class."""
-    module_path, class_name = path.rsplit(":", 1)
-    import importlib
-    mod = importlib.import_module(module_path)
-    return getattr(mod, class_name)
-
-
-def init_dictionaries():
-    """No-op — dictionaries are no longer loaded at server startup.
-
-    Dictionaries are now served as gzipped TSVs to the client browser,
-    which stores them in IndexedDB and uploads them back to the server
-    on demand via /upload_tsv.  This keeps server memory low and allows
-    scaling to many languages.
-    """
-    print("[INFO] Dictionary loading deferred — served on demand via gzipped TSV.")
-
-
-def get_dictionary(lang_code: str):
-    """Return the dictionary instance for a language code, or None.
-
-    With the new architecture dictionaries are uploaded by the client per
-    session, so this will typically return None unless a user-uploaded
-    dict is injected by the router.
-    """
-    return _dictionaries.get(lang_code)
-
 
 def get_tsv_path(lang_code: str) -> Optional[Path]:
     """Return the TSV dictionary path for a language, or None."""
@@ -1900,33 +1882,12 @@ def get_tokenizer_path(lang_code: str) -> str:
 # Hooks — one per language, loaded at startup
 # ---------------------------------------------------------------------------
 
-_hooks: Dict[str, LanguageHooks] = {}
-
-
-def init_hooks():
-    """Load all registered language hooks. Call once at startup."""
-    for code, info in LANGUAGE_REGISTRY.items():
-        hooks_obj = _import_class(info["hooks_path"])
-        _hooks[code] = hooks_obj
-        # Run language-specific preloader if provided
-        if hooks_obj.preload:
-            try:
-                hooks_obj.preload()
-            except Exception as e:
-                print(f"[WARN] Preload for '{code}' failed: {type(e).__name__}: {e}")
-
-
-def get_hooks(lang_code: str) -> LanguageHooks:
-    """Return the hooks object for a language code."""
-    return _hooks.get(lang_code, LanguageHooks())
-
 
 # ---------------------------------------------------------------------------
 # Master init — call once at startup
 # ---------------------------------------------------------------------------
 
+
 def init_all():
-    """Initialize all resources: dictionaries, hooks, Trankit."""
-    init_dictionaries()
-    init_hooks()
+    """Initialize the shared NLP pipeline."""
     init_trankit()

@@ -40,7 +40,7 @@ def _sqlite_database_url_path(database_url: str) -> Path | None:
     prefix = "sqlite:///"
     if not raw.startswith(prefix):
         return None
-    path_text = unquote(raw[len(prefix):])
+    path_text = unquote(raw[len(prefix) :])
     if not path_text:
         return None
     path = Path(path_text)
@@ -50,6 +50,7 @@ def _sqlite_database_url_path(database_url: str) -> Path | None:
 def _app_db_path() -> Path:
     try:
         import config as le_config
+
         configured = _sqlite_database_url_path(getattr(le_config, "DATABASE_URL", ""))
         if configured is not None:
             return configured
@@ -85,40 +86,6 @@ def _is_static_dictionary_db(db_path: Path) -> bool:
         return False
 
 
-def _get_conn(db_path: Path) -> sqlite3.Connection:
-    """Get or create a per-thread connection for a given .sqlite file."""
-    key = str(db_path)
-    conns = getattr(_thread_local, "connections", None)
-    if conns is None:
-        conns = {}
-        _thread_local.connections = conns
-    conn = conns.get(key)
-    if conn is not None:
-        return conn
-    path = Path(db_path)
-    try:
-        conn = sqlite3.connect(
-            _db_uri_for_readonly(path, immutable=_is_static_dictionary_db(path)),
-            uri=True,
-        )
-    except Exception:
-        conn = sqlite3.connect(key)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA query_only=ON")
-    conn.execute(f"PRAGMA cache_size=-{_READ_ONLY_CACHE_KB}")
-    conn.execute("PRAGMA temp_store=MEMORY")
-    try:
-        conn.execute(f"PRAGMA mmap_size={_READ_ONLY_MMAP_BYTES}")
-    except Exception:
-        pass
-    conns[key] = conn
-    return conn
-
-
-def _make_db_alias(index: int) -> str:
-    return f"db{int(index)}"
-
-
 def _alias_for_path(db_path: Path) -> str:
     """Return a stable SQLite ATTACH alias derived from the file stem.
 
@@ -130,19 +97,19 @@ def _alias_for_path(db_path: Path) -> str:
 
 
 def _is_korean_language_code(lang_code: str) -> bool:
-    lang = (lang_code or '').strip().lower()
-    return lang == 'ko' or lang == 'korean' or lang.startswith('ko-')
+    lang = (lang_code or "").strip().lower()
+    return lang == "ko" or lang == "korean" or lang.startswith("ko-")
 
 
 def _is_sanskrit_language_code(lang_code: str) -> bool:
-    lang = (lang_code or '').strip().lower()
+    lang = (lang_code or "").strip().lower()
     return (
-        lang == 'sa'
-        or lang == 'san'
-        or lang == 'sanskrit'
-        or lang.startswith('sa-')
-        or lang.startswith('san-')
-        or lang.startswith('sanskrit-')
+        lang == "sa"
+        or lang == "san"
+        or lang == "sanskrit"
+        or lang.startswith("sa-")
+        or lang.startswith("san-")
+        or lang.startswith("sanskrit-")
     )
 
 
@@ -152,24 +119,24 @@ def _is_sanskrit_language_code(lang_code: str) -> bool:
 # also reachable under the canonical anusvāra spelling the user tends to
 # type (saṃskṛta, saṃdhi…).
 _SANSKRIT_ANUSVARA_PATTERNS = (
-    (re.compile('\u1E45(?=[kg]h?)'), '\u1E43'),           # ṅ before k/g → ṃ
-    (re.compile('\u00F1(?=[cj]h?)'), '\u1E43'),           # ñ before c/j → ṃ
-    (re.compile('\u1E47(?=[\u1E6D\u1E0D]h?)'), '\u1E43'),  # ṇ before ṭ/ḍ → ṃ
-    (re.compile('n(?=[td]h?)'), '\u1E43'),                 # n before t/d → ṃ
-    (re.compile('m(?=[pb]h?)'), '\u1E43'),                 # m before p/b → ṃ
+    (re.compile("\u1e45(?=[kg]h?)"), "\u1e43"),  # ṅ before k/g → ṃ
+    (re.compile("\u00f1(?=[cj]h?)"), "\u1e43"),  # ñ before c/j → ṃ
+    (re.compile("\u1e47(?=[\u1e6d\u1e0d]h?)"), "\u1e43"),  # ṇ before ṭ/ḍ → ṃ
+    (re.compile("n(?=[td]h?)"), "\u1e43"),  # n before t/d → ṃ
+    (re.compile("m(?=[pb]h?)"), "\u1e43"),  # m before p/b → ṃ
 )
 
 
 def _sanskrit_anusvara_canonical(text: str) -> str:
     """Return the anusvāra-canonicalized form of an IAST string, or '' if
     unchanged. Input must already be IAST."""
-    s = str(text or '')
+    s = str(text or "")
     if not s:
-        return ''
+        return ""
     out = s
     for pat, repl in _SANSKRIT_ANUSVARA_PATTERNS:
         out = pat.sub(repl, out)
-    return out if out != s else ''
+    return out if out != s else ""
 
 
 def _build_aggregate_conn_key(
@@ -186,7 +153,9 @@ def _attach_database(conn: sqlite3.Connection, db_path: Path, alias: str) -> Non
     quoted = '"' + alias.replace('"', '""') + '"'
     sql = f"ATTACH DATABASE ? AS {quoted}"
     try:
-        conn.execute(sql, (_db_uri_for_readonly(db_path, immutable=_is_static_dictionary_db(db_path)),))
+        conn.execute(
+            sql, (_db_uri_for_readonly(db_path, immutable=_is_static_dictionary_db(db_path)),)
+        )
     except Exception:
         conn.execute(sql, (str(Path(db_path)),))
 
@@ -279,24 +248,10 @@ def _filter_db_paths(all_paths: list[Path], lang_code: str, sources: list[str]) 
                 filtered.append(p)
         else:
             # Extract source suffix: "ja-jmdict" -> "jmdict"
-            suffix = stem[len(lang_code) + 1:] if stem.startswith(lang_code + "-") else stem
+            suffix = stem[len(lang_code) + 1 :] if stem.startswith(lang_code + "-") else stem
             if suffix.lower() in source_set:
                 filtered.append(p)
     return filtered if filtered else all_paths  # fallback to all if nothing matched
-
-
-def _chunked_in_query(conn, base_sql: str, keys: list[str], extra_params: tuple = ()) -> list[sqlite3.Row]:
-    """Execute a query with an IN clause, chunking if needed (SQLite limit is 999 params)."""
-    if not keys:
-        return []
-    CHUNK = 900
-    results = []
-    for i in range(0, len(keys), CHUNK):
-        chunk = keys[i:i + CHUNK]
-        placeholders = ",".join("?" * len(chunk))
-        sql = base_sql.replace("__IN__", placeholders)
-        results.extend(conn.execute(sql, (*extra_params, *chunk)).fetchall())
-    return results
 
 
 def _iter_query_rows(
@@ -342,7 +297,7 @@ def _fetch_split_page_form_rows_for_entries(
     qa = '"' + alias.replace('"', '""') + '"'
     out: dict[int, list[dict[str, Any]]] = {}
     for chunk_start in range(0, len(ids), 900):
-        chunk = ids[chunk_start:chunk_start + 900]
+        chunk = ids[chunk_start : chunk_start + 900]
         placeholders = ",".join("?" * len(chunk))
         sql = (
             f"SELECT f.entry_id, f.id, f.form_text, "
@@ -358,7 +313,11 @@ def _fetch_split_page_form_rows_for_entries(
         rows = conn.execute(sql, tuple(chunk)).fetchall()
         norm_cache: dict[tuple[str, str], str] = {}
         if lang_code:
-            norm_pairs = [(str(row["form_text"] or "").strip(), lang_code) for row in rows if str(row["form_text"] or "").strip()]
+            norm_pairs = [
+                (str(row["form_text"] or "").strip(), lang_code)
+                for row in rows
+                if str(row["form_text"] or "").strip()
+            ]
             if norm_pairs:
                 norm_cache = _normalize_keys_via_js(norm_pairs)
         for row in rows:
@@ -383,13 +342,15 @@ def _fetch_split_page_form_rows_for_entries(
             }
             if dedupe_key in seen:
                 continue
-            bucket.append({
-                "form_id": int(row["id"] or 0),
-                "form_text": form_text,
-                "form_key": form_key,
-                "morph_tags": morph_tags,
-                "romanization": str(row["romanization"] or "").strip(),
-            })
+            bucket.append(
+                {
+                    "form_id": int(row["id"] or 0),
+                    "form_text": form_text,
+                    "form_key": form_key,
+                    "morph_tags": morph_tags,
+                    "romanization": str(row["romanization"] or "").strip(),
+                }
+            )
     return out
 
 
@@ -560,7 +521,9 @@ def _collect_pruned_alias_hits(
             return
         kept_hits = list(absolute_keep_hits)
         if candidate_hits:
-            fanout_reason = surface_fanout_cut_reason(db_name, current_form_text, len(candidate_live_survivor_ids))
+            fanout_reason = surface_fanout_cut_reason(
+                db_name, current_form_text, len(candidate_live_survivor_ids)
+            )
             if fanout_reason != "fanout_gt_10":
                 kept_hits.extend(candidate_hits)
         if kept_hits:
@@ -652,288 +615,6 @@ def _choose_split_page_promoted_form(
         if "canonical" in tags:
             return dict(row)
     return dict(rows[0])
-
-
-def _row_to_tsv_dict(row: sqlite3.Row, form_keys: list[tuple[str, str]] | None = None) -> dict:
-    """Convert a SQLite row back to the dict format that parseTsvRow expects.
-    This is the key compatibility layer — the browser's DictionaryEngine.loadFromRows()
-    will receive these as if they were parsed from TSV.
-
-    form_keys: optional list of (form_text, form_key) pairs for this entry,
-    pre-computed by Python _normalize_key. When provided, included as
-    _form_keys so the JS engine can use them directly without re-normalizing.
-    """
-    d = {
-        "headword": row["headword"],
-        "headword_key": row["headword_key"],
-        "glosses": row["glosses"],
-    }
-    fmt = row["format"]
-    if fmt == "compact":
-        d["romanization"] = row["romanization"]
-        d["pos"] = row["pos"]
-    else:
-        d["reading"] = row["romanization"]
-        d["pos_raw"] = row["pos"]
-        if row["tags"]:
-            d["tags"] = row["tags"]
-
-    if row["forms"]:
-        d["forms"] = row["forms"]
-    if row["commentary"]:
-        d["commentary"] = row["commentary"]
-    if row["lemma"]:
-        d["lemma"] = row["lemma"]
-    if row["etymology"]:
-        d["etymology"] = row["etymology"]
-    if row["etymology_number"]:
-        d["etymology_number"] = str(row["etymology_number"])
-    if row["source"]:
-        d["source"] = row["source"]
-    if row["entry_id"]:
-        d["entry_id"] = row["entry_id"]
-    if form_keys:
-        d["_form_keys"] = form_keys
-    return d
-
-
-def _row_to_lookup_dict(row: sqlite3.Row, *, match_key: str = "", form_keys: list[tuple[str, str]] | None = None) -> dict:
-    """Convert a DB row to a TSV-shaped dict for lookup consumers.
-
-    `match_key` is optional and only used by batch-prefetch helpers that need to
-    group exact rows by the key that triggered them.
-    """
-    d = _row_to_tsv_dict(row, form_keys=form_keys)
-    if match_key:
-        d["_match_key"] = match_key
-    return d
-
-
-def _custom_row_to_lookup_dict(
-    row: sqlite3.Row,
-    lang_code: str,
-    *,
-    match_key: str = "",
-    include_form_keys: bool = True,
-    form_keys: list[tuple[str, str]] | None = None,
-) -> dict:
-    """Convert a custom entry row to a lookup dict."""
-    hw = row["headword"]
-    hw_key = _normalize_key(hw, lang_code)
-    custom_form_keys: list[tuple[str, str]] = []
-    if include_form_keys and form_keys is not None:
-        custom_form_keys = list(form_keys)
-    elif include_form_keys:
-        try:
-            for ft, fk, _tags, _roman in _iter_normalized_custom_forms(lang_code, row["forms_json"] or "[]"):
-                custom_form_keys.append((ft, fk))
-        except Exception:
-            pass
-    d = {
-        "headword": hw,
-        "headword_key": hw_key,
-        "romanization": row["romanization"] or "",
-        "pos": row["pos"] or "",
-        "glosses": row["glosses_json"] or "[]",
-        "forms": row["forms_json"] or "[]",
-        "commentary": row["commentary"] or "",
-        "lemma": row["lemma"] or "",
-        "source": row["source"] or "gemini",
-        "entry_id": row["entry_id"] or "",
-    }
-    if include_form_keys and custom_form_keys:
-        d["_form_keys"] = custom_form_keys
-    if match_key:
-        d["_match_key"] = match_key
-    return d
-
-
-def _row_to_candidate_dict(
-    row: sqlite3.Row,
-    *,
-    storage_kind: str,
-    storage_db_path: str = "",
-    storage_row_id: int | None = None,
-    match_key: str = "",
-    match_kind: str = "",
-) -> dict:
-    return {
-        "headword": row["headword"],
-        "headword_key": row["headword_key"],
-        "romanization": row["romanization"] or "",
-        "reading": row["romanization"] or "",
-        "pos": row["pos"] or "",
-        "pos_raw": row["pos"] or "",
-        "commentary": row["commentary"] or "",
-        "lemma": row["lemma"] or "",
-        "source": row["source"] or "",
-        "entry_id": row["entry_id"] or "",
-        "tags": row["tags"] or "",
-        "format": row["format"] or "compact",
-        "_storage_kind": storage_kind,
-        "_storage_db_path": storage_db_path,
-        "_storage_row_id": int(storage_row_id or row["id"] or 0),
-        "_match_key": match_key,
-        "_match_kind": match_kind,
-        "_matched_forms": [],
-        "_hydrated": False,
-    }
-
-
-def _custom_row_to_candidate_dict(
-    row: sqlite3.Row,
-    lang_code: str,
-    *,
-    match_key: str = "",
-    match_kind: str = "",
-) -> dict:
-    return {
-        "headword": row["headword"],
-        "headword_key": _normalize_key(row["headword"], lang_code),
-        "romanization": row["romanization"] or "",
-        "reading": row["romanization"] or "",
-        "pos": row["pos"] or "",
-        "pos_raw": row["pos"] or "",
-        "commentary": row["commentary"] or "",
-        "lemma": row["lemma"] or "",
-        "source": row["source"] or "gemini",
-        "entry_id": row["entry_id"] or "",
-        "_storage_kind": "custom",
-        "_storage_db_path": "",
-        "_storage_row_id": int(row["id"] or 0),
-        "_match_key": match_key,
-        "_match_kind": match_kind,
-        "_matched_forms": [],
-        "_hydrated": False,
-    }
-
-
-def _dedupe_normalized_keys(normalized_keys: Sequence[str]) -> list[str]:
-    keys: list[str] = []
-    seen_keys: set[str] = set()
-    for raw_key in list(normalized_keys or []):
-        key = str(raw_key or "").strip()
-        if not key or key in seen_keys:
-            continue
-        seen_keys.add(key)
-        keys.append(key)
-    return keys
-
-
-def _project_probe_hit(row: sqlite3.Row) -> dict[str, Any]:
-    form_row_id = int(row["form_row_id"] or 0)
-    return {
-        "match_key": str(row["match_key"] or "").strip(),
-        "_storage_kind": str(row["storage_kind"] or "").strip().lower(),
-        "_storage_db_alias": str(row["db_alias"] or "").strip(),
-        "_storage_row_id": int(row["entry_row_id"] or 0),
-        "_match_kind": str(row["match_kind"] or "").strip().lower(),
-        "_form_row_id": form_row_id,
-        "_matched_form_row_ids": [form_row_id] if form_row_id > 0 else [],
-        "_hydrated": False,
-    }
-
-
-def _merge_probe_hit(grouped: dict[str, list[dict[str, Any]]], probe_hit: dict[str, Any]) -> None:
-    match_key = str(probe_hit.get("match_key") or "").strip()
-    if not match_key or match_key not in grouped:
-        return
-    ident = (
-        str(probe_hit.get("_storage_kind") or "").strip().lower(),
-        str(probe_hit.get("_storage_db_alias") or "").strip(),
-        int(probe_hit.get("_storage_row_id") or 0),
-    )
-    bucket = grouped.setdefault(match_key, [])
-    for existing in bucket:
-        existing_ident = (
-            str(existing.get("_storage_kind") or "").strip().lower(),
-            str(existing.get("_storage_db_alias") or "").strip(),
-            int(existing.get("_storage_row_id") or 0),
-        )
-        if existing_ident != ident:
-            continue
-        if str(probe_hit.get("_match_kind") or "").strip().lower() == "headword":
-            existing["_match_kind"] = "headword"
-            existing["_form_row_id"] = 0
-            existing["_matched_form_row_ids"] = []
-            return
-        matched_form_ids = existing.setdefault("_matched_form_row_ids", [])
-        for raw_form_id in list(probe_hit.get("_matched_form_row_ids") or []):
-            form_id = int(raw_form_id or 0)
-            if form_id > 0 and form_id not in matched_form_ids:
-                matched_form_ids.append(form_id)
-        if not existing.get("_form_row_id") and matched_form_ids:
-            existing["_form_row_id"] = int(matched_form_ids[0] or 0)
-        return
-    bucket.append(dict(probe_hit))
-
-
-def _build_probe_lookup_sql(db_aliases: Sequence[str], *, include_custom_entries: bool) -> str:
-    branches: list[str] = []
-    for alias in list(db_aliases or []):
-        qa = '"' + alias.replace('"', '""') + '"'
-        branches.append(
-            f"""
-            SELECT k.match_key AS match_key,
-                   'sqlite' AS storage_kind,
-                   '{alias}' AS db_alias,
-                   e.id AS entry_row_id,
-                   'headword' AS match_kind,
-                   0 AS form_row_id
-            FROM keybag k
-            JOIN {qa}.entries e ON e.headword_key = k.match_key
-            """
-        )
-        branches.append(
-            f"""
-            SELECT k.match_key AS match_key,
-                   'sqlite' AS storage_kind,
-                   '{alias}' AS db_alias,
-                   f.entry_id AS entry_row_id,
-                   'form' AS match_kind,
-                   f.id AS form_row_id
-            FROM keybag k
-            JOIN {qa}.forms f ON f.form_key = k.match_key
-            """
-        )
-    if include_custom_entries:
-        branches.append(
-            f"""
-            SELECT k.match_key AS match_key,
-                   'custom' AS storage_kind,
-                   '{_AGGREGATE_CUSTOM_ALIAS}' AS db_alias,
-                   c.id AS entry_row_id,
-                   'headword' AS match_kind,
-                   0 AS form_row_id
-            FROM keybag k
-            JOIN {_AGGREGATE_CUSTOM_ALIAS}.custom_dict_entries c
-              ON c.language = ? AND normkey_lang(c.headword, ?) = k.match_key
-            """
-        )
-        branches.append(
-            f"""
-            SELECT k.match_key AS match_key,
-                   'custom' AS storage_kind,
-                   '{_AGGREGATE_CUSTOM_ALIAS}' AS db_alias,
-                   f.entry_pk AS entry_row_id,
-                   'form' AS match_kind,
-                   f.id AS form_row_id
-            FROM keybag k
-            JOIN {_AGGREGATE_CUSTOM_ALIAS}.custom_dict_forms f
-              ON f.language = ? AND f.form_key = k.match_key
-            """
-        )
-    if not branches:
-        return ""
-    union_sql = "\nUNION ALL\n".join(branches)
-    return f"""
-        WITH keybag AS (
-            SELECT DISTINCT TRIM(value) AS match_key
-            FROM json_each(?)
-            WHERE TRIM(value) <> ''
-        )
-        {union_sql}
-    """
 
 
 def _build_hydrate_lookup_sql(db_aliases: Sequence[str], *, include_custom_entries: bool) -> str:
@@ -1077,7 +758,7 @@ def _build_hydrate_lookup_sql(db_aliases: Sequence[str], *, include_custom_entri
             """
         )
     if not branches:
-        return ''
+        return ""
     union_sql = "\nUNION ALL\n".join(branches)
     return f"""
         WITH refbag AS (
@@ -1093,6 +774,7 @@ def _build_hydrate_lookup_sql(db_aliases: Sequence[str], *, include_custom_entri
         )
         {union_sql}
     """
+
 
 def build_compact_key_index(
     lang_code: str,
@@ -1126,7 +808,7 @@ def build_compact_key_index(
         stem = Path(resolved_path_str).stem
         db_aliases[alias] = stem
     if include_custom:
-        db_aliases[_AGGREGATE_CUSTOM_ALIAS] = 'custom'
+        db_aliases[_AGGREGATE_CUSTOM_ALIAS] = "custom"
 
     hw: dict[str, list] = {}
     fw: dict[str, list] = {}
@@ -1134,26 +816,26 @@ def build_compact_key_index(
     inject_sanskrit_anusvara = _is_sanskrit_language_code(lang_code)
 
     def _push_hw_hit(match_key: str, alias: str, entry_id: int) -> None:
-        key = str(match_key or '').strip()
+        key = str(match_key or "").strip()
         if not key or not alias or entry_id <= 0:
             return
         hw.setdefault(key, []).append([alias, entry_id])
 
     def _korean_stem_text(surface_text: str, pos: str) -> str:
         if not inject_korean_stems:
-            return ''
-        pos_raw = str(pos or '').strip().lower()
-        if pos_raw not in {'verb', 'adj'}:
-            return ''
-        hw_text = str(surface_text or '').strip()
-        if not hw_text or not hw_text.endswith('다') or len(hw_text) <= 1:
-            return ''
+            return ""
+        pos_raw = str(pos or "").strip().lower()
+        if pos_raw not in {"verb", "adj"}:
+            return ""
+        hw_text = str(surface_text or "").strip()
+        if not hw_text or not hw_text.endswith("다") or len(hw_text) <= 1:
+            return ""
         return hw_text[:-1].strip()
 
     def _sanskrit_anusvara_text(surface_text: str) -> str:
         if not inject_sanskrit_anusvara:
-            return ''
-        return _sanskrit_anusvara_canonical(str(surface_text or '').strip())
+            return ""
+        return _sanskrit_anusvara_canonical(str(surface_text or "").strip())
 
     if paths:
         norm_texts: set[str] = set()
@@ -1172,10 +854,18 @@ def build_compact_key_index(
                 if raw:
                     norm_texts.add(raw)
             for survivor_entry_id in list(pruned.get("survivor_order") or []):
-                raw_headword = str(pruned["survivor_headword_by_entry_id"].get(survivor_entry_id) or "").strip()
+                raw_headword = str(
+                    pruned["survivor_headword_by_entry_id"].get(survivor_entry_id) or ""
+                ).strip()
                 pos = str(pruned["survivor_pos_by_entry_id"].get(survivor_entry_id) or "").strip()
-                promoted_rows = list(pruned.get("promoted_forms_by_survivor", {}).get(survivor_entry_id) or [])
-                primary_text = str(promoted_rows[0].get("form_text") or "").strip() if promoted_rows else raw_headword
+                promoted_rows = list(
+                    pruned.get("promoted_forms_by_survivor", {}).get(survivor_entry_id) or []
+                )
+                primary_text = (
+                    str(promoted_rows[0].get("form_text") or "").strip()
+                    if promoted_rows
+                    else raw_headword
+                )
                 if raw_headword:
                     norm_texts.add(raw_headword)
                 for promoted in promoted_rows:
@@ -1194,7 +884,7 @@ def build_compact_key_index(
 
         for alias, pruned in pruned_alias_hits:
             for raw_text, entry_id, form_id in list(pruned.get("form_hits") or []):
-                key = norm_cache.get((str(raw_text or "").strip(), lang_code), '')
+                key = norm_cache.get((str(raw_text or "").strip(), lang_code), "")
                 if not key or int(entry_id or 0) <= 0 or int(form_id or 0) <= 0:
                     continue
                 fw.setdefault(key, []).append([alias, int(entry_id), int(form_id)])
@@ -1204,36 +894,42 @@ def build_compact_key_index(
                 if entry_id <= 0:
                     continue
                 pos = str(pruned["survivor_pos_by_entry_id"].get(entry_id) or "").strip()
-                raw_headword = str(pruned["survivor_headword_by_entry_id"].get(entry_id) or "").strip()
-                promoted_form_rows = list(pruned.get("promoted_forms_by_survivor", {}).get(entry_id) or [])
+                raw_headword = str(
+                    pruned["survivor_headword_by_entry_id"].get(entry_id) or ""
+                ).strip()
+                promoted_form_rows = list(
+                    pruned.get("promoted_forms_by_survivor", {}).get(entry_id) or []
+                )
                 primary_text = raw_headword
                 emitted_hw_keys: set[str] = set()
 
                 if promoted_form_rows:
-                    primary_text = str(promoted_form_rows[0].get("form_text") or "").strip() or raw_headword
+                    primary_text = (
+                        str(promoted_form_rows[0].get("form_text") or "").strip() or raw_headword
+                    )
                     for promoted in promoted_form_rows:
                         promoted_text = str(promoted.get("form_text") or "").strip()
-                        promoted_key = norm_cache.get((promoted_text, lang_code), '')
+                        promoted_key = norm_cache.get((promoted_text, lang_code), "")
                         if not promoted_key or promoted_key in emitted_hw_keys:
                             continue
                         emitted_hw_keys.add(promoted_key)
                         _push_hw_hit(promoted_key, alias, entry_id)
                 else:
-                    base_key = norm_cache.get((raw_headword, lang_code), '')
+                    base_key = norm_cache.get((raw_headword, lang_code), "")
                     if base_key:
                         emitted_hw_keys.add(base_key)
                         _push_hw_hit(base_key, alias, entry_id)
 
                 stem_text = _korean_stem_text(primary_text, pos)
                 if stem_text:
-                    stem_key = norm_cache.get((stem_text, lang_code), '')
+                    stem_key = norm_cache.get((stem_text, lang_code), "")
                     if stem_key and stem_key not in emitted_hw_keys:
                         emitted_hw_keys.add(stem_key)
                         _push_hw_hit(stem_key, alias, entry_id)
 
                 anusvara_text = _sanskrit_anusvara_text(primary_text)
                 if anusvara_text:
-                    anusvara_key = norm_cache.get((anusvara_text, lang_code), '')
+                    anusvara_key = norm_cache.get((anusvara_text, lang_code), "")
                     if anusvara_key and anusvara_key not in emitted_hw_keys:
                         emitted_hw_keys.add(anusvara_key)
                         _push_hw_hit(anusvara_key, alias, entry_id)
@@ -1259,10 +955,10 @@ def build_compact_key_index(
         custom_form_rows: list[tuple[Any, str]] = []
 
         for row in hw_rows:
-            raw_text = str(row['headword'] or '').strip()
+            raw_text = str(row["headword"] or "").strip()
             if not raw_text:
                 continue
-            pos = str(row['pos'] or '').strip()
+            pos = str(row["pos"] or "").strip()
             custom_pairs.append((raw_text, lang_code))
             stem_text = _korean_stem_text(raw_text, pos)
             if stem_text:
@@ -1273,7 +969,7 @@ def build_compact_key_index(
             custom_head_rows.append((row, raw_text, stem_text, anusvara_text))
 
         for row in form_rows:
-            raw_text = str(row['form_text'] or '').strip()
+            raw_text = str(row["form_text"] or "").strip()
             if not raw_text:
                 continue
             custom_pairs.append((raw_text, lang_code))
@@ -1282,33 +978,33 @@ def build_compact_key_index(
         norm_cache = _normalize_keys_via_js(custom_pairs) if custom_pairs else {}
 
         for row, raw_text, stem_text, anusvara_text in custom_head_rows:
-            key = norm_cache.get((raw_text, lang_code), '')
+            key = norm_cache.get((raw_text, lang_code), "")
             if not key:
                 continue
-            entry_id = int(row['entry_row_id'] or 0)
+            entry_id = int(row["entry_row_id"] or 0)
             if entry_id <= 0:
                 continue
             _push_hw_hit(key, _AGGREGATE_CUSTOM_ALIAS, entry_id)
             if stem_text:
-                stem_key = norm_cache.get((stem_text, lang_code), '')
+                stem_key = norm_cache.get((stem_text, lang_code), "")
                 if stem_key and stem_key != key:
                     _push_hw_hit(stem_key, _AGGREGATE_CUSTOM_ALIAS, entry_id)
             if anusvara_text:
-                anusvara_key = norm_cache.get((anusvara_text, lang_code), '')
+                anusvara_key = norm_cache.get((anusvara_text, lang_code), "")
                 if anusvara_key and anusvara_key != key:
                     _push_hw_hit(anusvara_key, _AGGREGATE_CUSTOM_ALIAS, entry_id)
 
         for row, raw_text in custom_form_rows:
-            key = norm_cache.get((raw_text, lang_code), '')
+            key = norm_cache.get((raw_text, lang_code), "")
             if not key:
                 continue
-            entry_id = int(row['entry_row_id'] or 0)
-            form_id = int(row['form_row_id'] or 0)
+            entry_id = int(row["entry_row_id"] or 0)
+            form_id = int(row["form_row_id"] or 0)
             if entry_id <= 0 or form_id <= 0:
                 continue
             fw.setdefault(key, []).append([_AGGREGATE_CUSTOM_ALIAS, entry_id, form_id])
 
-    return {'hw': hw, 'fw': fw, 'db_aliases': db_aliases}
+    return {"hw": hw, "fw": fw, "db_aliases": db_aliases}
 
 
 def hydrate_winner_refs(
@@ -1327,13 +1023,23 @@ def hydrate_winner_refs(
         # Collect form_row_ids per entry for batch form lookup after entry fetch.
         # Key: (storage_kind, db_alias, entry_row_id) -> list of (form_row_id, match_key)
         form_refs_by_entry: dict[tuple[str, str, int], list[tuple[int, str]]] = {}
-        with (trace_scope("prepare_hydrate_refs", label="Prepare Hydrate Refs", candidate_count=len(list(candidates or []))) if trace else nullcontext()):
+        with (
+            trace_scope(
+                "prepare_hydrate_refs",
+                label="Prepare Hydrate Refs",
+                candidate_count=len(list(candidates or [])),
+            )
+            if trace
+            else nullcontext()
+        ):
             for candidate in list(candidates or []):
                 storage_kind = str(candidate.get("_storage_kind") or "").strip().lower()
                 db_alias = str(candidate.get("_storage_db_alias") or "").strip()
                 entry_row_id = int(candidate.get("_storage_row_id") or 0)
                 match_kind = str(candidate.get("_match_kind") or "headword").strip().lower()
-                match_key = str(candidate.get("match_key") or candidate.get("_match_key") or "").strip()
+                match_key = str(
+                    candidate.get("match_key") or candidate.get("_match_key") or ""
+                ).strip()
                 if not storage_kind or not db_alias or entry_row_id <= 0:
                     continue
                 if storage_kind == "custom":
@@ -1352,7 +1058,11 @@ def hydrate_winner_refs(
                         }
                     )
                 if match_kind == "form":
-                    matched_ids = [int(raw_id or 0) for raw_id in list(candidate.get("_matched_form_row_ids") or []) if int(raw_id or 0) > 0]
+                    matched_ids = [
+                        int(raw_id or 0)
+                        for raw_id in list(candidate.get("_matched_form_row_ids") or [])
+                        if int(raw_id or 0) > 0
+                    ]
                     if not matched_ids:
                         raw_id = int(candidate.get("_form_row_id") or 0)
                         if raw_id > 0:
@@ -1367,15 +1077,31 @@ def hydrate_winner_refs(
                                 seen_fids.add(fid)
         if not refs_payload:
             return {}
-        with (trace_scope("resolve_hydrate_sources", label="Resolve Hydrate Sources", refs_payload_count=len(refs_payload)) if trace else nullcontext()):
+        with (
+            trace_scope(
+                "resolve_hydrate_sources",
+                label="Resolve Hydrate Sources",
+                refs_payload_count=len(refs_payload),
+            )
+            if trace
+            else nullcontext()
+        ):
             include_custom = bool((include_custom_entries or need_custom) and APP_DB_PATH.exists())
             if db_paths is not None:
                 paths = [Path(p) for p in db_paths]
             else:
                 all_paths = _resolve_all_db_paths(lang_code)
-                paths = _filter_db_paths(all_paths, lang_code, list(sources or [])) if sources else all_paths
+                paths = (
+                    _filter_db_paths(all_paths, lang_code, list(sources or []))
+                    if sources
+                    else all_paths
+                )
             conn, alias_by_path = _get_aggregate_conn(paths, include_custom_entries=include_custom)
-        db_aliases = [alias_by_path[str(Path(p).resolve())] for p in paths if str(Path(p).resolve()) in alias_by_path]
+        db_aliases = [
+            alias_by_path[str(Path(p).resolve())]
+            for p in paths
+            if str(Path(p).resolve()) in alias_by_path
+        ]
         sql = _build_hydrate_lookup_sql(db_aliases, include_custom_entries=include_custom)
         if not sql:
             return {}
@@ -1390,7 +1116,8 @@ def hydrate_winner_refs(
                 params=tuple(params),
                 duration_ms=(time.perf_counter() - t0) * 1000.0,
                 row_count=len(rows),
-                db_path="aggregate:" + ",".join(db_aliases + ([_AGGREGATE_CUSTOM_ALIAS] if include_custom else [])),
+                db_path="aggregate:"
+                + ",".join(db_aliases + ([_AGGREGATE_CUSTOM_ALIAS] if include_custom else [])),
                 query_kind="hydrate_winner_refs",
                 extra={"candidate_count": len(refs_payload), "lang": lang_code},
             )
@@ -1411,12 +1138,20 @@ def hydrate_winner_refs(
             if alias and entry_id > 0:
                 split_page_entry_ids_by_alias.setdefault(alias, set()).add(entry_id)
         for alias, entry_ids in split_page_entry_ids_by_alias.items():
-            form_rows_by_entry = _fetch_split_page_form_rows_for_entries(conn, alias, sorted(entry_ids), lang_code=lang_code)
+            form_rows_by_entry = _fetch_split_page_form_rows_for_entries(
+                conn, alias, sorted(entry_ids), lang_code=lang_code
+            )
             for entry_id, form_rows in form_rows_by_entry.items():
                 split_page_forms_by_ref[("sqlite", alias, entry_id)] = form_rows
 
         hydrated: dict[tuple[str, str, int], dict] = {}
-        with (trace_scope("shape_hydrated_entries", label="Shape Hydrated Entries", row_count=len(rows)) if trace else nullcontext()):
+        with (
+            trace_scope(
+                "shape_hydrated_entries", label="Shape Hydrated Entries", row_count=len(rows)
+            )
+            if trace
+            else nullcontext()
+        ):
             for row in rows:
                 ref = (
                     str(row["storage_kind"] or "").strip().lower(),
@@ -1431,8 +1166,12 @@ def hydrate_winner_refs(
                         match_key=str(row["match_key"] or "").strip(),
                         form_row_id=int(row["form_row_id"] or 0),
                     )
-                    promoted_headword = str(promoted_form.get("form_text") or row["headword"] or "").strip()
-                    promoted_romanization = str(promoted_form.get("romanization") or row["romanization"] or "").strip()
+                    promoted_headword = str(
+                        promoted_form.get("form_text") or row["headword"] or ""
+                    ).strip()
+                    promoted_romanization = str(
+                        promoted_form.get("romanization") or row["romanization"] or ""
+                    ).strip()
                     entry = {
                         "headword": promoted_headword or row["headword"],
                         "glosses": row["glosses"],
@@ -1451,7 +1190,9 @@ def hydrate_winner_refs(
                         "_storage_db_alias": ref[1],
                         "_storage_row_id": ref[2],
                         "_storage_form_row_id": 0,
-                        "_match_kind": "headword" if promoted_form else str(row["match_kind"] or "").strip().lower(),
+                        "_match_kind": "headword"
+                        if promoted_form
+                        else str(row["match_kind"] or "").strip().lower(),
                         "_hydrated": True,
                         "_matched_forms": [],
                         "_split_page_promoted": bool(promoted_form),
@@ -1572,15 +1313,12 @@ def hydrate_winner_refs(
         for alias in db_aliases:
             qa = '"' + alias.replace('"', '""') + '"'
             # Collect entry IDs for this alias
-            alias_eids = [
-                ekey[2] for ekey in hydrated
-                if ekey[1] == alias and ekey[0] == "sqlite"
-            ]
+            alias_eids = [ekey[2] for ekey in hydrated if ekey[1] == alias and ekey[0] == "sqlite"]
             if not alias_eids:
                 continue
             # Fetch special-tagged forms + same-headword morph variants
             for chunk_start in range(0, len(alias_eids), 900):
-                chunk = alias_eids[chunk_start:chunk_start + 900]
+                chunk = alias_eids[chunk_start : chunk_start + 900]
                 placeholders = ",".join("?" * len(chunk))
                 special_sql = (
                     f"SELECT f.entry_id, f.form_text, f.morph_tags, f.romanization"
@@ -1594,9 +1332,11 @@ def hydrate_winner_refs(
                     st0 = time.perf_counter()
                     srows = conn.execute(special_sql, tuple(chunk)).fetchall()
                     record_sqlite_query(
-                        sql=special_sql, params=tuple(chunk),
+                        sql=special_sql,
+                        params=tuple(chunk),
                         duration_ms=(time.perf_counter() - st0) * 1000.0,
-                        row_count=len(srows), db_path="aggregate:" + alias,
+                        row_count=len(srows),
+                        db_path="aggregate:" + alias,
                         query_kind="hydrate_special_forms",
                         extra={"entry_count": len(chunk), "lang": lang_code},
                     )
@@ -1630,6 +1370,7 @@ def hydrate_winner_refs(
         # Attach community notes from EntryNote table
         try:
             from db import EntryNote
+
             note_keys = set()
             for ref_key, ent in hydrated.items():
                 alias = ent.get("_storage_db_alias", "")
@@ -1638,6 +1379,7 @@ def hydrate_winner_refs(
                     note_keys.add((alias, row_id))
             if note_keys:
                 from db import db as le_db
+
                 notes = EntryNote.query.filter(
                     EntryNote.language == lang_code,
                 ).all()
@@ -1662,39 +1404,14 @@ def hydrate_winner_refs(
         return hydrated
 
     if trace:
-        with trace_scope("hydrate_winner_refs", label="Hydrate Winner Refs", lang=lang_code, candidate_count=len(list(candidates or []))):
+        with trace_scope(
+            "hydrate_winner_refs",
+            label="Hydrate Winner Refs",
+            lang=lang_code,
+            candidate_count=len(list(candidates or [])),
+        ):
             return _run()
     return _run()
-
-
-def _generate_subword_candidates(text: str, lang_code: str = "") -> set:
-    """Generate all contiguous substrings respecting word boundaries.
-
-    For "khen chê" produces:
-      word spans  – khen, chê, khen chê
-      char slices – k, kh, khe, khen, h, he, hen, e, en, n, c, ch, chê, h, hê, ê
-    """
-    text = text.strip()
-    if not text:
-        return set()
-    candidates = set()
-    words = text.split()
-    # word-level contiguous spans
-    for i in range(len(words)):
-        for j in range(i + 1, len(words) + 1):
-            span = " ".join(words[i:j])
-            normed = _normalize_key(span, lang_code)
-            if normed:
-                candidates.add(normed)
-    # character-level substrings within each word
-    for word in words:
-        normed_word = _normalize_key(word, lang_code)
-        if not normed_word:
-            continue
-        for i in range(len(normed_word)):
-            for j in range(i + 1, len(normed_word) + 1):
-                candidates.add(normed_word[i:j])
-    return candidates
 
 
 def _normalize_keys_via_js(pairs: list[tuple[str, str]]) -> dict[tuple[str, str], str]:
@@ -1707,8 +1424,7 @@ def _normalize_keys_via_js(pairs: list[tuple[str, str]]) -> dict[tuple[str, str]
         return {}
     unique_pairs = list(dict.fromkeys(pairs))  # deduplicate, preserve order
     input_lines = "\n".join(
-        json.dumps({"text": t, "lang": l}, ensure_ascii=False)
-        for t, l in unique_pairs
+        json.dumps({"text": t, "lang": l}, ensure_ascii=False) for t, l in unique_pairs
     )
     result = subprocess.run(
         ["node", str(_JS_NORMALIZER)],
@@ -1743,23 +1459,27 @@ def _iter_custom_forms(
     records: list[tuple[str, str, str]] = []
     seen: set[tuple[str, str, str]] = set()
     try:
-        forms_list = forms_json if isinstance(forms_json, list) else json.loads(forms_json or '[]')
+        forms_list = forms_json if isinstance(forms_json, list) else json.loads(forms_json or "[]")
     except Exception:
         return records
     if not isinstance(forms_list, list):
         return records
     for form in forms_list:
-        form_text = ''
-        morph_tags = ''
-        romanization = ''
+        form_text = ""
+        morph_tags = ""
+        romanization = ""
         if isinstance(form, (list, tuple)):
-            form_text = str(form[0] if len(form) > 0 else '').strip()
-            morph_tags = str(form[1] if len(form) > 1 else '').strip()
-            romanization = str(form[2] if len(form) > 2 else '').strip()
+            form_text = str(form[0] if len(form) > 0 else "").strip()
+            morph_tags = str(form[1] if len(form) > 1 else "").strip()
+            romanization = str(form[2] if len(form) > 2 else "").strip()
         elif isinstance(form, dict):
-            form_text = str(form.get('form') or form.get('text') or '').strip()
-            morph_tags = str(form.get('tags') or form.get('label') or form.get('commentary') or '').strip()
-            romanization = str(form.get('romanization') or form.get('reading') or form.get('pronunciation') or '').strip()
+            form_text = str(form.get("form") or form.get("text") or "").strip()
+            morph_tags = str(
+                form.get("tags") or form.get("label") or form.get("commentary") or ""
+            ).strip()
+            romanization = str(
+                form.get("romanization") or form.get("reading") or form.get("pronunciation") or ""
+            ).strip()
         if not form_text:
             continue
         ident = (form_text, morph_tags, romanization)
@@ -1813,7 +1533,7 @@ def ensure_custom_form_index(force_rebuild: bool = False) -> None:
                     "SELECT id, language, forms_json FROM custom_dict_entries"
                 ).fetchall()
                 for row in rows:
-                    lang = str(row[1] or '').strip().lower()
+                    lang = str(row[1] or "").strip().lower()
                     for form_text, morph_tags, romanization in _iter_custom_forms(lang, row[2]):
                         conn.execute(
                             """
@@ -1835,13 +1555,15 @@ def ensure_custom_form_index(force_rebuild: bool = False) -> None:
             conn.close()
 
 
-def sync_custom_form_index_entry(entry_pk: int, lang_code: str, forms_json: str | list | None) -> None:
+def sync_custom_form_index_entry(
+    entry_pk: int, lang_code: str, forms_json: str | list | None
+) -> None:
     if not APP_DB_PATH.exists() or not entry_pk:
         return
     ensure_custom_form_index()
     conn = sqlite3.connect(str(APP_DB_PATH))
     try:
-        lang = str(lang_code or '').strip().lower()
+        lang = str(lang_code or "").strip().lower()
         conn.execute("DELETE FROM custom_dict_forms WHERE entry_pk = ?", (int(entry_pk),))
         for form_text, morph_tags, romanization in _iter_custom_forms(lang, forms_json):
             conn.execute(
@@ -1869,845 +1591,6 @@ def delete_custom_form_index_entry(entry_pk: int) -> None:
         conn.close()
 
 
-def _query_one_db(conn, headword_keys: list[str], form_keys: list[str], include_form_keys: bool = True) -> list[dict]:
-    """Run headword + form queries against one SQLite database, return TSV-shaped dicts."""
-    # Query 1: entries by headword
-    entry_rows = _chunked_in_query(
-        conn,
-        "SELECT * FROM entries WHERE headword_key IN (__IN__)",
-        headword_keys,
-    )
-
-    found_entry_ids = set(r["id"] for r in entry_rows)
-
-    # Query 2: entries via form index
-    if form_keys:
-        form_rows = _chunked_in_query(
-            conn,
-            "SELECT f.entry_id FROM forms f WHERE f.form_key IN (__IN__)",
-            form_keys,
-        )
-        form_entry_ids = set(r["entry_id"] for r in form_rows) - found_entry_ids
-        if form_entry_ids:
-            extra_rows = _chunked_in_query(
-                conn,
-                "SELECT * FROM entries WHERE id IN (__IN__)",
-                [str(eid) for eid in form_entry_ids],
-            )
-            entry_rows.extend(extra_rows)
-
-    seen_ids = set()
-    all_entry_ids = []
-    deduped_rows = []
-    for r in entry_rows:
-        rid = r["id"]
-        if rid in seen_ids:
-            continue
-        seen_ids.add(rid)
-        all_entry_ids.append(rid)
-        deduped_rows.append(r)
-
-    # Fetch pre-computed form keys for all entries in one query when requested.
-    form_keys_by_entry: dict[int, list[tuple[str, str]]] = {}
-    if include_form_keys and all_entry_ids:
-        fk_rows = _chunked_in_query(
-            conn,
-            "SELECT entry_id, form_text, form_key FROM forms WHERE entry_id IN (__IN__)",
-            [str(eid) for eid in all_entry_ids],
-        )
-        for fk in fk_rows:
-            eid = fk["entry_id"]
-            if eid not in form_keys_by_entry:
-                form_keys_by_entry[eid] = []
-            form_keys_by_entry[eid].append((fk["form_text"], fk["form_key"]))
-
-    rows = []
-    for r in deduped_rows:
-        fks = form_keys_by_entry.get(r["id"]) if include_form_keys else None
-        rows.append(_row_to_tsv_dict(r, fks))
-    return rows
-
-
-def _query_one_db_grouped(conn, headword_keys: list[str], form_keys: list[str]) -> dict[str, list[dict]]:
-    """Run headword + form queries against one SQLite database and group by match key."""
-    grouped: dict[str, list[dict]] = {}
-    seen_by_key: dict[str, set[tuple[str, str]]] = {}
-
-    def add_row(match_key: str, row: dict) -> None:
-        key = str(match_key or "").strip()
-        if not key:
-            return
-        row_id = str(row.get("entry_id") or row.get("id") or "")
-        source = str(row.get("source") or "").strip().lower()
-        seen = seen_by_key.setdefault(key, set())
-        ident = (source, row_id)
-        if ident in seen:
-            return
-        seen.add(ident)
-        grouped.setdefault(key, []).append(row)
-
-    entry_rows = _chunked_in_query(
-        conn,
-        "SELECT *, headword_key AS _match_key FROM entries WHERE headword_key IN (__IN__)",
-        headword_keys,
-    )
-    for r in entry_rows:
-        match_key = str(r["_match_key"] or "").strip()
-        add_row(match_key, _row_to_lookup_dict(r, match_key=match_key, form_keys=None))
-
-    if form_keys:
-        form_rows = _chunked_in_query(
-            conn,
-            "SELECT DISTINCT e.*, f.form_key AS _match_key FROM forms f JOIN entries e ON e.id = f.entry_id WHERE f.form_key IN (__IN__)",
-            form_keys,
-        )
-        for r in form_rows:
-            match_key = str(r["_match_key"] or "").strip()
-            add_row(match_key, _row_to_lookup_dict(r, match_key=match_key, form_keys=None))
-
-    return grouped
-
-
-def _query_custom_entries(lang_code: str, headword_keys: list[str], include_form_keys: bool = True) -> list[dict]:
-    """Query custom entries through the same normalized candidate-key flow."""
-    if not APP_DB_PATH.exists():
-        return []
-    ensure_custom_form_index()
-    normalized_keys = [str(k or "").strip() for k in (headword_keys or []) if str(k or "").strip()]
-    if not normalized_keys:
-        return []
-    try:
-        conn = _get_conn(APP_DB_PATH)
-    except Exception:
-        return []
-    results = []
-    seen_entry_ids = set()
-    CHUNK = 450
-    try:
-        rows_by_entry_pk: dict[int, sqlite3.Row] = {}
-        for i in range(0, len(normalized_keys), CHUNK):
-            chunk = normalized_keys[i:i + CHUNK]
-            placeholders = ",".join("?" * len(chunk))
-            queries = [
-                (
-                    "SELECT DISTINCT c.* "
-                    "FROM custom_dict_entries c "
-                    f"WHERE c.language = ? AND normkey_lang(c.headword, ?) IN ({placeholders})",
-                    (lang_code, lang_code, *chunk),
-                ),
-                (
-                    "SELECT DISTINCT c.* "
-                    "FROM custom_dict_forms f "
-                    "JOIN custom_dict_entries c ON c.id = f.entry_pk "
-                    f"WHERE f.language = ? AND f.form_key IN ({placeholders})",
-                    (lang_code, *chunk),
-                ),
-            ]
-            rows = []
-            for sql, params in queries:
-                rows.extend(conn.execute(sql, params).fetchall())
-            for r in rows:
-                entry_pk = int(r["id"] or 0)
-                entry_id = r["entry_id"] or f"pk:{r['id']}"
-                if entry_id in seen_entry_ids:
-                    continue
-                seen_entry_ids.add(entry_id)
-                rows_by_entry_pk[entry_pk] = r
-        form_keys_by_entry: dict[int, list[tuple[str, str]]] = {}
-        if include_form_keys and rows_by_entry_pk:
-            fk_rows = _chunked_in_query(
-                conn,
-                "SELECT entry_pk, form_text, form_key FROM custom_dict_forms WHERE entry_pk IN (__IN__)",
-                [str(entry_pk) for entry_pk in rows_by_entry_pk],
-            )
-            for fk in fk_rows:
-                entry_pk = int(fk["entry_pk"] or 0)
-                form_keys_by_entry.setdefault(entry_pk, []).append(
-                    (str(fk["form_text"] or ""), str(fk["form_key"] or ""))
-                )
-        for entry_pk, row in rows_by_entry_pk.items():
-            results.append(
-                _custom_row_to_lookup_dict(
-                    row,
-                    lang_code,
-                    include_form_keys=include_form_keys,
-                    form_keys=form_keys_by_entry.get(entry_pk) if include_form_keys else None,
-                )
-            )
-    except Exception:
-        return []
-    return results
-
-
-def _query_custom_entries_grouped(lang_code: str, headword_keys: list[str]) -> dict[str, list[dict]]:
-    """Query custom entries and group results by match key."""
-    if not APP_DB_PATH.exists():
-        return {}
-    ensure_custom_form_index()
-    normalized_keys = [str(k or "").strip() for k in (headword_keys or []) if str(k or "").strip()]
-    if not normalized_keys:
-        return {}
-    try:
-        conn = _get_conn(APP_DB_PATH)
-    except Exception:
-        return {}
-    grouped: dict[str, list[dict]] = {}
-    seen_by_key: dict[str, set[str]] = {}
-    CHUNK = 450
-    try:
-        for i in range(0, len(normalized_keys), CHUNK):
-            chunk = normalized_keys[i:i + CHUNK]
-            placeholders = ",".join("?" * len(chunk))
-            queries = [
-                (
-                    "SELECT DISTINCT c.*, normkey_lang(c.headword, ?) AS _match_key "
-                    "FROM custom_dict_entries c "
-                    f"WHERE c.language = ? AND normkey_lang(c.headword, ?) IN ({placeholders}) "
-                    "AND LOWER(COALESCE(c.source, 'gemini')) = 'gemini'",
-                    (lang_code, lang_code, lang_code, *chunk),
-                ),
-                (
-                    "SELECT DISTINCT c.*, f.form_key AS _match_key "
-                    "FROM custom_dict_forms f "
-                    "JOIN custom_dict_entries c ON c.id = f.entry_pk "
-                    f"WHERE f.language = ? AND f.form_key IN ({placeholders}) "
-                    "AND LOWER(COALESCE(c.source, 'gemini')) = 'gemini'",
-                    (lang_code, *chunk),
-                ),
-            ]
-            for sql, params in queries:
-                rows = conn.execute(sql, params).fetchall()
-                for r in rows:
-                    match_key = str(r["_match_key"] or "").strip()
-                    if not match_key:
-                        continue
-                    row = _custom_row_to_lookup_dict(r, lang_code, match_key=match_key, include_form_keys=False)
-                    entry_id = str(row.get("entry_id") or row.get("id") or "")
-                    seen = seen_by_key.setdefault(match_key, set())
-                    if entry_id in seen:
-                        continue
-                    seen.add(entry_id)
-                    grouped.setdefault(match_key, []).append(row)
-    except Exception:
-        return {}
-    return grouped
-
-
-def lookup_rows_for_keys(
-    lang_code: str,
-    texts: list[str] | tuple[str, ...] | set[str],
-    *,
-    db_paths: Sequence[str | Path] | None = None,
-    sources: list[str] | None = None,
-    include_custom_entries: bool = True,
-) -> dict[str, list[dict]]:
-    """Batch lookup exact headword/form rows for a set of normalized or raw texts.
-
-    Returns a mapping of normalized lookup key -> list of TSV-shaped row dicts.
-    """
-    keys = normalize_keys(list(texts or []), lang_code)
-    if not keys:
-        return {}
-
-    if db_paths is not None:
-        paths = [Path(p) for p in db_paths]
-    else:
-        all_paths = _resolve_all_db_paths(lang_code)
-        paths = _filter_db_paths(all_paths, lang_code, list(sources or [])) if sources else all_paths
-
-    grouped: dict[str, list[dict]] = {key: [] for key in keys}
-    seen_by_key: dict[str, set[tuple[str, str]]] = {key: set() for key in keys}
-
-    def merge_rows(rows_map: dict[str, list[dict]]) -> None:
-        for match_key, rows in rows_map.items():
-            if match_key not in grouped:
-                continue
-            seen = seen_by_key.setdefault(match_key, set())
-            bucket = grouped.setdefault(match_key, [])
-            for row in rows:
-                entry_id = str(row.get("entry_id") or row.get("id") or "")
-                source = str(row.get("source") or "").strip().lower()
-                ident = (source, entry_id)
-                if ident in seen:
-                    continue
-                seen.add(ident)
-                bucket.append(row)
-
-    for db_path in paths:
-        merge_rows(_query_one_db_grouped(_get_conn(db_path), keys, keys))
-    if include_custom_entries:
-        merge_rows(_query_custom_entries_grouped(lang_code, keys))
-    return grouped
-
-
-def _query_candidate_db_grouped(conn, db_path: Path, keys: list[str], *, trace: bool = False) -> dict[str, list[dict]]:
-    grouped: dict[str, list[dict]] = {key: [] for key in keys}
-    seen_by_key: dict[str, set[tuple[str, int]]] = {key: set() for key in keys}
-    path_text = str(Path(db_path))
-
-    def add_candidate(match_key: str, candidate: dict) -> None:
-        key = str(match_key or "").strip()
-        if not key or key not in grouped:
-            return
-        row_id = int(candidate.get("_storage_row_id") or 0)
-        ident = (str(candidate.get("source") or "").strip().lower(), row_id)
-        seen = seen_by_key.setdefault(key, set())
-        bucket = grouped.setdefault(key, [])
-        if ident in seen:
-            for existing in bucket:
-                if (
-                    int(existing.get("_storage_row_id") or 0) == row_id
-                    and str(existing.get("source") or "").strip().lower() == ident[0]
-                ):
-                    matched = existing.setdefault("_matched_forms", [])
-                    for rec in list(candidate.get("_matched_forms") or []):
-                        if rec not in matched:
-                            matched.append(rec)
-                    if candidate.get("_match_kind") == "headword":
-                        existing["_match_kind"] = "headword"
-                    return
-            return
-        seen.add(ident)
-        bucket.append(candidate)
-
-    head_sql = """
-        SELECT id, headword, headword_key, romanization, pos, commentary, lemma, source, entry_id, tags, format,
-               headword_key AS _match_key
-        FROM entries
-        WHERE headword_key IN (__IN__)
-        """
-    if trace:
-        head_t0 = time.perf_counter()
-        head_rows = _chunked_in_query(conn, head_sql, keys)
-        record_sqlite_query(
-            sql=head_sql,
-            params=keys,
-            duration_ms=(time.perf_counter() - head_t0) * 1000.0,
-            row_count=len(head_rows),
-            db_path=path_text,
-            query_kind="candidate_headword",
-            extra={"normalized_keys": list(keys)},
-        )
-    else:
-        head_rows = _chunked_in_query(conn, head_sql, keys)
-    for row in head_rows:
-        match_key = str(row["_match_key"] or "").strip()
-        add_candidate(
-            match_key,
-            _row_to_candidate_dict(
-                row,
-                storage_kind="sqlite",
-                storage_db_path=path_text,
-                storage_row_id=int(row["id"] or 0),
-                match_key=match_key,
-                match_kind="headword",
-            ),
-        )
-
-    form_sql = """
-        SELECT e.id, e.headword, e.headword_key, e.romanization, e.pos, e.commentary, e.lemma, e.source, e.entry_id, e.tags, e.format,
-               f.form_text, f.form_key AS _match_key, f.morph_tags, f.romanization AS form_romanization
-        FROM forms f
-        JOIN entries e ON e.id = f.entry_id
-        WHERE f.form_key IN (__IN__)
-        """
-    if trace:
-        form_t0 = time.perf_counter()
-        form_rows = _chunked_in_query(conn, form_sql, keys)
-        record_sqlite_query(
-            sql=form_sql,
-            params=keys,
-            duration_ms=(time.perf_counter() - form_t0) * 1000.0,
-            row_count=len(form_rows),
-            db_path=path_text,
-            query_kind="candidate_form",
-            extra={"normalized_keys": list(keys)},
-        )
-    else:
-        form_rows = _chunked_in_query(conn, form_sql, keys)
-    for row in form_rows:
-        match_key = str(row["_match_key"] or "").strip()
-        candidate = _row_to_candidate_dict(
-            row,
-            storage_kind="sqlite",
-            storage_db_path=path_text,
-            storage_row_id=int(row["id"] or 0),
-            match_key=match_key,
-            match_kind="form",
-        )
-        candidate["_matched_forms"] = [{
-            "form_text": str(row["form_text"] or "").strip(),
-            "display_text": str(row["form_text"] or "").strip(),
-            "form_roman": str(row["form_romanization"] or "").strip(),
-            "tags": str(row["morph_tags"] or "").strip(),
-            "index_keys": [match_key] if match_key else [],
-        }]
-        add_candidate(match_key, candidate)
-    return grouped
-
-
-def _query_custom_candidate_entries_grouped(lang_code: str, keys: list[str], *, trace: bool = False) -> dict[str, list[dict]]:
-    ensure_custom_form_index()
-    grouped: dict[str, list[dict]] = {key: [] for key in keys}
-    seen_by_key: dict[str, set[str]] = {key: set() for key in keys}
-    if not APP_DB_PATH.exists() or not keys:
-        return grouped
-    try:
-        conn = _get_conn(APP_DB_PATH)
-    except Exception:
-        return grouped
-    CHUNK = 450
-
-    def add_candidate(match_key: str, candidate: dict) -> None:
-        key = str(match_key or "").strip()
-        if not key or key not in grouped:
-            return
-        ident = str(candidate.get("entry_id") or candidate.get("_storage_row_id") or "")
-        seen = seen_by_key.setdefault(key, set())
-        bucket = grouped.setdefault(key, [])
-        if ident in seen:
-            for existing in bucket:
-                existing_ident = str(existing.get("entry_id") or existing.get("_storage_row_id") or "")
-                if existing_ident != ident:
-                    continue
-                matched = existing.setdefault("_matched_forms", [])
-                for rec in list(candidate.get("_matched_forms") or []):
-                    if rec not in matched:
-                        matched.append(rec)
-                if candidate.get("_match_kind") == "headword":
-                    existing["_match_kind"] = "headword"
-                return
-            return
-        seen.add(ident)
-        bucket.append(candidate)
-
-    try:
-        for i in range(0, len(keys), CHUNK):
-            chunk = keys[i:i + CHUNK]
-            placeholders = ",".join("?" * len(chunk))
-            head_sql = f"""
-                SELECT id, entry_id, headword, romanization, pos, commentary, lemma, source,
-                       normkey_lang(headword, ?) AS headword_key,
-                       normkey_lang(headword, ?) AS _match_key
-                FROM custom_dict_entries
-                WHERE language = ? AND normkey_lang(headword, ?) IN ({placeholders})
-                AND LOWER(COALESCE(source, 'gemini')) = 'gemini'
-                """
-            if trace:
-                head_t0 = time.perf_counter()
-                head_rows = conn.execute(
-                    head_sql,
-                    (lang_code, lang_code, lang_code, lang_code, *chunk),
-                ).fetchall()
-                record_sqlite_query(
-                    sql=head_sql,
-                    params=(lang_code, lang_code, lang_code, lang_code, *chunk),
-                    duration_ms=(time.perf_counter() - head_t0) * 1000.0,
-                    row_count=len(head_rows),
-                    db_path=str(APP_DB_PATH),
-                    query_kind="candidate_custom_headword",
-                    extra={"normalized_keys": list(chunk)},
-                )
-            else:
-                head_rows = conn.execute(
-                    head_sql,
-                    (lang_code, lang_code, lang_code, lang_code, *chunk),
-                ).fetchall()
-            for row in head_rows:
-                match_key = str(row["_match_key"] or "").strip()
-                add_candidate(
-                    match_key,
-                    _custom_row_to_candidate_dict(
-                        row,
-                        lang_code,
-                        match_key=match_key,
-                        match_kind="headword",
-                    ),
-                )
-
-            form_sql = f"""
-                SELECT c.id, c.entry_id, c.headword, c.romanization, c.pos, c.commentary, c.lemma, c.source,
-                       f.form_text, f.form_key AS _match_key, f.morph_tags, f.romanization AS form_romanization
-                FROM custom_dict_forms f
-                JOIN custom_dict_entries c ON c.id = f.entry_pk
-                WHERE f.language = ? AND f.form_key IN ({placeholders})
-                AND LOWER(COALESCE(c.source, 'gemini')) = 'gemini'
-                """
-            if trace:
-                form_t0 = time.perf_counter()
-                form_rows = conn.execute(
-                    form_sql,
-                    (lang_code, *chunk),
-                ).fetchall()
-                record_sqlite_query(
-                    sql=form_sql,
-                    params=(lang_code, *chunk),
-                    duration_ms=(time.perf_counter() - form_t0) * 1000.0,
-                    row_count=len(form_rows),
-                    db_path=str(APP_DB_PATH),
-                    query_kind="candidate_custom_form",
-                    extra={"normalized_keys": list(chunk)},
-                )
-            else:
-                form_rows = conn.execute(
-                    form_sql,
-                    (lang_code, *chunk),
-                ).fetchall()
-            for row in form_rows:
-                match_key = str(row["_match_key"] or "").strip()
-                candidate = _custom_row_to_candidate_dict(
-                    row,
-                    lang_code,
-                    match_key=match_key,
-                    match_kind="form",
-                )
-                candidate["_matched_forms"] = [{
-                    "form_text": str(row["form_text"] or "").strip(),
-                    "display_text": str(row["form_text"] or "").strip(),
-                    "form_roman": str(row["form_romanization"] or "").strip(),
-                    "tags": str(row["morph_tags"] or "").strip(),
-                    "index_keys": [match_key] if match_key else [],
-                }]
-                add_candidate(match_key, candidate)
-    except Exception:
-        return grouped
-    return grouped
-
-
-def lookup_candidate_rows_for_normalized_keys(
-    lang_code: str,
-    normalized_keys: Sequence[str],
-    *,
-    db_paths: Sequence[str | Path] | None = None,
-    sources: list[str] | None = None,
-    include_custom_entries: bool = True,
-    trace: bool = False,
-) -> dict[str, list[dict]]:
-    def _run() -> dict[str, list[dict]]:
-        keys: list[str] = []
-        seen_keys: set[str] = set()
-        for raw_key in list(normalized_keys or []):
-            key = str(raw_key or "").strip()
-            if not key or key in seen_keys:
-                continue
-            seen_keys.add(key)
-            keys.append(key)
-        if not keys:
-            return {}
-        if db_paths is not None:
-            paths = [Path(p) for p in db_paths]
-        else:
-            all_paths = _resolve_all_db_paths(lang_code)
-            paths = _filter_db_paths(all_paths, lang_code, list(sources or [])) if sources else all_paths
-        grouped: dict[str, list[dict]] = {key: [] for key in keys}
-        seen_by_key: dict[str, set[tuple[str, str, int]]] = {key: set() for key in keys}
-
-        def merge(rows_map: dict[str, list[dict]]) -> None:
-            for key, rows in rows_map.items():
-                if key not in grouped:
-                    continue
-                seen = seen_by_key.setdefault(key, set())
-                bucket = grouped.setdefault(key, [])
-                for row in rows:
-                    ident = (
-                        str(row.get("_storage_kind") or ""),
-                        str(row.get("_storage_db_path") or ""),
-                        int(row.get("_storage_row_id") or 0),
-                    )
-                    if ident in seen:
-                        for existing in bucket:
-                            if (
-                                str(existing.get("_storage_kind") or "") == ident[0]
-                                and str(existing.get("_storage_db_path") or "") == ident[1]
-                                and int(existing.get("_storage_row_id") or 0) == ident[2]
-                            ):
-                                matched = existing.setdefault("_matched_forms", [])
-                                for rec in list(row.get("_matched_forms") or []):
-                                    if rec not in matched:
-                                        matched.append(rec)
-                                if row.get("_match_kind") == "headword":
-                                    existing["_match_kind"] = "headword"
-                                break
-                        continue
-                    seen.add(ident)
-                    bucket.append(row)
-
-        for db_path in paths:
-            merge(_query_candidate_db_grouped(_get_conn(db_path), Path(db_path), keys, trace=trace))
-        if include_custom_entries:
-            merge(_query_custom_candidate_entries_grouped(lang_code, keys, trace=trace))
-        if trace:
-            for key, rows in grouped.items():
-                record_retrieval(
-                    normalized_key=key,
-                    entries=rows,
-                    source="candidate_lookup",
-                    extra={"lang": lang_code},
-                )
-        return grouped
-    if trace:
-        with trace_scope("lookup_candidate_rows", label="Lookup Candidate Rows", lang=lang_code, normalized_key_count=len(list(normalized_keys or []))):
-            return _run()
-    return _run()
-
-
-def hydrate_rows_for_candidates(
-    candidates: Sequence[dict[str, object]],
-    lang_code: str,
-    *,
-    trace: bool = False,
-) -> dict[tuple[str, str, int], dict]:
-    def _run() -> dict[tuple[str, str, int], dict]:
-        hydrated: dict[tuple[str, str, int], dict] = {}
-        sqlite_ids_by_path: dict[str, list[int]] = {}
-        custom_ids: list[int] = []
-        for candidate in list(candidates or []):
-            storage_kind = str(candidate.get("_storage_kind") or "").strip().lower()
-            storage_db_path = str(candidate.get("_storage_db_path") or "").strip()
-            storage_row_id = int(candidate.get("_storage_row_id") or 0)
-            if not storage_row_id:
-                continue
-            ref = (storage_kind, storage_db_path, storage_row_id)
-            if ref in hydrated:
-                continue
-            if storage_kind == "sqlite" and storage_db_path:
-                sqlite_ids_by_path.setdefault(storage_db_path, []).append(storage_row_id)
-            elif storage_kind == "custom":
-                custom_ids.append(storage_row_id)
-
-        for path_text, row_ids in sqlite_ids_by_path.items():
-            conn = _get_conn(Path(path_text))
-            sql = "SELECT * FROM entries WHERE id IN (__IN__)"
-            params = [str(row_id) for row_id in sorted(set(row_ids))]
-            if trace:
-                t0 = time.perf_counter()
-                rows = _chunked_in_query(conn, sql, params)
-                record_sqlite_query(
-                    sql=sql,
-                    params=params,
-                    duration_ms=(time.perf_counter() - t0) * 1000.0,
-                    row_count=len(rows),
-                    db_path=str(path_text),
-                    query_kind="hydrate_entries",
-                )
-            else:
-                rows = _chunked_in_query(conn, sql, params)
-            for row in rows:
-                out = _row_to_lookup_dict(row, form_keys=None)
-                out["_storage_kind"] = "sqlite"
-                out["_storage_db_path"] = path_text
-                out["_storage_row_id"] = int(row["id"] or 0)
-                out["_hydrated"] = True
-                hydrated[("sqlite", path_text, int(row["id"] or 0))] = out
-
-        if custom_ids and APP_DB_PATH.exists():
-            ensure_custom_form_index()
-            conn = _get_conn(APP_DB_PATH)
-            sql = "SELECT * FROM custom_dict_entries WHERE id IN (__IN__)"
-            params = [str(row_id) for row_id in sorted(set(custom_ids))]
-            if trace:
-                t0 = time.perf_counter()
-                rows = _chunked_in_query(conn, sql, params)
-                record_sqlite_query(
-                    sql=sql,
-                    params=params,
-                    duration_ms=(time.perf_counter() - t0) * 1000.0,
-                    row_count=len(rows),
-                    db_path=str(APP_DB_PATH),
-                    query_kind="hydrate_custom_entries",
-                )
-            else:
-                rows = _chunked_in_query(conn, sql, params)
-            for row in rows:
-                out = _custom_row_to_lookup_dict(row, lang_code, include_form_keys=False)
-                out["_storage_kind"] = "custom"
-                out["_storage_db_path"] = ""
-                out["_storage_row_id"] = int(row["id"] or 0)
-                out["_hydrated"] = True
-                hydrated[("custom", "", int(row["id"] or 0))] = out
-        return hydrated
-    if trace:
-        with trace_scope("hydrate_candidates", label="Hydrate Candidate Rows", lang=lang_code, candidate_count=len(list(candidates or []))):
-            return _run()
-    return _run()
-
-
-def batch_lookup(lang_code: str, tokens: list[dict], source: str = "", sources: list[str] | None = None) -> dict:
-    """
-    Main batch lookup entry point.
-    Queries dictionaries for the language, optionally filtered by source names.
-
-    Args:
-        lang_code: Language code (e.g. "zh", "de", "ar")
-        tokens: List of dicts with keys: surface, lemma (both strings)
-        source: Deprecated — single source for API compat
-        sources: Optional list of source names to include (e.g. ["wiktionary", "jmdict"])
-                 If empty/None, queries ALL available dicts.
-
-    Returns:
-        {
-            "ok": True,
-            "rows": [...],  # list of TSV-shaped dicts for loadFromRows()
-            "entry_count": int,
-            "query_ms": float,
-        }
-    """
-    import time
-    t0 = time.perf_counter()
-
-    all_paths = _resolve_all_db_paths(lang_code)
-    # Filter by requested sources if specified
-    if sources:
-        db_paths = _filter_db_paths(all_paths, lang_code, sources)
-    else:
-        db_paths = all_paths
-    if not db_paths:
-        return {"ok": False, "error": f"No SQLite dictionary for {lang_code}", "rows": []}
-
-    surface_keys = set()
-    lemma_keys = set()
-
-    for tok in tokens:
-        surface = (tok.get("surface") or "").strip()
-        lemma = (tok.get("lemma") or "").strip()
-        if surface:
-            sk = _normalize_key(surface, lang_code)
-            if sk:
-                surface_keys.add(sk)
-        if lemma:
-            lk = _normalize_key(lemma, lang_code)
-            if lk:
-                lemma_keys.add(lk)
-
-    exact_keys = list(surface_keys | lemma_keys)
-
-    # Phase 1: exact headword + form lookup
-    rows = []
-    for db_path in db_paths:
-        conn = _get_conn(db_path)
-        rows.extend(_query_one_db(conn, exact_keys, exact_keys))
-    rows.extend(_query_custom_entries(lang_code, exact_keys))
-
-    # Phase 2: subword decomposition only for tokens with no exact match
-    found_keys = set()
-    for r in rows:
-        hk = _normalize_key(r.get("headword", ""), lang_code)
-        if hk:
-            found_keys.add(hk)
-        for pair in list(r.get("_form_keys") or []):
-            if isinstance(pair, (list, tuple)) and len(pair) >= 2:
-                fk = str(pair[1] or "").strip()
-                if fk:
-                    found_keys.add(fk)
-    missing_tokens = []
-    for tok in tokens:
-        surface = (tok.get("surface") or "").strip()
-        lemma = (tok.get("lemma") or "").strip()
-        sk = _normalize_key(surface, lang_code) if surface else ""
-        lk = _normalize_key(lemma, lang_code) if lemma else ""
-        if sk and sk in found_keys:
-            continue
-        if lk and lk in found_keys:
-            continue
-        if surface:
-            missing_tokens.append(surface)
-        if lemma and lemma != surface:
-            missing_tokens.append(lemma)
-
-    if missing_tokens:
-        subword_candidates = set()
-        for text in missing_tokens:
-            subword_candidates.update(_generate_subword_candidates(text, lang_code))
-        sub_keys = list(subword_candidates - set(exact_keys))
-        if sub_keys:
-            for db_path in db_paths:
-                conn = _get_conn(db_path)
-                rows.extend(_query_one_db(conn, sub_keys, []))
-            rows.extend(_query_custom_entries(lang_code, sub_keys))
-
-    elapsed_ms = (time.perf_counter() - t0) * 1000
-
-    return {
-        "ok": True,
-        "rows": rows,
-        "entry_count": len(rows),
-        "query_ms": round(elapsed_ms, 2),
-    }
-
-
-def single_lookup(lang_code: str, word: str, source: str = "", sources: list[str] | None = None) -> dict:
-    """
-    Single-word lookup for search bar / subsegments / dp_only.
-    Two-phase: first try exact/lemma match only. If nothing found,
-    decompose into subword candidates for greedy segmentation.
-    """
-    import time
-    t0 = time.perf_counter()
-
-    all_paths = _resolve_all_db_paths(lang_code)
-    if sources:
-        db_paths = _filter_db_paths(all_paths, lang_code, sources)
-    else:
-        db_paths = all_paths
-    if not db_paths:
-        return {"ok": False, "error": f"No SQLite dictionary for {lang_code}", "rows": []}
-
-    key = _normalize_key(word, lang_code)
-    if not key:
-        return {"ok": True, "rows": [], "entry_count": 0, "query_ms": 0}
-
-    # Phase 1: exact headword + form lookup only
-    rows = []
-    for db_path in db_paths:
-        conn = _get_conn(db_path)
-        rows.extend(_query_one_db(conn, [key], [key]))
-    rows.extend(_query_custom_entries(lang_code, [key]))
-
-    # Phase 2: only if no exact match, decompose for greedy segmentation
-    if not rows:
-        subword_candidates = _generate_subword_candidates(word, lang_code)
-        sub_keys = list(subword_candidates - {key})  # already queried key
-        if sub_keys:
-            for db_path in db_paths:
-                conn = _get_conn(db_path)
-                rows.extend(_query_one_db(conn, sub_keys, []))
-            rows.extend(_query_custom_entries(lang_code, sub_keys))
-
-    elapsed_ms = (time.perf_counter() - t0) * 1000
-    return {
-        "ok": True,
-        "rows": rows,
-        "entry_count": len(rows),
-        "query_ms": round(elapsed_ms, 2),
-    }
-
-
 def is_available(lang_code: str, source: str = "") -> bool:
     """Check if any SQLite dictionary exists for a given language."""
     return len(_resolve_all_db_paths(lang_code)) > 0
-
-
-def list_sources(lang_code: str) -> list[dict]:
-    """List all available SQLite dictionary sources for a language.
-    Returns [{"key": "wiktionary", "label": "Wiktionary"}, {"key": "jmdict", "label": "JMDict"}, ...]
-    """
-    paths = _resolve_all_db_paths(lang_code)
-    sources = []
-    for p in paths:
-        stem = p.stem
-        if stem == lang_code:
-            sources.append({"key": "wiktionary", "label": "Wiktionary"})
-        else:
-            suffix = stem[len(lang_code) + 1:] if stem.startswith(lang_code + "-") else stem
-            # Capitalize nicely: "cc-cedict" -> "CC-CEDICT", "jmdict" -> "JMDict"
-            label = suffix.replace("-", " ").title().replace(" ", "-")
-            if suffix.lower() == "jmdict":
-                label = "JMDict"
-            elif suffix.lower() == "cc-cedict":
-                label = "CC-CEDICT"
-            elif suffix.lower() == "krdict":
-                label = "KRDict"
-            elif suffix.lower() == "lsj":
-                label = "LSJ"
-            sources.append({"key": suffix.lower(), "label": label})
-    return sources

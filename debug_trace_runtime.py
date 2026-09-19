@@ -17,7 +17,9 @@ def _ensure_list_limit(items: list[Any], limit: int) -> None:
         del items[limit:]
 
 
-def start_trace(*, language: str = "", query: str = "", capture_id: str = "") -> tuple[Any, dict[str, Any]]:
+def start_trace(
+    *, language: str = "", query: str = "", capture_id: str = ""
+) -> tuple[Any, dict[str, Any]]:
     trace_id = str(capture_id or uuid.uuid4().hex).strip()
     started_wall = time.time()
     started_ms = _now_ms()
@@ -56,7 +58,9 @@ def finish_trace(result_payload: Mapping[str, Any] | None = None) -> dict[str, A
     if not isinstance(state, dict):
         return None
     root = state.get("root") or {}
-    root["duration_ms"] = max(0.0, _now_ms() - float(root.get("started_ms") or state.get("started_ms") or 0.0))
+    root["duration_ms"] = max(
+        0.0, _now_ms() - float(root.get("started_ms") or state.get("started_ms") or 0.0)
+    )
     total_ms = float(root.get("duration_ms") or 0.0)
     if result_payload is not None:
         try:

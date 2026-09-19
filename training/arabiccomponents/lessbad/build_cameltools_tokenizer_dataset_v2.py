@@ -9,6 +9,7 @@ Fixes vs original converter:
 2. Taamarbuta ة not split as standalone subtoken
 3. بعض not mis-split as ب+عض
 """
+
 from __future__ import annotations
 import os, math, sys
 from pathlib import Path
@@ -96,21 +97,60 @@ def _sentence_to_conllu(
             head = "0" if tid == 1 else "1"
             deprel = "root" if tid == 1 else "dep"
             form = morphemes[0]
-            lines.append("\t".join([
-                str(tid), form, form, "X", "X", "_", head, deprel, "_", "_",
-            ]))
+            lines.append(
+                "\t".join(
+                    [
+                        str(tid),
+                        form,
+                        form,
+                        "X",
+                        "X",
+                        "_",
+                        head,
+                        deprel,
+                        "_",
+                        "_",
+                    ]
+                )
+            )
             tid += 1
         else:
             end = tid + len(morphemes) - 1
-            lines.append("\t".join([
-                f"{tid}-{end}", surface, "_", "_", "_", "_", "_", "_", "_", "_",
-            ]))
+            lines.append(
+                "\t".join(
+                    [
+                        f"{tid}-{end}",
+                        surface,
+                        "_",
+                        "_",
+                        "_",
+                        "_",
+                        "_",
+                        "_",
+                        "_",
+                        "_",
+                    ]
+                )
+            )
             for morph in morphemes:
                 head = "0" if tid == 1 else "1"
                 deprel = "root" if tid == 1 else "dep"
-                lines.append("\t".join([
-                    str(tid), morph, morph, "X", "X", "_", head, deprel, "_", "_",
-                ]))
+                lines.append(
+                    "\t".join(
+                        [
+                            str(tid),
+                            morph,
+                            morph,
+                            "X",
+                            "X",
+                            "_",
+                            head,
+                            deprel,
+                            "_",
+                            "_",
+                        ]
+                    )
+                )
                 tid += 1
     return "\n".join(lines)
 
@@ -122,7 +162,10 @@ def main() -> None:
     print("Loading CAMeL Tools MLE disambiguator …")
     mle = MLEDisambiguator.pretrained(MODEL_NAME)
     tokenizer = MorphologicalTokenizer(
-        disambiguator=mle, scheme=SCHEME, split=True, diac=False,
+        disambiguator=mle,
+        scheme=SCHEME,
+        split=True,
+        diac=False,
     )
 
     all_rows: List[Tuple[str, List[Tuple[str, List[str]]]]] = []
@@ -150,8 +193,7 @@ def main() -> None:
         stem = SRC.stem
         txt_path = OUT_DIR / f"{stem}_trankit_tok_{split_name}.conllu"
         txt_txt = OUT_DIR / f"{stem}_trankit_tok_{split_name}.txt"
-        with txt_path.open("w", encoding="utf-8") as cf, \
-             txt_txt.open("w", encoding="utf-8") as tf:
+        with txt_path.open("w", encoding="utf-8") as cf, txt_txt.open("w", encoding="utf-8") as tf:
             for sid, (text, groups) in enumerate(rows, 1):
                 cf.write(_sentence_to_conllu(sid, text, groups) + "\n\n")
                 tf.write(text + "\n")

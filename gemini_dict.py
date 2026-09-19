@@ -11,6 +11,7 @@ in dedicated columns rather than collapsed onto an existing lemma row.
 To disable: set GEMINI_DICT_ENABLED = False or remove the API key.
 Budget is shared with the chatbot via ApiUsage.
 """
+
 import json
 import logging
 import re
@@ -47,10 +48,28 @@ LEGACY_TSV_HEADER = "headword\tromanization\tpos\tglosses\tlabel\tlemma\tforms"
 
 # Languages whose primary script is non-Latin — Gemini MUST produce romanization.
 # For all other registered languages, romanization is forbidden (null).
-LANGS_REQUIRING_ROMANIZATION: frozenset[str] = frozenset({
-    "zh", "lzh", "ja", "ko", "th", "ar", "fa", "ur", "hi",
-    "ta", "bn", "pa", "he", "hbo", "hy", "ru", "el", "grc",
-})
+LANGS_REQUIRING_ROMANIZATION: frozenset[str] = frozenset(
+    {
+        "zh",
+        "lzh",
+        "ja",
+        "ko",
+        "th",
+        "ar",
+        "fa",
+        "ur",
+        "hi",
+        "ta",
+        "bn",
+        "pa",
+        "he",
+        "hbo",
+        "hy",
+        "ru",
+        "el",
+        "grc",
+    }
+)
 
 # Inflecting UPOS per language. Value is a frozenset of UPOS tags (uppercased)
 # for which the language carries productive token-level inflection.
@@ -58,42 +77,42 @@ LANGS_REQUIRING_ROMANIZATION: frozenset[str] = frozenset({
 # Source: binary UD matrix supplied by the user.
 LANGS_WITH_MORPHOLOGY: dict[str, frozenset[str]] = {
     # European / classical — full-blown inflection
-    "la":  frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
+    "la": frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
     "grc": frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
-    "el":  frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
+    "el": frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
     "ang": frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
-    "ru":  frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
-    "de":  frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
-    "nl":  frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
-    "fr":  frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "VERB"}),
-    "it":  frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "VERB"}),
-    "es":  frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "VERB"}),
-    "pt":  frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "VERB"}),
+    "ru": frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
+    "de": frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
+    "nl": frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
+    "fr": frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "VERB"}),
+    "it": frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "VERB"}),
+    "es": frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "VERB"}),
+    "pt": frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "VERB"}),
     # Celtic / Semitic / Indo-Iranian / Armenian / Turkic
-    "ga":  frozenset({"ADJ", "ADP", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
-    "ar":  frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
-    "he":  frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "VERB"}),
+    "ga": frozenset({"ADJ", "ADP", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
+    "ar": frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
+    "he": frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "VERB"}),
     "hbo": frozenset({"ADJ", "AUX", "NOUN", "PRON", "VERB"}),
-    "fa":  frozenset({"AUX", "NOUN", "PRON", "VERB"}),
-    "ur":  frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
-    "hi":  frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
-    "sa":  frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
-    "ta":  frozenset({"AUX", "NOUN", "PRON", "PROPN", "VERB"}),
-    "bn":  frozenset({"ADJ", "AUX", "NOUN", "PRON", "PROPN", "VERB"}),
-    "pa":  frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
-    "hy":  frozenset({"ADJ", "ADP", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
-    "tr":  frozenset({"AUX", "NOUN", "PRON", "PROPN", "VERB"}),
+    "fa": frozenset({"AUX", "NOUN", "PRON", "VERB"}),
+    "ur": frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
+    "hi": frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
+    "sa": frozenset({"ADJ", "AUX", "DET", "NOUN", "NUM", "PRON", "PROPN", "VERB"}),
+    "ta": frozenset({"AUX", "NOUN", "PRON", "PROPN", "VERB"}),
+    "bn": frozenset({"ADJ", "AUX", "NOUN", "PRON", "PROPN", "VERB"}),
+    "pa": frozenset({"ADJ", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
+    "hy": frozenset({"ADJ", "ADP", "AUX", "DET", "NOUN", "PRON", "PROPN", "VERB"}),
+    "tr": frozenset({"AUX", "NOUN", "PRON", "PROPN", "VERB"}),
     # East Asian / Southeast Asian / African — narrow or none
-    "ko":  frozenset({"ADJ", "AUX", "VERB"}),
-    "ja":  frozenset({"ADJ", "AUX", "VERB"}),
-    "id":  frozenset({"VERB"}),
-    "tl":  frozenset({"PRON", "VERB"}),
-    "sw":  frozenset({"ADJ", "DET", "NOUN", "NUM", "PRON", "VERB"}),
+    "ko": frozenset({"ADJ", "AUX", "VERB"}),
+    "ja": frozenset({"ADJ", "AUX", "VERB"}),
+    "id": frozenset({"VERB"}),
+    "tl": frozenset({"PRON", "VERB"}),
+    "sw": frozenset({"ADJ", "DET", "NOUN", "NUM", "PRON", "VERB"}),
     # Fully isolating — no entry needed but listed for clarity (empty set)
-    "zh":  frozenset(),
+    "zh": frozenset(),
     "lzh": frozenset(),
-    "vi":  frozenset(),
-    "th":  frozenset(),
+    "vi": frozenset(),
+    "th": frozenset(),
 }
 
 
@@ -121,20 +140,49 @@ def _upos_inflects(lang_code: str, upos: str) -> bool:
 # Uninflected, inflectedUninflected).
 # Bracketed agreement variants like `Number[psor]` / `Person[obj]` are
 # handled by stripping the `[...]` suffix before comparing.
-_INFLECTIONAL_FEATURE_KEYS: frozenset[str] = frozenset({
-    # User-specified core UD inflectional features
-    "Gender", "VerbForm", "Animacy", "Mood", "NounClass", "Tense",
-    "Number", "Aspect", "Case", "Voice", "Definite", "Evident",
-    "Deixis", "Polarity", "DeixisRef", "Person", "Degree", "Polite",
-    "Clusivity",
-    # Additional inflectional features present in TRANKIT_TAGS.js FEATS
-    "Clitic", "Connegative", "Form", "Formation", "HebBinyan", "InfForm",
-    "Poss", "PrepCase", "PrepForm", "Reflex",
-    # Agreement-target noun class/number/person/gender (e.g. ObjNumber,
-    # RelPerson, ObjNounClass) — Bantu / Semitic / Celtic agreement markers
-    "ObjNumber", "ObjPerson", "ObjNounClass",
-    "RelNumber", "RelPerson", "RelNounClass",
-})
+_INFLECTIONAL_FEATURE_KEYS: frozenset[str] = frozenset(
+    {
+        # User-specified core UD inflectional features
+        "Gender",
+        "VerbForm",
+        "Animacy",
+        "Mood",
+        "NounClass",
+        "Tense",
+        "Number",
+        "Aspect",
+        "Case",
+        "Voice",
+        "Definite",
+        "Evident",
+        "Deixis",
+        "Polarity",
+        "DeixisRef",
+        "Person",
+        "Degree",
+        "Polite",
+        "Clusivity",
+        # Additional inflectional features present in TRANKIT_TAGS.js FEATS
+        "Clitic",
+        "Connegative",
+        "Form",
+        "Formation",
+        "HebBinyan",
+        "InfForm",
+        "Poss",
+        "PrepCase",
+        "PrepForm",
+        "Reflex",
+        # Agreement-target noun class/number/person/gender (e.g. ObjNumber,
+        # RelPerson, ObjNounClass) — Bantu / Semitic / Celtic agreement markers
+        "ObjNumber",
+        "ObjPerson",
+        "ObjNounClass",
+        "RelNumber",
+        "RelPerson",
+        "RelNounClass",
+    }
+)
 
 
 def _trankit_requires_morph(surface: str, lemma_hint: str, feats: str, lang_code: str = "") -> bool:
@@ -164,9 +212,22 @@ def _trankit_requires_morph(surface: str, lemma_hint: str, feats: str, lang_code
 
 
 _POS_ENUM = [
-    "noun", "verb", "adj", "adv", "pron", "det", "num", "conj",
-    "prep", "postp", "particle", "intj", "suffix", "prefix",
-    "name", "phrase",
+    "noun",
+    "verb",
+    "adj",
+    "adv",
+    "pron",
+    "det",
+    "num",
+    "conj",
+    "prep",
+    "postp",
+    "particle",
+    "intj",
+    "suffix",
+    "prefix",
+    "name",
+    "phrase",
 ]
 
 
@@ -235,7 +296,9 @@ def _build_system_prompt(requires_roman: bool, inflects: bool) -> str:
         " glosses explaining the meaning of the target word.",
     ]
     if requires_roman:
-        parts.append("The target is written in a non-Latin script: you MUST provide an accurate romanization.")
+        parts.append(
+            "The target is written in a non-Latin script: you MUST provide an accurate romanization."
+        )
     if inflects:
         parts.append(
             "If the word is inflected, you MUST lemmatize it, reducing it to its uninflected base form,"
@@ -253,7 +316,9 @@ def _build_system_prompt(requires_roman: bool, inflects: bool) -> str:
             "  Sanskrit — rājñaḥ (noun): lemma=rājan, morphological properties=genitive singular masculine"
         )
     else:
-        parts.append("This word does not inflect: DO NOT output `lemma` or `morphological properties` fields.")
+        parts.append(
+            "This word does not inflect: DO NOT output `lemma` or `morphological properties` fields."
+        )
         parts.append(
             "Examples:\n"
             "  French — vite (adv): glosses=quickly; fast\n"
@@ -311,6 +376,7 @@ def generate_entry(
     # Budget check
     if user is not None:
         from db import db, ApiUsage
+
         usage = ApiUsage.query.filter_by(user_id=user.id).first()
         if not usage:
             usage = ApiUsage(user_id=user.id)
@@ -346,6 +412,7 @@ def generate_entry(
     # Record usage
     if user is not None:
         from db import db, ApiUsage
+
         usage = ApiUsage.query.filter_by(user_id=user.id).first()
         if usage:
             usage.record_llm(
@@ -377,6 +444,7 @@ def _entry_to_frontend(entry: dict) -> dict:
 # ---------------------------------------------------------------------------
 # TSV file helpers
 # ---------------------------------------------------------------------------
+
 
 def _parse_tsv_rows(path: Path) -> tuple[str, list[dict]]:
     """Read a TSV file and return (header_line, list_of_row_dicts).
@@ -458,29 +526,33 @@ def _append_tsv_row(path: Path, entry: dict, senses: list[dict]):
     OLD_COMPACT_HEADER = "headword\tromanization\tpos\tglosses\tforms"
 
     if existing_header == LEGACY_TSV_HEADER:
-        row = "\t".join([
-            _tsv_escape(entry.get("headword", "")),
-            _tsv_escape(entry.get("romanization", "")),
-            _tsv_escape(entry.get("pos", "")),
-            json.dumps(senses, ensure_ascii=False),
-            "",
-            "[]",
-            json.dumps(forms, ensure_ascii=False),
-        ])
+        row = "\t".join(
+            [
+                _tsv_escape(entry.get("headword", "")),
+                _tsv_escape(entry.get("romanization", "")),
+                _tsv_escape(entry.get("pos", "")),
+                json.dumps(senses, ensure_ascii=False),
+                "",
+                "[]",
+                json.dumps(forms, ensure_ascii=False),
+            ]
+        )
     else:
         # Migrate old 5-column header to new 7-column header on first new append
         if existing_header == OLD_COMPACT_HEADER:
             _migrate_tsv_header(path, OLD_COMPACT_HEADER, TSV_HEADER)
 
-        row = "\t".join([
-            _tsv_escape(entry.get("headword", "")),
-            _tsv_escape(entry.get("romanization", "")),
-            _tsv_escape(entry.get("pos", "")),
-            json.dumps(senses, ensure_ascii=False),
-            json.dumps(forms, ensure_ascii=False),
-            commentary,
-            lemma,
-        ])
+        row = "\t".join(
+            [
+                _tsv_escape(entry.get("headword", "")),
+                _tsv_escape(entry.get("romanization", "")),
+                _tsv_escape(entry.get("pos", "")),
+                json.dumps(senses, ensure_ascii=False),
+                json.dumps(forms, ensure_ascii=False),
+                commentary,
+                lemma,
+            ]
+        )
 
     needs_header = not path.exists() or path.stat().st_size == 0
     with open(path, "a", encoding="utf-8", newline="") as f:
@@ -495,7 +567,7 @@ def _migrate_tsv_header(path: Path, old_header: str, new_header: str):
     try:
         content = path.read_text(encoding="utf-8")
         if content.startswith(old_header):
-            content = new_header + content[len(old_header):]
+            content = new_header + content[len(old_header) :]
             path.write_text(content, encoding="utf-8", newline="")
     except Exception:
         pass
@@ -509,6 +581,7 @@ def _tsv_escape(s: str) -> str:
 # ---------------------------------------------------------------------------
 # Gemini API call — structured JSON output via responseSchema
 # ---------------------------------------------------------------------------
+
 
 def _call_gemini(
     token: str,
@@ -571,13 +644,16 @@ def _call_gemini(
     # Log the full communication
     try:
         from gemini_log import log_gemini_call
+
         log_gemini_call("dict_generation", GEMINI_DICT_MODEL, payload, data)
     except Exception:
         pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
-    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get("thoughtsTokenCount", 0)
+    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get(
+        "thoughtsTokenCount", 0
+    )
     usage_counts = {
         "prompt_tokens": usage_meta.get("promptTokenCount", max(0, total_tokens - response_tokens)),
         "response_tokens": response_tokens,
@@ -663,6 +739,7 @@ def generate_entry_note(
     try:
         from dict_lookup_sqlite import hydrate_winner_refs, SQLITE_DIR
         import json as _json
+
         candidate = {
             "_storage_kind": "sqlite" if db_alias != "customdb" else "custom",
             "_storage_db_alias": db_alias,
@@ -686,10 +763,10 @@ def generate_entry_note(
                 except Exception:
                     raw = []
             gloss_parts = []
-            for sense in (raw or []):
+            for sense in raw or []:
                 if isinstance(sense, dict):
                     inner = sense.get("glosses") or []
-                    for g in (inner if isinstance(inner, list) else [inner]):
+                    for g in inner if isinstance(inner, list) else [inner]:
                         text = str(g).strip() if g else ""
                         if text:
                             gloss_parts.append(text)
@@ -774,6 +851,7 @@ def generate_entry_note(
         )
 
     from api_services import _call_gemini
+
     result = _call_gemini(
         model or GEMINI_DICT_MODEL,
         [{"text": user_prompt}],
@@ -791,12 +869,16 @@ def generate_entry_note(
 
     usage_meta = result.get("usage_meta") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
-    output_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get("thoughtsTokenCount", 0)
+    output_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get(
+        "thoughtsTokenCount", 0
+    )
     return {
         "ok": True,
         "note": note_text,
         "usage_meta": {
-            "input_tokens": usage_meta.get("promptTokenCount", max(0, total_tokens - output_tokens)),
+            "input_tokens": usage_meta.get(
+                "promptTokenCount", max(0, total_tokens - output_tokens)
+            ),
             "output_tokens": output_tokens,
         },
     }
@@ -898,6 +980,7 @@ def generate_entry_decomp(
         try:
             from dict_lookup_sqlite import hydrate_winner_refs, SQLITE_DIR
             import json as _json
+
             candidate = {
                 "_storage_kind": "sqlite" if db_alias != "customdb" else "custom",
                 "_storage_db_alias": db_alias,
@@ -923,7 +1006,7 @@ def generate_entry_decomp(
                 for sense in (raw or [])[:6]:
                     if isinstance(sense, dict):
                         inner = sense.get("glosses") or []
-                        for g in (inner if isinstance(inner, list) else [inner]):
+                        for g in inner if isinstance(inner, list) else [inner]:
                             t = str(g).strip() if g else ""
                             if t:
                                 collected.append(t)
@@ -1006,13 +1089,16 @@ def generate_entry_decomp(
 
     try:
         from gemini_log import log_gemini_call
+
         log_gemini_call("entry_decomp_generate", used_model, payload, data)
     except Exception:
         pass
 
     usage_meta_raw = data.get("usageMetadata") or {}
     total = usage_meta_raw.get("totalTokenCount", 0)
-    resp_tok = usage_meta_raw.get("candidatesTokenCount", 0) + usage_meta_raw.get("thoughtsTokenCount", 0)
+    resp_tok = usage_meta_raw.get("candidatesTokenCount", 0) + usage_meta_raw.get(
+        "thoughtsTokenCount", 0
+    )
     usage_meta = {
         "input_tokens": usage_meta_raw.get("promptTokenCount", max(0, total - resp_tok)),
         "output_tokens": resp_tok,
@@ -1053,14 +1139,35 @@ import unicodedata as _unicodedata
 
 # Unicode categories that are "junk" — if a token is composed entirely of
 # characters in these categories we skip it (no point glossing punctuation).
-_GLOSS_SKIP_CATEGORIES = frozenset({
-    "Mn", "Mc", "Me",          # Mark
-    "Nd", "Nl", "No",          # Number
-    "Pc", "Pd", "Ps", "Pe", "Pi", "Pf", "Po",  # Punctuation
-    "Sm", "Sc", "Sk", "So",    # Symbol
-    "Zs", "Zl", "Zp",          # Separator
-    "Cc", "Cf", "Cs", "Co", "Cn",  # Other/Control
-})
+_GLOSS_SKIP_CATEGORIES = frozenset(
+    {
+        "Mn",
+        "Mc",
+        "Me",  # Mark
+        "Nd",
+        "Nl",
+        "No",  # Number
+        "Pc",
+        "Pd",
+        "Ps",
+        "Pe",
+        "Pi",
+        "Pf",
+        "Po",  # Punctuation
+        "Sm",
+        "Sc",
+        "Sk",
+        "So",  # Symbol
+        "Zs",
+        "Zl",
+        "Zp",  # Separator
+        "Cc",
+        "Cf",
+        "Cs",
+        "Co",
+        "Cn",  # Other/Control
+    }
+)
 
 
 def _is_glossable_token(text: str) -> bool:
@@ -1160,6 +1267,7 @@ _LLM_GLOSS_SYSTEM_PROMPT = (
 )
 
 import re as _re
+
 
 def _token_to_key_suffix(text: str) -> str:
     """Turn a token's display text into a JSON-key suffix.
@@ -1301,7 +1409,7 @@ def generate_llm_glosses(
 
     # Split into chunks of 100 to stay within Gemini's schema state limit
     CHUNK_SIZE = 100
-    chunks = [glossable[i:i+CHUNK_SIZE] for i in range(0, len(glossable), CHUNK_SIZE)]
+    chunks = [glossable[i : i + CHUNK_SIZE] for i in range(0, len(glossable), CHUNK_SIZE)]
     chunk_index_offsets = list(range(0, len(glossable), CHUNK_SIZE))
 
     combined_g = []
@@ -1350,8 +1458,10 @@ def stream_llm_glosses(
         return
 
     CHUNK_SIZE = 100
-    chunks = [glossable[i:i+CHUNK_SIZE] for i in range(0, len(glossable), CHUNK_SIZE)]
-    gi_chunks = [glossable_indices[i:i+CHUNK_SIZE] for i in range(0, len(glossable_indices), CHUNK_SIZE)]
+    chunks = [glossable[i : i + CHUNK_SIZE] for i in range(0, len(glossable), CHUNK_SIZE)]
+    gi_chunks = [
+        glossable_indices[i : i + CHUNK_SIZE] for i in range(0, len(glossable_indices), CHUNK_SIZE)
+    ]
 
     for chunk, gi_chunk in zip(chunks, gi_chunks):
         g_chunk, usage_chunk = call_gloss_chunk(chunk, lang_code, context=context_text)
@@ -1388,7 +1498,9 @@ def call_gloss_chunk(
     if sentence_spans:
         parts = []
         for sn, (start, end) in enumerate(sentence_spans, start=1):
-            stream = " ".join(_gloss_prompt_token_text(chunk[i], lang_code) for i in range(start, end))
+            stream = " ".join(
+                _gloss_prompt_token_text(chunk[i], lang_code) for i in range(start, end)
+            )
             parts.append(f"sentence {sn}:\n{stream}")
         user_prompt = f"Language: {lang_code}.\n" + "\n\n".join(parts) + "\n"
     else:
@@ -1429,7 +1541,9 @@ def call_gloss_chunk(
                     err_msg = resp.text[:200]
                 if "too many states" in err_msg or "constraint" in err_msg:
                     if len(chunk) <= 1:
-                        log.warning("LLM gloss chunk: 400 schema too complex on single token, giving up")
+                        log.warning(
+                            "LLM gloss chunk: 400 schema too complex on single token, giving up"
+                        )
                         return None, {}
                     log.warning(
                         "LLM gloss chunk: 400 schema too complex (%d tokens), splitting in half",
@@ -1458,8 +1572,12 @@ def call_gloss_chunk(
                                 spans_b_raw.append([b0, b1])
                         spans_a = spans_a_raw or None
                         spans_b = spans_b_raw or None
-                    res_a, usage_a = call_gloss_chunk(half_a, lang_code, context=context, sentences=spans_a)
-                    res_b, usage_b = call_gloss_chunk(half_b, lang_code, context=context, sentences=spans_b)
+                    res_a, usage_a = call_gloss_chunk(
+                        half_a, lang_code, context=context, sentences=spans_a
+                    )
+                    res_b, usage_b = call_gloss_chunk(
+                        half_b, lang_code, context=context, sentences=spans_b
+                    )
                     combined_usage = {
                         k: usage_a.get(k, 0) + usage_b.get(k, 0)
                         for k in ("prompt_tokens", "response_tokens", "total_tokens")
@@ -1480,6 +1598,7 @@ def call_gloss_chunk(
         log.warning("LLM gloss chunk failed: %s", e)
         try:
             from gemini_log import log_gemini_call
+
             log_gemini_call("llm_gloss", GEMINI_DICT_MODEL, payload, None, error=str(e))
         except Exception:
             pass
@@ -1487,13 +1606,16 @@ def call_gloss_chunk(
 
     try:
         from gemini_log import log_gemini_call
+
         log_gemini_call("llm_gloss", GEMINI_DICT_MODEL, payload, data)
     except Exception:
         pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
-    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get("thoughtsTokenCount", 0)
+    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get(
+        "thoughtsTokenCount", 0
+    )
     usage_counts = {
         "prompt_tokens": usage_meta.get("promptTokenCount", max(0, total_tokens - response_tokens)),
         "response_tokens": response_tokens,
@@ -1518,9 +1640,11 @@ def call_gloss_chunk(
     # Keys are now "{index}_{token_suffix}" — rebuild them to validate.
     expected_keys = set(schema["required"])
     if not isinstance(parsed, dict) or set(parsed.keys()) != expected_keys:
-        log.warning("LLM gloss chunk: key mismatch. Expected %s, got %s",
-                    sorted(expected_keys),
-                    sorted(parsed.keys()) if isinstance(parsed, dict) else type(parsed))
+        log.warning(
+            "LLM gloss chunk: key mismatch. Expected %s, got %s",
+            sorted(expected_keys),
+            sorted(parsed.keys()) if isinstance(parsed, dict) else type(parsed),
+        )
         return None, usage_counts
 
     # Read values back, collapsing expanded compound slots into "g1 + g2 + g3".
@@ -1563,43 +1687,43 @@ _LLM_DECOMP_SYSTEM_PROMPT = (
     "Input:\n"
     "أبي\n"
     "Output:\n"
-    "أب = root-based noun \"father\", ي = genitive case ending\n\n"
+    'أب = root-based noun "father", ي = genitive case ending\n\n'
     "Input:\n"
     "गृहेण\n"
     "Output:\n"
-    "गृह = noun stem \"house\", ेण = instrumental singular ending\n\n"
+    'गृह = noun stem "house", ेण = instrumental singular ending\n\n'
     "Input:\n"
     "portarum\n"
     "Output:\n"
-    "port = noun stem \"gate\", arum = genitive plural ending\n\n"
+    'port = noun stem "gate", arum = genitive plural ending\n\n'
     "Input:\n"
     "λόγοις\n"
     "Output:\n"
-    "λόγ = noun stem \"word\", οις = dative plural ending\n\n"
+    'λόγ = noun stem "word", οις = dative plural ending\n\n'
     "Input:\n"
     "книгой\n"
     "Output:\n"
-    "книг = noun stem \"book\", ой = instrumental singular ending\n\n"
+    'книг = noun stem "book", ой = instrumental singular ending\n\n'
     "Input:\n"
     "Häusern\n"
     "Output:\n"
-    "Häus = noun stem \"house\", er = plural marker, n = dative ending\n\n"
+    'Häus = noun stem "house", er = plural marker, n = dative ending\n\n'
     "Input:\n"
     "evlerimizden\n"
     "Output:\n"
-    "ev = noun stem \"house\", ler = plural marker, imiz = first-person plural possessive suffix \"our\", den = ablative case ending\n\n"
+    'ev = noun stem "house", ler = plural marker, imiz = first-person plural possessive suffix "our", den = ablative case ending\n\n'
     "Input:\n"
     "talossa\n"
     "Output:\n"
-    "talo = noun stem \"house\", ssa = inessive case ending\n\n"
+    'talo = noun stem "house", ssa = inessive case ending\n\n'
     "Input:\n"
     "hablábamos\n"
     "Output:\n"
-    "habl = verb stem \"speak\", ába = imperfect marker, mos = first-person plural ending\n\n"
+    'habl = verb stem "speak", ába = imperfect marker, mos = first-person plural ending\n\n'
     "Input:\n"
     "लड़कों\n"
     "Output:\n"
-    "लड़क = noun stem \"boy\", ों = oblique plural ending"
+    'लड़क = noun stem "boy", ों = oblique plural ending'
 )
 
 
@@ -1711,6 +1835,7 @@ def call_decomp_chunk(
         log.warning("LLM decomp chunk failed: %s", e)
         try:
             from gemini_log import log_gemini_call
+
             log_gemini_call("llm_decomp", GEMINI_DICT_MODEL, payload, None, error=str(e))
         except Exception:
             pass
@@ -1718,13 +1843,16 @@ def call_decomp_chunk(
 
     try:
         from gemini_log import log_gemini_call
+
         log_gemini_call("llm_decomp", GEMINI_DICT_MODEL, payload, data)
     except Exception:
         pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
-    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get("thoughtsTokenCount", 0)
+    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get(
+        "thoughtsTokenCount", 0
+    )
     usage_counts = {
         "prompt_tokens": usage_meta.get("promptTokenCount", max(0, total_tokens - response_tokens)),
         "response_tokens": response_tokens,
@@ -1791,58 +1919,58 @@ _LLM_DECOMP_SYSTEM_PROMPT = (
     "Wir wohnten in Häusern .\n"
     "Output:\n"
     "1_wohnten:\n"
-    "wohn = verb stem \"dwell\"\n"
+    'wohn = verb stem "dwell"\n'
     "te = past tense marker\n"
     "n = first-person plural ending\n"
     "\n"
     "3_Häusern:\n"
-    "Häus = noun stem \"house\"\n"
+    'Häus = noun stem "house"\n'
     "er = plural marker\n"
     "n = dative ending\n\n"
     "Input sentence:\n"
     "Çocuklar evlerimizden kaçtı .\n"
     "Output:\n"
     "0_Çocuklar:\n"
-    "Çocuk = noun stem \"child\"\n"
+    'Çocuk = noun stem "child"\n'
     "lar = plural marker\n"
     "\n"
     "1_evlerimizden:\n"
-    "ev = noun stem \"house\"\n"
+    'ev = noun stem "house"\n'
     "ler = plural marker\n"
-    "imiz = first-person plural possessive suffix \"our\"\n"
+    'imiz = first-person plural possessive suffix "our"\n'
     "den = ablative ending\n"
     "\n"
     "2_kaçtı:\n"
-    "kaç = verb stem \"escape\"\n"
+    'kaç = verb stem "escape"\n'
     "tı = past tense third-person ending\n\n"
     "Input sentence:\n"
     "وكتبناها أمس .\n"
     "Output:\n"
     "0_وكتبناها:\n"
-    "و = coordinating prefix \"and\"\n"
-    "كتب = verb stem \"write\"\n"
-    "نا = first-person plural suffix \"we\"\n"
-    "ها = feminine object suffix \"it\"\n\n"
+    'و = coordinating prefix "and"\n'
+    'كتب = verb stem "write"\n'
+    'نا = first-person plural suffix "we"\n'
+    'ها = feminine object suffix "it"\n\n'
     "Input sentence:\n"
     "Hablábamos allí .\n"
     "Output:\n"
     "0_Hablábamos:\n"
-    "habl = verb stem \"speak\"\n"
+    'habl = verb stem "speak"\n'
     "ába = imperfect marker\n"
     "mos = first-person plural ending\n\n"
     "Input sentence:\n"
     "बालकाः गृहेषु वसन्ति ।\n"
     "Output:\n"
     "0_बालकाः:\n"
-    "बालक = noun stem \"boy\"\n"
+    'बालक = noun stem "boy"\n'
     "ाः = nominative plural ending\n"
     "\n"
     "1_गृहेषु:\n"
-    "गृह = noun stem \"house\"\n"
+    'गृह = noun stem "house"\n'
     "ेषु = locative plural ending\n"
     "\n"
     "2_वसन्ति:\n"
-    "वस् = verb stem \"dwell\"\n"
+    'वस् = verb stem "dwell"\n'
     "न्ति = present third-person plural ending"
 )
 
@@ -1952,6 +2080,7 @@ def call_decomp_chunk(
         log.warning("LLM decomp chunk failed: %s", e)
         try:
             from gemini_log import log_gemini_call
+
             log_gemini_call("llm_decomp", GEMINI_DICT_MODEL, payload, None, error=str(e))
         except Exception:
             pass
@@ -1959,13 +2088,16 @@ def call_decomp_chunk(
 
     try:
         from gemini_log import log_gemini_call
+
         log_gemini_call("llm_decomp", GEMINI_DICT_MODEL, payload, data)
     except Exception:
         pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
-    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get("thoughtsTokenCount", 0)
+    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get(
+        "thoughtsTokenCount", 0
+    )
     usage_counts = {
         "prompt_tokens": usage_meta.get("promptTokenCount", max(0, total_tokens - response_tokens)),
         "response_tokens": response_tokens,
@@ -2104,6 +2236,7 @@ def call_orth_chunk(
         log.warning("Orth breakdown chunk failed: %s", e)
         try:
             from gemini_log import log_gemini_call
+
             log_gemini_call("orth_breakdown", GEMINI_DICT_MODEL, payload, None, error=str(e))
         except Exception:
             pass
@@ -2111,13 +2244,16 @@ def call_orth_chunk(
 
     try:
         from gemini_log import log_gemini_call
+
         log_gemini_call("orth_breakdown", GEMINI_DICT_MODEL, payload, data)
     except Exception:
         pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
-    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get("thoughtsTokenCount", 0)
+    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get(
+        "thoughtsTokenCount", 0
+    )
     usage_counts = {
         "prompt_tokens": usage_meta.get("promptTokenCount", max(0, total_tokens - response_tokens)),
         "response_tokens": response_tokens,
@@ -2140,9 +2276,11 @@ def call_orth_chunk(
 
     expected_keys = set(required)
     if not isinstance(parsed, dict) or set(parsed.keys()) != expected_keys:
-        log.warning("Orth breakdown chunk: key mismatch. Expected %d keys, got %d",
-                    len(expected_keys),
-                    len(parsed) if isinstance(parsed, dict) else -1)
+        log.warning(
+            "Orth breakdown chunk: key mismatch. Expected %d keys, got %d",
+            len(expected_keys),
+            len(parsed) if isinstance(parsed, dict) else -1,
+        )
         return None, usage_counts
 
     # Collapse sub-parts with " + " for MWT/compound tokens
@@ -2164,6 +2302,7 @@ def call_orth_chunk(
 # Community editing helpers — used by router.py for user-created entries
 # ---------------------------------------------------------------------------
 
+
 def headword_exists(lang_code: str, headword: str) -> bool:
     """Check if a headword already exists in the gemini TSV for this language."""
     path = get_tsv_path(lang_code)
@@ -2176,8 +2315,14 @@ def headword_exists(lang_code: str, headword: str) -> bool:
     return False
 
 
-def append_user_entry(lang_code: str, headword: str, romanization: str,
-                      pos: str, glosses: list[str], forms: list | None = None):
+def append_user_entry(
+    lang_code: str,
+    headword: str,
+    romanization: str,
+    pos: str,
+    glosses: list[str],
+    forms: list | None = None,
+):
     """Append a user-created entry to the gemini TSV.
     A _source marker is embedded in the senses JSON so the frontend can
     distinguish user-created entries from Gemini-generated ones."""
@@ -2194,11 +2339,16 @@ def append_user_entry(lang_code: str, headword: str, romanization: str,
     _append_tsv_row(path, entry, senses)
 
 
-def update_tsv_entry(lang_code: str, headword: str, new_romanization: str | None = None,
-                     new_pos: str | None = None, new_glosses: list[str] | None = None,
-                     new_forms: list | None = None,
-                     new_commentary: str | None = None,
-                     new_lemma: str | None = None) -> bool:
+def update_tsv_entry(
+    lang_code: str,
+    headword: str,
+    new_romanization: str | None = None,
+    new_pos: str | None = None,
+    new_glosses: list[str] | None = None,
+    new_forms: list | None = None,
+    new_commentary: str | None = None,
+    new_lemma: str | None = None,
+) -> bool:
     """Update an existing entry in the gemini TSV. Returns True if found and updated.
     Preserves any _source marker already embedded in the glosses JSON."""
     path = get_tsv_path(lang_code)
@@ -2258,7 +2408,9 @@ def remove_tsv_entry(lang_code: str, headword: str) -> bool:
 # SQLite-backed custom entry storage (live path)
 # ---------------------------------------------------------------------------
 
-CUSTOM_TSV_HEADER = "entry_id\theadword\tromanization\tpos\tglosses\tforms\tcommentary\tlemma\tsource"
+CUSTOM_TSV_HEADER = (
+    "entry_id\theadword\tromanization\tpos\tglosses\tforms\tcommentary\tlemma\tsource"
+)
 
 
 def _json_load_list(raw, default=None):
@@ -2282,7 +2434,7 @@ def _normalize_glosses(glosses) -> list[str]:
         glosses = [g.strip() for g in glosses.split(";") if g.strip()]
     out = []
     seen = set()
-    for gloss in (glosses or []):
+    for gloss in glosses or []:
         text = str(gloss or "").strip()
         if not text or text in seen:
             continue
@@ -2297,7 +2449,7 @@ def _normalize_glosses(glosses) -> list[str]:
 
 def _normalize_forms(forms) -> list[list[str]]:
     out = []
-    for form in (forms or []):
+    for form in forms or []:
         if not isinstance(form, (list, tuple)):
             continue
         word = str(form[0] if len(form) > 0 else "").strip()
@@ -2321,7 +2473,7 @@ def _entry_model_to_frontend(entry) -> dict:
     glosses = []
     for sense in _json_load_list(entry.glosses_json):
         if isinstance(sense, dict):
-            for gloss in (sense.get("glosses") or []):
+            for gloss in sense.get("glosses") or []:
                 text = str(gloss or "").strip()
                 if text:
                     glosses.append(text)
@@ -2393,10 +2545,18 @@ def _query_custom_entry(lang_code: str, headword: str = "", entry_id: str = ""):
     return q.filter_by(language=lang, headword=hw).first()
 
 
-def upsert_custom_entry(lang_code: str, headword: str, romanization: str = "",
-                        pos: str = "", glosses=None, forms=None,
-                        commentary: str = "", lemma: str = "",
-                        source: str = "gemini", entry_id: str = ""):
+def upsert_custom_entry(
+    lang_code: str,
+    headword: str,
+    romanization: str = "",
+    pos: str = "",
+    glosses=None,
+    forms=None,
+    commentary: str = "",
+    lemma: str = "",
+    source: str = "gemini",
+    entry_id: str = "",
+):
     from db import db, CustomDictEntry
 
     lang = str(lang_code or "").strip().lower()
@@ -2435,8 +2595,7 @@ def iter_custom_entry_tsv_lines(lang_code: str, batch_size: int = 500):
         return
 
     q = (
-        CustomDictEntry.query
-        .filter_by(language=lang)
+        CustomDictEntry.query.filter_by(language=lang)
         .filter((CustomDictEntry.source == "gemini") | (CustomDictEntry.source.is_(None)))
         .order_by(CustomDictEntry.id.asc())
         .yield_per(batch_size)
@@ -2448,7 +2607,9 @@ def iter_custom_entry_tsv_lines(lang_code: str, batch_size: int = 500):
             _tsv_escape(entry.headword or ""),
             _tsv_escape(entry.romanization or ""),
             _tsv_escape(entry.pos or ""),
-            json.dumps(_glosses_to_senses(normalized_glosses, entry.source or "gemini"), ensure_ascii=False),
+            json.dumps(
+                _glosses_to_senses(normalized_glosses, entry.source or "gemini"), ensure_ascii=False
+            ),
             json.dumps(_normalize_forms(_json_load_list(entry.forms_json)), ensure_ascii=False),
             _tsv_escape(entry.commentary or ""),
             _tsv_escape(entry.lemma or ""),
@@ -2465,8 +2626,14 @@ def headword_exists(lang_code: str, headword: str) -> bool:
     return _query_custom_entry(lang_code, headword=headword) is not None
 
 
-def append_user_entry(lang_code: str, headword: str, romanization: str,
-                      pos: str, glosses: list[str], forms: list | None = None):
+def append_user_entry(
+    lang_code: str,
+    headword: str,
+    romanization: str,
+    pos: str,
+    glosses: list[str],
+    forms: list | None = None,
+):
     return upsert_custom_entry(
         lang_code=lang_code,
         headword=headword,
@@ -2480,12 +2647,17 @@ def append_user_entry(lang_code: str, headword: str, romanization: str,
     )
 
 
-def update_tsv_entry(lang_code: str, headword: str, new_romanization: str | None = None,
-                     new_pos: str | None = None, new_glosses: list[str] | None = None,
-                     new_forms: list | None = None,
-                     new_commentary: str | None = None,
-                     new_lemma: str | None = None,
-                     entry_id: str = ""):
+def update_tsv_entry(
+    lang_code: str,
+    headword: str,
+    new_romanization: str | None = None,
+    new_pos: str | None = None,
+    new_glosses: list[str] | None = None,
+    new_forms: list | None = None,
+    new_commentary: str | None = None,
+    new_lemma: str | None = None,
+    entry_id: str = "",
+):
     entry = _query_custom_entry(lang_code, headword=headword, entry_id=entry_id)
     if not entry:
         return None
@@ -2497,13 +2669,23 @@ def update_tsv_entry(lang_code: str, headword: str, new_romanization: str | None
         existing_glosses = []
         for sense in _json_load_list(entry.glosses_json):
             if isinstance(sense, dict):
-                existing_glosses.extend([str(g or "").strip() for g in (sense.get("glosses") or []) if str(g or "").strip()])
+                existing_glosses.extend(
+                    [
+                        str(g or "").strip()
+                        for g in (sense.get("glosses") or [])
+                        if str(g or "").strip()
+                    ]
+                )
 
-    forms = _normalize_forms(new_forms if new_forms is not None else _json_load_list(entry.forms_json))
+    forms = _normalize_forms(
+        new_forms if new_forms is not None else _json_load_list(entry.forms_json)
+    )
     updated = upsert_custom_entry(
         lang_code=entry.language,
         headword=entry.headword,
-        romanization=(new_romanization if new_romanization is not None else (entry.romanization or "")),
+        romanization=(
+            new_romanization if new_romanization is not None else (entry.romanization or "")
+        ),
         pos=(new_pos if new_pos is not None else (entry.pos or "")),
         glosses=(glosses if glosses is not None else existing_glosses),
         forms=forms,
@@ -2537,8 +2719,11 @@ def migrate_legacy_custom_entries():
 
     existing_pairs = {
         (str(e.language or "").strip().lower(), str(e.headword or "").strip())
-        for e in CustomDictEntry.query.with_entities(CustomDictEntry.language, CustomDictEntry.headword).all()
+        for e in CustomDictEntry.query.with_entities(
+            CustomDictEntry.language, CustomDictEntry.headword
+        ).all()
     }
+
     def import_row(lang_code: str, row: dict, fallback_source: str = "gemini"):
         lang = str(lang_code or "").strip().lower()
         headword = str(row.get("headword", "") or "").strip()
@@ -2550,16 +2735,21 @@ def migrate_legacy_custom_entries():
 
         glosses_raw = row.get("glosses", "[]")
         glosses = []
-        detected_source = str(row.get("source", "") or fallback_source or "gemini").strip().lower() or "gemini"
+        detected_source = (
+            str(row.get("source", "") or fallback_source or "gemini").strip().lower() or "gemini"
+        )
         try:
             parsed = json.loads(glosses_raw)
             if isinstance(parsed, list):
                 for sense in parsed:
                     if isinstance(sense, dict) and sense.get("_source"):
-                        detected_source = str(sense.get("_source") or detected_source).strip().lower() or detected_source
+                        detected_source = (
+                            str(sense.get("_source") or detected_source).strip().lower()
+                            or detected_source
+                        )
                         continue
                     if isinstance(sense, dict):
-                        for gloss in (sense.get("glosses") or []):
+                        for gloss in sense.get("glosses") or []:
                             text = str(gloss or "").strip()
                             if text:
                                 glosses.append(text)
@@ -2573,7 +2763,9 @@ def migrate_legacy_custom_entries():
             headword=headword,
             romanization=str(row.get("romanization", "") or "").strip() or None,
             pos=str(row.get("pos", "") or "").strip() or None,
-            glosses_json=json.dumps(_glosses_to_senses(glosses, detected_source), ensure_ascii=False),
+            glosses_json=json.dumps(
+                _glosses_to_senses(glosses, detected_source), ensure_ascii=False
+            ),
             forms_json=json.dumps(forms, ensure_ascii=False),
             commentary=str(row.get("commentary", "") or "").strip() or None,
             lemma=str(row.get("lemma", "") or "").strip() or None,
@@ -2626,7 +2818,9 @@ def _gemini_ner_join_tokens(tokens: list[str], lang_code: str) -> str:
     return re.sub(r"\s+([,.;:!?،。、「」『』)])", r"\1", text).strip()
 
 
-def _gemini_ner_sentence_inputs(segments: list, ud_overlay: dict | None, lang_code: str) -> tuple[list[dict], dict]:
+def _gemini_ner_sentence_inputs(
+    segments: list, ud_overlay: dict | None, lang_code: str
+) -> tuple[list[dict], dict]:
     segs = [str(s or "") for s in (segments or [])]
     if not segs:
         return [], {"token_count": 0, "sentence_count": 0, "truncated": False}
@@ -2666,12 +2860,14 @@ def _gemini_ner_sentence_inputs(segments: list, ud_overlay: dict | None, lang_co
             local_tokens.append(segs[idx])
             token_count += 1
         if local_tokens:
-            sentences.append({
-                "id": sent_id,
-                "start": start,
-                "end": start + len(local_tokens),
-                "tokens": local_tokens,
-            })
+            sentences.append(
+                {
+                    "id": sent_id,
+                    "start": start,
+                    "end": start + len(local_tokens),
+                    "tokens": local_tokens,
+                }
+            )
         if truncated:
             break
 
@@ -2750,7 +2946,11 @@ def _find_gemini_ner_span_text(
         if mapped:
             start = min(mapped)
             end = max(mapped) + 1
-            if end > start and end - start <= _GEMINI_NER_MAX_SPAN_TOKENS and (start, end) not in occupied:
+            if (
+                end > start
+                and end - start <= _GEMINI_NER_MAX_SPAN_TOKENS
+                and (start, end) not in occupied
+            ):
                 return start, end
         search_from = pos + 1
 
@@ -2817,7 +3017,9 @@ def _parse_gemini_ner_lines(
             end_limit=end_limit,
         )
         if span is None:
-            phrase_tokens = [t.strip().strip("\"'`") for t in left.split() if t.strip().strip("\"'`")]
+            phrase_tokens = [
+                t.strip().strip("\"'`") for t in left.split() if t.strip().strip("\"'`")
+            ]
             span = _find_gemini_ner_span(
                 phrase_tokens,
                 segs,
@@ -2835,18 +3037,22 @@ def _parse_gemini_ner_lines(
         occupied.add((start, end))
         tokens = segs[start:end]
         text = _gemini_ner_join_tokens(tokens, lang_code)
-        out.append({
-            "start": start,
-            "end": end,
-            "label": label,
-            "text": text,
-            "tokens": tokens,
-            "source": "gemini",
-        })
+        out.append(
+            {
+                "start": start,
+                "end": end,
+                "label": label,
+                "text": text,
+                "tokens": tokens,
+                "source": "gemini",
+            }
+        )
     return out
 
 
-def _parse_gemini_ner_object(parsed: dict, sentences: list[dict], segments: list, lang_code: str) -> list[dict]:
+def _parse_gemini_ner_object(
+    parsed: dict, sentences: list[dict], segments: list, lang_code: str
+) -> list[dict]:
     if not isinstance(parsed, dict):
         return []
     out = []
@@ -2864,14 +3070,16 @@ def _parse_gemini_ner_object(parsed: dict, sentences: list[dict], segments: list
         except Exception:
             start_limit = 0
             end_limit = len(segments or [])
-        out.extend(_parse_gemini_ner_lines(
-            raw_value,
-            segments,
-            lang_code,
-            occupied,
-            start_limit=start_limit,
-            end_limit=end_limit,
-        ))
+        out.extend(
+            _parse_gemini_ner_lines(
+                raw_value,
+                segments,
+                lang_code,
+                occupied,
+                start_limit=start_limit,
+                end_limit=end_limit,
+            )
+        )
     return out
 
 
@@ -2914,7 +3122,9 @@ def recognize_ner_mwe_for_overlay(
     )
     payload = {
         "contents": [{"parts": [{"text": json.dumps(src_obj, ensure_ascii=False)}]}],
-        "systemInstruction": {"parts": [{"text": f"Language: {lang_code}. " + _GEMINI_NER_SYSTEM_PROMPT}]},
+        "systemInstruction": {
+            "parts": [{"text": f"Language: {lang_code}. " + _GEMINI_NER_SYSTEM_PROMPT}]
+        },
         "generationConfig": {
             "responseMimeType": "application/json",
             "responseSchema": {
@@ -2946,6 +3156,7 @@ def recognize_ner_mwe_for_overlay(
     except requests.exceptions.Timeout:
         try:
             from gemini_log import log_gemini_call
+
             log_gemini_call("gemini_ner", model, payload, None, error="timeout")
         except Exception:
             pass
@@ -2954,6 +3165,7 @@ def recognize_ner_mwe_for_overlay(
         log.warning("Gemini NER failed: %s", e)
         try:
             from gemini_log import log_gemini_call
+
             log_gemini_call("gemini_ner", model, payload, None, error=str(e))
         except Exception:
             pass
@@ -2961,13 +3173,16 @@ def recognize_ner_mwe_for_overlay(
 
     try:
         from gemini_log import log_gemini_call
+
         log_gemini_call("gemini_ner", model, payload, data)
     except Exception:
         pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
-    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get("thoughtsTokenCount", 0)
+    response_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get(
+        "thoughtsTokenCount", 0
+    )
     usage_counts = {
         "prompt_tokens": usage_meta.get("promptTokenCount", max(0, total_tokens - response_tokens)),
         "response_tokens": response_tokens,
@@ -3005,6 +3220,7 @@ def recognize_ner_mwe_for_overlay(
 # Sentence-level fluent translation (batch)
 # ---------------------------------------------------------------------------
 
+
 def translate_sentences(
     sentences: list,
     user,
@@ -3033,7 +3249,9 @@ def translate_sentences(
         for item in sentence_requests:
             if not isinstance(item, dict):
                 continue
-            tokens = [str(t or "").strip() for t in (item.get("tokens") or []) if str(t or "").strip()]
+            tokens = [
+                str(t or "").strip() for t in (item.get("tokens") or []) if str(t or "").strip()
+            ]
             if not tokens:
                 continue
             structured.append({"tokens": tokens})

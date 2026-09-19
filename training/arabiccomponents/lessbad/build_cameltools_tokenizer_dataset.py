@@ -114,7 +114,10 @@ def _write_split(split_name: str, rows: Sequence[Tuple[str, List[str]]]) -> None
     txt_path = OUT_DIR / f"{stem}_trankit_tok_{split_name}.txt"
     conllu_path = OUT_DIR / f"{stem}_trankit_tok_{split_name}.conllu"
 
-    with txt_path.open("w", encoding="utf-8") as txt_fh, conllu_path.open("w", encoding="utf-8") as conllu_fh:
+    with (
+        txt_path.open("w", encoding="utf-8") as txt_fh,
+        conllu_path.open("w", encoding="utf-8") as conllu_fh,
+    ):
         for sent_id, (sentence, tokens) in enumerate(rows, start=1):
             txt_fh.write(sentence + "\n")
             conllu_fh.write(_sentence_to_conllu(sent_id, sentence, tokens) + "\n\n")
@@ -146,12 +149,17 @@ def main() -> None:
     if not canonical_rows:
         raise RuntimeError("No tokenized sentences were produced.")
 
-    with CANONICAL_TXT.open("w", encoding="utf-8") as txt_fh, CANONICAL_CONLLU.open("w", encoding="utf-8") as conllu_fh:
+    with (
+        CANONICAL_TXT.open("w", encoding="utf-8") as txt_fh,
+        CANONICAL_CONLLU.open("w", encoding="utf-8") as conllu_fh,
+    ):
         for sent_id, (sentence, tokens) in enumerate(canonical_rows, start=1):
             txt_fh.write(sentence + "\n")
             conllu_fh.write(_sentence_to_conllu(sent_id, sentence, tokens) + "\n\n")
 
-    print(f"canonical: {len(canonical_rows)} sentences -> {CANONICAL_TXT.name}, {CANONICAL_CONLLU.name}")
+    print(
+        f"canonical: {len(canonical_rows)} sentences -> {CANONICAL_TXT.name}, {CANONICAL_CONLLU.name}"
+    )
 
     n_dev = max(1, math.ceil(len(canonical_rows) * DEV_RATIO))
     dev_rows = canonical_rows[:n_dev]

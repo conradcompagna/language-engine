@@ -13,32 +13,63 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # Languages where Trankit may emit MWT structures.
 _MWT_LANGUAGE_KEYS = {
-    "ar", "arabic",
-    "ca", "catalan",
-    "cs", "czech",
-    "de", "german",
-    "el", "greek",
-    "es", "spanish",
-    "fa", "persian",
-    "fr", "french",
-    "ga", "irish",
-    "gl", "galician",
-    "hbo", "ancient-hebrew-mwt",
-    "he", "hebrew",
-    "hr", "croatian",
-    "hy", "armenian",
-    "it", "italian",
-    "lt", "lithuanian",
-    "mr", "marathi",
-    "nb", "norwegian-bokmaal", "norwegian_bokmaal", "norwegian bokmaal",
-    "pt", "portuguese",
-    "ro", "romanian",
-    "sa", "sanskrit", "sanskrit-vedic",
-    "sr", "serbian",
-    "ta", "tamil",
-    "tl", "tagalog", "filipino", "tagalog-custom",
-    "tr", "turkish",
-    "uk", "ukrainian",
+    "ar",
+    "arabic",
+    "ca",
+    "catalan",
+    "cs",
+    "czech",
+    "de",
+    "german",
+    "el",
+    "greek",
+    "es",
+    "spanish",
+    "fa",
+    "persian",
+    "fr",
+    "french",
+    "ga",
+    "irish",
+    "gl",
+    "galician",
+    "hbo",
+    "ancient-hebrew-mwt",
+    "he",
+    "hebrew",
+    "hr",
+    "croatian",
+    "hy",
+    "armenian",
+    "it",
+    "italian",
+    "lt",
+    "lithuanian",
+    "mr",
+    "marathi",
+    "nb",
+    "norwegian-bokmaal",
+    "norwegian_bokmaal",
+    "norwegian bokmaal",
+    "pt",
+    "portuguese",
+    "ro",
+    "romanian",
+    "sa",
+    "sanskrit",
+    "sanskrit-vedic",
+    "sr",
+    "serbian",
+    "ta",
+    "tamil",
+    "tl",
+    "tagalog",
+    "filipino",
+    "tagalog-custom",
+    "tr",
+    "turkish",
+    "uk",
+    "ukrainian",
 }
 
 _LANG_ALIAS = {
@@ -240,22 +271,26 @@ def build_mwt_dict_fill_seed_entries(
         entries = list(lookup_all(text) or []) if callable(lookup_all) else []
         if entries:
             first = entries[0] or {}
-            out.append({
-                "text": text,
-                "head": text,
-                "roman": str(first.get("pinyin", "") or ""),
-                "senses": list(first.get("flat_glosses") or first.get("senses", []) or []),
-                "source": "MWT_EXPANDED",
-            })
+            out.append(
+                {
+                    "text": text,
+                    "head": text,
+                    "roman": str(first.get("pinyin", "") or ""),
+                    "senses": list(first.get("flat_glosses") or first.get("senses", []) or []),
+                    "source": "MWT_EXPANDED",
+                }
+            )
         else:
-            out.append({
-                "text": text,
-                "head": text,
-                "roman": "",
-                "pos": "unknown",
-                "senses": ["[no dictionary entry found for this segment]"],
-                "source": "MWT_EXPANDED",
-            })
+            out.append(
+                {
+                    "text": text,
+                    "head": text,
+                    "roman": "",
+                    "pos": "unknown",
+                    "senses": ["[no dictionary entry found for this segment]"],
+                    "source": "MWT_EXPANDED",
+                }
+            )
     return out
 
 
@@ -307,7 +342,9 @@ def set_mwt_decoding_headroom(
 
         applied[str(lang)] = {
             "max_dec_len": int(max_dec_len),
-            "beam_size": int(trainer_args.get("beam_size")) if isinstance(trainer_args, dict) else None,
+            "beam_size": int(trainer_args.get("beam_size"))
+            if isinstance(trainer_args, dict)
+            else None,
         }
     return applied
 
@@ -347,12 +384,14 @@ def patch_lemma_predict_dict_first() -> bool:
 
     def _patched_predict(self, tagged_doc, obmit_tag):
         if self.treebank_name in [
-            'UD_Old_French-SRCMF',
-            'UD_Vietnamese-VTB',
-            'UD_Vietnamese-VLSP',
+            "UD_Old_French-SRCMF",
+            "UD_Vietnamese-VTB",
+            "UD_Vietnamese-VLSP",
         ]:
             preds = [
-                t[TEXT] for sentence in tagged_doc for t in sentence[TOKENS]
+                t[TEXT]
+                for sentence in tagged_doc
+                for t in sentence[TOKENS]
                 if type(t[ID]) == int or len(t[ID]) == 1
             ]
             return set_lemma(tagged_doc, preds, obmit_tag)
@@ -363,14 +402,10 @@ def patch_lemma_predict_dict_first() -> bool:
         for sentence in tagged_doc:
             for t in sentence[TOKENS]:
                 if type(t[ID]) == int or len(t[ID]) == 1:
-                    predict_dict_input.append(
-                        [t[TEXT], t[UPOS] if UPOS in t else None]
-                    )
+                    predict_dict_input.append([t[TEXT], t[UPOS] if UPOS in t else None])
                 else:
                     for w in t.get(EXPANDED, []) or []:
-                        predict_dict_input.append(
-                            [w[TEXT], w[UPOS] if UPOS in w else None]
-                        )
+                        predict_dict_input.append([w[TEXT], w[UPOS] if UPOS in w else None])
 
         # Dict-first: which tokens are answered by the lexicon?
         try:
@@ -399,7 +434,7 @@ def patch_lemma_predict_dict_first() -> bool:
         miss_doc = [{TOKENS: miss_tokens}]
         batch = LemmaDataLoader(
             miss_doc,
-            self.args['batch_size'],
+            self.args["batch_size"],
             self.loaded_args,
             vocab=self.vocab,
             evaluation=True,
@@ -408,7 +443,7 @@ def patch_lemma_predict_dict_first() -> bool:
         miss_preds: List[str] = []
         miss_edits: List[int] = []
         for b in batch:
-            ps, es = self.model.predict(b, self.args['beam_size'])
+            ps, es = self.model.predict(b, self.args["beam_size"])
             miss_preds += ps
             if es is not None:
                 miss_edits += es
@@ -573,19 +608,29 @@ def maybe_expand_mwt_doc(
                         head_part = word_to_surface_part.get(row_head)
                         if head_part is not None:
                             head_part_index = int(head_part[1])
-                    all_subword_edges.append({
-                        "head": int(mapped),
-                        "part_index": int(row_idx),
-                        "head_part_index": head_part_index,
-                        "deprel": str(row.get("deprel", "dep") or "dep"),
-                        "upos": str(row.get("upos", "X") or "X"),
-                    })
+                    all_subword_edges.append(
+                        {
+                            "head": int(mapped),
+                            "part_index": int(row_idx),
+                            "head_part_index": head_part_index,
+                            "deprel": str(row.get("deprel", "dep") or "dep"),
+                            "upos": str(row.get("upos", "X") or "X"),
+                        }
+                    )
                 parent["mwt_subword_edges"] = all_subword_edges
 
-            parent["deprel"] = _collapse_all_values(rows, "deprel", fallback=str(parent.get("deprel", "dep") or "dep"), sep="+")
-            parent["upos"] = _collapse_all_values(rows, "upos", fallback=str(parent.get("upos", "X") or "X"), sep="+")
-            parent["xpos"] = _collapse_all_values(rows, "xpos", fallback=str(parent.get("xpos", "") or ""), sep="+")
-            parent["lemma"] = _collapse_all_values(rows, "lemma", fallback=str(parent.get("lemma", "") or ""), sep="+")
+            parent["deprel"] = _collapse_all_values(
+                rows, "deprel", fallback=str(parent.get("deprel", "dep") or "dep"), sep="+"
+            )
+            parent["upos"] = _collapse_all_values(
+                rows, "upos", fallback=str(parent.get("upos", "X") or "X"), sep="+"
+            )
+            parent["xpos"] = _collapse_all_values(
+                rows, "xpos", fallback=str(parent.get("xpos", "") or ""), sep="+"
+            )
+            parent["lemma"] = _collapse_all_values(
+                rows, "lemma", fallback=str(parent.get("lemma", "") or ""), sep="+"
+            )
             parent["feats"] = _collapse_all_values(rows, "feats", fallback="", sep="+")
 
             if not str(parent.get("ner", "") or "").strip():

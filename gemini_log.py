@@ -10,6 +10,7 @@ Each line is a JSON object with:
   - response (raw text, parsed if applicable)
   - token counts (from Gemini's usageMetadata)
 """
+
 import json
 import os
 import datetime
@@ -98,7 +99,9 @@ def log_gemini_call(
     return usage_meta
 
 
-def log_translation_cache_hit(caller: str, lang: str, sentences: list, source: str = "browser_session"):
+def log_translation_cache_hit(
+    caller: str, lang: str, sentences: list, source: str = "browser_session"
+):
     """Log when fluent sentence translations were served from the client session cache."""
     if not LE_GEMINI_COMMS_LOG:
         return

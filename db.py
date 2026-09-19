@@ -12,6 +12,7 @@ Tables:
   - EntryNote: shared notes on dictionary entries
   - EntryDecomp: shared morpheme decompositions
 """
+
 import datetime
 
 from flask_sqlalchemy import SQLAlchemy
@@ -58,10 +59,7 @@ class User(UserMixin, db.Model):
     def is_subscribed(self):
         if self.email and self.email.lower() in self.PREMIUM_EMAILS:
             return True
-        return (
-            self.subscription is not None
-            and self.subscription.status in ("active", "trialing")
-        )
+        return self.subscription is not None and self.subscription.status in ("active", "trialing")
 
     @property
     def tier(self):
@@ -84,7 +82,9 @@ class Subscription(db.Model):
     current_period_end = db.Column(db.DateTime, nullable=True)
     cancel_at_period_end = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
+    )
 
 
 class AccountActionToken(db.Model):
@@ -125,6 +125,7 @@ class LookupQuota(db.Model):
     @property
     def remaining(self):
         from config import FREE_LOOKUP_TOKENS_PER_DAY
+
         self.reset_if_new_day()
         return max(0, FREE_LOOKUP_TOKENS_PER_DAY - self.count)
 
@@ -132,6 +133,7 @@ class LookupQuota(db.Model):
 # ---------------------------------------------------------------------------
 # Analytics — local aggregate counters for production operations
 # ---------------------------------------------------------------------------
+
 
 class AnalyticsDaily(db.Model):
     __tablename__ = "analytics_daily"
@@ -172,9 +174,7 @@ class AnalyticsLanguageDaily(db.Model):
     lookup_tokens = db.Column(db.Integer, default=0)
     lookup_dp_only_requests = db.Column(db.Integer, default=0)
 
-    __table_args__ = (
-        db.UniqueConstraint("date", "language", name="uq_analytics_language_daily"),
-    )
+    __table_args__ = (db.UniqueConstraint("date", "language", name="uq_analytics_language_daily"),)
 
 
 class AnalyticsVisitorDay(db.Model):
@@ -185,14 +185,13 @@ class AnalyticsVisitorDay(db.Model):
     visitor_hash = db.Column(db.String(64), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    __table_args__ = (
-        db.UniqueConstraint("date", "visitor_hash", name="uq_analytics_visitor_day"),
-    )
+    __table_args__ = (db.UniqueConstraint("date", "visitor_hash", name="uq_analytics_visitor_day"),)
 
 
 # ---------------------------------------------------------------------------
 # API Usage — hard monthly budget caps (resets on billing period)
 # ---------------------------------------------------------------------------
+
 
 class ApiUsage(db.Model):
     __tablename__ = "api_usage"
@@ -236,6 +235,7 @@ class ApiUsage(db.Model):
 
     def can_use_mt(self, chars, user):
         from config import TIER_CAPS
+
         self._maybe_reset(user)
         cap = TIER_CAPS.get(user.tier, {}).get("mt_chars_per_month", 0)
         return self.mt_chars_used + chars <= cap
@@ -256,20 +256,21 @@ class ApiUsage(db.Model):
 
     def llm_budget_usd(self, user):
         from config import TIER_CAPS
+
         self._maybe_reset(user)
         return float(TIER_CAPS.get(user.tier, {}).get("llm_budget_usd_per_month", 0.0) or 0.0)
 
     def llm_cost_usd(self, user):
         from config import TIER_CAPS, GEMINI_MODEL_PRICING_USD_PER_1M
+
         self._maybe_reset(user)
         model = str(TIER_CAPS.get(user.tier, {}).get("gemini_model") or "").strip()
         pricing = GEMINI_MODEL_PRICING_USD_PER_1M.get(model, {})
         input_rate = float(pricing.get("input_tokens", 0.0) or 0.0)
         output_rate = float(pricing.get("output_tokens", 0.0) or 0.0)
-        return (
-            (float(self.llm_prompt_tokens_used or 0) / 1_000_000.0) * input_rate
-            + (float(self.llm_output_tokens_used or 0) / 1_000_000.0) * output_rate
-        )
+        return (float(self.llm_prompt_tokens_used or 0) / 1_000_000.0) * input_rate + (
+            float(self.llm_output_tokens_used or 0) / 1_000_000.0
+        ) * output_rate
 
     def llm_usage_percent(self, user):
         budget = self.llm_budget_usd(user)
@@ -282,13 +283,14 @@ class ApiUsage(db.Model):
 # Synthetic entries — cached MT glosses from Google Translate
 # ---------------------------------------------------------------------------
 
+
 class SyntheticEntry(db.Model):
     __tablename__ = "synthetic_entries"
 
     id = db.Column(db.Integer, primary_key=True)
     headword = db.Column(db.String(500), nullable=False)
     language = db.Column(db.String(20), nullable=False)
-    mt_gloss = db.Column(db.Text, nullable=False)        # frozen original MT translation
+    mt_gloss = db.Column(db.Text, nullable=False)  # frozen original MT translation
     source = db.Column(db.String(50), default="google_translate")
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
@@ -297,9 +299,11 @@ class SyntheticEntry(db.Model):
         db.UniqueConstraint("headword", "language", name="uq_synthetic_headword_lang"),
     )
 
+
 # ---------------------------------------------------------------------------
 # Custom dictionary entries
 # ---------------------------------------------------------------------------
+
 
 class CustomDictEntry(db.Model):
     __tablename__ = "custom_dict_entries"
@@ -316,7 +320,9 @@ class CustomDictEntry(db.Model):
     lemma = db.Column(db.String(500), nullable=True)
     source = db.Column(db.String(50), nullable=False, default="gemini")
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
+    )
 
     __table_args__ = (
         db.UniqueConstraint("language", "headword", name="uq_custom_dict_entry_lang_head"),
@@ -326,6 +332,7 @@ class CustomDictEntry(db.Model):
 # ---------------------------------------------------------------------------
 # Entry notes — community wiki-style notes on dictionary entries
 # ---------------------------------------------------------------------------
+
 
 class EntryNote(db.Model):
     __tablename__ = "entry_notes"
@@ -337,16 +344,21 @@ class EntryNote(db.Model):
     note = db.Column(db.Text, nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
+    )
 
     __table_args__ = (
-        db.UniqueConstraint("language", "db_alias", "entry_row_id", name="uq_entry_note_lang_alias_row"),
+        db.UniqueConstraint(
+            "language", "db_alias", "entry_row_id", name="uq_entry_note_lang_alias_row"
+        ),
     )
 
 
 # ---------------------------------------------------------------------------
 # Entry morpheme decompositions — Leipzig-style breakdowns
 # ---------------------------------------------------------------------------
+
 
 class EntryDecomp(db.Model):
     __tablename__ = "entry_decomps"
@@ -360,7 +372,9 @@ class EntryDecomp(db.Model):
     decomp = db.Column(db.Text, nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
+    )
 
     __table_args__ = (
         db.UniqueConstraint("language", "surface_form", name="uq_entry_decomp_lang_surface"),

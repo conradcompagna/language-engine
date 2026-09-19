@@ -6,8 +6,8 @@ N = 4
 
 pairs = [
     ("train (2).txt", "train.para4.txt"),
-    ("dev (2).txt",   "dev.para4.txt"),
-    ("test (2).txt",  "test.para4.txt"),
+    ("dev (2).txt", "dev.para4.txt"),
+    ("test (2).txt", "test.para4.txt"),
 ]
 
 for src_name, dst_name in pairs:
@@ -17,7 +17,7 @@ for src_name, dst_name in pairs:
         sentences = [ln.rstrip("\r\n") for ln in f if ln.strip() != ""]
     paragraphs = []
     for i in range(0, len(sentences), N):
-        paragraphs.append("\n".join(sentences[i:i+N]))
+        paragraphs.append("\n".join(sentences[i : i + N]))
     out = "\n\n".join(paragraphs) + "\n"
     with open(dst_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(out)

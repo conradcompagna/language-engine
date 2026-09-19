@@ -11,6 +11,7 @@ For each picked lemma_id:
            generated forms rows actually did,
        (b) no identical-duplicate forms rows leaked through.
 """
+
 import csv
 import os
 import re
@@ -31,37 +32,97 @@ CONLLU_ROOT = DCS_ROOT / "files"
 # Mirror the build script's normalize_feats so we can reconstruct the
 # exact morph_tags we should expect from each token line.
 FEAT_MAP = {
-    "Case": {"Nom":"nominative","Gen":"genitive","Dat":"dative","Acc":"accusative",
-             "Abl":"ablative","Ins":"instrumental","Loc":"locative","Voc":"vocative",
-             "Cpd":"compound"},
-    "Gender": {"Masc":"masculine","Fem":"feminine","Neut":"neuter"},
-    "Number": {"Sing":"singular","Dual":"dual","Plur":"plural"},
-    "Mood": {"Ind":"indicative","Imp":"imperative","Opt":"optative","Cond":"conditional",
-             "Sub":"subjunctive","Jus":"jussive","Prec":"precative"},
-    "Person": {"1":"first-person","2":"second-person","3":"third-person"},
-    "Tense": {"Pres":"present","Past":"past","Fut":"future","Aor":"aorist",
-              "Perf":"perfect","Imp":"imperfect","Impf":"imperfect","Pqp":"pluperfect"},
-    "Voice": {"Act":"active","Pass":"passive","Mid":"middle"},
-    "VerbForm": {"Part":"participle","Conv":"converb","Fin":"finite",
-                 "Inf":"infinitive","Ger":"gerundive","Gdv":"gerundive",
-                 "Vnoun":"verbal-noun"},
-    "Aspect": {"Perf":"perfective","Imp":"imperfective","Hab":"habitual","Iter":"iterative"},
-    "Degree": {"Cmp":"comparative","Sup":"superlative","Pos":"positive"},
-    "Definite": {"Def":"definite","Ind":"indefinite"},
-    "Formation": {"root":"formation-root","them":"formation-thematic",
-                  "s":"formation-sigmatic","peri":"formation-periphrastic",
-                  "red":"formation-reduplicated","is":"formation-is","sa":"formation-sa"},
-    "PronType": {"Dem":"demonstrative","Int":"interrogative","Rel":"relative",
-                 "Prs":"personal","Neg":"negative","Tot":"total","Ind":"indefinite"},
-    "NumType": {"Card":"cardinal","Ord":"ordinal","Mult":"multiplicative"},
-    "Reflex": {"Yes":"reflexive"},
-    "Polarity": {"Neg":"negative","Pos":"positive"},
-    "Foreign": {"Yes":"foreign"},
-    "Compound": {"Yes":"compound"},
+    "Case": {
+        "Nom": "nominative",
+        "Gen": "genitive",
+        "Dat": "dative",
+        "Acc": "accusative",
+        "Abl": "ablative",
+        "Ins": "instrumental",
+        "Loc": "locative",
+        "Voc": "vocative",
+        "Cpd": "compound",
+    },
+    "Gender": {"Masc": "masculine", "Fem": "feminine", "Neut": "neuter"},
+    "Number": {"Sing": "singular", "Dual": "dual", "Plur": "plural"},
+    "Mood": {
+        "Ind": "indicative",
+        "Imp": "imperative",
+        "Opt": "optative",
+        "Cond": "conditional",
+        "Sub": "subjunctive",
+        "Jus": "jussive",
+        "Prec": "precative",
+    },
+    "Person": {"1": "first-person", "2": "second-person", "3": "third-person"},
+    "Tense": {
+        "Pres": "present",
+        "Past": "past",
+        "Fut": "future",
+        "Aor": "aorist",
+        "Perf": "perfect",
+        "Imp": "imperfect",
+        "Impf": "imperfect",
+        "Pqp": "pluperfect",
+    },
+    "Voice": {"Act": "active", "Pass": "passive", "Mid": "middle"},
+    "VerbForm": {
+        "Part": "participle",
+        "Conv": "converb",
+        "Fin": "finite",
+        "Inf": "infinitive",
+        "Ger": "gerundive",
+        "Gdv": "gerundive",
+        "Vnoun": "verbal-noun",
+    },
+    "Aspect": {"Perf": "perfective", "Imp": "imperfective", "Hab": "habitual", "Iter": "iterative"},
+    "Degree": {"Cmp": "comparative", "Sup": "superlative", "Pos": "positive"},
+    "Definite": {"Def": "definite", "Ind": "indefinite"},
+    "Formation": {
+        "root": "formation-root",
+        "them": "formation-thematic",
+        "s": "formation-sigmatic",
+        "peri": "formation-periphrastic",
+        "red": "formation-reduplicated",
+        "is": "formation-is",
+        "sa": "formation-sa",
+    },
+    "PronType": {
+        "Dem": "demonstrative",
+        "Int": "interrogative",
+        "Rel": "relative",
+        "Prs": "personal",
+        "Neg": "negative",
+        "Tot": "total",
+        "Ind": "indefinite",
+    },
+    "NumType": {"Card": "cardinal", "Ord": "ordinal", "Mult": "multiplicative"},
+    "Reflex": {"Yes": "reflexive"},
+    "Polarity": {"Neg": "negative", "Pos": "positive"},
+    "Foreign": {"Yes": "foreign"},
+    "Compound": {"Yes": "compound"},
 }
-FEAT_ORDER = ["Case","Gender","Number","Person","Mood","Tense","Voice","VerbForm","Aspect",
-              "Degree","Definite","Formation","PronType","NumType","Reflex","Polarity",
-              "Foreign","Compound"]
+FEAT_ORDER = [
+    "Case",
+    "Gender",
+    "Number",
+    "Person",
+    "Mood",
+    "Tense",
+    "Voice",
+    "VerbForm",
+    "Aspect",
+    "Degree",
+    "Definite",
+    "Formation",
+    "PronType",
+    "NumType",
+    "Reflex",
+    "Polarity",
+    "Foreign",
+    "Compound",
+]
+
 
 def normalize_feats(feats_field):
     if not feats_field or feats_field == "_":
@@ -73,38 +134,45 @@ def normalize_feats(feats_field):
             kv[k] = v
     out = []
     for key in FEAT_ORDER:
-        if key not in kv: continue
+        if key not in kv:
+            continue
         raw = kv[key]
         out.append(FEAT_MAP.get(key, {}).get(raw, raw.lower()))
     return ";".join(out)
 
+
 def norm_cmp(s):
     return unicodedata.normalize("NFKC", (s or "").strip().lower()) if s else ""
 
+
 def is_junk_form(s):
-    if not s: return True
-    if s == "_": return True
-    if "]" in s or "[" in s: return True
+    if not s:
+        return True
+    if s == "_":
+        return True
+    if "]" in s or "[" in s:
+        return True
     return False
 
+
 MISC_LEMMA_RE = re.compile(r"(?:^|\|)LemmaId=(\d+)")
-MISC_UNS_RE  = re.compile(r"(?:^|\|)Unsandhied=([^|]+)")
+MISC_UNS_RE = re.compile(r"(?:^|\|)Unsandhied=([^|]+)")
 
 # Picked lemma ids: mix of noun / adj / verb / pron / adv.
 # Includes the three from the user's examples (169501, 162663, 173892) plus
 # seven more chosen to exercise verbs, participles, pronouns, and indeclinables.
 # Bound to existing conllu occurrences (sampled before picking).
 TARGETS = [
-    169501,   # kākacaṇḍīśvara (user's example #1 - noun)
-    162663,   # pratiṣṭhā      (user's example #2 - verb)
-    173892,   # rasasiddha     (user's example #3 - noun)
-    44133,    # namas          (noun)
-    148996,   # buddha         (common noun)
-    37877,    # yad            (relative pronoun)
-    157144,   # ca             (conjunction)
-    157282,   # han            (verb, classic root)
-    105161,   # sarvathā       (adverb)
-    20335,    # andhakāra      (noun)
+    169501,  # kākacaṇḍīśvara (user's example #1 - noun)
+    162663,  # pratiṣṭhā      (user's example #2 - verb)
+    173892,  # rasasiddha     (user's example #3 - noun)
+    44133,  # namas          (noun)
+    148996,  # buddha         (common noun)
+    37877,  # yad            (relative pronoun)
+    157144,  # ca             (conjunction)
+    157282,  # han            (verb, classic root)
+    105161,  # sarvathā       (adverb)
+    20335,  # andhakāra      (noun)
 ]
 
 
@@ -120,7 +188,8 @@ def load_csv_row(lemma_id):
         reader = csv.reader(f, delimiter="\t")
         header = next(reader)
         for r in reader:
-            if not r: continue
+            if not r:
+                continue
             try:
                 if int(r[0]) == lemma_id:
                     return dict(zip(header, r))
@@ -139,9 +208,11 @@ def collect_all_occurrences(target_ids):
     scanned = 0
     for sub in sorted(os.listdir(CONLLU_ROOT)):
         d = CONLLU_ROOT / sub
-        if not d.is_dir(): continue
+        if not d.is_dir():
+            continue
         for fn in os.listdir(d):
-            if not fn.endswith(".conllu"): continue
+            if not fn.endswith(".conllu"):
+                continue
             scanned += 1
             fp = d / fn
             try:
@@ -159,17 +230,21 @@ def collect_all_occurrences(target_ids):
                         if matched_id is None:
                             continue
                         parts = line.rstrip("\n").split("\t")
-                        if len(parts) < 10: continue
+                        if len(parts) < 10:
+                            continue
                         tok_id = parts[0]
-                        if "-" in tok_id or "." in tok_id: continue
-                        by_lemma[matched_id].append({
-                            "file": str(fp.relative_to(CONLLU_ROOT)),
-                            "surface": parts[1],
-                            "lemma_col": parts[2],
-                            "upos": parts[3],
-                            "feats": parts[5],
-                            "misc": parts[9],
-                        })
+                        if "-" in tok_id or "." in tok_id:
+                            continue
+                        by_lemma[matched_id].append(
+                            {
+                                "file": str(fp.relative_to(CONLLU_ROOT)),
+                                "surface": parts[1],
+                                "lemma_col": parts[2],
+                                "upos": parts[3],
+                                "feats": parts[5],
+                                "misc": parts[9],
+                            }
+                        )
             except Exception:
                 continue
             if scanned % 2000 == 0:
@@ -214,8 +289,10 @@ def main():
             print(f"!! MISSING in CSV (unexpected)")
             overall_ok = False
         else:
-            print(f"csv:   word={csv_row['word']!r} grammar={csv_row['grammar']!r} "
-                  f"meanings={csv_row['meanings']!r}")
+            print(
+                f"csv:   word={csv_row['word']!r} grammar={csv_row['grammar']!r} "
+                f"meanings={csv_row['meanings']!r}"
+            )
             if csv_row["word"].strip() != row[1]:
                 print(f"!! HEADWORD MISMATCH csv={csv_row['word']!r} db={row[1]!r}")
                 overall_ok = False
@@ -250,8 +327,7 @@ def main():
             print("  first 3 raw occurrences:")
             for o in occs[:3]:
                 print(f"    {o['file']}")
-                print(f"      surface={o['surface']!r} feats={o['feats']!r} "
-                      f"misc={o['misc']!r}")
+                print(f"      surface={o['surface']!r} feats={o['feats']!r} misc={o['misc']!r}")
 
         headword_n = norm_cmp(row[1])
         headword_charset = set(unicodedata.normalize("NFC", row[1] or ""))
@@ -277,23 +353,23 @@ def main():
         #   (a) drop empty form_text or empty morph_tags
         #   (b) drop forms with no char overlap with headword
         #   (c) drop sandhied rows whose (form, base_tags) already exists plain
-        filtered_empty = {
-            (f, t) for (f, t) in raw_expected
-            if f and f.strip() and f != "_" and t
-        }
+        filtered_empty = {(f, t) for (f, t) in raw_expected if f and f.strip() and f != "_" and t}
         filtered_chars = {
-            (f, t) for (f, t) in filtered_empty
+            (f, t)
+            for (f, t) in filtered_empty
             if set(unicodedata.normalize("NFC", f)) & headword_charset
         }
         # sandhied-dup filter
-        plain_set = {(f, t) for (f, t) in filtered_chars if not (t == "sandhied" or t.endswith(";sandhied"))}
+        plain_set = {
+            (f, t) for (f, t) in filtered_chars if not (t == "sandhied" or t.endswith(";sandhied"))
+        }
         expected = set()
-        for (f, t) in filtered_chars:
+        for f, t in filtered_chars:
             if t == "sandhied":
                 if (f, "") in plain_set:
                     continue
             elif t.endswith(";sandhied"):
-                base = t[:-len(";sandhied")]
+                base = t[: -len(";sandhied")]
                 if (f, base) in plain_set:
                     continue
             expected.add((f, t))

@@ -7,6 +7,7 @@ Endpoints:
   GET  /payments/portal           — redirect to Stripe Customer Portal
   GET  /payments/status           — current subscription + quota status
 """
+
 import datetime
 
 from flask import Blueprint, request, jsonify, redirect, url_for
@@ -21,12 +22,14 @@ def _get_stripe():
     """Lazy import and configure stripe."""
     import stripe
     from config import STRIPE_SECRET_KEY
+
     stripe.api_key = STRIPE_SECRET_KEY
     return stripe
 
 
 def _public_url(endpoint):
     from config import APP_BASE_URL
+
     if APP_BASE_URL:
         return APP_BASE_URL + url_for(endpoint)
     return url_for(endpoint, _external=True)
@@ -34,6 +37,7 @@ def _public_url(endpoint):
 
 def _price_id_for_billing(billing):
     from config import STRIPE_MONTHLY_PRICE_ID, STRIPE_YEARLY_PRICE_ID
+
     if billing == "yearly":
         return STRIPE_YEARLY_PRICE_ID
     if billing == "monthly":
@@ -45,10 +49,12 @@ def _price_id_for_billing(billing):
 # Create Checkout Session
 # ---------------------------------------------------------------------------
 
+
 @payments_bp.route("/create-checkout", methods=["POST"])
 @login_required
 def create_checkout():
     from config import STRIPE_SECRET_KEY
+
     if not STRIPE_SECRET_KEY:
         return jsonify({"ok": False, "error": "STRIPE_SECRET_KEY is not configured."}), 501
 
@@ -65,6 +71,7 @@ def create_checkout():
 
     try:
         from analytics import record_checkout_attempt
+
         record_checkout_attempt()
     except Exception:
         pass
@@ -97,9 +104,11 @@ def create_checkout():
 # Stripe Webhook
 # ---------------------------------------------------------------------------
 
+
 @payments_bp.route("/webhook", methods=["POST"])
 def webhook():
     from config import STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+
     if not STRIPE_SECRET_KEY or not STRIPE_WEBHOOK_SECRET:
         return jsonify({"error": "Stripe webhook is not configured."}), 501
 
@@ -180,10 +189,12 @@ def _sync_subscription(sub_obj):
 # Customer Portal (change payment method, cancel)
 # ---------------------------------------------------------------------------
 
+
 @payments_bp.route("/portal")
 @login_required
 def portal():
     from config import STRIPE_SECRET_KEY
+
     if not STRIPE_SECRET_KEY:
         return jsonify({"ok": False, "error": "STRIPE_SECRET_KEY is not configured."}), 501
 
@@ -203,34 +214,42 @@ def portal():
 @login_required
 def invoices():
     from config import STRIPE_SECRET_KEY
+
     if not STRIPE_SECRET_KEY or not current_user.stripe_customer_id:
         return jsonify({"ok": True, "invoices": []})
 
     stripe = _get_stripe()
     try:
-        rows = stripe.Invoice.list(customer=current_user.stripe_customer_id, limit=10).get("data", [])
+        rows = stripe.Invoice.list(customer=current_user.stripe_customer_id, limit=10).get(
+            "data", []
+        )
     except Exception as exc:
-        return jsonify({"ok": False, "error": f"Could not load invoices: {type(exc).__name__}"}), 502
+        return jsonify(
+            {"ok": False, "error": f"Could not load invoices: {type(exc).__name__}"}
+        ), 502
 
     invoices_out = []
     for inv in rows:
         amount = inv.get("amount_paid")
         if amount is None:
             amount = inv.get("amount_due", 0)
-        invoices_out.append({
-            "id": inv.get("id", ""),
-            "created": inv.get("created"),
-            "status": inv.get("status", ""),
-            "amount": amount or 0,
-            "currency": (inv.get("currency") or "usd").upper(),
-            "url": inv.get("hosted_invoice_url") or inv.get("invoice_pdf") or "",
-        })
+        invoices_out.append(
+            {
+                "id": inv.get("id", ""),
+                "created": inv.get("created"),
+                "status": inv.get("status", ""),
+                "amount": amount or 0,
+                "currency": (inv.get("currency") or "usd").upper(),
+                "url": inv.get("hosted_invoice_url") or inv.get("invoice_pdf") or "",
+            }
+        )
     return jsonify({"ok": True, "invoices": invoices_out})
 
 
 # ---------------------------------------------------------------------------
 # Status: quota + subscription
 # ---------------------------------------------------------------------------
+
 
 @payments_bp.route("/status")
 @login_required
@@ -256,25 +275,29 @@ def status():
     sub = current_user.subscription
     period_end = sub.current_period_end if sub and sub.current_period_end else None
 
-    return jsonify({
-        "ok": True,
-        "is_subscribed": current_user.is_subscribed,
-        "tier": tier,
-        "lookups_used": quota.count,
-        "lookups_remaining": quota.remaining if not current_user.is_subscribed else None,
-        "lookups_limit": FREE_LOOKUP_TOKENS_PER_DAY,
-        "lookup_tokens_used": quota.count,
-        "lookup_tokens_remaining": quota.remaining if not current_user.is_subscribed else None,
-        "lookup_tokens_limit": FREE_LOOKUP_TOKENS_PER_DAY,
-        "subscription_status": sub.status if sub else "none",
-        "subscription_current_period_end": period_end.isoformat() + "Z" if period_end else None,
-        "subscription_cancel_at_period_end": bool(sub.cancel_at_period_end) if sub else False,
-        "mt_chars_used": usage.mt_chars_used if usage else 0,
-        "mt_chars_cap": caps.get("mt_chars_per_month", 0),
-        "llm_prompt_tokens_used": usage.llm_prompt_tokens_used if usage else 0,
-        "llm_output_tokens_used": usage.llm_output_tokens_used if usage else 0,
-        "llm_tokens_used": usage.llm_tokens_used if usage else 0,
-        "llm_budget_usd": usage.llm_budget_usd(current_user) if usage else float(caps.get("llm_budget_usd_per_month", 0.0) or 0.0),
-        "llm_cost_usd": usage.llm_cost_usd(current_user) if usage else 0.0,
-        "llm_usage_pct": usage.llm_usage_percent(current_user) if usage else 0.0,
-    })
+    return jsonify(
+        {
+            "ok": True,
+            "is_subscribed": current_user.is_subscribed,
+            "tier": tier,
+            "lookups_used": quota.count,
+            "lookups_remaining": quota.remaining if not current_user.is_subscribed else None,
+            "lookups_limit": FREE_LOOKUP_TOKENS_PER_DAY,
+            "lookup_tokens_used": quota.count,
+            "lookup_tokens_remaining": quota.remaining if not current_user.is_subscribed else None,
+            "lookup_tokens_limit": FREE_LOOKUP_TOKENS_PER_DAY,
+            "subscription_status": sub.status if sub else "none",
+            "subscription_current_period_end": period_end.isoformat() + "Z" if period_end else None,
+            "subscription_cancel_at_period_end": bool(sub.cancel_at_period_end) if sub else False,
+            "mt_chars_used": usage.mt_chars_used if usage else 0,
+            "mt_chars_cap": caps.get("mt_chars_per_month", 0),
+            "llm_prompt_tokens_used": usage.llm_prompt_tokens_used if usage else 0,
+            "llm_output_tokens_used": usage.llm_output_tokens_used if usage else 0,
+            "llm_tokens_used": usage.llm_tokens_used if usage else 0,
+            "llm_budget_usd": usage.llm_budget_usd(current_user)
+            if usage
+            else float(caps.get("llm_budget_usd_per_month", 0.0) or 0.0),
+            "llm_cost_usd": usage.llm_cost_usd(current_user) if usage else 0.0,
+            "llm_usage_pct": usage.llm_usage_percent(current_user) if usage else 0.0,
+        }
+    )

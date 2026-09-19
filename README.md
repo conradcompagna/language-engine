@@ -1,46 +1,40 @@
 # Language Engine
 
-**A deployed NLP reading platform for close reading across modern and historical languages.**
+**A deployed multilingual reading platform combining document reading, neural language analysis, and interactive dictionaries.**
 
-I built Language Engine to bring dictionary research, grammatical analysis, and document reading into one environment. Readers can work with PDFs, ebooks, Word documents, and captured web pages while inspecting the language of the original text.
+I built Language Engine to bring close reading and language research into one workspace: open a document, select a passage, and inspect its vocabulary, grammar, and named entities without losing the original context.
 
-[Live application](https://language-engine.ai) · [Portfolio](https://github.com/conradcompagna) · [Setup and external resources](docs/SETUP.md)
+[Live application](https://language-engine.ai) · [Setup](docs/SETUP.md) · [Architecture](docs/ARCHITECTURE.md) · [Portfolio](https://github.com/conradcompagna)
+
+[![Checks](https://github.com/conradcompagna/language-engine/actions/workflows/checks.yml/badge.svg)](https://github.com/conradcompagna/language-engine/actions/workflows/checks.yml)
 
 ## Engineering highlights
 
-- **Hybrid lexical search:** browser-side dynamic programming over compact key indexes, with full dictionary entries hydrated from SQLite only after candidate selection.
-- **Multilingual inference:** Trankit integration, custom training workflows, Unicode/offset alignment, multi-word-token expansion, and a shared dynamic-INT8 ONNX encoder with language/task adapter inputs.
-- **A complete reading product:** document rendering, dependency and entity overlays, morphology, pronunciation, dictionary editing, and contextual language assistance.
-- **Deployed application infrastructure:** Flask, authentication and email verification, Google sign-in, Stripe subscriptions, server-side feature gates, usage budgets, analytics, and Gunicorn/Nginx deployment templates.
+- **Hybrid search architecture:** browser-side dynamic programming over compact lexical indexes; batch SQLite hydration fetches full entries only after candidate selection. IndexedDB caches indexes between sessions.
+- **Multilingual neural inference:** Trankit integration, custom training pipelines, multi-word-token alignment, and a shared dynamic-INT8 ONNX encoder with language/task adapter inputs.
+- **A complete reading interface:** PDF, ebook, Word, and web-page ingestion; dictionary popups, dependency trees, entity overlays, annotations, pronunciation, and contextual language assistance.
+- **Product infrastructure:** Flask authentication, Google sign-in, Stripe subscriptions, server-side quotas and usage budgets, account management, and Gunicorn/Nginx deployment configuration.
 
 ## Scope
 
-The published snapshot includes 34 language display configurations and 27 enabled language registry entries. The deployment uses 42 SQLite dictionary files; their contents and all model weights are excluded here. Historical training and dictionary-conversion tools are included so the preparation infrastructure is inspectable alongside the runtime.
-
-## How it works
-
-```mermaid
-flowchart LR
-    A[Selected document text] --> B[Flask / Trankit NLP]
-    B --> C[Browser DP segmentation]
-    D[Compact lexical index / IndexedDB] --> C
-    C --> E[Batch SQLite hydration]
-    E --> F[Dictionary and grammar overlays]
-```
-
-The active reader is `templates/reader_jshybrid.html`. Its shared dictionary stack is `static/dictionary_client_hybrid.js`, `static/dictionary_engine_hybrid.js`, and `static/reader_wikt.js`. `router.py` supplies the HTTP boundary; `language_registry.py` controls NLP; `dict_lookup_sqlite.py` builds indexes and hydrates entries.
+The code includes **34 language display configurations and 27 enabled NLP registry entries**, covering modern and historical languages. The deployment uses 42 SQLite dictionary files; dictionary contents and model weights remain external to this repository.
 
 ## Explore the code
 
-| Area | Starting points |
+| Area | Starting point |
 |---|---|
-| Runtime and deployment | `wsgi.py`, `router.py`, `deploy/` |
-| Neural inference | `language_registry.py`, `trankit_onnx_live_switch.py`, `sandbox_trankit_compressed_runtime.py` |
-| Model preparation | `training/`, `build_trankit_compressed_runtime_artifacts.py`, `prep_trankit.py` |
-| Dictionary preparation | `convert_tsv_to_sqlite.py`, language-specific conversion scripts, `sqlite_prune_policy.py` |
-| Account and payment lifecycle | `auth.py`, `payments.py`, `db.py` |
-| Application diagnostics | `analytics.py`, `debug_panel.py`, `debug_trace_runtime.py` |
+| HTTP application and accounts | [router.py](router.py), [auth.py](auth.py), [payments.py](payments.py) |
+| Browser segmentation and hydration | [dictionary_client_hybrid.js](static/dictionary_client_hybrid.js) |
+| Lexical indexes and SQLite access | [dict_lookup_sqlite.py](dict_lookup_sqlite.py) |
+| Neural inference and alignment | [language_registry.py](language_registry.py), [pipeline_common.py](pipeline_common.py), [trankit_compressed_runtime.py](trankit_compressed_runtime.py) |
+| Training and preparation | [training/](training/), [tools/](tools/) |
+| Regression checks and performance work | [tests/](tests/), [benchmarks/](benchmarks/) |
+| Deployment | [wsgi.py](wsgi.py), [deploy/](deploy/) |
 
-The repository preserves deployed modules, including retained legacy functions. Standalone preparation and experimental scripts are not additional production entrypoints. Historical tools retain their dataset-specific assumptions; inspect their CLI arguments and input paths before running them.
+## Run the lightweight checks
 
-See [publication contents](docs/PUBLICATION.md) for exclusions and [third-party notices](THIRD_PARTY_NOTICES.md).
+```sh
+python -m tests.test_mwt_realign_dp
+```
+
+This regression runs without model weights or dictionaries. CI also checks Python formatting, undefined names, and JavaScript syntax. See [setup](docs/SETUP.md) for the resources required to run the application and [publication contents](docs/PUBLICATION.md) for the data boundary.

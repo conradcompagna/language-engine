@@ -19,10 +19,7 @@ from training.dcs_sanskrit_trankit_mwt_subset_10pct.gemini_sanskrit_ner_10_sente
 
 
 BASE_DIR = (
-    ROOT
-    / "training"
-    / "dcs_sanskrit_trankit_mwt_subset_10pct"
-    / "gemini_ner_test_10_sentences"
+    ROOT / "training" / "dcs_sanskrit_trankit_mwt_subset_10pct" / "gemini_ner_test_10_sentences"
 )
 INPUT_DIR = BASE_DIR / "inputs"
 RAW_DIR = BASE_DIR / "raw_atomic"
@@ -323,7 +320,16 @@ def main() -> None:
         if selected is None:
             skipped_empty += 1
             manifest_rows.append(
-                [str(chunk), "skipped_empty_or_missing", "", str(len(input_tokens)), "0", "0", "", "0"]
+                [
+                    str(chunk),
+                    "skipped_empty_or_missing",
+                    "",
+                    str(len(input_tokens)),
+                    "0",
+                    "0",
+                    "",
+                    "0",
+                ]
             )
             continue
 
@@ -373,7 +379,9 @@ def main() -> None:
     bio_path = FINAL_DIR / "sanskrit_gemini_ner_chunks_0001_1800_nonempty_fixed.bio"
     manifest_path = FINAL_DIR / "sanskrit_gemini_ner_chunks_0001_1800_nonempty_fixed_manifest.tsv"
     fix_log_path = FINAL_DIR / "sanskrit_gemini_ner_chunks_0001_1800_nonempty_fixed_fix_log.tsv"
-    tag_counts_path = FINAL_DIR / "sanskrit_gemini_ner_chunks_0001_1800_nonempty_fixed_tag_counts.tsv"
+    tag_counts_path = (
+        FINAL_DIR / "sanskrit_gemini_ner_chunks_0001_1800_nonempty_fixed_tag_counts.tsv"
+    )
     summary_path = FINAL_DIR / "sanskrit_gemini_ner_chunks_0001_1800_nonempty_fixed_summary.json"
 
     atomic_path.write_text("\n".join(atomic_lines).rstrip() + "\n", encoding="utf-8")
@@ -381,11 +389,11 @@ def main() -> None:
     manifest_path.write_text(
         "\n".join("\t".join(row) for row in manifest_rows) + "\n", encoding="utf-8"
     )
-    fix_log_path.write_text(
-        "\n".join("\t".join(row) for row in fix_rows) + "\n", encoding="utf-8"
-    )
+    fix_log_path.write_text("\n".join("\t".join(row) for row in fix_rows) + "\n", encoding="utf-8")
     tag_counts_path.write_text(
-        "tag\tcount\n" + "\n".join(f"{tag}\t{count}" for tag, count in tag_counts.most_common()) + "\n",
+        "tag\tcount\n"
+        + "\n".join(f"{tag}\t{count}" for tag, count in tag_counts.most_common())
+        + "\n",
         encoding="utf-8",
     )
     summary = {

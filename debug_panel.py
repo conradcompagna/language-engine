@@ -1,4 +1,4 @@
-﻿"""
+"""
 debug_panel.py â€” Debug Blueprint for inspecting raw pipeline data.
 
 Visit /debug in the browser to see the last lookup's:
@@ -137,20 +137,28 @@ def _build_raw_trankit_token_rows(doc):
                 continue
             tok_id = tok.get("id")
             expanded = tok.get("expanded")
-            is_mwt = (isinstance(tok_id, (list, tuple)) and len(tok_id) == 2) or (isinstance(expanded, list) and len(expanded) > 0)
+            is_mwt = (isinstance(tok_id, (list, tuple)) and len(tok_id) == 2) or (
+                isinstance(expanded, list) and len(expanded) > 0
+            )
             if is_mwt:
-                display_id = "{}-{}".format(tok_id[0], tok_id[1]) if isinstance(tok_id, (list, tuple)) and len(tok_id) == 2 else str(tok_id)
-                rows.append({
-                    "sentence_index": sent_idx,
-                    "id": display_id,
-                    "type": "MWT_PARENT",
-                    "text": str(tok.get("text", "") or ""),
-                    "head": None,
-                    "deprel": None,
-                    "upos": None,
-                    "span": tok.get("span"),
-                    "dspan": tok.get("dspan"),
-                })
+                display_id = (
+                    "{}-{}".format(tok_id[0], tok_id[1])
+                    if isinstance(tok_id, (list, tuple)) and len(tok_id) == 2
+                    else str(tok_id)
+                )
+                rows.append(
+                    {
+                        "sentence_index": sent_idx,
+                        "id": display_id,
+                        "type": "MWT_PARENT",
+                        "text": str(tok.get("text", "") or ""),
+                        "head": None,
+                        "deprel": None,
+                        "upos": None,
+                        "span": tok.get("span"),
+                        "dspan": tok.get("dspan"),
+                    }
+                )
                 # mwt_expanded_words has heuristic spans assigned by _derive_child_spans;
                 # fall back to raw expanded if mwt_expanded_words is not present.
                 child_source = tok.get("mwt_expanded_words") or tok.get("expanded") or []
@@ -162,35 +170,39 @@ def _build_raw_trankit_token_rows(doc):
                     cs_text = ""
                     if isinstance(cs, (list, tuple)) and len(cs) == 2:
                         try:
-                            cs_text = parent_text_for_slice[int(cs[0]):int(cs[1])]
+                            cs_text = parent_text_for_slice[int(cs[0]) : int(cs[1])]
                         except Exception:
                             cs_text = ""
-                    rows.append({
-                        "sentence_index": sent_idx,
-                        "id": child.get("id"),
-                        "type": "MWT_WORD",
-                        "text": str(child.get("text", "") or ""),
-                        "upos": str(child.get("upos", "") or ""),
-                        "deprel": str(child.get("deprel", "") or ""),
-                        "head": child.get("head"),
-                        "lemma": str(child.get("lemma", "") or ""),
-                        "span": child.get("span"),
-                        "dspan": child.get("dspan"),
-                        "surface_slice": cs,
-                        "surface_slice_text": cs_text,
-                        "realign_pass": str(child.get("_realign_pass", "") or ""),
-                    })
+                    rows.append(
+                        {
+                            "sentence_index": sent_idx,
+                            "id": child.get("id"),
+                            "type": "MWT_WORD",
+                            "text": str(child.get("text", "") or ""),
+                            "upos": str(child.get("upos", "") or ""),
+                            "deprel": str(child.get("deprel", "") or ""),
+                            "head": child.get("head"),
+                            "lemma": str(child.get("lemma", "") or ""),
+                            "span": child.get("span"),
+                            "dspan": child.get("dspan"),
+                            "surface_slice": cs,
+                            "surface_slice_text": cs_text,
+                            "realign_pass": str(child.get("_realign_pass", "") or ""),
+                        }
+                    )
             else:
-                rows.append({
-                    "sentence_index": sent_idx,
-                    "id": tok_id,
-                    "type": "WORD",
-                    "text": str(tok.get("text", "") or ""),
-                    "upos": str(tok.get("upos", "") or ""),
-                    "deprel": str(tok.get("deprel", "") or ""),
-                    "head": tok.get("head"),
-                    "lemma": str(tok.get("lemma", "") or ""),
-                })
+                rows.append(
+                    {
+                        "sentence_index": sent_idx,
+                        "id": tok_id,
+                        "type": "WORD",
+                        "text": str(tok.get("text", "") or ""),
+                        "upos": str(tok.get("upos", "") or ""),
+                        "deprel": str(tok.get("deprel", "") or ""),
+                        "head": tok.get("head"),
+                        "lemma": str(tok.get("lemma", "") or ""),
+                    }
+                )
     return rows
 
 
@@ -367,7 +379,10 @@ def _group_sqlite_query_waves(trace_payload):
 def _winner_ref_uid(ref):
     if not isinstance(ref, dict):
         return ""
-    storage_kind = str(ref.get("storage_kind") or ref.get("_storage_kind") or "sqlite").strip().lower() or "sqlite"
+    storage_kind = (
+        str(ref.get("storage_kind") or ref.get("_storage_kind") or "sqlite").strip().lower()
+        or "sqlite"
+    )
     db_alias = str(ref.get("db_alias") or ref.get("_storage_db_alias") or "").strip()
     try:
         entry_row_id = int(ref.get("entry_row_id") or ref.get("_storage_row_id") or 0)
@@ -379,13 +394,18 @@ def _winner_ref_uid(ref):
         form_row_id = 0
     if not db_alias or entry_row_id <= 0:
         return ""
-    return f"{storage_kind}|{db_alias}|{entry_row_id}" + (f"|{form_row_id}" if form_row_id > 0 else "")
+    return f"{storage_kind}|{db_alias}|{entry_row_id}" + (
+        f"|{form_row_id}" if form_row_id > 0 else ""
+    )
 
 
 def _winner_ref_base_uid(ref):
     if not isinstance(ref, dict):
         return ""
-    storage_kind = str(ref.get("storage_kind") or ref.get("_storage_kind") or "sqlite").strip().lower() or "sqlite"
+    storage_kind = (
+        str(ref.get("storage_kind") or ref.get("_storage_kind") or "sqlite").strip().lower()
+        or "sqlite"
+    )
     db_alias = str(ref.get("db_alias") or ref.get("_storage_db_alias") or "").strip()
     try:
         entry_row_id = int(ref.get("entry_row_id") or ref.get("_storage_row_id") or 0)
@@ -529,7 +549,11 @@ def _extract_debug_sense_lines(raw_senses):
     seen = set()
     for raw in list(raw_senses or []):
         if isinstance(raw, dict):
-            glosses = [str(item or "").strip() for item in list(raw.get("glosses") or []) if str(item or "").strip()]
+            glosses = [
+                str(item or "").strip()
+                for item in list(raw.get("glosses") or [])
+                if str(item or "").strip()
+            ]
             text = "; ".join(glosses).strip()
         else:
             text = str(raw or "").strip()
@@ -548,9 +572,16 @@ def _extract_debug_form_rows(raw_forms):
         tags = ""
         roman = ""
         if isinstance(raw_row, dict):
-            text = str(raw_row.get("display_text") or raw_row.get("form_text") or raw_row.get("text") or "").strip()
+            text = str(
+                raw_row.get("display_text") or raw_row.get("form_text") or raw_row.get("text") or ""
+            ).strip()
             tags = str(raw_row.get("tags") or raw_row.get("morph_tags") or "").strip()
-            roman = str(raw_row.get("form_roman") or raw_row.get("romanization") or raw_row.get("roman") or "").strip()
+            roman = str(
+                raw_row.get("form_roman")
+                or raw_row.get("romanization")
+                or raw_row.get("roman")
+                or ""
+            ).strip()
         elif isinstance(raw_row, (list, tuple)):
             if len(raw_row) > 0:
                 text = str(raw_row[0] or "").strip()
@@ -583,9 +614,13 @@ def _build_debug_entry_view(entry_key, entry):
         morph_info = [morph_text] if morph_text else []
     return {
         "entry_key": str(entry_key or "").strip(),
-        "runtime_entry_id": str(row.get("runtime_entry_id") or row.get("entry_id") or entry_key or "").strip(),
+        "runtime_entry_id": str(
+            row.get("runtime_entry_id") or row.get("entry_id") or entry_key or ""
+        ).strip(),
         "display_headword": str(row.get("display_headword") or row.get("headword") or "").strip(),
-        "display_reading": str(row.get("display_reading") or row.get("reading") or row.get("roman") or "").strip(),
+        "display_reading": str(
+            row.get("display_reading") or row.get("reading") or row.get("roman") or ""
+        ).strip(),
         "lemma_headword": str(row.get("lemma_headword") or row.get("headword") or "").strip(),
         "source": str(row.get("source") or row.get("_source") or "").strip(),
         "pos": str(row.get("pos") or row.get("pos_raw") or "").strip(),
@@ -600,12 +635,28 @@ def _build_debug_entry_view(entry_key, entry):
         "senses": _extract_debug_sense_lines(row.get("senses_full") or row.get("senses") or []),
         "forms": {
             "rows": _extract_debug_form_rows(forms),
-            "kanji": [str(v or "").strip() for v in list(forms.get("kanji") or []) if str(v or "").strip()],
-            "readings": [str(v or "").strip() for v in list(forms.get("readings") or []) if str(v or "").strip()],
-            "alt": [str(v or "").strip() for v in list(forms.get("alt") or []) if str(v or "").strip()],
-            "hanja": [str(v or "").strip() for v in list(forms.get("hanja") or []) if str(v or "").strip()],
-            "hangeul": [str(v or "").strip() for v in list(forms.get("hangeul") or []) if str(v or "").strip()],
-            "cjk": [str(v or "").strip() for v in list(forms.get("cjk") or []) if str(v or "").strip()],
+            "kanji": [
+                str(v or "").strip() for v in list(forms.get("kanji") or []) if str(v or "").strip()
+            ],
+            "readings": [
+                str(v or "").strip()
+                for v in list(forms.get("readings") or [])
+                if str(v or "").strip()
+            ],
+            "alt": [
+                str(v or "").strip() for v in list(forms.get("alt") or []) if str(v or "").strip()
+            ],
+            "hanja": [
+                str(v or "").strip() for v in list(forms.get("hanja") or []) if str(v or "").strip()
+            ],
+            "hangeul": [
+                str(v or "").strip()
+                for v in list(forms.get("hangeul") or [])
+                if str(v or "").strip()
+            ],
+            "cjk": [
+                str(v or "").strip() for v in list(forms.get("cjk") or []) if str(v or "").strip()
+            ],
         },
         "match_kind": str(row.get("match_kind") or row.get("_match_kind") or "").strip().lower(),
         "is_alternate_match": bool(row.get("is_alternate_match")),
@@ -617,7 +668,9 @@ def _build_debug_entry_view(entry_key, entry):
 
 def _build_token_sqlite_query_waves(token_trace, grouped_waves):
     token_ref_uids = set(str(v) for v in list(token_trace.get("deduped_ref_uids") or []) if str(v))
-    token_base_uids = set(str(v) for v in list(token_trace.get("deduped_base_uids") or []) if str(v))
+    token_base_uids = set(
+        str(v) for v in list(token_trace.get("deduped_base_uids") or []) if str(v)
+    )
     token_entry_ids = _safe_positive_int_set(token_trace.get("entry_row_ids") or [])
     token_form_ids = _safe_positive_int_set(token_trace.get("form_row_ids") or [])
     out = []
@@ -632,7 +685,10 @@ def _build_token_sqlite_query_waves(token_trace, grouped_waves):
             is_match = False
             if wave_key == "hydrate_winner_refs":
                 query_ref_uids, query_base_uids = _extract_hydrate_query_ref_uids(query)
-                is_match = bool((token_ref_uids and query_ref_uids.intersection(token_ref_uids)) or (token_base_uids and query_base_uids.intersection(token_base_uids)))
+                is_match = bool(
+                    (token_ref_uids and query_ref_uids.intersection(token_ref_uids))
+                    or (token_base_uids and query_base_uids.intersection(token_base_uids))
+                )
             elif wave_key == "hydrate_form_rows":
                 is_match = bool(token_form_ids.intersection(_extract_query_param_ints(query)))
             elif wave_key == "hydrate_special_forms":
@@ -674,14 +730,20 @@ def _build_debug_overlay_view(overlay):
         "display_headword": str(row.get("display_headword") or "").strip(),
         "display_reading": str(row.get("display_reading") or "").strip(),
         "match_kind": str(row.get("match_kind") or row.get("_match_kind") or "").strip().lower(),
-        "morph_info": [str(v or "").strip() for v in list(row.get("morph_info") or []) if str(v or "").strip()],
+        "morph_info": [
+            str(v or "").strip() for v in list(row.get("morph_info") or []) if str(v or "").strip()
+        ],
         "morph_base": str(row.get("morph_base") or "").strip(),
         "is_alternate_match": bool(row.get("is_alternate_match")),
         "matched_form": {
-            "text": str(matched_form.get("display_text") or matched_form.get("form_text") or "").strip(),
+            "text": str(
+                matched_form.get("display_text") or matched_form.get("form_text") or ""
+            ).strip(),
             "tags": str(matched_form.get("tags") or "").strip(),
             "roman": str(matched_form.get("form_roman") or "").strip(),
-        } if matched_form else {},
+        }
+        if matched_form
+        else {},
     }
 
 
@@ -690,7 +752,9 @@ def _build_token_hydrated_entries(token_trace, hydrate_payload):
     payload = hydrate_payload if isinstance(hydrate_payload, dict) else {}
     entry_store = payload.get("entry_store") if isinstance(payload.get("entry_store"), dict) else {}
     ref_to_key = payload.get("ref_to_key") if isinstance(payload.get("ref_to_key"), dict) else {}
-    form_overlays = payload.get("form_overlays") if isinstance(payload.get("form_overlays"), dict) else {}
+    form_overlays = (
+        payload.get("form_overlays") if isinstance(payload.get("form_overlays"), dict) else {}
+    )
     buckets = {}
     order = []
 
@@ -708,8 +772,8 @@ def _build_token_hydrated_entries(token_trace, hydrate_payload):
             "requested_match_keys": set(),
             "requested_form_row_ids": set(),
             "overlays": [],
-            "norm_kind_ids": set(),      # rule IDs that fired (changed the text)
-            "norm_kind_details": [],     # list of {id, label, before, after} (order-preserved, deduped by id)
+            "norm_kind_ids": set(),  # rule IDs that fired (changed the text)
+            "norm_kind_details": [],  # list of {id, label, before, after} (order-preserved, deduped by id)
         }
         buckets[key] = bucket
         order.append(key)
@@ -720,7 +784,9 @@ def _build_token_hydrated_entries(token_trace, hydrate_payload):
             continue
         wire_key = _winner_ref_uid(raw_ref)
         base_key = _winner_ref_base_uid(raw_ref)
-        entry_key = str(ref_to_key.get(wire_key) or ref_to_key.get(base_key) or base_key or "").strip()
+        entry_key = str(
+            ref_to_key.get(wire_key) or ref_to_key.get(base_key) or base_key or ""
+        ).strip()
         if not entry_key:
             continue
         bucket = _ensure_bucket(entry_key)
@@ -751,12 +817,14 @@ def _build_token_hydrated_entries(token_trace, hydrate_payload):
                 continue
             if nid not in bucket["norm_kind_ids"]:
                 bucket["norm_kind_ids"].add(nid)
-                bucket["norm_kind_details"].append({
-                    "id": nid,
-                    "label": str(norm_item.get("label") or nid).strip(),
-                    "before": str(norm_item.get("before") or ""),
-                    "after": str(norm_item.get("after") or ""),
-                })
+                bucket["norm_kind_details"].append(
+                    {
+                        "id": nid,
+                        "label": str(norm_item.get("label") or nid).strip(),
+                        "before": str(norm_item.get("before") or ""),
+                        "after": str(norm_item.get("after") or ""),
+                    }
+                )
 
     for entry_id in list(token.get("result_entry_ids") or []):
         entry_key = str(entry_id or "").strip()
@@ -770,8 +838,16 @@ def _build_token_hydrated_entries(token_trace, hydrate_payload):
         if not isinstance(bucket, dict):
             continue
         entry_view = bucket.get("entry") if isinstance(bucket.get("entry"), dict) else {}
-        form_rows = list(((entry_view.get("forms") or {}).get("rows") or [])) if isinstance(entry_view, dict) else []
-        lemma_headword = str(entry_view.get("lemma_headword") or entry_view.get("display_headword") or "").strip().lower()
+        form_rows = (
+            list(((entry_view.get("forms") or {}).get("rows") or []))
+            if isinstance(entry_view, dict)
+            else []
+        )
+        lemma_headword = (
+            str(entry_view.get("lemma_headword") or entry_view.get("display_headword") or "")
+            .strip()
+            .lower()
+        )
         special_rows = []
         same_headword_rows = []
         for row in form_rows:
@@ -839,7 +915,11 @@ def _build_fill_traces(token_trace):
                 "text": str(token.get("segment_text") or "").strip(),
                 "head": str(((token.get("result_summary") or {}).get("head") or "")).strip(),
                 "source": str(((token.get("result_summary") or {}).get("source") or "")).strip(),
-                "entry_ids": [str(v or "").strip() for v in list(token.get("result_entry_ids") or []) if str(v or "").strip()],
+                "entry_ids": [
+                    str(v or "").strip()
+                    for v in list(token.get("result_entry_ids") or [])
+                    if str(v or "").strip()
+                ],
             }
         ]
 
@@ -873,8 +953,14 @@ def _build_fill_traces(token_trace):
         fill_norm_kinds_seen = set()
         fill_norm_kinds = []
         for entry_item in fill_entries:
-            meta = entry_item.get("metadata") if isinstance(entry_item.get("metadata"), dict) else {}
-            match_kinds.update(str(v or "").strip() for v in list(meta.get("requested_match_kinds") or []) if str(v or "").strip())
+            meta = (
+                entry_item.get("metadata") if isinstance(entry_item.get("metadata"), dict) else {}
+            )
+            match_kinds.update(
+                str(v or "").strip()
+                for v in list(meta.get("requested_match_kinds") or [])
+                if str(v or "").strip()
+            )
             special_rows += len(list(meta.get("special_form_rows") or []))
             same_headword_rows += len(list(meta.get("same_headword_form_rows") or []))
             overlay_count += len(list(meta.get("form_overlays") or []))
@@ -921,8 +1007,14 @@ def _build_fill_traces(token_trace):
         uf_norm_kinds_seen = set()
         uf_norm_kinds = []
         for entry_item in unfilled_entries:
-            meta = entry_item.get("metadata") if isinstance(entry_item.get("metadata"), dict) else {}
-            match_kinds.update(str(v or "").strip() for v in list(meta.get("requested_match_kinds") or []) if str(v or "").strip())
+            meta = (
+                entry_item.get("metadata") if isinstance(entry_item.get("metadata"), dict) else {}
+            )
+            match_kinds.update(
+                str(v or "").strip()
+                for v in list(meta.get("requested_match_kinds") or [])
+                if str(v or "").strip()
+            )
             special_rows += len(list(meta.get("special_form_rows") or []))
             same_headword_rows += len(list(meta.get("same_headword_form_rows") or []))
             overlay_count += len(list(meta.get("form_overlays") or []))
@@ -945,7 +1037,11 @@ def _build_fill_traces(token_trace):
                 "fill_text": str(token.get("segment_text") or "").strip(),
                 "fill_head": str(((token.get("result_summary") or {}).get("head") or "")).strip(),
                 "fill_source": fill_source_label,
-                "entry_ids": [str(((item.get("entry") or {}).get("entry_key") or "")) for item in unfilled_entries if isinstance(item, dict)],
+                "entry_ids": [
+                    str(((item.get("entry") or {}).get("entry_key") or ""))
+                    for item in unfilled_entries
+                    if isinstance(item, dict)
+                ],
                 "analysis": {
                     "entry_count": len(unfilled_entries),
                     "match_kinds": sorted(v for v in match_kinds if v),
@@ -1015,7 +1111,9 @@ def _build_token_display_trace(token_trace):
     }
 
 
-def _build_sqlite_query_analysis(snapshot, client_capture, grouped_waves, token_traces, artifact_meta):
+def _build_sqlite_query_analysis(
+    snapshot, client_capture, grouped_waves, token_traces, artifact_meta
+):
     snap = snapshot if isinstance(snapshot, dict) else {}
     client = client_capture if isinstance(client_capture, dict) else {}
     wave_stats = _summarize_wave_stats(grouped_waves)
@@ -1072,7 +1170,9 @@ def _build_sqlite_token_traces(snapshot, client_capture, grouped_waves):
     segment_rows = list(client.get("segment_winners") or [])
     dedupe_rows = list(client.get("dedupe_rows") or [])
     results_by_seg = []
-    if isinstance(snap.get("debug_ui_results_by_seg"), list) and snap.get("debug_ui_results_by_seg"):
+    if isinstance(snap.get("debug_ui_results_by_seg"), list) and snap.get(
+        "debug_ui_results_by_seg"
+    ):
         results_by_seg = list(snap.get("debug_ui_results_by_seg") or [])
     elif isinstance(snap.get("results_by_seg"), list):
         results_by_seg = list(snap.get("results_by_seg") or [])
@@ -1131,7 +1231,11 @@ def _build_sqlite_token_traces(snapshot, client_capture, grouped_waves):
                     form_row_id = 0
                 if form_row_id > 0:
                     form_row_ids.add(form_row_id)
-        result_row = results_by_seg[seg_idx] if seg_idx < len(results_by_seg) and isinstance(results_by_seg[seg_idx], dict) else {}
+        result_row = (
+            results_by_seg[seg_idx]
+            if seg_idx < len(results_by_seg) and isinstance(results_by_seg[seg_idx], dict)
+            else {}
+        )
         trace = {
             "segment_index": seg_idx,
             "segment_text": str(raw_row.get("segment_text") or ""),
@@ -1156,7 +1260,9 @@ def _build_sqlite_token_traces(snapshot, client_capture, grouped_waves):
                 "method": "POST",
                 "path": "/js/hydrate",
                 "payload": {
-                    "lang": str(client.get("language") or snap.get("language") or "").strip().lower(),
+                    "lang": str(client.get("language") or snap.get("language") or "")
+                    .strip()
+                    .lower(),
                     "winner_refs": deduped_refs,
                 },
             },
@@ -1186,11 +1292,19 @@ def _build_sqlite_download_url(capture_id):
 def _build_sqlite_debug_payload(snapshot):
     snap = snapshot if isinstance(snapshot, dict) else {}
     capture_id = str(snap.get("debug_capture_id") or "").strip()
-    trace_payload = _json_safe_copy(snap.get("sqlite_debug_trace")) if isinstance(snap.get("sqlite_debug_trace"), dict) else {}
+    trace_payload = (
+        _json_safe_copy(snap.get("sqlite_debug_trace"))
+        if isinstance(snap.get("sqlite_debug_trace"), dict)
+        else {}
+    )
     if not isinstance(trace_payload, dict):
         trace_payload = {}
     trace_payload.pop("final_payload", None)
-    client_capture = _json_safe_copy(snap.get("debug_ui_sqlite_capture")) if isinstance(snap.get("debug_ui_sqlite_capture"), dict) else {}
+    client_capture = (
+        _json_safe_copy(snap.get("debug_ui_sqlite_capture"))
+        if isinstance(snap.get("debug_ui_sqlite_capture"), dict)
+        else {}
+    )
     if not isinstance(client_capture, dict):
         client_capture = {}
     grouped_waves = _group_sqlite_query_waves(trace_payload)
@@ -1200,14 +1314,28 @@ def _build_sqlite_debug_payload(snapshot):
         for token_trace in token_traces:
             if not isinstance(token_trace, dict):
                 continue
-            token_trace["hydrated_entries"] = _build_token_hydrated_entries(token_trace, hydrate_payload)
-    artifact_meta = get_debug_json_artifact_meta(capture_id, _SQLITE_PAYLOAD_ARTIFACT_SLUG) if capture_id else None
-    if not isinstance(artifact_meta, dict) and isinstance(trace_payload.get("final_payload_artifact"), dict):
+            token_trace["hydrated_entries"] = _build_token_hydrated_entries(
+                token_trace, hydrate_payload
+            )
+    artifact_meta = (
+        get_debug_json_artifact_meta(capture_id, _SQLITE_PAYLOAD_ARTIFACT_SLUG)
+        if capture_id
+        else None
+    )
+    if not isinstance(artifact_meta, dict) and isinstance(
+        trace_payload.get("final_payload_artifact"), dict
+    ):
         artifact_meta = _json_safe_copy(trace_payload.get("final_payload_artifact"))
     if isinstance(artifact_meta, dict):
         artifact_meta["download_url"] = _build_sqlite_download_url(capture_id)
-    display_tokens = [_build_token_display_trace(token_trace) for token_trace in token_traces if isinstance(token_trace, dict)]
-    query_analysis = _build_sqlite_query_analysis(snap, client_capture, grouped_waves, display_tokens, artifact_meta)
+    display_tokens = [
+        _build_token_display_trace(token_trace)
+        for token_trace in token_traces
+        if isinstance(token_trace, dict)
+    ]
+    query_analysis = _build_sqlite_query_analysis(
+        snap, client_capture, grouped_waves, display_tokens, artifact_meta
+    )
     return {
         "ok": True,
         "debug_capture_id": capture_id,
@@ -1230,7 +1358,9 @@ def debug_data():
         )
     snap = get_debug_snapshot()
     if snap is None:
-        return jsonify({"ok": False, "error": "No lookup yet. Run a lookup in the main window first."})
+        return jsonify(
+            {"ok": False, "error": "No lookup yet. Run a lookup in the main window first."}
+        )
     # Make a JSON-safe copy (Trankit doc can have odd types)
     try:
         safe = json.loads(json.dumps(snap, ensure_ascii=False, default=str))
@@ -1288,7 +1418,9 @@ def debug_data():
             trimmed["raw_trankit_tokens"] = []
     except Exception:
         trimmed["raw_trankit_tokens"] = []
-    trimmed["snapshot_results"] = list(trimmed.get("results") or []) if isinstance(trimmed.get("results"), list) else []
+    trimmed["snapshot_results"] = (
+        list(trimmed.get("results") or []) if isinstance(trimmed.get("results"), list) else []
+    )
     trimmed["snapshot_results_by_seg"] = (
         list(trimmed.get("results_by_seg") or [])
         if isinstance(trimmed.get("results_by_seg"), list)
@@ -1318,13 +1450,22 @@ def debug_sqlite_data():
         )
     snap = get_debug_snapshot()
     if not isinstance(snap, dict):
-        return jsonify({"ok": False, "error": "No lookup yet. Run a lookup in the main window first."})
+        return jsonify(
+            {"ok": False, "error": "No lookup yet. Run a lookup in the main window first."}
+        )
     capture_id = str(snap.get("debug_capture_id") or "").strip()
     if not capture_id:
-        return jsonify({"ok": False, "error": "No active debug capture. Turn on Debug capture and run a fresh lookup."})
+        return jsonify(
+            {
+                "ok": False,
+                "error": "No active debug capture. Turn on Debug capture and run a fresh lookup.",
+            }
+        )
     payload = _build_sqlite_debug_payload(snap)
     if not payload.get("query_analysis") and not payload.get("token_traces"):
-        return jsonify({"ok": False, "error": "No SQLite capture is available for the current lookup."})
+        return jsonify(
+            {"ok": False, "error": "No SQLite capture is available for the current lookup."}
+        )
     return jsonify(payload)
 
 
@@ -1341,7 +1482,9 @@ def debug_sqlite_download():
         return jsonify({"ok": False, "error": "Missing capture id."}), 400
     artifact = get_debug_json_artifact(capture_id, _SQLITE_PAYLOAD_ARTIFACT_SLUG)
     if not isinstance(artifact, dict):
-        return jsonify({"ok": False, "error": "No SQLite payload artifact is available for this capture."}), 404
+        return jsonify(
+            {"ok": False, "error": "No SQLite payload artifact is available for this capture."}
+        ), 404
     meta = artifact.get("meta") if isinstance(artifact.get("meta"), dict) else {}
     body = str(artifact.get("text") or "")
     filename = str(meta.get("filename") or f"{capture_id}-{_SQLITE_PAYLOAD_ARTIFACT_SLUG}.json")
@@ -1471,7 +1614,9 @@ def debug_greedy_score():
     try:
         exact_entries = list(dictionary.lookup_all(token) or [])
     except Exception as exc:
-        return jsonify({"ok": False, "error": f"lookup_all failed: {type(exc).__name__}: {exc}"}), 500
+        return jsonify(
+            {"ok": False, "error": f"lookup_all failed: {type(exc).__name__}: {exc}"}
+        ), 500
 
     try:
         greedy_result = _call_fill_token_with_debug(
@@ -1482,7 +1627,9 @@ def debug_greedy_score():
             debug=True,
         )
     except Exception as exc:
-        return jsonify({"ok": False, "error": f"fill_token failed: {type(exc).__name__}: {exc}"}), 500
+        return jsonify(
+            {"ok": False, "error": f"fill_token failed: {type(exc).__name__}: {exc}"}
+        ), 500
 
     if not isinstance(greedy_result, dict):
         greedy_result = {
@@ -1497,10 +1644,7 @@ def debug_greedy_score():
     if exact_entries:
         top = exact_entries[0] if isinstance(exact_entries[0], dict) else {}
         top_head = str(
-            top.get("headword", "")
-            or top.get("word", "")
-            or top.get("head", "")
-            or token
+            top.get("headword", "") or top.get("word", "") or top.get("head", "") or token
         )
         top_pos = str(top.get("pos_raw", "") or top.get("pos", "") or "")
 
@@ -1517,11 +1661,31 @@ def debug_greedy_score():
                 "source": str(piece.get("source", "") or ""),
                 "pos": str(piece.get("pos", "") or ""),
                 "xpos_hint": str(piece.get("_xpos_hint", "") or piece.get("xpos_hint", "") or ""),
-                "lemma_upos_hint": str(piece.get("_lemma_upos_hint", "") or piece.get("lemma_upos_hint", "") or ""),
-                "lemma_xpos_hint": str(piece.get("_lemma_xpos_hint", "") or piece.get("lemma_xpos_hint", "") or ""),
-                "effective_upos": str(((piece.get("_debug_trace") or {}) if isinstance(piece.get("_debug_trace"), dict) else {}).get("effective_upos", "") or ""),
-                "effective_xpos": str(((piece.get("_debug_trace") or {}) if isinstance(piece.get("_debug_trace"), dict) else {}).get("effective_xpos", "") or ""),
-                "lemma_promoted": str(piece.get("_lemma_promoted", "") or piece.get("lemma_promoted", "") or ""),
+                "lemma_upos_hint": str(
+                    piece.get("_lemma_upos_hint", "") or piece.get("lemma_upos_hint", "") or ""
+                ),
+                "lemma_xpos_hint": str(
+                    piece.get("_lemma_xpos_hint", "") or piece.get("lemma_xpos_hint", "") or ""
+                ),
+                "effective_upos": str(
+                    (
+                        (piece.get("_debug_trace") or {})
+                        if isinstance(piece.get("_debug_trace"), dict)
+                        else {}
+                    ).get("effective_upos", "")
+                    or ""
+                ),
+                "effective_xpos": str(
+                    (
+                        (piece.get("_debug_trace") or {})
+                        if isinstance(piece.get("_debug_trace"), dict)
+                        else {}
+                    ).get("effective_xpos", "")
+                    or ""
+                ),
+                "lemma_promoted": str(
+                    piece.get("_lemma_promoted", "") or piece.get("lemma_promoted", "") or ""
+                ),
                 "sense_count": len(senses),
             }
         )

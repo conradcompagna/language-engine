@@ -3,6 +3,7 @@ config.py — Application configuration for Language Engine.
 
 Reads secrets from environment variables or a .env file.
 """
+
 import os
 from pathlib import Path
 
@@ -59,7 +60,7 @@ APP_BASE_URL = os.environ.get("APP_BASE_URL", "").rstrip("/")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_MONTHLY_PRICE_ID = os.environ.get("STRIPE_MONTHLY_PRICE_ID", "")  # Pro monthly ($10)
-STRIPE_YEARLY_PRICE_ID = os.environ.get("STRIPE_YEARLY_PRICE_ID", "")    # Pro yearly ($100)
+STRIPE_YEARLY_PRICE_ID = os.environ.get("STRIPE_YEARLY_PRICE_ID", "")  # Pro yearly ($100)
 
 # Google OAuth (optional)
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
@@ -74,7 +75,9 @@ LE_GEMINI_COMMS_LOG = _env_bool("LE_GEMINI_COMMS_LOG", default=False)
 
 # Production runtime switches
 ENABLE_DEBUG_PANEL = _env_bool("LE_ENABLE_DEBUG_PANEL", default=not IS_PRODUCTION)
-ENABLE_LEGACY_DOCUMENT_ROUTES = _env_bool("LE_ENABLE_LEGACY_DOCUMENT_ROUTES", default=not IS_PRODUCTION)
+ENABLE_LEGACY_DOCUMENT_ROUTES = _env_bool(
+    "LE_ENABLE_LEGACY_DOCUMENT_ROUTES", default=not IS_PRODUCTION
+)
 TRUST_PROXY_HEADERS = _env_bool("LE_TRUST_PROXY_HEADERS", default=IS_PRODUCTION)
 ANALYTICS_ENABLED = _env_bool("LE_ANALYTICS_ENABLED", default=True)
 
@@ -85,7 +88,12 @@ SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 SMTP_USERNAME = os.environ.get("SMTP_USERNAME", "")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 SMTP_FROM_EMAIL = os.environ.get("SMTP_FROM_EMAIL", SMTP_USERNAME or CONTACT_TO_EMAIL)
-SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "1").strip().lower() not in {"0", "false", "no", "off"}
+SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "1").strip().lower() not in {
+    "0",
+    "false",
+    "no",
+    "off",
+}
 
 # Free tier
 FREE_LOOKUP_TOKENS_PER_DAY = int(os.environ.get("LE_FREE_LOOKUP_TOKENS", "1000"))

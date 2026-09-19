@@ -36,7 +36,9 @@ INPUT_DIR = (
     / "train_10k_parent_tokens_unannotated_bio_chunks"
     / "unannotatedchild"
 )
-OUT_DIR = ROOT / "training" / "dcs_sanskrit_trankit_mwt_subset_10pct" / "gemini_ner_test_10_sentences"
+OUT_DIR = (
+    ROOT / "training" / "dcs_sanskrit_trankit_mwt_subset_10pct" / "gemini_ner_test_10_sentences"
+)
 INPUT_OUT_DIR = OUT_DIR / "inputs"
 SYSTEM_PROMPT_DIR = OUT_DIR / "prompts" / "system"
 USER_PROMPT_DIR = OUT_DIR / "prompts" / "user"
@@ -423,7 +425,10 @@ def run_job_with_retries(
     if has_existing_raw_without_summary(job_no):
         return {"chunk": job_no, "status": "skipped_existing_raw_without_summary"}
 
-    if raw_path_for(canonical_prefix(job_no)).exists() or summary_path_for(canonical_prefix(job_no)).exists():
+    if (
+        raw_path_for(canonical_prefix(job_no)).exists()
+        or summary_path_for(canonical_prefix(job_no)).exists()
+    ):
         prefix = next_retry_prefix(job_no)
         is_retry = True
     else:
@@ -547,7 +552,9 @@ def rebuild_issue_files() -> None:
             issue_lines.append(
                 f"{run_name}\tinvalid_label\terror\t{len(in_toks)}\t{len(rows_out)}\t{non_o_total}\tblank/missing label present"
             )
-        invalid_labels = sorted({label for label in labels if label and label not in ALLOWED_LABELS})
+        invalid_labels = sorted(
+            {label for label in labels if label and label not in ALLOWED_LABELS}
+        )
         if invalid_labels:
             issue_lines.append(
                 f"{run_name}\tinvalid_label\terror\t{len(in_toks)}\t{len(rows_out)}\t{non_o_total}\tinvalid labels: {', '.join(invalid_labels)}"
@@ -562,9 +569,7 @@ def rebuild_issue_files() -> None:
             )
 
     (LOG_DIR / "issues.tsv").write_text("\n".join(issue_lines) + "\n", encoding="utf-8")
-    (LOG_DIR / "annotation_counts.tsv").write_text(
-        "\n".join(count_lines) + "\n", encoding="utf-8"
-    )
+    (LOG_DIR / "annotation_counts.tsv").write_text("\n".join(count_lines) + "\n", encoding="utf-8")
 
 
 def append_progress(row: dict[str, Any]) -> None:
@@ -618,8 +623,7 @@ def main() -> None:
     for wave_start in range(args.start, args.end + 1, args.wave_size):
         wave_end = min(args.end, wave_start + args.wave_size - 1)
         jobs = [
-            (job_no, job_sentences(all_rows, job_no))
-            for job_no in range(wave_start, wave_end + 1)
+            (job_no, job_sentences(all_rows, job_no)) for job_no in range(wave_start, wave_end + 1)
         ]
         results: list[dict[str, Any]] = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
@@ -647,9 +651,7 @@ def main() -> None:
             "wave_end": wave_end,
             "completed": sum(1 for row in results if row.get("status") == "completed"),
             "passed": sum(1 for row in results if row.get("validation") == "passed"),
-            "failed_validation": sum(
-                1 for row in results if row.get("validation") == "failed"
-            ),
+            "failed_validation": sum(1 for row in results if row.get("validation") == "failed"),
             "errors": sum(1 for row in results if row.get("status") == "error"),
             "skipped_validated": sum(
                 1 for row in results if row.get("status") == "skipped_validated"
@@ -661,9 +663,7 @@ def main() -> None:
                 1 for row in results if row.get("status") == "skipped_empty_after_retry"
             ),
             "skipped_existing_raw_without_summary": sum(
-                1
-                for row in results
-                if row.get("status") == "skipped_existing_raw_without_summary"
+                1 for row in results if row.get("status") == "skipped_existing_raw_without_summary"
             ),
             "estimated_total_cost_usd": wave_cost,
             "results": results,
@@ -685,9 +685,7 @@ def main() -> None:
         "jobs_seen": len(total_results),
         "completed": sum(1 for row in total_results if row.get("status") == "completed"),
         "passed": sum(1 for row in total_results if row.get("validation") == "passed"),
-        "failed_validation": sum(
-            1 for row in total_results if row.get("validation") == "failed"
-        ),
+        "failed_validation": sum(1 for row in total_results if row.get("validation") == "failed"),
         "errors": sum(1 for row in total_results if row.get("status") == "error"),
         "skipped_validated": sum(
             1 for row in total_results if row.get("status") == "skipped_validated"

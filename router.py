@@ -22,7 +22,17 @@ from email.utils import formatdate
 from typing import Any, Mapping, Sequence
 from xml.sax.saxutils import escape as _xml_escape
 
-from flask import Flask, request, jsonify, render_template, redirect, Response, send_from_directory, stream_with_context, make_response
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    render_template,
+    redirect,
+    Response,
+    send_from_directory,
+    stream_with_context,
+    make_response,
+)
 from flask_cors import CORS
 from flask_login import current_user
 from universal_normalization import (
@@ -69,22 +79,27 @@ APP_ROOT = Path(__file__).resolve().parent
 
 app = Flask(__name__)
 
+
 # Jinja2 helper: returns file mtime as an int so static files auto-bust cache on save.
 # Usage in templates: ?v={{ mtime('reader.js') }}
 def _static_mtime(filename):
     try:
-        p = APP_ROOT / 'static' / filename
+        p = APP_ROOT / "static" / filename
         return int(_os.path.getmtime(p))
     except Exception:
         return 0
-app.jinja_env.globals['mtime'] = _static_mtime
-app.jinja_env.globals['is_debug_collection_enabled'] = is_debug_collection_enabled
+
+
+app.jinja_env.globals["mtime"] = _static_mtime
+app.jinja_env.globals["is_debug_collection_enabled"] = is_debug_collection_enabled
 
 
 def _inject_extension_snapshot_style(html: str) -> str:
     html = re.sub(r"<script\b[^>]*>[\s\S]*?</script\s*>", "", html, flags=re.I)
     html = re.sub(r"\s+on[a-zA-Z]+\s*=\s*(\"[^\"]*\"|'[^']*'|[^\s>]+)", "", html)
-    html = re.sub(r"(?i)(href|src|xlink:href)\s*=\s*(['\"])\s*javascript:[\s\S]*?\2", r"\1=\"#\"", html)
+    html = re.sub(
+        r"(?i)(href|src|xlink:href)\s*=\s*(['\"])\s*javascript:[\s\S]*?\2", r"\1=\"#\"", html
+    )
     style = """
 <style id="docrender-monolith-inert-style">
 html[data-docrender-web-snapshot],html[data-docrender-web-snapshot] body{min-height:100%;scrollbar-width:none!important;overflow-x:hidden!important;}
@@ -93,9 +108,9 @@ html[data-docrender-web-snapshot] *{animation:none!important;transition:none!imp
 html[data-docrender-web-snapshot] a,html[data-docrender-web-snapshot] button,html[data-docrender-web-snapshot] input,html[data-docrender-web-snapshot] textarea,html[data-docrender-web-snapshot] select,html[data-docrender-web-snapshot] [role='button']{pointer-events:none!important;}
 html[data-docrender-web-snapshot] video,html[data-docrender-web-snapshot] audio{display:none!important;}
 </style>""".strip()
-    marked = re.sub(r"<html\b", "<html data-docrender-web-snapshot=\"1\"", html, count=1, flags=re.I)
+    marked = re.sub(r"<html\b", '<html data-docrender-web-snapshot="1"', html, count=1, flags=re.I)
     if marked == html and "data-docrender-web-snapshot" not in marked:
-        marked = html.replace("<HTML", "<HTML data-docrender-web-snapshot=\"1\"", 1)
+        marked = html.replace("<HTML", '<HTML data-docrender-web-snapshot="1"', 1)
     if re.search(r"</head\s*>", marked, re.I):
         return re.sub(r"</head\s*>", style + "\n</head>", marked, count=1, flags=re.I)
     return style + "\n" + marked
@@ -103,10 +118,12 @@ html[data-docrender-web-snapshot] video,html[data-docrender-web-snapshot] audio{
 
 @app.route("/api/monolith_snapshot", methods=["POST"])
 def monolith_snapshot():
-    return jsonify({
-        "ok": False,
-        "error": "URL snapshot capture is disabled. Upload frozen Chrome-extension HTML instead.",
-    }), 410
+    return jsonify(
+        {
+            "ok": False,
+            "error": "URL snapshot capture is disabled. Upload frozen Chrome-extension HTML instead.",
+        }
+    ), 410
 
 
 # ---------------------------------------------------------------------------
@@ -130,8 +147,11 @@ _EXTENSION_CAPTURE_MAX_BYTES = 64 * 1024 * 1024  # 64 MB
 
 def _ext_prune_locked():
     now = time.time()
-    stale = [tok for tok, rec in _EXTENSION_CAPTURES.items()
-             if now - rec.get("ts", now) > _EXTENSION_CAPTURE_TTL_SECONDS]
+    stale = [
+        tok
+        for tok, rec in _EXTENSION_CAPTURES.items()
+        if now - rec.get("ts", now) > _EXTENSION_CAPTURE_TTL_SECONDS
+    ]
     for tok in stale:
         _EXTENSION_CAPTURES.pop(tok, None)
     while len(_EXTENSION_CAPTURES) > _EXTENSION_CAPTURE_MAX:
@@ -173,22 +193,26 @@ def extension_capture_post():
     if not isinstance(html, str) or not html.strip():
         return jsonify({"ok": False, "error": "Missing 'html' field."}), 400
     if len(html.encode("utf-8", "replace")) > _EXTENSION_CAPTURE_MAX_BYTES:
-        return jsonify({
-            "ok": False,
-            "error": f"Captured HTML exceeds {_EXTENSION_CAPTURE_MAX_BYTES // (1024 * 1024)} MB cap.",
-        }), 413
+        return jsonify(
+            {
+                "ok": False,
+                "error": f"Captured HTML exceeds {_EXTENSION_CAPTURE_MAX_BYTES // (1024 * 1024)} MB cap.",
+            }
+        ), 413
     source_url = str(payload.get("url") or "").strip()
     title = str(payload.get("title") or "").strip() or source_url or "Captured page"
     token = _ext_store(html, source_url, title)
     base = request.host_url.rstrip("/")
-    return jsonify({
-        "ok": True,
-        "token": token,
-        "viewerUrl": f"{base}/extension/snapshot/{token}",
-        "snapshotPayloadUrl": f"{base}/api/extension_snapshot/{token}",
-        "title": title,
-        "url": source_url,
-    })
+    return jsonify(
+        {
+            "ok": True,
+            "token": token,
+            "viewerUrl": f"{base}/extension/snapshot/{token}",
+            "snapshotPayloadUrl": f"{base}/api/extension_snapshot/{token}",
+            "title": title,
+            "url": source_url,
+        }
+    )
 
 
 @app.route("/extension/snapshot/<token>", methods=["GET"])
@@ -214,68 +238,79 @@ def extension_snapshot_payload(token: str):
     if rec is None:
         return jsonify({"ok": False, "error": "Snapshot not found or expired."}), 404
     html = _inject_extension_snapshot_style(rec["html"])
-    return jsonify({
-        "ok": True,
-        "page": {
-            "kind": "webSnapshot",
-            "type": "webSnapshot",
-            "html": html,
-            "snapshot": {
-                "requestedUrl": rec.get("url", ""),
-                "finalUrl": rec.get("url", ""),
-                "title": rec.get("title", ""),
-                "createdAt": datetime.fromtimestamp(rec["ts"], tz=timezone.utc).isoformat(),
-                "htmlLength": len(html),
-                "capture": "chrome-extension",
-                "jsRendered": True,
+    return jsonify(
+        {
+            "ok": True,
+            "page": {
+                "kind": "webSnapshot",
+                "type": "webSnapshot",
+                "html": html,
+                "snapshot": {
+                    "requestedUrl": rec.get("url", ""),
+                    "finalUrl": rec.get("url", ""),
+                    "title": rec.get("title", ""),
+                    "createdAt": datetime.fromtimestamp(rec["ts"], tz=timezone.utc).isoformat(),
+                    "htmlLength": len(html),
+                    "capture": "chrome-extension",
+                    "jsRendered": True,
+                },
             },
-        },
-    })
+        }
+    )
 
 
 # Bump this string whenever you deploy updated dictionaries or client code.
 # All users will have their IndexedDB index cache wiped on next page load.
 APP_DICT_VERSION = "2026-04-10-1"
-app.jinja_env.globals['app_dict_version'] = APP_DICT_VERSION
+app.jinja_env.globals["app_dict_version"] = APP_DICT_VERSION
 
 # ---- Language Engine: production config, database, auth, payments ----
 import config as le_config
 
 if le_config.TRUST_PROXY_HEADERS:
     from werkzeug.middleware.proxy_fix import ProxyFix
+
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 if le_config.IS_PRODUCTION:
-    CORS(app, origins=[le_config.APP_BASE_URL or "https://language-engine.ai"], supports_credentials=True)
+    CORS(
+        app,
+        origins=[le_config.APP_BASE_URL or "https://language-engine.ai"],
+        supports_credentials=True,
+    )
 else:
     CORS(app)
-app.config['JSON_AS_ASCII'] = False
+app.config["JSON_AS_ASCII"] = False
 
-app.config['SECRET_KEY'] = le_config.SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = le_config.DATABASE_URL
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['REMEMBER_COOKIE_DURATION'] = 60 * 60 * 24 * 30  # 30 days
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = bool(le_config.IS_PRODUCTION)
-app.config['REMEMBER_COOKIE_HTTPONLY'] = True
-app.config['REMEMBER_COOKIE_SAMESITE'] = 'Lax'
-app.config['REMEMBER_COOKIE_SECURE'] = bool(le_config.IS_PRODUCTION)
-app.config['PREFERRED_URL_SCHEME'] = 'https' if le_config.IS_PRODUCTION else 'http'
-app.jinja_env.globals['public_base_url'] = le_config.APP_BASE_URL
+app.config["SECRET_KEY"] = le_config.SECRET_KEY
+app.config["SQLALCHEMY_DATABASE_URI"] = le_config.DATABASE_URL
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["REMEMBER_COOKIE_DURATION"] = 60 * 60 * 24 * 30  # 30 days
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = bool(le_config.IS_PRODUCTION)
+app.config["REMEMBER_COOKIE_HTTPONLY"] = True
+app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
+app.config["REMEMBER_COOKIE_SECURE"] = bool(le_config.IS_PRODUCTION)
+app.config["PREFERRED_URL_SCHEME"] = "https" if le_config.IS_PRODUCTION else "http"
+app.jinja_env.globals["public_base_url"] = le_config.APP_BASE_URL
 
 from db import db as le_db
+
 le_db.init_app(app)
 
 from auth import auth_bp, login_manager
+
 login_manager.init_app(app)
 app.register_blueprint(auth_bp)
 
 from payments import payments_bp
+
 app.register_blueprint(payments_bp)
 
 with app.app_context():
     import sqlalchemy
+
     if str(le_config.DATABASE_URL or "").startswith("sqlite"):
         from sqlalchemy import event
 
@@ -296,9 +331,11 @@ with app.app_context():
         except Exception:
             le_db.session.rollback()
             try:
-                le_db.session.execute(sqlalchemy.text(
-                    f"ALTER TABLE api_usage ADD COLUMN {column_name} INTEGER DEFAULT 0"
-                ))
+                le_db.session.execute(
+                    sqlalchemy.text(
+                        f"ALTER TABLE api_usage ADD COLUMN {column_name} INTEGER DEFAULT 0"
+                    )
+                )
                 le_db.session.commit()
             except Exception:
                 le_db.session.rollback()
@@ -307,9 +344,9 @@ with app.app_context():
     except Exception:
         le_db.session.rollback()
         try:
-            le_db.session.execute(sqlalchemy.text(
-                "ALTER TABLE users ADD COLUMN password_length INTEGER DEFAULT 8"
-            ))
+            le_db.session.execute(
+                sqlalchemy.text("ALTER TABLE users ADD COLUMN password_length INTEGER DEFAULT 8")
+            )
             le_db.session.commit()
         except Exception:
             le_db.session.rollback()
@@ -318,23 +355,29 @@ with app.app_context():
     except Exception:
         le_db.session.rollback()
         try:
-            le_db.session.execute(sqlalchemy.text(
-                "ALTER TABLE users ADD COLUMN email_verified_at DATETIME"
-            ))
-            le_db.session.execute(sqlalchemy.text(
-                "UPDATE users SET email_verified_at = CURRENT_TIMESTAMP WHERE email_verified_at IS NULL"
-            ))
+            le_db.session.execute(
+                sqlalchemy.text("ALTER TABLE users ADD COLUMN email_verified_at DATETIME")
+            )
+            le_db.session.execute(
+                sqlalchemy.text(
+                    "UPDATE users SET email_verified_at = CURRENT_TIMESTAMP WHERE email_verified_at IS NULL"
+                )
+            )
             le_db.session.commit()
         except Exception:
             le_db.session.rollback()
     try:
-        le_db.session.execute(sqlalchemy.text("SELECT cancel_at_period_end FROM subscriptions LIMIT 1"))
+        le_db.session.execute(
+            sqlalchemy.text("SELECT cancel_at_period_end FROM subscriptions LIMIT 1")
+        )
     except Exception:
         le_db.session.rollback()
         try:
-            le_db.session.execute(sqlalchemy.text(
-                "ALTER TABLE subscriptions ADD COLUMN cancel_at_period_end BOOLEAN DEFAULT 0"
-            ))
+            le_db.session.execute(
+                sqlalchemy.text(
+                    "ALTER TABLE subscriptions ADD COLUMN cancel_at_period_end BOOLEAN DEFAULT 0"
+                )
+            )
             le_db.session.commit()
         except Exception:
             le_db.session.rollback()
@@ -347,56 +390,87 @@ with app.app_context():
     except Exception:
         le_db.session.rollback()
         try:
-            le_db.session.execute(sqlalchemy.text(
-                "ALTER TABLE entry_decomps ADD COLUMN surface_form TEXT DEFAULT NULL"
-            ))
+            le_db.session.execute(
+                sqlalchemy.text(
+                    "ALTER TABLE entry_decomps ADD COLUMN surface_form TEXT DEFAULT NULL"
+                )
+            )
             le_db.session.commit()
         except Exception:
             le_db.session.rollback()
     try:
-        le_db.session.execute(sqlalchemy.text(
-            "DELETE FROM entry_decomps WHERE surface_form IS NULL OR surface_form = ''"
-        ))
-        le_db.session.execute(sqlalchemy.text(
-            "DROP INDEX IF EXISTS uq_entry_decomp_lang_alias_row_surface"
-        ))
-        le_db.session.execute(sqlalchemy.text(
-            "CREATE UNIQUE INDEX IF NOT EXISTS uq_entry_decomp_lang_surface "
-            "ON entry_decomps(language, surface_form)"
-        ))
+        le_db.session.execute(
+            sqlalchemy.text(
+                "DELETE FROM entry_decomps WHERE surface_form IS NULL OR surface_form = ''"
+            )
+        )
+        le_db.session.execute(
+            sqlalchemy.text("DROP INDEX IF EXISTS uq_entry_decomp_lang_alias_row_surface")
+        )
+        le_db.session.execute(
+            sqlalchemy.text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS uq_entry_decomp_lang_surface "
+                "ON entry_decomps(language, surface_form)"
+            )
+        )
         le_db.session.commit()
     except Exception:
         le_db.session.rollback()
     try:
         import gemini_dict
+
         gemini_dict.migrate_legacy_custom_entries()
         gemini_dict.ensure_custom_form_index()
     except Exception as exc:
         print(f"[WARN] Custom-entry SQLite migration failed: {type(exc).__name__}: {exc}")
     try:
+
         def _table_exists(name: str) -> bool:
-            return le_db.session.execute(
-                sqlalchemy.text("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = :name"),
-                {"name": name},
-            ).first() is not None
+            return (
+                le_db.session.execute(
+                    sqlalchemy.text(
+                        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = :name"
+                    ),
+                    {"name": name},
+                ).first()
+                is not None
+            )
 
         def _column_exists(table: str, column: str) -> bool:
             if not _table_exists(table):
                 return False
-            rows = le_db.session.execute(sqlalchemy.text(f"PRAGMA table_info({table})")).mappings().all()
+            rows = (
+                le_db.session.execute(sqlalchemy.text(f"PRAGMA table_info({table})"))
+                .mappings()
+                .all()
+            )
             return any(row.get("name") == column for row in rows)
 
         for table, required_column, sql in (
-            ("custom_dict_entries", "owner_user_id", "UPDATE custom_dict_entries SET owner_user_id = NULL WHERE owner_user_id IS NOT NULL"),
-            ("entry_notes", "user_id", "UPDATE entry_notes SET user_id = NULL WHERE user_id IS NOT NULL"),
-            ("entry_decomps", "user_id", "UPDATE entry_decomps SET user_id = NULL WHERE user_id IS NOT NULL"),
+            (
+                "custom_dict_entries",
+                "owner_user_id",
+                "UPDATE custom_dict_entries SET owner_user_id = NULL WHERE owner_user_id IS NOT NULL",
+            ),
+            (
+                "entry_notes",
+                "user_id",
+                "UPDATE entry_notes SET user_id = NULL WHERE user_id IS NOT NULL",
+            ),
+            (
+                "entry_decomps",
+                "user_id",
+                "UPDATE entry_decomps SET user_id = NULL WHERE user_id IS NOT NULL",
+            ),
             ("custom_entry_deletion_votes", None, "DELETE FROM custom_entry_deletion_votes"),
             ("gemini_deletion_votes", None, "DELETE FROM gemini_deletion_votes"),
             ("gemini_entry_owners", None, "DELETE FROM gemini_entry_owners"),
             ("synthetic_annotations", None, "DELETE FROM synthetic_annotations"),
             ("user_annotations", None, "DELETE FROM user_annotations"),
         ):
-            if _table_exists(table) and (not required_column or _column_exists(table, required_column)):
+            if _table_exists(table) and (
+                not required_column or _column_exists(table, required_column)
+            ):
                 le_db.session.execute(sqlalchemy.text(sql))
         le_db.session.commit()
     except Exception as exc:
@@ -405,8 +479,8 @@ with app.app_context():
 
 if le_config.ENABLE_DEBUG_PANEL:
     app.register_blueprint(debug_bp)
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 MB
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config["MAX_CONTENT_LENGTH"] = 500 * 1024 * 1024  # 500 MB
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 _SWAHILI_UPOS_NORMALIZATION = {
     "COP": "AUX",
@@ -446,7 +520,9 @@ def _normalize_trankit_upos_doc(doc: Any, lang_code: str) -> Any:
     return doc
 
 
-def _get_custom_dict_entry(entry_id: str = "", entry_row_id: int | str = 0, language: str = "", headword: str = ""):
+def _get_custom_dict_entry(
+    entry_id: str = "", entry_row_id: int | str = 0, language: str = "", headword: str = ""
+):
     from db import CustomDictEntry
 
     try:
@@ -499,26 +575,29 @@ def _delete_custom_entry(entry) -> bool:
 # Routes listed here require a paid tier. The @app.before_request hook
 # checks incoming requests against this set and returns 403 for free users.
 # To gate a new route, just add its endpoint name here.
-_PAID_FEATURE_ENDPOINTS = frozenset([
-    "user_dict_add",
-    "user_dict_update",
-    "user_dict_delete",
-    "gemini_entry_update",
-    "gemini_entry_delete",
-    "gemini_entry_vote_delete",
-    "gemini_entry_deletion_votes",
-    "entry_note_save",
-    "entry_note_delete",
-    "entry_note_generate",
-    "entry_decomp_save",
-    "entry_decomp_delete",
-    "entry_decomp_generate",
-    "mt_gloss",
-    "llm_glosses",
-    "llm_decomps",
-    "orth_breakdowns",
-    "llm_translate_sentences",
-])
+_PAID_FEATURE_ENDPOINTS = frozenset(
+    [
+        "user_dict_add",
+        "user_dict_update",
+        "user_dict_delete",
+        "gemini_entry_update",
+        "gemini_entry_delete",
+        "gemini_entry_vote_delete",
+        "gemini_entry_deletion_votes",
+        "entry_note_save",
+        "entry_note_delete",
+        "entry_note_generate",
+        "entry_decomp_save",
+        "entry_decomp_delete",
+        "entry_decomp_generate",
+        "mt_gloss",
+        "llm_glosses",
+        "llm_decomps",
+        "orth_breakdowns",
+        "llm_translate_sentences",
+    ]
+)
+
 
 @app.before_request
 def _enforce_paid_feature_gate():
@@ -538,19 +617,12 @@ def _enforce_paid_feature_gate():
 _lang_configs = {}
 
 
-def _truthy_payload_flag(value, default: bool = True) -> bool:
-    if value is None:
-        return default
-    if isinstance(value, bool):
-        return value
-    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
-
-
 def get_lang_config(lang: str) -> dict:
     if lang in _lang_configs:
         return _lang_configs[lang]
     # Check for explicit lang_config_file in registry first
     from language_registry import LANGUAGE_REGISTRY, resolve_lang_code
+
     resolved = resolve_lang_code(lang) or lang
     info = LANGUAGE_REGISTRY.get(resolved, {})
     if info.get("lang_config_file"):
@@ -565,8 +637,6 @@ def get_lang_config(lang: str) -> dict:
         _lang_configs[lang] = config
         return config
     return {}
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -618,7 +688,9 @@ def _dedupe_text_list(values: Sequence[Any] | None) -> list[str]:
     return out
 
 
-def _normalize_selected_sources(raw_sources: Sequence[Any] | None, single_source: Any = "") -> list[str]:
+def _normalize_selected_sources(
+    raw_sources: Sequence[Any] | None, single_source: Any = ""
+) -> list[str]:
     out: list[str] = []
     seen: set[str] = set()
     for raw in list(raw_sources or []):
@@ -648,7 +720,9 @@ def _get_requested_sources(payload: dict[str, Any] | None = None) -> list[str]:
     return _normalize_selected_sources(source_list, single_source)
 
 
-def _split_segmenter_sources(selected_sources: Sequence[str] | None) -> tuple[list[str], bool, bool]:
+def _split_segmenter_sources(
+    selected_sources: Sequence[str] | None,
+) -> tuple[list[str], bool, bool]:
     selected = _normalize_selected_sources(selected_sources)
     if not selected:
         return [], True, False
@@ -709,9 +783,13 @@ def _collect_lookup_texts_for_entry(entry: dict[str, Any] | None) -> list[str]:
     return out
 
 
-def _invalidate_sqlite_segmenter_cache(lang_code: str = "", lookup_texts: Sequence[str] | str | None = None) -> None:
+def _invalidate_sqlite_segmenter_cache(
+    lang_code: str = "", lookup_texts: Sequence[str] | str | None = None
+) -> None:
     lang = str(lang_code or "").strip().lower()
-    texts = _dedupe_text_list([lookup_texts] if isinstance(lookup_texts, str) else list(lookup_texts or []))
+    texts = _dedupe_text_list(
+        [lookup_texts] if isinstance(lookup_texts, str) else list(lookup_texts or [])
+    )
     if not lang or not texts:
         return
     with _segmenter_cache_lock:
@@ -734,7 +812,9 @@ def _entry_source_tag(entry: dict[str, Any] | None) -> str:
 def _entry_reading(entry: dict[str, Any] | None) -> str:
     if not isinstance(entry, dict):
         return ""
-    return str(entry.get("reading") or entry.get("romanization") or entry.get("pinyin") or "").strip()
+    return str(
+        entry.get("reading") or entry.get("romanization") or entry.get("pinyin") or ""
+    ).strip()
 
 
 def _entry_pos(entry: dict[str, Any] | None) -> str:
@@ -743,7 +823,9 @@ def _entry_pos(entry: dict[str, Any] | None) -> str:
     return str(entry.get("pos") or entry.get("pos_raw") or "").strip()
 
 
-def _clone_entry_with_nlp(entry: dict[str, Any] | None, upos: str = "", xpos: str = "") -> dict[str, Any]:
+def _clone_entry_with_nlp(
+    entry: dict[str, Any] | None, upos: str = "", xpos: str = ""
+) -> dict[str, Any]:
     if not isinstance(entry, dict):
         return {}
     clone = dict(entry)
@@ -761,7 +843,9 @@ def _clone_entry_with_nlp(entry: dict[str, Any] | None, upos: str = "", xpos: st
     return clone
 
 
-def _decorate_entries_with_nlp(entries: Sequence[dict[str, Any]] | None, upos: str = "", xpos: str = "") -> list[dict[str, Any]]:
+def _decorate_entries_with_nlp(
+    entries: Sequence[dict[str, Any]] | None, upos: str = "", xpos: str = ""
+) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for raw in entries or []:
         if not isinstance(raw, dict):
@@ -779,7 +863,9 @@ def _fill_effective_upos(fill_row: Mapping[str, Any] | None, fallback_upos: str 
 def _fill_effective_xpos(fill_row: Mapping[str, Any] | None, fallback_xpos: str = "") -> str:
     if not isinstance(fill_row, Mapping):
         return str(fallback_xpos or "").strip()
-    return str(fill_row.get("_xpos_hint") or fill_row.get("_lemma_xpos_hint") or fallback_xpos or "").strip()
+    return str(
+        fill_row.get("_xpos_hint") or fill_row.get("_lemma_xpos_hint") or fallback_xpos or ""
+    ).strip()
 
 
 def _entry_senses_lines(entry: dict[str, Any] | None, fallback_head: str = "") -> list[str]:
@@ -794,7 +880,11 @@ def _entry_senses_lines(entry: dict[str, Any] | None, fallback_head: str = "") -
         first = senses[0]
         if isinstance(first, dict):
             for idx, sense in enumerate(senses):
-                glosses = [str(g or "").strip() for g in list(sense.get("glosses") or []) if str(g or "").strip()]
+                glosses = [
+                    str(g or "").strip()
+                    for g in list(sense.get("glosses") or [])
+                    if str(g or "").strip()
+                ]
                 if not glosses:
                     continue
                 line = "; ".join(glosses)
@@ -813,7 +903,7 @@ def _entry_senses_lines(entry: dict[str, Any] | None, fallback_head: str = "") -
                 out.append(f"{head}	{roman}	{pos}	{line}")
             else:
                 out.append(f"			{line}")
-            
+
         return out
     glosses = entry.get("glosses")
     if isinstance(glosses, list) and glosses:
@@ -840,7 +930,9 @@ def _merge_all_entries(head: str, entries: Sequence[dict[str, Any]] | None) -> l
     return out
 
 
-def _build_entry_groups(entries: Sequence[dict[str, Any]] | None, surface: str) -> list[dict[str, Any]]:
+def _build_entry_groups(
+    entries: Sequence[dict[str, Any]] | None, surface: str
+) -> list[dict[str, Any]]:
     groups: list[dict[str, Any]] = []
     for entry in entries or []:
         headword = str(entry.get("surface_form") or entry.get("headword") or surface or "").strip()
@@ -853,7 +945,11 @@ def _build_entry_groups(entries: Sequence[dict[str, Any]] | None, surface: str) 
             "pos": _entry_pos(entry),
             "senses": copy.deepcopy(entry.get("senses_full") or entry.get("senses") or []),
         }
-        morph_info = _dedupe_text_list(entry.get("morph_info") if isinstance(entry.get("morph_info"), list) else [entry.get("morph_info")])
+        morph_info = _dedupe_text_list(
+            entry.get("morph_info")
+            if isinstance(entry.get("morph_info"), list)
+            else [entry.get("morph_info")]
+        )
         morph_base = str(entry.get("morph_base") or "").strip()
         grammar = str(entry.get("grammar") or "").strip()
         if morph_info:
@@ -922,14 +1018,18 @@ _LANGUAGE_UPOS_EXTRA_POS = {
 
 _FILTER_EXEMPT_POS = frozenset({"proverb", "phrase", "prep_phrase"})
 _ALWAYS_FILTERED_POS = frozenset({"character", "romanization", "syllable", "punct", "symbol"})
-_GREEDY_FILTER_MODES = frozenset({"greedy", "lemma_greedy", "lemma_partial_greedy", "greedy_lemma_mismatch"})
+_GREEDY_FILTER_MODES = frozenset(
+    {"greedy", "lemma_greedy", "lemma_partial_greedy", "greedy_lemma_mismatch"}
+)
 
 
 def _split_upos_tags(raw_upos: Any) -> list[str]:
     text = str(raw_upos or "").strip()
     if not text:
         return []
-    parts = [text] if "+" not in text else [part.strip() for part in text.split("+") if part.strip()]
+    parts = (
+        [text] if "+" not in text else [part.strip() for part in text.split("+") if part.strip()]
+    )
     return [part.upper() for part in parts if part]
 
 
@@ -1001,7 +1101,9 @@ def _split_entries_by_upos(
         active_always_filtered.difference_update(affix_preferred)
 
     if len(base_entries) <= 1:
-        only_pos = str(base_entries[0].get("pos_raw") or base_entries[0].get("pos") or "").strip().lower()
+        only_pos = (
+            str(base_entries[0].get("pos_raw") or base_entries[0].get("pos") or "").strip().lower()
+        )
         if only_pos in active_always_filtered:
             return [], base_entries[:]
         return base_entries[:], []
@@ -1010,7 +1112,11 @@ def _split_entries_by_upos(
     allowed: set[str] = set()
     recognized = False
     for tag in upos_tags:
-        mapped = [str(item or "").strip().lower() for item in _UPOS_TO_KAIKKI_POS.get(tag, []) if str(item or "").strip()]
+        mapped = [
+            str(item or "").strip().lower()
+            for item in _UPOS_TO_KAIKKI_POS.get(tag, [])
+            if str(item or "").strip()
+        ]
         extra_mapped = _get_language_upos_extra_pos(lang_code, tag)
         combined = mapped + extra_mapped
         if not combined:
@@ -1107,12 +1213,20 @@ def _split_entries_for_display(
     if not base_entries:
         return [], []
 
-    preferred_idents = {_entry_filter_identity(entry) for entry in list(preferred_entries or []) if isinstance(entry, dict)}
-    preferred_subset = [entry for entry in base_entries if _entry_filter_identity(entry) in preferred_idents]
+    preferred_idents = {
+        _entry_filter_identity(entry)
+        for entry in list(preferred_entries or [])
+        if isinstance(entry, dict)
+    }
+    preferred_subset = [
+        entry for entry in base_entries if _entry_filter_identity(entry) in preferred_idents
+    ]
     use_preferred_subset = 0 < len(preferred_subset) < len(base_entries)
     candidate_entries = preferred_subset if use_preferred_subset else base_entries
     candidate_idents = {_entry_filter_identity(entry) for entry in candidate_entries}
-    remainder_entries = [entry for entry in base_entries if _entry_filter_identity(entry) not in candidate_idents]
+    remainder_entries = [
+        entry for entry in base_entries if _entry_filter_identity(entry) not in candidate_idents
+    ]
 
     primary, other = _split_entries_by_upos(
         candidate_entries,
@@ -1124,31 +1238,17 @@ def _split_entries_for_display(
     shown_entries = _dedupe_entry_list(primary or candidate_entries)
     shown_idents = {_entry_filter_identity(entry) for entry in shown_entries}
     combined_other = list(other or []) + remainder_entries
-    hidden_entries = [entry for entry in _dedupe_entry_list(combined_other) if _entry_filter_identity(entry) not in shown_idents]
+    hidden_entries = [
+        entry
+        for entry in _dedupe_entry_list(combined_other)
+        if _entry_filter_identity(entry) not in shown_idents
+    ]
     return shown_entries, hidden_entries
 
 
-def _collect_morph_meta(entries: Sequence[dict[str, Any]] | None, fallback_entry: dict[str, Any] | None) -> dict[str, Any]:
-    morph_info: list[str] = []
-    seen: set[str] = set()
-    morph_base = ""
-    for entry in entries or []:
-        raw_info = entry.get("morph_info")
-        info_list = raw_info if isinstance(raw_info, list) else ([raw_info] if raw_info else [])
-        for item in info_list:
-            text = str(item or "").strip()
-            if not text or text in seen:
-                continue
-            seen.add(text)
-            morph_info.append(text)
-        if not morph_base:
-            morph_base = str(entry.get("morph_base") or "").strip()
-    if not morph_base and isinstance(fallback_entry, dict):
-        morph_base = str(fallback_entry.get("morph_base") or fallback_entry.get("headword") or "").strip()
-    return {"morph_info": morph_info, "morph_base": morph_base}
-
-
-def _build_fill_surface_slices(surface: str, fills: Sequence[dict[str, Any]] | None) -> list[dict[str, Any]]:
+def _build_fill_surface_slices(
+    surface: str, fills: Sequence[dict[str, Any]] | None
+) -> list[dict[str, Any]]:
     surface_text = str(surface or "")
     rows = list(fills or [])
     if not surface_text or len(rows) < 2:
@@ -1172,7 +1272,9 @@ def _build_fill_surface_slices(surface: str, fills: Sequence[dict[str, Any]] | N
         if start < 0 or end <= start or end > len(surface_text):
             explicit_valid = False
             break
-        explicit_slices.setdefault((start, end), {"start": start, "end": end, "fill_indexes": []})["fill_indexes"].append(idx)
+        explicit_slices.setdefault((start, end), {"start": start, "end": end, "fill_indexes": []})[
+            "fill_indexes"
+        ].append(idx)
     if explicit_rows == len(rows) and explicit_valid:
         ordered = sorted(explicit_slices.values(), key=lambda item: (item["start"], item["end"]))
         last_end = 0
@@ -1189,7 +1291,7 @@ def _build_fill_surface_slices(surface: str, fills: Sequence[dict[str, Any]] | N
         piece = str(row.get("text") or row.get("head") or "")
         if not piece:
             return []
-        if surface_text[cursor:cursor + len(piece)] != piece:
+        if surface_text[cursor : cursor + len(piece)] != piece:
             return []
         slices.append({"start": cursor, "end": cursor + len(piece), "fill_indexes": [idx]})
         cursor += len(piece)
@@ -1237,11 +1339,25 @@ def _normalize_entry_form_rows(raw: Any) -> list[list[str]]:
             romanization = str(item[2] or "") if len(item) > 2 else ""
             rows.append([word, commentary, romanization])
         elif isinstance(item, dict):
-            rows.append([
-                str(item.get("word") or item.get("form") or item.get("headword") or item.get("form_text") or item.get("display_text") or ""),
-                str(item.get("commentary") or item.get("tags") or ""),
-                str(item.get("romanization") or item.get("reading") or item.get("form_roman") or ""),
-            ])
+            rows.append(
+                [
+                    str(
+                        item.get("word")
+                        or item.get("form")
+                        or item.get("headword")
+                        or item.get("form_text")
+                        or item.get("display_text")
+                        or ""
+                    ),
+                    str(item.get("commentary") or item.get("tags") or ""),
+                    str(
+                        item.get("romanization")
+                        or item.get("reading")
+                        or item.get("form_roman")
+                        or ""
+                    ),
+                ]
+            )
         else:
             rows.append([str(item or ""), "", ""])
     return rows
@@ -1250,72 +1366,17 @@ def _normalize_entry_form_rows(raw: Any) -> list[list[str]]:
 # Tags that indicate a form row is needed for upstream UI display (e.g.
 # Chinese characters beside Korean/Vietnamese headwords).  Everything
 # else is only useful for the full-forms panel which can lazy-load.
-_HYDRATION_KEEP_FORM_TAGS = frozenset({
-    "hanja", "hangeul",
-    "cjk", "sinitic", "hán-nôm", "han-nom", "hannom",
-})
-
-
-def _filter_forms_for_hydration(raw_forms: Any, headword: str) -> Any:
-    """Trim the forms blob to only the rows needed by the hydration response.
-
-    Keeps:
-    * Rows with a special display tag (hanja, hangeul, cjk, etc.)
-    * Rows whose surface text equals the headword (morphological variants
-      of the same spelling — shown in the panel).
-
-    Everything else is discarded so it doesn't bloat the payload.
-    Always returns a parsed list (never a JSON string) so downstream
-    callers like ``_normalize_entry_form_rows`` skip re-parsing.
-    """
-    if not raw_forms:
-        return []
-
-    parsed: Any = raw_forms
-    if isinstance(raw_forms, str):
-        text = raw_forms.strip()
-        if not text or text == "[]":
-            return []
-        try:
-            parsed = json.loads(text)
-        except Exception:
-            return []
-
-    if not isinstance(parsed, list):
-        return []
-
-    hw_lower = (headword or "").strip().lower()
-    kept: list[Any] = []
-    for item in parsed:
-        # Each item is either [word, tags, romanization] or a dict
-        if isinstance(item, (list, tuple)):
-            word = str(item[0] or "").strip() if len(item) > 0 else ""
-            tags_str = str(item[1] or "").strip().lower() if len(item) > 1 else ""
-        elif isinstance(item, dict):
-            word = str(
-                item.get("word") or item.get("form") or item.get("headword")
-                or item.get("form_text") or item.get("display_text") or ""
-            ).strip()
-            tags_str = str(
-                item.get("commentary") or item.get("tags") or ""
-            ).strip().lower()
-        else:
-            continue
-
-        # Keep if surface text matches headword (morph variant of same spelling)
-        if hw_lower and word.strip().lower() == hw_lower:
-            kept.append(item)
-            continue
-
-        # Keep if any tag is a special display tag
-        if tags_str:
-            tag_parts = re.split(r"[;|,\s]+", tags_str)
-            for part in tag_parts:
-                if part in _HYDRATION_KEEP_FORM_TAGS:
-                    kept.append(item)
-                    break
-
-    return kept
+_HYDRATION_KEEP_FORM_TAGS = frozenset(
+    {
+        "hanja",
+        "hangeul",
+        "cjk",
+        "sinitic",
+        "hán-nôm",
+        "han-nom",
+        "hannom",
+    }
+)
 
 
 _SPECIAL_DISPLAY_FORM_TAG_TO_BUCKET = {
@@ -1369,7 +1430,9 @@ def _merge_entry_form_rows(*row_groups: Sequence[Sequence[str]] | None) -> list[
     return out
 
 
-def _normalize_special_display_form_rows(form_rows: Sequence[Sequence[str]] | None) -> tuple[list[list[str]], dict[str, list[str]]]:
+def _normalize_special_display_form_rows(
+    form_rows: Sequence[Sequence[str]] | None,
+) -> tuple[list[list[str]], dict[str, list[str]]]:
     normalized_rows: list[list[str]] = []
     seen_rows: set[tuple[str, str, str]] = set()
     bucket_values: dict[str, list[str]] = {
@@ -1400,7 +1463,9 @@ def _normalize_special_display_form_rows(form_rows: Sequence[Sequence[str]] | No
                 appended_tags.append(bucket)
         normalized_commentary = commentary
         if appended_tags:
-            normalized_commentary += (";" if normalized_commentary else "") + ";".join(appended_tags)
+            normalized_commentary += (";" if normalized_commentary else "") + ";".join(
+                appended_tags
+            )
         row = [word, normalized_commentary, romanization]
         row_key = tuple(row)
         if row_key in seen_rows:
@@ -1411,7 +1476,9 @@ def _normalize_special_display_form_rows(form_rows: Sequence[Sequence[str]] | No
     return normalized_rows, bucket_values
 
 
-def _build_entry_forms_payload(entry: Mapping[str, Any] | None, *, include_matched_rows: bool) -> dict[str, Any]:
+def _build_entry_forms_payload(
+    entry: Mapping[str, Any] | None, *, include_matched_rows: bool
+) -> dict[str, Any]:
     if not isinstance(entry, Mapping):
         return {}
     out: dict[str, Any] = {}
@@ -1420,7 +1487,9 @@ def _build_entry_forms_payload(entry: Mapping[str, Any] | None, *, include_match
     if not form_rows:
         form_rows = _normalize_entry_form_rows(entry.get("_forms_raw") or entry.get("_forms_json"))
     if include_matched_rows:
-        form_rows = _merge_entry_form_rows(form_rows, _normalize_entry_form_rows(entry.get("_matched_forms")))
+        form_rows = _merge_entry_form_rows(
+            form_rows, _normalize_entry_form_rows(entry.get("_matched_forms"))
+        )
 
     normalized_rows, special_buckets = _normalize_special_display_form_rows(form_rows)
     if normalized_rows:
@@ -1482,7 +1551,9 @@ def _canonical_entry_senses(entry: Mapping[str, Any] | None) -> list[Any]:
         if parsed is not None:
             raw_glosses = parsed
         else:
-            return [{"glosses": [part]} for part in (chunk.strip() for chunk in text.split(";")) if part]
+            return [
+                {"glosses": [part]} for part in (chunk.strip() for chunk in text.split(";")) if part
+            ]
 
     if isinstance(raw_glosses, Mapping):
         raw_glosses = [raw_glosses]
@@ -1492,7 +1563,11 @@ def _canonical_entry_senses(entry: Mapping[str, Any] | None) -> list[Any]:
     out: list[Any] = []
     for raw in raw_glosses:
         if isinstance(raw, Mapping):
-            glosses = [str(item or "").strip() for item in list(raw.get("glosses") or []) if str(item or "").strip()]
+            glosses = [
+                str(item or "").strip()
+                for item in list(raw.get("glosses") or [])
+                if str(item or "").strip()
+            ]
             if not glosses:
                 fallback = str(raw.get("gloss") or raw.get("text") or "").strip()
                 if fallback:
@@ -1529,7 +1604,9 @@ def _canonical_entry_payload(entry: Mapping[str, Any] | None) -> dict[str, Any]:
                         break
             if _chosen is None:
                 _chosen = _mfs[0]
-            _ft = str((_chosen or {}).get("display_text") or (_chosen or {}).get("form_text") or "").strip()
+            _ft = str(
+                (_chosen or {}).get("display_text") or (_chosen or {}).get("form_text") or ""
+            ).strip()
             if _ft and _ft != headword:
                 surface_form = _ft
     reading = _entry_reading(dict(entry))
@@ -1543,7 +1620,11 @@ def _canonical_entry_payload(entry: Mapping[str, Any] | None) -> dict[str, Any]:
     commentary = str(entry.get("_commentary") or entry.get("commentary") or "").strip()
     lemma = str(entry.get("_lemma") or entry.get("lemma") or entry.get("lemma_form") or "").strip()
     morph_info_raw = entry.get("morph_info")
-    morph_info = morph_info_raw if isinstance(morph_info_raw, list) else ([morph_info_raw] if morph_info_raw else [])
+    morph_info = (
+        morph_info_raw
+        if isinstance(morph_info_raw, list)
+        else ([morph_info_raw] if morph_info_raw else [])
+    )
     if not morph_info and commentary and source_tag in {"gemini", "user_created"}:
         morph_info = [commentary]
     # For form-index matches, morph tags live in _matched_forms[].tags and the
@@ -1627,7 +1708,11 @@ def _flatten_structured_senses(senses: Sequence[Any] | None) -> list[str]:
     out: list[str] = []
     for raw in senses or []:
         if isinstance(raw, Mapping):
-            glosses = [str(item or "").strip() for item in list(raw.get("glosses") or []) if str(item or "").strip()]
+            glosses = [
+                str(item or "").strip()
+                for item in list(raw.get("glosses") or [])
+                if str(item or "").strip()
+            ]
             if glosses:
                 out.append("; ".join(glosses))
                 continue
@@ -1725,7 +1810,11 @@ def _build_hydrated_display_payload(entry: Mapping[str, Any] | None) -> dict[str
     display_headword = str(entry.get("display_headword") or "").strip() or lemma_headword
     display_reading = entry_reading
     raw_morph_info = entry.get("morph_info")
-    morph_info = raw_morph_info if isinstance(raw_morph_info, list) else ([raw_morph_info] if raw_morph_info else [])
+    morph_info = (
+        raw_morph_info
+        if isinstance(raw_morph_info, list)
+        else ([raw_morph_info] if raw_morph_info else [])
+    )
     morph_info = [str(item or "").strip() for item in morph_info if str(item or "").strip()]
     morph_base = str(entry.get("morph_base") or "").strip()
     is_alternate_match = False
@@ -1733,7 +1822,9 @@ def _build_hydrated_display_payload(entry: Mapping[str, Any] | None) -> dict[str
 
     if match_kind == "form":
         matched_form = _select_triggering_matched_form(entry)
-        form_text = str(matched_form.get("display_text") or matched_form.get("form_text") or "").strip()
+        form_text = str(
+            matched_form.get("display_text") or matched_form.get("form_text") or ""
+        ).strip()
         form_reading = str(matched_form.get("form_roman") or "").strip()
         raw_tags = str(matched_form.get("tags") or "").strip()
         display_reading = form_reading
@@ -1834,7 +1925,9 @@ def _build_hydrated_display_payload(entry: Mapping[str, Any] | None) -> dict[str
     return out
 
 
-def _build_shared_base_payload(entry: Mapping[str, Any], match_key: str, lang_code: str) -> dict[str, Any]:
+def _build_shared_base_payload(
+    entry: Mapping[str, Any], match_key: str, lang_code: str
+) -> dict[str, Any]:
     """Build the canonical shared payload for entry_store.
 
     The shared base payload must stay headword-shaped even when the same entry
@@ -1888,7 +1981,9 @@ def _extract_form_overlay(entry: Mapping[str, Any], matched_form: dict[str, Any]
     return overlay
 
 
-def _shape_korean_synthetic_stem_entry(entry: dict[str, Any], match_key: str, lang_code: str) -> None:
+def _shape_korean_synthetic_stem_entry(
+    entry: dict[str, Any], match_key: str, lang_code: str
+) -> None:
     if not isinstance(entry, dict):
         return
     lang = str(lang_code or "").strip().lower()
@@ -1938,7 +2033,9 @@ def _entry_store_key(entry: Mapping[str, Any] | None) -> str:
     if explicit:
         return explicit
     digest = hashlib.sha1(
-        json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode(
+            "utf-8"
+        )
     ).hexdigest()
     return f"anon:{digest}"
 
@@ -1976,7 +2073,9 @@ def _intern_entry(entry_store: dict[str, dict[str, Any]], entry: Mapping[str, An
     incoming_forms = canonical.get("forms")
     if isinstance(incoming_forms, Mapping):
         incoming_forms = dict(incoming_forms)
-        merged_rows = _normalize_entry_form_rows(merged_forms.get("rows")) + _normalize_entry_form_rows(incoming_forms.get("rows"))
+        merged_rows = _normalize_entry_form_rows(
+            merged_forms.get("rows")
+        ) + _normalize_entry_form_rows(incoming_forms.get("rows"))
         if matched_forms:
             merged_rows += _normalize_entry_form_rows(matched_forms)
         if merged_rows:
@@ -1990,7 +2089,9 @@ def _intern_entry(entry_store: dict[str, dict[str, Any]], entry: Mapping[str, An
                 deduped_rows.append(row)
             merged_forms["rows"] = deduped_rows
         for form_key in ("kanji", "readings", "alt", "hanja", "hangeul", "cjk"):
-            values = _list_text_values(merged_forms.get(form_key)) + _list_text_values(incoming_forms.get(form_key))
+            values = _list_text_values(merged_forms.get(form_key)) + _list_text_values(
+                incoming_forms.get(form_key)
+            )
             if values:
                 deduped_values: list[str] = []
                 seen_values: set[str] = set()
@@ -2007,9 +2108,13 @@ def _intern_entry(entry_store: dict[str, dict[str, Any]], entry: Mapping[str, An
     if merged_forms:
         existing["forms"] = merged_forms
 
-    merged_morph = _list_text_values(existing.get("morph_info")) + _list_text_values(canonical.get("morph_info"))
+    merged_morph = _list_text_values(existing.get("morph_info")) + _list_text_values(
+        canonical.get("morph_info")
+    )
     if matched_forms:
-        merged_morph += [str(mf.get("tags") or "").strip() for mf in matched_forms if isinstance(mf, Mapping)]
+        merged_morph += [
+            str(mf.get("tags") or "").strip() for mf in matched_forms if isinstance(mf, Mapping)
+        ]
     if merged_morph:
         deduped_morph: list[str] = []
         seen_morph: set[str] = set()
@@ -2053,11 +2158,18 @@ def _collect_interned_entry_ids(
     return out
 
 
-def _build_resolution_payload(category: str, resolved_via: str, fill_mode: str, lemma_oracle_used: bool,
-                              lemma_oracle_outcome: str, fills: Sequence[dict[str, Any]] | None,
-                              exact_lemma_match_count: int, partial_gap_count: int = 0,
-                              partial_exact_lemma_count: int = 0,
-                              partial_missing_lemma_count: int = 0) -> dict[str, Any]:
+def _build_resolution_payload(
+    category: str,
+    resolved_via: str,
+    fill_mode: str,
+    lemma_oracle_used: bool,
+    lemma_oracle_outcome: str,
+    fills: Sequence[dict[str, Any]] | None,
+    exact_lemma_match_count: int,
+    partial_gap_count: int = 0,
+    partial_exact_lemma_count: int = 0,
+    partial_missing_lemma_count: int = 0,
+) -> dict[str, Any]:
     meta = _build_resolution_actual(
         category,
         resolved_via,
@@ -2091,8 +2203,12 @@ def _build_resolution_payload(category: str, resolved_via: str, fill_mode: str, 
     return out
 
 
-def _build_canonical_fills(fills: Sequence[dict[str, Any]] | None, surface_text: str, resolved_via: str,
-                           entry_store: dict[str, dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def _build_canonical_fills(
+    fills: Sequence[dict[str, Any]] | None,
+    surface_text: str,
+    resolved_via: str,
+    entry_store: dict[str, dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     annotated = _annotate_fill_resolution_links(fills, resolved_via)
     slices = _build_fill_surface_slices(surface_text, annotated)
     slice_by_index: dict[int, tuple[int, int]] = {}
@@ -2162,8 +2278,20 @@ def _trim_ud_overlay(ud_overlay: Mapping[str, Any] | None) -> dict[str, Any]:
     overlay = ud_overlay or {}
     tokens: list[dict[str, Any]] = []
     allowed_token_keys = (
-        "i", "doc_i", "head", "heads", "dep", "lemma", "lemma_raw", "lemma_suffix",
-        "tag", "upos", "feats", "text", "seg_span", "mwt_parts",
+        "i",
+        "doc_i",
+        "head",
+        "heads",
+        "dep",
+        "lemma",
+        "lemma_raw",
+        "lemma_suffix",
+        "tag",
+        "upos",
+        "feats",
+        "text",
+        "seg_span",
+        "mwt_parts",
     )
     for raw in list(overlay.get("tokens") or []):
         if not isinstance(raw, Mapping):
@@ -2230,7 +2358,9 @@ def _lookup_json_response(
     return Response(body, status=status, headers=headers)
 
 
-def _annotate_fill_resolution_links(fills: Sequence[dict[str, Any]] | None, resolved_via: str) -> list[dict[str, Any]]:
+def _annotate_fill_resolution_links(
+    fills: Sequence[dict[str, Any]] | None, resolved_via: str
+) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     path = str(resolved_via or "").strip().lower()
     whole_lemma_path = path in {"lemma", "lemma_override"}
@@ -2258,57 +2388,95 @@ def _annotate_fill_resolution_links(fills: Sequence[dict[str, Any]] | None, reso
     return rows
 
 
-def _build_resolution_route_steps(category: str, lemma_oracle_used: bool, partial_gap_count: int = 0) -> tuple[str, list[dict[str, str]]]:
+def _build_resolution_route_steps(
+    category: str, lemma_oracle_used: bool, partial_gap_count: int = 0
+) -> tuple[str, list[dict[str, str]]]:
     category_key = str(category or "").strip().lower()
     if category_key == "exact_lemma_match":
         return "surface_exact_lemma_match", [
             {"code": "surface_exact_lookup", "text": "surface exact lookup matched", "detail": ""},
-            {"code": "lemma_check", "text": "lemma check found an underlying lemma match", "detail": ""},
+            {
+                "code": "lemma_check",
+                "text": "lemma check found an underlying lemma match",
+                "detail": "",
+            },
         ]
     if category_key == "exact_match":
-        steps = [{"code": "surface_exact_lookup", "text": "surface exact lookup matched", "detail": ""}]
+        steps = [
+            {"code": "surface_exact_lookup", "text": "surface exact lookup matched", "detail": ""}
+        ]
         if lemma_oracle_used:
-            steps.append({"code": "lemma_check", "text": "lemma check kept the surface exact result", "detail": ""})
+            steps.append(
+                {
+                    "code": "lemma_check",
+                    "text": "lemma check kept the surface exact result",
+                    "detail": "",
+                }
+            )
             return "surface_exact_lemma_checked", steps
         return "surface_exact", steps
     if category_key == "lemma_partial_override":
         return "surface_no_match_then_partial_lemma_exact_then_gap_greedy", [
             {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-            {"code": "lemma_exact_parts", "text": "exact lemma parts were aligned onto the surface", "detail": ""},
+            {
+                "code": "lemma_exact_parts",
+                "text": "exact lemma parts were aligned onto the surface",
+                "detail": "",
+            },
             {
                 "code": "lemma_gap_greedy",
-                "text": "greedy DP filled the remaining uncovered spans" if partial_gap_count > 0 else "no uncovered spans remained after exact lemma-part alignment",
+                "text": "greedy DP filled the remaining uncovered spans"
+                if partial_gap_count > 0
+                else "no uncovered spans remained after exact lemma-part alignment",
                 "detail": "",
             },
         ]
     if category_key == "lemma_override":
         return "surface_no_match_then_lemma_exact_parts", [
             {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-            {"code": "lemma_exact_parts", "text": "all lemma parts resolved by exact lookup", "detail": ""},
+            {
+                "code": "lemma_exact_parts",
+                "text": "all lemma parts resolved by exact lookup",
+                "detail": "",
+            },
             {"code": "lemma_override", "text": "lemma exact-part alignment selected", "detail": ""},
         ]
     if category_key == "greedy_lemma_match":
         return "surface_greedy_lemma_match", [
             {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-            {"code": "lemma_greedy", "text": "lemma-aware greedy DP selected lemma-linked pieces", "detail": ""},
+            {
+                "code": "lemma_greedy",
+                "text": "lemma-aware greedy DP selected lemma-linked pieces",
+                "detail": "",
+            },
         ]
     if category_key == "greedy_segmentation":
         return "surface_greedy", [
             {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
             {
                 "code": "lemma_greedy" if lemma_oracle_used else "surface_greedy",
-                "text": "lemma-aware greedy DP selected a surface path" if lemma_oracle_used else "surface greedy DP selected the final path",
+                "text": "lemma-aware greedy DP selected a surface path"
+                if lemma_oracle_used
+                else "surface greedy DP selected the final path",
                 "detail": "",
             },
         ]
     if lemma_oracle_used:
         return "surface_no_match_after_lemma_check", [
             {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-            {"code": "lemma_greedy", "text": "lemma-aware greedy DP found no known dictionary path", "detail": ""},
+            {
+                "code": "lemma_greedy",
+                "text": "lemma-aware greedy DP found no known dictionary path",
+                "detail": "",
+            },
         ]
     return "surface_no_match", [
         {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-        {"code": "surface_greedy", "text": "surface greedy DP found no known dictionary path", "detail": ""},
+        {
+            "code": "surface_greedy",
+            "text": "surface greedy DP found no known dictionary path",
+            "detail": "",
+        },
     ]
 
 
@@ -2323,10 +2491,18 @@ def _build_resolution_route_text(route_steps: Sequence[Mapping[str, Any]] | None
     return " -> ".join(out)
 
 
-def _build_resolution_actual(category: str, resolved_via: str, fill_mode: str, lemma_oracle_used: bool,
-                             lemma_oracle_outcome: str, fills: Sequence[dict[str, Any]] | None,
-                             exact_lemma_match_count: int, partial_gap_count: int = 0,
-                             partial_exact_lemma_count: int = 0, partial_missing_lemma_count: int = 0) -> dict[str, Any]:
+def _build_resolution_actual(
+    category: str,
+    resolved_via: str,
+    fill_mode: str,
+    lemma_oracle_used: bool,
+    lemma_oracle_outcome: str,
+    fills: Sequence[dict[str, Any]] | None,
+    exact_lemma_match_count: int,
+    partial_gap_count: int = 0,
+    partial_exact_lemma_count: int = 0,
+    partial_missing_lemma_count: int = 0,
+) -> dict[str, Any]:
     rows = list(fills or [])
     known_piece_count = 0
     unknown_piece_count = 0
@@ -2339,7 +2515,13 @@ def _build_resolution_actual(category: str, resolved_via: str, fill_mode: str, l
             known_piece_count += 1
         if row.get("resolution_linked_to_lemma"):
             lemma_linked_fill_indexes.append(idx)
-            lemma_key = str(row.get("_lemma_override") or row.get("_lemma_promoted") or row.get("lemma_form") or row.get("morph_base") or "").strip()
+            lemma_key = str(
+                row.get("_lemma_override")
+                or row.get("_lemma_promoted")
+                or row.get("lemma_form")
+                or row.get("morph_base")
+                or ""
+            ).strip()
             if lemma_key:
                 lemma_linked_keys.add(lemma_key)
     final_text = ""
@@ -2358,7 +2540,9 @@ def _build_resolution_actual(category: str, resolved_via: str, fill_mode: str, l
             parts.append(f"lemma-exact={exact_lemma_match_count}")
         final_text = " | ".join(parts)
     category_key = str(category or "").strip().lower()
-    route_code, route_steps = _build_resolution_route_steps(category_key, bool(lemma_oracle_used), int(partial_gap_count or 0))
+    route_code, route_steps = _build_resolution_route_steps(
+        category_key, bool(lemma_oracle_used), int(partial_gap_count or 0)
+    )
     out = {
         "category": category_key,
         "label": _ACTUAL_RESOLUTION_LABELS.get(category_key, "") if category_key else "",
@@ -2366,7 +2550,10 @@ def _build_resolution_actual(category: str, resolved_via: str, fill_mode: str, l
         "route_steps": route_steps,
         "route_text": _build_resolution_route_text(route_steps),
         "final_text": final_text,
-        "compare_kind": "surface" if category_key in {"exact_lemma_match", "greedy_lemma_match", "lemma_override", "lemma_partial_override"} else ("lemma" if lemma_oracle_used else ""),
+        "compare_kind": "surface"
+        if category_key
+        in {"exact_lemma_match", "greedy_lemma_match", "lemma_override", "lemma_partial_override"}
+        else ("lemma" if lemma_oracle_used else ""),
         "resolved_via": str(resolved_via or "").strip().lower(),
         "fill_mode": str(fill_mode or "").strip().lower(),
         "lemma_oracle_used": bool(lemma_oracle_used),
@@ -2393,7 +2580,11 @@ def _build_resolution_actual(category: str, resolved_via: str, fill_mode: str, l
     return out
 
 
-def _infer_resolution_category(surface_lookup: dict[str, Any], fill: dict[str, Any] | None, all_entries: Sequence[dict[str, Any]] | None) -> str:
+def _infer_resolution_category(
+    surface_lookup: dict[str, Any],
+    fill: dict[str, Any] | None,
+    all_entries: Sequence[dict[str, Any]] | None,
+) -> str:
     resolved_via = str(surface_lookup.get("resolved_via") or "").strip().lower()
     exact_lemma_match_count = int(surface_lookup.get("exact_lemma_match_count") or 0)
     fill_mode = str((fill or {}).get("mode") or "").strip().lower()
@@ -2412,17 +2603,31 @@ def _infer_resolution_category(surface_lookup: dict[str, Any], fill: dict[str, A
     return ""
 
 
-def _prepare_fill_entries(fills: Sequence[dict[str, Any]] | None, surface_text: str, segmenter: Any,
-                          lang_code: str, upos: str, xpos: str, fill_mode: str, resolved_via: str,
-                          debug_trace: bool = False) -> list[dict[str, Any]]:
+def _prepare_fill_entries(
+    fills: Sequence[dict[str, Any]] | None,
+    surface_text: str,
+    segmenter: Any,
+    lang_code: str,
+    upos: str,
+    xpos: str,
+    fill_mode: str,
+    resolved_via: str,
+    debug_trace: bool = False,
+) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
-    known_fill_count = sum(1 for raw in list(fills or []) if str((raw or {}).get("source") or "").upper() != "UNKNOWN")
-    greedy_multi_fill = str(fill_mode or "").strip().lower() in _GREEDY_FILTER_MODES and known_fill_count > 1
+    known_fill_count = sum(
+        1 for raw in list(fills or []) if str((raw or {}).get("source") or "").upper() != "UNKNOWN"
+    )
+    greedy_multi_fill = (
+        str(fill_mode or "").strip().lower() in _GREEDY_FILTER_MODES and known_fill_count > 1
+    )
     for raw in fills or []:
         row = dict(raw)
         effective_upos = _fill_effective_upos(row, upos)
         effective_xpos = _fill_effective_xpos(row, xpos)
-        fill_entries = _decorate_entries_with_nlp(row.get("entries") or [], effective_upos, effective_xpos)
+        fill_entries = _decorate_entries_with_nlp(
+            row.get("entries") or [], effective_upos, effective_xpos
+        )
         lookup_head = str(row.get("head") or row.get("text") or surface_text or "")
         shown_entries, hidden_entries = _split_entries_for_display(
             fill_entries,
@@ -2431,19 +2636,41 @@ def _prepare_fill_entries(fills: Sequence[dict[str, Any]] | None, surface_text: 
             fill_mode=fill_mode,
             greedy_multi_fill=greedy_multi_fill,
         )
-        row["senses_all"] = _merge_all_entries(lookup_head, fill_entries) if fill_entries else list(row.get("senses") or [])
-        row["senses"] = _merge_all_entries(lookup_head, shown_entries) if shown_entries else list(row["senses_all"])
+        row["senses_all"] = (
+            _merge_all_entries(lookup_head, fill_entries)
+            if fill_entries
+            else list(row.get("senses") or [])
+        )
+        row["senses"] = (
+            _merge_all_entries(lookup_head, shown_entries)
+            if shown_entries
+            else list(row["senses_all"])
+        )
         row["senses_hover"] = list(row["senses"])
-        row["senses_hover_other"] = _merge_all_entries(lookup_head, hidden_entries) if hidden_entries else []
+        row["senses_hover_other"] = (
+            _merge_all_entries(lookup_head, hidden_entries) if hidden_entries else []
+        )
         row["hover_has_alt_senses"] = bool(row["senses_hover_other"])
-        row["entry_groups_all"] = _build_entry_groups(fill_entries, lookup_head) if fill_entries else []
-        row["entry_groups"] = _build_entry_groups(shown_entries or fill_entries, lookup_head) if (shown_entries or fill_entries) else []
+        row["entry_groups_all"] = (
+            _build_entry_groups(fill_entries, lookup_head) if fill_entries else []
+        )
+        row["entry_groups"] = (
+            _build_entry_groups(shown_entries or fill_entries, lookup_head)
+            if (shown_entries or fill_entries)
+            else []
+        )
         if hidden_entries:
-            row["entry_groups_hover"] = _build_entry_groups(shown_entries, lookup_head) if shown_entries else []
+            row["entry_groups_hover"] = (
+                _build_entry_groups(shown_entries, lookup_head) if shown_entries else []
+            )
             row["entry_groups_other"] = _build_entry_groups(hidden_entries, lookup_head)
         row["entries"] = shown_entries or fill_entries
         row["all_entries"] = fill_entries
-        chosen = segmenter._choose_entry(lookup_head, shown_entries or fill_entries) if fill_entries else None
+        chosen = (
+            segmenter._choose_entry(lookup_head, shown_entries or fill_entries)
+            if fill_entries
+            else None
+        )
         if chosen and not row.get("roman"):
             row["roman"] = _entry_reading(chosen)
         if shown_entries or fill_entries:
@@ -2490,21 +2717,17 @@ def _prepare_fill_entries(fills: Sequence[dict[str, Any]] | None, surface_text: 
     return _annotate_fill_resolution_links(out, resolved_via)
 
 
-def _is_whole_surface_known_fill(fill: Mapping[str, Any] | None, surface_text: str) -> bool:
-    if not fill or not fill.get("has_known") or fill.get("has_unknown"):
-        return False
-    rows = list(fill.get("fills") or [])
-    if len(rows) != 1:
-        return False
-    row = rows[0] or {}
-    if str(row.get("source") or "").upper() == "UNKNOWN":
-        return False
-    piece = str(row.get("text") or row.get("head") or "").strip()
-    return piece == str(surface_text or "").strip()
-
-
-def _build_unknown_result(word: str, upos: str, xpos: str, deprel: str, lemma: str, feats: str,
-                          idx: int, lemma_raw: str, lemma_suffix: str) -> dict[str, Any]:
+def _build_unknown_result(
+    word: str,
+    upos: str,
+    xpos: str,
+    deprel: str,
+    lemma: str,
+    feats: str,
+    idx: int,
+    lemma_raw: str,
+    lemma_suffix: str,
+) -> dict[str, Any]:
     entry = {
         "seg_i": idx,
         "surface_form": word,
@@ -2549,8 +2772,15 @@ def _extract_token_map(lookup_data: dict[str, Any]) -> dict[int, dict[str, Any]]
     return out
 
 
-def _build_segment_result(word: str, token: dict[str, Any], seg_idx: int, segmenter: Any, lang_code: str,
-                          entry_store: dict[str, dict[str, Any]], debug_trace: bool = False) -> dict[str, Any]:
+def _build_segment_result(
+    word: str,
+    token: dict[str, Any],
+    seg_idx: int,
+    segmenter: Any,
+    lang_code: str,
+    entry_store: dict[str, dict[str, Any]],
+    debug_trace: bool = False,
+) -> dict[str, Any]:
     upos = str(token.get("upos") or "X")
     deprel = str(token.get("dep") or "dep")
     xpos = str(token.get("tag") or "")
@@ -2560,11 +2790,23 @@ def _build_segment_result(word: str, token: dict[str, Any], seg_idx: int, segmen
     feats = str(token.get("feats") or "")
 
     if segmenter is None:
-        return _build_unknown_result(word, upos, xpos, deprel, lemma, feats, seg_idx, lemma_raw, lemma_suffix)
+        return _build_unknown_result(
+            word, upos, xpos, deprel, lemma, feats, seg_idx, lemma_raw, lemma_suffix
+        )
 
     if debug_trace:
-        with trace_scope("segment_result", label="Segment Result", token=word, seg_i=seg_idx, upos=upos, xpos=xpos, lemma=lemma):
-            surface_lookup = segmenter.build_surface_lemma_aware_lookup(word, lemma, upos=upos, xpos=xpos, debug=debug_trace)
+        with trace_scope(
+            "segment_result",
+            label="Segment Result",
+            token=word,
+            seg_i=seg_idx,
+            upos=upos,
+            xpos=xpos,
+            lemma=lemma,
+        ):
+            surface_lookup = segmenter.build_surface_lemma_aware_lookup(
+                word, lemma, upos=upos, xpos=xpos, debug=debug_trace
+            )
             fill = surface_lookup.get("fill") or {}
             all_entries = list(surface_lookup.get("all_entries") or [])
             preferred_entries = list(surface_lookup.get("preferred_entries") or all_entries)
@@ -2577,7 +2819,9 @@ def _build_segment_result(word: str, token: dict[str, Any], seg_idx: int, segmen
             fill_mode = str(fill.get("mode") or "greedy")
             exact_lemma_match_count = int(surface_lookup.get("exact_lemma_match_count") or 0)
             partial_exact_lemma_count = int(surface_lookup.get("partial_exact_lemma_count") or 0)
-            partial_missing_lemma_count = int(surface_lookup.get("partial_missing_lemma_count") or 0)
+            partial_missing_lemma_count = int(
+                surface_lookup.get("partial_missing_lemma_count") or 0
+            )
             partial_gap_count = int(surface_lookup.get("partial_gap_count") or 0)
             lemma_override_parts = list(surface_lookup.get("lemma_override_parts") or [])
             shown_entries, other_entries = _split_entries_for_display(
@@ -2587,9 +2831,13 @@ def _build_segment_result(word: str, token: dict[str, Any], seg_idx: int, segmen
                 fill_mode=fill_mode,
                 preferred_entries=output_preferred_entries,
             )
-            chosen_main = segmenter._choose_entry(dict_head, shown_entries or output_preferred_entries or output_all_entries)
+            chosen_main = segmenter._choose_entry(
+                dict_head, shown_entries or output_preferred_entries or output_all_entries
+            )
     else:
-        surface_lookup = segmenter.build_surface_lemma_aware_lookup(word, lemma, upos=upos, xpos=xpos, debug=False)
+        surface_lookup = segmenter.build_surface_lemma_aware_lookup(
+            word, lemma, upos=upos, xpos=xpos, debug=False
+        )
         fill = surface_lookup.get("fill") or {}
         all_entries = list(surface_lookup.get("all_entries") or [])
         preferred_entries = list(surface_lookup.get("preferred_entries") or all_entries)
@@ -2612,7 +2860,9 @@ def _build_segment_result(word: str, token: dict[str, Any], seg_idx: int, segmen
             fill_mode=fill_mode,
             preferred_entries=output_preferred_entries,
         )
-        chosen_main = segmenter._choose_entry(dict_head, shown_entries or output_preferred_entries or output_all_entries)
+        chosen_main = segmenter._choose_entry(
+            dict_head, shown_entries or output_preferred_entries or output_all_entries
+        )
 
     entry: dict[str, Any] = {
         "seg_i": seg_idx,
@@ -2634,7 +2884,9 @@ def _build_segment_result(word: str, token: dict[str, Any], seg_idx: int, segmen
 
     if chosen_main:
         primary_entry = _canonical_entry_payload(chosen_main)
-        display_head = str(primary_entry.get("surface_form") or primary_entry.get("headword") or dict_head or word).strip()
+        display_head = str(
+            primary_entry.get("surface_form") or primary_entry.get("headword") or dict_head or word
+        ).strip()
         if display_head:
             entry["head"] = display_head
         headword = str(primary_entry.get("headword") or "").strip()
@@ -2678,14 +2930,20 @@ def _build_segment_result(word: str, token: dict[str, Any], seg_idx: int, segmen
             whole_lemma_path = resolved_via in {"lemma", "lemma_override"}
             if whole_lemma_path:
                 synthetic_fill["resolution_linked_to_lemma"] = True
-                synthetic_fill["resolution_source"] = "lemma_override" if resolved_via == "lemma_override" else "lemma"
+                synthetic_fill["resolution_source"] = (
+                    "lemma_override" if resolved_via == "lemma_override" else "lemma"
+                )
             canonical_fills = [synthetic_fill]
-            resolution_rows = [{
-                "text": word,
-                "source": "DICT",
-                "resolution_linked_to_lemma": bool(synthetic_fill.get("resolution_linked_to_lemma")),
-                "resolution_source": str(synthetic_fill.get("resolution_source") or "surface"),
-            }]
+            resolution_rows = [
+                {
+                    "text": word,
+                    "source": "DICT",
+                    "resolution_linked_to_lemma": bool(
+                        synthetic_fill.get("resolution_linked_to_lemma")
+                    ),
+                    "resolution_source": str(synthetic_fill.get("resolution_source") or "surface"),
+                }
+            ]
     entry["fills"] = canonical_fills
     category = _infer_resolution_category(surface_lookup, fill, all_entries)
     if partial_gap_count > 0:
@@ -2758,35 +3016,43 @@ def _build_segment_result(word: str, token: dict[str, Any], seg_idx: int, segmen
     return entry
 
 
-def _build_results_by_seg(lookup_data: dict[str, Any], lang_code: str, selected_sources: Sequence[str] | None,
-                          debug_trace: bool = False) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
+def _build_results_by_seg(
+    lookup_data: dict[str, Any],
+    lang_code: str,
+    selected_sources: Sequence[str] | None,
+    debug_trace: bool = False,
+) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
     segments = list(lookup_data.get("segments") or [])
     token_map = _extract_token_map(lookup_data)
     segmenter = _get_sqlite_segmenter(lang_code, selected_sources)
     entry_store: dict[str, dict[str, Any]] = {}
     if debug_trace:
-        with trace_scope("build_results_by_seg", label="Build Results By Segment", language=lang_code, segment_count=len(segments)):
+        with trace_scope(
+            "build_results_by_seg",
+            label="Build Results By Segment",
+            language=lang_code,
+            segment_count=len(segments),
+        ):
             results: list[dict[str, Any]] = []
             for idx, raw_word in enumerate(segments):
                 word = str(raw_word or "")
                 token = token_map.get(idx) or {}
-                results.append(_build_segment_result(word, token, idx, segmenter, lang_code, entry_store, debug_trace=debug_trace))
+                results.append(
+                    _build_segment_result(
+                        word, token, idx, segmenter, lang_code, entry_store, debug_trace=debug_trace
+                    )
+                )
             return results, entry_store
     results: list[dict[str, Any]] = []
     for idx, raw_word in enumerate(segments):
         word = str(raw_word or "")
         token = token_map.get(idx) or {}
-        results.append(_build_segment_result(word, token, idx, segmenter, lang_code, entry_store, debug_trace=False))
+        results.append(
+            _build_segment_result(
+                word, token, idx, segmenter, lang_code, entry_store, debug_trace=False
+            )
+        )
     return results, entry_store
-
-
-def _build_merged_lookup_payload(lookup_data: dict[str, Any], lang_code: str, selected_sources: Sequence[str] | None,
-                                 debug_trace: bool = False) -> dict[str, Any]:
-    merged = _build_lookup_payload_base(lookup_data)
-    results_by_seg, entry_store = _build_results_by_seg(lookup_data, lang_code, selected_sources, debug_trace=debug_trace)
-    merged["results_by_seg"] = results_by_seg
-    merged["entry_store"] = entry_store
-    return merged
 
 
 def _update_backend_debug_snapshot(
@@ -2815,11 +3081,15 @@ def _update_backend_debug_snapshot(
         "grammar_overlay": copy.deepcopy(merged_payload.get("grammar_overlay") or {}),
     }
     if isinstance(sqlite_debug_trace, Mapping):
-        patch["sqlite_debug_trace"] = _merge_debug_trace_payloads(existing_trace, sqlite_debug_trace)
+        patch["sqlite_debug_trace"] = _merge_debug_trace_payloads(
+            existing_trace, sqlite_debug_trace
+        )
     update_debug_snapshot(patch)
 
 
-def _attach_sqlite_debug_trace_to_capture(*, capture_id: str, sqlite_debug_trace: Mapping[str, Any] | None) -> None:
+def _attach_sqlite_debug_trace_to_capture(
+    *, capture_id: str, sqlite_debug_trace: Mapping[str, Any] | None
+) -> None:
     capture = str(capture_id or "").strip()
     if not capture or not isinstance(sqlite_debug_trace, Mapping):
         return
@@ -2829,9 +3099,13 @@ def _attach_sqlite_debug_trace_to_capture(*, capture_id: str, sqlite_debug_trace
     current_capture_id = str(snap.get("debug_capture_id") or "").strip()
     if not current_capture_id or current_capture_id != capture:
         return
-    update_debug_snapshot({
-        "sqlite_debug_trace": _merge_debug_trace_payloads(snap.get("sqlite_debug_trace"), sqlite_debug_trace),
-    })
+    update_debug_snapshot(
+        {
+            "sqlite_debug_trace": _merge_debug_trace_payloads(
+                snap.get("sqlite_debug_trace"), sqlite_debug_trace
+            ),
+        }
+    )
 
 
 def _prepare_debug_trace_payload(
@@ -2853,7 +3127,9 @@ def _prepare_debug_trace_payload(
     root = out.get("timing_tree")
     if isinstance(root, Mapping):
         root_copy = copy.deepcopy(dict(root))
-        root_copy["label"] = str(label or root_copy.get("label") or root_copy.get("name") or "").strip()
+        root_copy["label"] = str(
+            label or root_copy.get("label") or root_copy.get("name") or ""
+        ).strip()
         meta = root_copy.get("meta")
         meta_copy = copy.deepcopy(dict(meta)) if isinstance(meta, Mapping) else {}
         meta_copy["request_kind"] = str(request_kind or "").strip()
@@ -2896,20 +3172,12 @@ def _merge_debug_trace_payloads(
 
     out = existing_copy
     out["debug_capture_id"] = str(
-        incoming_copy.get("debug_capture_id")
-        or existing_copy.get("debug_capture_id")
-        or ""
+        incoming_copy.get("debug_capture_id") or existing_copy.get("debug_capture_id") or ""
     ).strip()
-    out["language"] = str(
-        incoming_copy.get("language")
-        or existing_copy.get("language")
-        or ""
-    ).strip().lower()
-    out["q"] = str(
-        incoming_copy.get("q")
-        or existing_copy.get("q")
-        or ""
+    out["language"] = (
+        str(incoming_copy.get("language") or existing_copy.get("language") or "").strip().lower()
     )
+    out["q"] = str(incoming_copy.get("q") or existing_copy.get("q") or "")
     try:
         started_existing = float(existing_copy.get("started_at") or 0.0)
     except Exception:
@@ -2955,9 +3223,16 @@ def _merge_debug_trace_payloads(
     return out
 
 
-def _build_lookup_dp_only_payload(word: str, lang_code: str, selected_sources: Sequence[str] | None,
-                                  lemma: str = "", upos: str = "", xpos: str = "",
-                                  exact_only: bool = False, debug_trace: bool = False) -> dict[str, Any]:
+def _build_lookup_dp_only_payload(
+    word: str,
+    lang_code: str,
+    selected_sources: Sequence[str] | None,
+    lemma: str = "",
+    upos: str = "",
+    xpos: str = "",
+    exact_only: bool = False,
+    debug_trace: bool = False,
+) -> dict[str, Any]:
     token = str(word or "")
     if not token.strip():
         return {"ok": False, "error": "empty"}
@@ -2971,44 +3246,59 @@ def _build_lookup_dp_only_payload(word: str, lang_code: str, selected_sources: S
         "grammar_overlay": {"tokens": []},
         "ud_overlay": {
             "ok": False,
-            "tokens": [{
-                "i": 0,
-                "doc_i": 0,
-                "head": 0,
-                "dep": "dep",
-                "text": token,
-                "upos": upos_hint or "X",
-                "tag": xpos_hint,
-                "lemma": str(lemma or ""),
-                "lemma_raw": str(lemma or ""),
-                "lemma_suffix": "",
-                "feats": "",
-            }],
+            "tokens": [
+                {
+                    "i": 0,
+                    "doc_i": 0,
+                    "head": 0,
+                    "dep": "dep",
+                    "text": token,
+                    "upos": upos_hint or "X",
+                    "tag": xpos_hint,
+                    "lemma": str(lemma or ""),
+                    "lemma_raw": str(lemma or ""),
+                    "lemma_suffix": "",
+                    "feats": "",
+                }
+            ],
             "edges": [],
             "roots": [],
             "ents": [],
             "sentences": [],
         },
     }
-    results_by_seg, entry_store = _build_results_by_seg(lookup_data, lang_code, selected_sources, debug_trace=debug_trace)
-    result = results_by_seg[0] if results_by_seg else _build_unknown_result(token, upos_hint or "unknown", xpos_hint, "dep", lemma, "", 0, lemma, "")
+    results_by_seg, entry_store = _build_results_by_seg(
+        lookup_data, lang_code, selected_sources, debug_trace=debug_trace
+    )
+    result = (
+        results_by_seg[0]
+        if results_by_seg
+        else _build_unknown_result(
+            token, upos_hint or "unknown", xpos_hint, "dep", lemma, "", 0, lemma, ""
+        )
+    )
     payload = _build_lookup_payload_base(lookup_data)
     payload["results_by_seg"] = [result]
     payload["entry_store"] = entry_store
     return payload
 
 
-def _build_subsegments_payload(token: str, lang_code: str, selected_sources: Sequence[str] | None,
-                               decompose: bool = False) -> dict[str, Any]:
+def _build_subsegments_payload(
+    token: str, lang_code: str, selected_sources: Sequence[str] | None, decompose: bool = False
+) -> dict[str, Any]:
     text = str(token or "")
     if not text.strip():
         return {"ok": False, "error": "empty"}
     segmenter = _get_sqlite_segmenter(lang_code, selected_sources)
     if segmenter is None:
         return {"ok": True, "token": text, "subsegments": [], "mode": "greedy"}
-    fill = segmenter.fill_token(text, {"allowExact": not decompose, "excludeWhole": bool(decompose)})
+    fill = segmenter.fill_token(
+        text, {"allowExact": not decompose, "excludeWhole": bool(decompose)}
+    )
     mode = str(fill.get("mode") or "greedy")
-    prepared = _prepare_fill_entries(fill.get("fills") or [], text, segmenter, lang_code, "", "", mode, "surface")
+    prepared = _prepare_fill_entries(
+        fill.get("fills") or [], text, segmenter, lang_code, "", "", mode, "surface"
+    )
     if decompose and text:
         prepared = [row for row in prepared if str(row.get("head") or "") != text]
     return {
@@ -3017,6 +3307,7 @@ def _build_subsegments_payload(token: str, lang_code: str, selected_sources: Seq
         "subsegments": prepared,
         "mode": mode,
     }
+
 
 # ---------------------------------------------------------------------------
 # Routes
@@ -3056,24 +3347,26 @@ def _add_private_route_noindex(response):
 
 @app.route("/robots.txt")
 def robots_txt():
-    body = "\n".join([
-        "User-agent: *",
-        "Allow: /",
-        "Disallow: /reader",
-        "Disallow: /account",
-        "Disallow: /contact",
-        "Disallow: /about",
-        "Disallow: /auth/",
-        "Disallow: /payments/",
-        "Disallow: /api/",
-        "Disallow: /lookup",
-        "Disallow: /lookup_dp_only",
-        "Disallow: /subsegments",
-        "Disallow: /js/",
-        "Disallow: /extension/",
-        f"Sitemap: {_site_base_url()}/sitemap.xml",
-        "",
-    ])
+    body = "\n".join(
+        [
+            "User-agent: *",
+            "Allow: /",
+            "Disallow: /reader",
+            "Disallow: /account",
+            "Disallow: /contact",
+            "Disallow: /about",
+            "Disallow: /auth/",
+            "Disallow: /payments/",
+            "Disallow: /api/",
+            "Disallow: /lookup",
+            "Disallow: /lookup_dp_only",
+            "Disallow: /subsegments",
+            "Disallow: /js/",
+            "Disallow: /extension/",
+            f"Sitemap: {_site_base_url()}/sitemap.xml",
+            "",
+        ]
+    )
     return Response(body, mimetype="text/plain; charset=utf-8")
 
 
@@ -3084,10 +3377,7 @@ def sitemap_xml():
         f"{base}/",
         f"{base}/chrome-extension",
     ]
-    items = "\n".join(
-        f"  <url><loc>{url}</loc></url>"
-        for url in urls
-    )
+    items = "\n".join(f"  <url><loc>{url}</loc></url>" for url in urls)
     body = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{items}\n</urlset>\n'
     return Response(body, mimetype="application/xml; charset=utf-8")
 
@@ -3103,6 +3393,7 @@ def index():
         new_visitor_cookie = True
     try:
         from analytics import record_landing_visit
+
         record_landing_visit(visitor_id)
     except Exception:
         pass
@@ -3121,7 +3412,9 @@ def index():
 
 @app.route("/chrome-extension")
 def chrome_extension_page():
-    return redirect("https://chromewebstore.google.com/detail/language-engine-capture/moljdhkmokgdglimghgkenhbeccpognn")
+    return redirect(
+        "https://chromewebstore.google.com/detail/language-engine-capture/moljdhkmokgdglimghgkenhbeccpognn"
+    )
 
 
 @app.route("/reader", methods=["GET"])
@@ -3158,6 +3451,7 @@ def _is_admin_user() -> bool:
         return False
     try:
         from db import User
+
         email = str(getattr(current_user, "email", "") or "").strip().lower()
         return bool(email and email in User.PREMIUM_EMAILS)
     except Exception:
@@ -3173,6 +3467,7 @@ def admin_analytics_page():
     except (TypeError, ValueError):
         days = 30
     from analytics import admin_summary
+
     return render_template("admin_analytics.html", analytics=admin_summary(days), days=days)
 
 
@@ -3185,11 +3480,13 @@ def admin_analytics_json():
     except (TypeError, ValueError):
         days = 30
     from analytics import admin_summary
+
     return jsonify(admin_summary(days))
 
 
 def _get_or_create_lookup_quota():
     from db import LookupQuota
+
     quota = LookupQuota.query.filter_by(user_id=current_user.id).first()
     if not quota:
         quota = LookupQuota(user_id=current_user.id)
@@ -3246,11 +3543,19 @@ def _precheck_lookup_quota_response():
 
 
 def _lookup_token_count_from_payload(payload: Mapping[str, Any]) -> int:
-    ud_tokens = ((payload.get("ud_overlay") or {}) if isinstance(payload.get("ud_overlay"), Mapping) else {}).get("tokens")
+    ud_tokens = (
+        (payload.get("ud_overlay") or {}) if isinstance(payload.get("ud_overlay"), Mapping) else {}
+    ).get("tokens")
     if isinstance(ud_tokens, Sequence) and not isinstance(ud_tokens, (str, bytes, bytearray)):
         return len(ud_tokens)
-    grammar_tokens = ((payload.get("grammar_overlay") or {}) if isinstance(payload.get("grammar_overlay"), Mapping) else {}).get("tokens")
-    if isinstance(grammar_tokens, Sequence) and not isinstance(grammar_tokens, (str, bytes, bytearray)):
+    grammar_tokens = (
+        (payload.get("grammar_overlay") or {})
+        if isinstance(payload.get("grammar_overlay"), Mapping)
+        else {}
+    ).get("tokens")
+    if isinstance(grammar_tokens, Sequence) and not isinstance(
+        grammar_tokens, (str, bytes, bytearray)
+    ):
         return len(grammar_tokens)
     segments = payload.get("segments")
     if isinstance(segments, Sequence) and not isinstance(segments, (str, bytes, bytearray)):
@@ -3285,42 +3590,48 @@ def lookup_gate():
 
     if current_user.is_subscribed:
         le_db.session.commit()
-        return jsonify({
-            "ok": True,
-            "remaining": None,
-            "limit": None,
-            "tokens_used": None,
-            "tokens_remaining": None,
-            "tokens_limit": None,
-        })
+        return jsonify(
+            {
+                "ok": True,
+                "remaining": None,
+                "limit": None,
+                "tokens_used": None,
+                "tokens_remaining": None,
+                "tokens_limit": None,
+            }
+        )
 
     quota = _get_or_create_lookup_quota()
     limit = le_config.FREE_LOOKUP_TOKENS_PER_DAY
     used = int(quota.count or 0)
     if used >= limit:
         le_db.session.commit()
-        return jsonify({
-            "ok": False,
-            "upgrade": True,
-            "error": "Daily lookup token limit reached.",
-            "remaining": 0,
-            "limit": limit,
-            "tokens_used": used,
-            "tokens_remaining": 0,
-            "tokens_limit": limit,
-            "over_limit": True,
-        }), 429
+        return jsonify(
+            {
+                "ok": False,
+                "upgrade": True,
+                "error": "Daily lookup token limit reached.",
+                "remaining": 0,
+                "limit": limit,
+                "tokens_used": used,
+                "tokens_remaining": 0,
+                "tokens_limit": limit,
+                "over_limit": True,
+            }
+        ), 429
 
     le_db.session.commit()
-    return jsonify({
-        "ok": True,
-        "remaining": quota.remaining,
-        "limit": limit,
-        "tokens_used": used,
-        "tokens_remaining": quota.remaining,
-        "tokens_limit": limit,
-        "over_limit": False,
-    })
+    return jsonify(
+        {
+            "ok": True,
+            "remaining": quota.remaining,
+            "limit": limit,
+            "tokens_used": used,
+            "tokens_remaining": quota.remaining,
+            "tokens_limit": limit,
+            "over_limit": False,
+        }
+    )
 
 
 def _contact_field(value: Any, max_len: int) -> str:
@@ -3334,7 +3645,9 @@ def _contact_header(value: str) -> str:
     return re.sub(r"[\r\n]+", " ", value).strip()
 
 
-def _send_contact_email(contact_type: str, subject: str, message: str, context: Mapping[str, Any]) -> None:
+def _send_contact_email(
+    contact_type: str, subject: str, message: str, context: Mapping[str, Any]
+) -> None:
     if not le_config.SMTP_HOST:
         raise RuntimeError("SMTP is not configured.")
 
@@ -3404,7 +3717,6 @@ def contact_message():
     return jsonify({"ok": True})
 
 
-
 def _lookup_json_body() -> dict[str, Any]:
     if request.method != "POST":
         return {}
@@ -3434,6 +3746,7 @@ def _replace_lookup_ner_with_gemini(payload: dict[str, Any], lang_code: str) -> 
     overlay["ents"] = []
     try:
         import gemini_dict
+
         result = gemini_dict.recognize_ner_mwe_for_overlay(
             list(payload.get("segments") or []),
             overlay,
@@ -3450,119 +3763,12 @@ def _replace_lookup_ner_with_gemini(payload: dict[str, Any], lang_code: str) -> 
     overlay["gemini_ner"] = {
         "enabled": True,
         "ok": bool(result.get("ok")) if isinstance(result, Mapping) else False,
-        "error": str(result.get("error") or "") if isinstance(result, Mapping) else "Gemini NER failed.",
+        "error": str(result.get("error") or "")
+        if isinstance(result, Mapping)
+        else "Gemini NER failed.",
         "tag_count": len(overlay.get("ents") or []),
         "meta": copy.deepcopy(meta) if isinstance(meta, Mapping) else {},
     }
-
-
-def _chunk_full_offset(value: Any) -> int | None:
-    try:
-        if value is None:
-            return None
-        n = int(value)
-    except (TypeError, ValueError):
-        return None
-    return n if n >= 0 else None
-
-
-def _build_orig_to_model_positions(model_to_orig: Sequence[int]) -> dict[int, list[int]]:
-    out: dict[int, list[int]] = {}
-    for model_i, raw_orig_i in enumerate(model_to_orig or []):
-        try:
-            orig_i = int(raw_orig_i)
-        except (TypeError, ValueError):
-            continue
-        if orig_i < 0:
-            continue
-        out.setdefault(orig_i, []).append(model_i)
-    return out
-
-
-def _prepare_lookup_trankit_chunks(
-    full_text: str,
-    chunks: Any,
-    lang_code: str,
-    strip_punctuation: bool,
-) -> list[dict[str, Any]]:
-    # Prepares geometry chunks in normalized/model-text coordinates. The active
-    # chunk path uses these as hard tokenizer boundaries, then runs POS/dep once.
-    if not isinstance(chunks, list):
-        return []
-    prepared: list[dict[str, Any]] = []
-    full_len = len(full_text or "")
-    full_context = build_preprocess_context(
-        full_text,
-        language=lang_code,
-        strip_punctuation=strip_punctuation,
-    )
-    full_model_text = str(full_context.model_text if full_context.changed else full_context.original_text)
-    orig_to_model = _build_orig_to_model_positions(full_context.model_to_orig)
-    total_chunk_text = 0
-    for idx, raw in enumerate(chunks[:240]):
-        if not isinstance(raw, Mapping):
-            continue
-        chunk_text = str(raw.get("text") or "")
-        if not chunk_text.strip():
-            continue
-        total_chunk_text += len(chunk_text)
-        if total_chunk_text > max(40000, full_len * 3):
-            break
-
-        raw_start = _chunk_full_offset(raw.get("start"))
-        if raw_start is None:
-            raw_start = 0
-        raw_end = _chunk_full_offset(raw.get("end"))
-        if raw_end is None:
-            raw_end = min(full_len, raw_start + len(chunk_text))
-
-        raw_map = raw.get("offsetMap")
-        if not isinstance(raw_map, list):
-            raw_map = raw.get("offset_map")
-        if isinstance(raw_map, list):
-            offset_map = [_chunk_full_offset(v) for v in raw_map[:len(chunk_text)]]
-        else:
-            offset_map = [raw_start + i for i in range(len(chunk_text))]
-        if len(offset_map) < len(chunk_text):
-            offset_map.extend([None] * (len(chunk_text) - len(offset_map)))
-
-        model_chars: list[str] = []
-        model_offset_map: list[int | None] = []
-        appended_model_positions: set[int] = set()
-        for raw_i, raw_ch in enumerate(chunk_text):
-            orig_i = offset_map[raw_i] if raw_i < len(offset_map) else None
-            if orig_i is None:
-                # Preserve only non-tokenizing whitespace from geometry gaps.
-                if str(raw_ch).isspace():
-                    model_chars.append(str(raw_ch))
-                    model_offset_map.append(None)
-                continue
-            model_positions = orig_to_model.get(orig_i) or []
-            for model_i in model_positions:
-                if model_i in appended_model_positions:
-                    continue
-                if 0 <= model_i < len(full_model_text):
-                    model_chars.append(full_model_text[model_i])
-                    model_offset_map.append(model_i)
-                    appended_model_positions.add(model_i)
-        model_text = "".join(model_chars)
-        if not model_text.strip():
-            continue
-        finite_model_offsets = [v for v in model_offset_map if isinstance(v, int) and v >= 0]
-        model_start = min(finite_model_offsets) if finite_model_offsets else 0
-        model_end = (max(finite_model_offsets) + 1) if finite_model_offsets else len(model_text)
-
-        prepared.append({
-            "index": idx,
-            "start": model_start,
-            "end": model_end,
-            "original_start": raw_start,
-            "original_end": raw_end,
-            "text": model_text,
-            "offset_map": model_offset_map,
-        })
-    prepared.sort(key=lambda c: (int(c.get("original_start") or 0), int(c.get("original_end") or 0), int(c.get("index") or 0)))
-    return prepared
 
 
 @app.route("/lookup", methods=["GET", "POST"])
@@ -3582,9 +3788,16 @@ def lookup():
         q = str(json_body.get("q") or "")
     raw_lang = str(request.args.get("lang") or json_body.get("lang") or "zh").strip().lower()
     use_raw = str(request.args.get("raw") or "").strip().lower() in {"1", "true", "yes", "raw"}
-    exact_only = str(request.args.get("exact") or "").strip().lower() in {"1", "true", "yes", "exact"}
+    exact_only = str(request.args.get("exact") or "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "exact",
+    }
     raw_debug_capture = request.args.get("debug_capture")
-    requested_debug_capture = False if raw_debug_capture is None else _lookup_bool(raw_debug_capture)
+    requested_debug_capture = (
+        False if raw_debug_capture is None else _lookup_bool(raw_debug_capture)
+    )
     enable_debug_capture = bool(requested_debug_capture and is_debug_collection_enabled())
     strip_punctuation = False
     manual_sentence_segmentation = _lookup_bool(request.args.get("manual_sentence_segmentation"))
@@ -3605,7 +3818,9 @@ def lookup():
     manual_sentence_segmentation_post_strip = bool(
         manual_sentence_segmentation and strip_punctuation and lang_code in {"sa", "lzh"}
     )
-    effective_strip_punctuation = bool(strip_punctuation and not manual_sentence_segmentation_post_strip)
+    effective_strip_punctuation = bool(
+        strip_punctuation and not manual_sentence_segmentation_post_strip
+    )
     # DISABLED: the experimental chunked Trankit lookup path used geometry chunks
     # as hard tokenizer boundaries. Canonical PDF/HTML extraction now inserts
     # synthetic paragraph breaks instead, so the normal single lookup path gives
@@ -3641,6 +3856,7 @@ def lookup():
         if bool(payload.get("ok", True)):
             try:
                 from analytics import record_lookup
+
                 record_lookup(lang_code, _lookup_token_count_from_payload(payload), dp_only=False)
             except Exception:
                 pass
@@ -3667,7 +3883,13 @@ def lookup():
     # NLP-only: JS client handles DP segmentation + hydration
     def _run_nlp(text, _dictionary, _hooks, trankit_lang):
         if enable_debug_capture:
-            with trace_scope("run_trankit", label="Run Trankit", language=trankit_lang, query_length=len(text or ""), chunk_count=len(prepared_trankit_chunks)):
+            with trace_scope(
+                "run_trankit",
+                label="Run Trankit",
+                language=trankit_lang,
+                query_length=len(text or ""),
+                chunk_count=len(prepared_trankit_chunks),
+            ):
                 if prepared_trankit_chunks:
                     trankit_doc = run_trankit_chunk_boundaries(
                         text,
@@ -3688,7 +3910,9 @@ def lookup():
                 trankit_doc = _normalize_trankit_upos_doc(trankit_doc, trankit_lang)
                 if gemini_ner_requested:
                     _clear_trankit_ner_tags(trankit_doc)
-            with trace_scope("process_lookup_nlp_only", label="Process NLP Only", language=trankit_lang):
+            with trace_scope(
+                "process_lookup_nlp_only", label="Process NLP Only", language=trankit_lang
+            ):
                 payload = process_lookup_nlp_only(
                     text,
                     trankit_doc,
@@ -3779,6 +4003,7 @@ def lookup():
     if bool(payload.get("ok", True)):
         try:
             from analytics import record_lookup
+
             record_lookup(lang_code, _lookup_token_count_from_payload(payload), dp_only=False)
         except Exception:
             pass
@@ -3823,13 +4048,16 @@ def lookup_dp_only():
         lemma=request.args.get("lemma", ""),
         upos=request.args.get("upos", ""),
         xpos=request.args.get("xpos", ""),
-        exact_only=str(request.args.get("exact") or "").strip().lower() in {"1", "true", "yes", "exact"},
-        debug_trace=str(request.args.get("debug_trace") or "").strip().lower() in {"1", "true", "yes", "on"},
+        exact_only=str(request.args.get("exact") or "").strip().lower()
+        in {"1", "true", "yes", "exact"},
+        debug_trace=str(request.args.get("debug_trace") or "").strip().lower()
+        in {"1", "true", "yes", "on"},
     )
     payload["language"] = lang_code
     if bool(payload.get("ok", True)):
         try:
             from analytics import record_lookup
+
             record_lookup(lang_code, _lookup_token_count_from_payload(payload), dp_only=True)
         except Exception:
             pass
@@ -3846,8 +4074,15 @@ def subsegments():
     lang_code = resolve_lang_code(raw_lang) or raw_lang
     if not token or not lang_code:
         return jsonify({"ok": False, "error": "missing token or lang"}), 400
-    decompose = str(request.args.get("decompose") or "").strip().lower() in {"1", "true", "yes", "on"}
-    payload = _build_subsegments_payload(token, lang_code, _get_requested_sources(), decompose=decompose)
+    decompose = str(request.args.get("decompose") or "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+    payload = _build_subsegments_payload(
+        token, lang_code, _get_requested_sources(), decompose=decompose
+    )
     payload["language"] = lang_code
     return jsonify(payload)
 
@@ -3868,6 +4103,7 @@ def annotation_endpoint():
 # ---------------------------------------------------------------------------
 # MT glossing — Gemini dict generation first, Google Translate fallback
 # ---------------------------------------------------------------------------
+
 
 # Gemini synthetic dictionary entry generation
 @app.route("/api/mt_gloss", methods=["POST"])
@@ -3934,9 +4170,13 @@ def js_custom_index(lang_code: str):
     if not APP_DB_PATH.exists():
         # No custom DB at all — return empty index
         import gzip as _gz
+
         empty = {"hw": {}, "fw": {}, "db_aliases": {}, "count": 0}
-        return Response(_gz.compress(json.dumps(empty, separators=(",", ":")).encode()), status=200,
-                        headers={"Content-Type": "application/gzip", "Cache-Control": "no-store"})
+        return Response(
+            _gz.compress(json.dumps(empty, separators=(",", ":")).encode()),
+            status=200,
+            headers={"Content-Type": "application/gzip", "Cache-Control": "no-store"},
+        )
 
     # Build custom-only index (no static sqlite files, just customdb)
     index = build_compact_key_index(resolved, db_paths=[], include_custom_entries=True)
@@ -3944,11 +4184,19 @@ def js_custom_index(lang_code: str):
     index["count"] = count
 
     import gzip as _gz
-    compressed = _gz.compress(json.dumps(index, ensure_ascii=False, separators=(",", ":")).encode("utf-8"), compresslevel=1)
-    return Response(compressed, status=200, headers={
-        "Content-Type": "application/gzip",
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-    })
+
+    compressed = _gz.compress(
+        json.dumps(index, ensure_ascii=False, separators=(",", ":")).encode("utf-8"),
+        compresslevel=1,
+    )
+    return Response(
+        compressed,
+        status=200,
+        headers={
+            "Content-Type": "application/gzip",
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        },
+    )
 
 
 @app.route("/api/dict/<lang_code>/gemini", methods=["GET"])
@@ -3960,6 +4208,7 @@ def get_gemini_dict(lang_code):
         return jsonify({"ok": False, "error": "Missing language."}), 400
 
     import gemini_dict
+
     return Response(
         stream_with_context(gemini_dict.iter_custom_entry_tsv_lines(lang)),
         mimetype="text/tab-separated-values",
@@ -3977,6 +4226,7 @@ def get_gemini_dict(lang_code):
 # ---------------------------------------------------------------------------
 # Gemini LLM assistant
 # ---------------------------------------------------------------------------
+
 
 @app.route("/api/llm_query", methods=["POST"])
 def llm_query():
@@ -4014,6 +4264,7 @@ def llm_query():
 def llm_translate_sentences():
     """Batch translate per-sentence token lists to fluent English. Paid users only."""
     from gemini_dict import translate_sentences
+
     data = request.get_json(silent=True) or {}
     sentence_requests = data.get("requests") or []
     lang_code = (data.get("lang") or "").strip()
@@ -4046,27 +4297,34 @@ def llm_usage():
         usage._maybe_reset(current_user)
         le_db.session.commit()
 
-    llm_budget_usd = usage.llm_budget_usd(current_user) if usage else float(caps.get("llm_budget_usd_per_month", 0.0) or 0.0)
+    llm_budget_usd = (
+        usage.llm_budget_usd(current_user)
+        if usage
+        else float(caps.get("llm_budget_usd_per_month", 0.0) or 0.0)
+    )
     llm_cost_usd = usage.llm_cost_usd(current_user) if usage else 0.0
     llm_usage_pct = usage.llm_usage_percent(current_user) if usage else 0.0
 
-    return jsonify({
-        "ok": True,
-        "tier": tier,
-        "mt_chars_used": usage.mt_chars_used if usage else 0,
-        "mt_chars_cap": caps.get("mt_chars_per_month", 0),
-        "llm_prompt_tokens_used": usage.llm_prompt_tokens_used if usage else 0,
-        "llm_output_tokens_used": usage.llm_output_tokens_used if usage else 0,
-        "llm_tokens_used": usage.llm_tokens_used if usage else 0,
-        "llm_budget_usd": llm_budget_usd,
-        "llm_cost_usd": llm_cost_usd,
-        "llm_usage_pct": llm_usage_pct,
-    })
+    return jsonify(
+        {
+            "ok": True,
+            "tier": tier,
+            "mt_chars_used": usage.mt_chars_used if usage else 0,
+            "mt_chars_cap": caps.get("mt_chars_per_month", 0),
+            "llm_prompt_tokens_used": usage.llm_prompt_tokens_used if usage else 0,
+            "llm_output_tokens_used": usage.llm_output_tokens_used if usage else 0,
+            "llm_tokens_used": usage.llm_tokens_used if usage else 0,
+            "llm_budget_usd": llm_budget_usd,
+            "llm_cost_usd": llm_cost_usd,
+            "llm_usage_pct": llm_usage_pct,
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
 # User dictionary entries — community definitions
 # ---------------------------------------------------------------------------
+
 
 @app.route("/api/user_dict/add", methods=["POST"])
 def user_dict_add():
@@ -4138,10 +4396,7 @@ def user_dict_update():
         entry = CustomDictEntry.query.filter_by(entry_id=entry_id).first()
     elif legacy_id:
         entry = CustomDictEntry.query.get(legacy_id)
-    if (
-        not entry
-        or entry.source != "user_created"
-    ):
+    if not entry or entry.source != "user_created":
         return jsonify({"ok": False, "error": "Entry not found."}), 404
 
     headword = (data.get("headword") or entry.headword or "").strip()
@@ -4166,11 +4421,15 @@ def user_dict_update():
     updated = gemini_dict.upsert_custom_entry(
         lang_code=(data.get("language") or entry.language or "").strip(),
         headword=headword,
-        romanization=(data.get("romanization") if "romanization" in data else current_payload["romanization"]),
+        romanization=(
+            data.get("romanization") if "romanization" in data else current_payload["romanization"]
+        ),
         pos=(data.get("pos") if "pos" in data else current_payload["pos"]),
         glosses=(defs if defs is not None else current_payload["glosses"]),
         forms=(forms if forms is not None else current_payload["forms"]),
-        commentary=(data.get("commentary") if "commentary" in data else current_payload["commentary"]),
+        commentary=(
+            data.get("commentary") if "commentary" in data else current_payload["commentary"]
+        ),
         lemma=(data.get("lemma") if "lemma" in data else current_payload["lemma"]),
         source="user_created",
         entry_id=entry.entry_id,
@@ -4178,7 +4437,9 @@ def user_dict_update():
     if not updated:
         return jsonify({"ok": False, "error": "Failed to update entry."}), 500
     updated_payload = _custom_entry_to_response(updated)
-    _invalidate_sqlite_segmenter_cache(entry.language, _collect_lookup_texts_for_entry(updated_payload))
+    _invalidate_sqlite_segmenter_cache(
+        entry.language, _collect_lookup_texts_for_entry(updated_payload)
+    )
     return jsonify({"ok": True, "entry": updated_payload})
 
 
@@ -4198,16 +4459,15 @@ def user_dict_delete():
         entry = CustomDictEntry.query.filter_by(entry_id=entry_id).first()
     elif legacy_id:
         entry = CustomDictEntry.query.get(legacy_id)
-    if (
-        not entry
-        or entry.source != "user_created"
-    ):
+    if not entry or entry.source != "user_created":
         return jsonify({"ok": False, "error": "Entry not found."}), 404
 
     removed = gemini_dict.remove_tsv_entry(entry.language, entry.headword, entry_id=entry.entry_id)
     if not removed:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
-    _invalidate_sqlite_segmenter_cache(entry.language, _collect_lookup_texts_for_entry(_custom_entry_to_response(entry)))
+    _invalidate_sqlite_segmenter_cache(
+        entry.language, _collect_lookup_texts_for_entry(_custom_entry_to_response(entry))
+    )
     return jsonify({"ok": True})
 
 
@@ -4227,6 +4487,7 @@ def community_entries():
 # LLM per-token glosses (word-sense disambiguation aid)
 # ---------------------------------------------------------------------------
 
+
 @app.route("/api/llm_translate_sentences/cache_hit", methods=["POST"])
 def llm_translate_sentences_cache_hit():
     """Debug endpoint: client reports that sentence translations were served
@@ -4236,6 +4497,7 @@ def llm_translate_sentences_cache_hit():
     hits = data.get("hits") or []
     try:
         import gemini_log
+
         gemini_log.log_translation_cache_hit(
             caller="llm_translate_sentences",
             lang=lang,
@@ -4255,6 +4517,7 @@ def llm_glosses_cache_hit():
     hits = data.get("hits") or []
     try:
         import gemini_log
+
         for h in hits:
             gemini_log.log_gloss_cache_hit(
                 caller="llm_glosses",
@@ -4275,6 +4538,7 @@ def llm_decomps_cache_hit():
     hits = data.get("hits") or []
     try:
         import gemini_log
+
         for h in hits:
             gemini_log.log_decomp_cache_hit(
                 caller="llm_decomps",
@@ -4310,6 +4574,7 @@ def llm_glosses():
 
     import gemini_dict
     from db import ApiUsage
+
     if not gemini_dict.is_enabled():
         return jsonify({"ok": False, "error": "LLM glosses not available."}), 503
 
@@ -4328,6 +4593,7 @@ def llm_glosses():
     def generate():
         from db import ApiUsage as _ApiUsage
         from concurrent.futures import ThreadPoolExecutor, as_completed
+
         _usage = _ApiUsage.query.filter_by(user_id=user_id).first()
         try:
             valid_chunks = [c for c in chunks if c.get("tokens")]
@@ -4349,7 +4615,10 @@ def llm_glosses():
                             sentence_spans.append([cursor, cursor + n])
                             cursor += n
                 g_chunk, usage_chunk = gemini_dict.call_gloss_chunk(
-                    tokens, lang, context, sentences=sentence_spans,
+                    tokens,
+                    lang,
+                    context,
+                    sentences=sentence_spans,
                 )
                 return indices, g_chunk, usage_chunk
 
@@ -4369,9 +4638,15 @@ def llm_glosses():
                                 out_indices.append(gi)
                                 out_glosses.append(g_chunk[j])
                         if out_indices:
-                            line = json.dumps({"indices": out_indices, "glosses": out_glosses}, ensure_ascii=False)
+                            line = json.dumps(
+                                {"indices": out_indices, "glosses": out_glosses}, ensure_ascii=False
+                            )
                             yield f"data: {line}\n\n"
-                    if _usage and usage_chunk and (usage_chunk.get("prompt_tokens") or usage_chunk.get("response_tokens")):
+                    if (
+                        _usage
+                        and usage_chunk
+                        and (usage_chunk.get("prompt_tokens") or usage_chunk.get("response_tokens"))
+                    ):
                         _usage.record_llm(
                             usage_chunk.get("prompt_tokens", 0),
                             usage_chunk.get("response_tokens", 0),
@@ -4379,7 +4654,7 @@ def llm_glosses():
                         le_db.session.commit()
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
-        yield "data: {\"done\": true}\n\n"
+        yield 'data: {"done": true}\n\n'
 
     return Response(
         stream_with_context(generate()),
@@ -4401,6 +4676,7 @@ def llm_decomps():
 
     import gemini_dict
     from db import ApiUsage
+
     if not gemini_dict.is_enabled():
         return jsonify({"ok": False, "error": "LLM decompositions not available."}), 503
 
@@ -4418,6 +4694,7 @@ def llm_decomps():
     def generate():
         from db import ApiUsage as _ApiUsage
         from concurrent.futures import ThreadPoolExecutor, as_completed
+
         _usage = _ApiUsage.query.filter_by(user_id=user_id).first()
         try:
             valid_chunks = [c for c in chunks if c.get("tokens")]
@@ -4431,10 +4708,12 @@ def llm_decomps():
                 targets = []
                 for i, token_text in enumerate(target_tokens):
                     sentence_index = target_positions[i] if i < len(target_positions) else i
-                    targets.append({
-                        "sentence_index": sentence_index,
-                        "text": token_text,
-                    })
+                    targets.append(
+                        {
+                            "sentence_index": sentence_index,
+                            "text": token_text,
+                        }
+                    )
                 d_chunk, usage_chunk = gemini_dict.call_decomp_chunk(tokens, targets, lang)
                 return chunk_id, indices, d_chunk, usage_chunk
 
@@ -4447,13 +4726,20 @@ def llm_decomps():
                         yield f"data: {json.dumps({'error': str(e)})}\n\n"
                         continue
                     if d_chunk is not None:
-                        line = json.dumps({
-                            "chunk_id": chunk_id,
-                            "indices": indices,
-                            "decomps": d_chunk,
-                        }, ensure_ascii=False)
+                        line = json.dumps(
+                            {
+                                "chunk_id": chunk_id,
+                                "indices": indices,
+                                "decomps": d_chunk,
+                            },
+                            ensure_ascii=False,
+                        )
                         yield f"data: {line}\n\n"
-                    if _usage and usage_chunk and (usage_chunk.get("prompt_tokens") or usage_chunk.get("response_tokens")):
+                    if (
+                        _usage
+                        and usage_chunk
+                        and (usage_chunk.get("prompt_tokens") or usage_chunk.get("response_tokens"))
+                    ):
                         _usage.record_llm(
                             usage_chunk.get("prompt_tokens", 0),
                             usage_chunk.get("response_tokens", 0),
@@ -4461,7 +4747,7 @@ def llm_decomps():
                         le_db.session.commit()
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
-        yield "data: {\"done\": true}\n\n"
+        yield 'data: {"done": true}\n\n'
 
     return Response(
         stream_with_context(generate()),
@@ -4483,6 +4769,7 @@ def orth_breakdowns():
 
     import gemini_dict
     from db import ApiUsage
+
     if not gemini_dict.is_enabled():
         return jsonify({"ok": False, "error": "Orth breakdowns not available."}), 503
 
@@ -4500,6 +4787,7 @@ def orth_breakdowns():
     def generate():
         from db import ApiUsage as _ApiUsage
         from concurrent.futures import ThreadPoolExecutor, as_completed
+
         _usage = _ApiUsage.query.filter_by(user_id=user_id).first()
         try:
             valid_chunks = [c for c in chunks if c.get("tokens")]
@@ -4508,7 +4796,9 @@ def orth_breakdowns():
                 tokens = chunk_data.get("tokens") or []
                 indices = chunk_data.get("indices") or []
                 slot_counts = chunk_data.get("slot_counts") or None
-                o_chunk, usage_chunk = gemini_dict.call_orth_chunk(tokens, lang, slot_counts=slot_counts)
+                o_chunk, usage_chunk = gemini_dict.call_orth_chunk(
+                    tokens, lang, slot_counts=slot_counts
+                )
                 return indices, o_chunk, usage_chunk
 
             with ThreadPoolExecutor(max_workers=len(valid_chunks) or 1) as executor:
@@ -4527,9 +4817,15 @@ def orth_breakdowns():
                                 out_indices.append(gi)
                                 out_roms.append(o_chunk[j])
                         if out_indices:
-                            line = json.dumps({"indices": out_indices, "roms": out_roms}, ensure_ascii=False)
+                            line = json.dumps(
+                                {"indices": out_indices, "roms": out_roms}, ensure_ascii=False
+                            )
                             yield f"data: {line}\n\n"
-                    if _usage and usage_chunk and (usage_chunk.get("prompt_tokens") or usage_chunk.get("response_tokens")):
+                    if (
+                        _usage
+                        and usage_chunk
+                        and (usage_chunk.get("prompt_tokens") or usage_chunk.get("response_tokens"))
+                    ):
                         _usage.record_llm(
                             usage_chunk.get("prompt_tokens", 0),
                             usage_chunk.get("response_tokens", 0),
@@ -4537,7 +4833,7 @@ def orth_breakdowns():
                         le_db.session.commit()
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
-        yield "data: {\"done\": true}\n\n"
+        yield 'data: {"done": true}\n\n'
 
     return Response(
         stream_with_context(generate()),
@@ -4553,6 +4849,7 @@ def orth_breakdowns():
 _UNKNOWN_PHON_LOG = _os.path.join(_os.path.dirname(__file__), "unknown_phon_marks.json")
 _unknown_phon_lock = __import__("threading").Lock()
 
+
 @app.route("/api/log_unknown_phon_mark", methods=["POST"])
 def log_unknown_phon_mark():
     data = request.get_json(silent=True) or {}
@@ -4563,6 +4860,7 @@ def log_unknown_phon_mark():
     with _unknown_phon_lock:
         try:
             import json as _json
+
             if _os.path.exists(_UNKNOWN_PHON_LOG):
                 with open(_UNKNOWN_PHON_LOG, "r", encoding="utf-8") as f:
                     log = _json.load(f)
@@ -4570,19 +4868,22 @@ def log_unknown_phon_mark():
                 log = []
             # Deduplicate: skip if this (char, lang) pair already logged
             key = f"{lang}|{char}"
-            existing_keys = {f"{e.get('lang','')}|{e.get('char','')}" for e in log}
+            existing_keys = {f"{e.get('lang', '')}|{e.get('char', '')}" for e in log}
             if key not in existing_keys:
                 import unicodedata as _ud
+
                 try:
                     name = _ud.name(char, "")
                 except Exception:
                     name = ""
-                log.append({
-                    "char": char,
-                    "codepoint": "U+" + format(ord(char), "04X") if len(char) == 1 else "",
-                    "name": name,
-                    "lang": lang,
-                })
+                log.append(
+                    {
+                        "char": char,
+                        "codepoint": "U+" + format(ord(char), "04X") if len(char) == 1 else "",
+                        "name": name,
+                        "lang": lang,
+                    }
+                )
                 with open(_UNKNOWN_PHON_LOG, "w", encoding="utf-8") as f:
                     _json.dump(log, f, ensure_ascii=False, indent=2)
         except Exception:
@@ -4594,6 +4895,7 @@ def log_unknown_phon_mark():
 # Gemini/community entry editing & vote-based deletion
 # ---------------------------------------------------------------------------
 
+
 @app.route("/api/gemini_entry/get", methods=["GET"])
 def gemini_entry_get():
     """Get a single SQLite-backed custom entry."""
@@ -4604,7 +4906,9 @@ def gemini_entry_get():
     entry_row_id = request.args.get("entry_row_id") or 0
     headword = (request.args.get("headword") or "").strip()
     language = (request.args.get("language") or "").strip()
-    entry = _get_custom_dict_entry(entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword)
+    entry = _get_custom_dict_entry(
+        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+    )
     if not entry:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
     return jsonify({"ok": True, "entry": _custom_entry_to_response(entry)})
@@ -4622,7 +4926,9 @@ def gemini_entry_update():
     entry_row_id = data.get("entry_row_id") or 0
     headword = (data.get("headword") or "").strip()
     language = (data.get("language") or "").strip()
-    entry = _get_custom_dict_entry(entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword)
+    entry = _get_custom_dict_entry(
+        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+    )
     if not entry:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
 
@@ -4660,7 +4966,9 @@ def gemini_entry_update():
     if not updated:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
     updated_payload = _custom_entry_to_response(updated)
-    _invalidate_sqlite_segmenter_cache(entry.language, _collect_lookup_texts_for_entry(updated_payload))
+    _invalidate_sqlite_segmenter_cache(
+        entry.language, _collect_lookup_texts_for_entry(updated_payload)
+    )
     return jsonify({"ok": True, "entry": updated_payload})
 
 
@@ -4674,7 +4982,9 @@ def gemini_entry_vote_delete():
     entry_row_id = data.get("entry_row_id") or 0
     headword = (data.get("headword") or "").strip()
     language = (data.get("language") or "").strip()
-    entry = _get_custom_dict_entry(entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword)
+    entry = _get_custom_dict_entry(
+        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+    )
     if not entry:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
 
@@ -4694,7 +5004,9 @@ def gemini_entry_delete():
     entry_row_id = data.get("entry_row_id") or 0
     headword = (data.get("headword") or "").strip()
     language = (data.get("language") or "").strip()
-    entry = _get_custom_dict_entry(entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword)
+    entry = _get_custom_dict_entry(
+        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+    )
     if not entry:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
 
@@ -4714,23 +5026,28 @@ def gemini_entry_deletion_votes():
     entry_row_id = request.args.get("entry_row_id") or 0
     headword = (request.args.get("headword") or "").strip()
     language = (request.args.get("language") or "").strip()
-    entry = _get_custom_dict_entry(entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword)
-    return jsonify({
-        "ok": True,
-        "deprecated": True,
-        "entry_id": entry.entry_id if entry else "",
-        "can_delete_directly": True,
-        "votes": 0,
-        "user_voted": False,
-        "reason": "",
-        "is_owner": False,
-        "owner_source": entry.source if entry else "",
-    })
+    entry = _get_custom_dict_entry(
+        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+    )
+    return jsonify(
+        {
+            "ok": True,
+            "deprecated": True,
+            "entry_id": entry.entry_id if entry else "",
+            "can_delete_directly": True,
+            "votes": 0,
+            "user_voted": False,
+            "reason": "",
+            "is_owner": False,
+            "owner_source": entry.source if entry else "",
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
 # User annotations
 # ---------------------------------------------------------------------------
+
 
 @app.route("/api/entry_note/get", methods=["GET"])
 def entry_note_get():
@@ -4831,7 +5148,9 @@ def entry_note_generate():
     entry_row_id = data.get("entry_row_id")
     headword = (data.get("headword") or "").strip()
     pos = (data.get("pos") or "").strip()
-    sentence_tokens = data.get("sentence_tokens") if isinstance(data.get("sentence_tokens"), list) else None
+    sentence_tokens = (
+        data.get("sentence_tokens") if isinstance(data.get("sentence_tokens"), list) else None
+    )
     fills = data.get("fills") if isinstance(data.get("fills"), list) else None
 
     if not lang or not db_alias or not entry_row_id or not headword:
@@ -4850,8 +5169,12 @@ def entry_note_generate():
 
     model = TIER_CAPS.get(current_user.tier, {}).get("gemini_model", "")
     result = generate_entry_note(
-        lang, db_alias, entry_row_id, headword,
-        pos=pos, model=model,
+        lang,
+        db_alias,
+        entry_row_id,
+        headword,
+        pos=pos,
+        model=model,
         sentence_tokens=sentence_tokens,
         fills=fills,
     )
@@ -4892,6 +5215,7 @@ def entry_note_generate():
 # Entry morpheme decompositions — Leipzig-style breakdowns
 # ---------------------------------------------------------------------------
 
+
 @app.route("/api/entry_decomp/batch", methods=["POST"])
 def entry_decomp_batch():
     """Fetch decomps for many surface forms at once.
@@ -4913,7 +5237,7 @@ def entry_decomp_batch():
     out = {}
     # SQLite parameter limit is ~999; chunk to be safe.
     for i in range(0, len(surfaces), 500):
-        chunk = surfaces[i:i + 500]
+        chunk = surfaces[i : i + 500]
         rows = EntryDecomp.query.filter(
             EntryDecomp.language == lang,
             EntryDecomp.surface_form.in_(chunk),
@@ -5029,8 +5353,12 @@ def entry_decomp_generate():
 
     model = TIER_CAPS.get(current_user.tier, {}).get("gemini_model", "")
     result = generate_entry_decomp(
-        lang, "", 0, headword,
-        pos=pos, model=model,
+        lang,
+        "",
+        0,
+        headword,
+        pos=pos,
+        model=model,
         glosses=glosses or None,
         trankit=trankit,
     )
@@ -5066,6 +5394,7 @@ def entry_decomp_generate():
 # User sharing preferences
 # ---------------------------------------------------------------------------
 
+
 @app.route("/api/user/preferences", methods=["GET", "POST"])
 def user_preferences():
     """Legacy sharing-preferences endpoint. Content no longer has account ownership."""
@@ -5083,7 +5412,6 @@ def lang_config_endpoint():
     if not config:
         return jsonify({"ok": False, "error": f"No config for language: {lang}"}), 404
     return jsonify({"ok": True, "config": config})
-
 
 
 # ---------------------------------------------------------------------------
@@ -5135,7 +5463,9 @@ def _resolve_dict_tsv_path(lang_code: str, source: str = "") -> Path | None:
     return tsv_path
 
 
-def _dict_gzip_cache_paths(tsv_path: Path, lang_code: str, source: str, version: str) -> tuple[Path, Path]:
+def _dict_gzip_cache_paths(
+    tsv_path: Path, lang_code: str, source: str, version: str
+) -> tuple[Path, Path]:
     src_path = str(tsv_path.resolve())
     raw_key = f"{lang_code}|{source}|{src_path}|{version}"
     digest = hashlib.sha1(raw_key.encode("utf-8")).hexdigest()[:20]
@@ -5198,11 +5528,16 @@ def _ensure_cached_gzip_tsv(lang_code: str, source: str = "") -> tuple[Path | No
                     break
                 gz_fh.write(chunk)
         gz_size = tmp_gz_path.stat().st_size
-        tmp_meta_path.write_text(json.dumps({
-            "version": version,
-            "source_path": str(tsv_path.resolve()),
-            "gz_size": gz_size,
-        }), encoding="utf-8")
+        tmp_meta_path.write_text(
+            json.dumps(
+                {
+                    "version": version,
+                    "source_path": str(tsv_path.resolve()),
+                    "gz_size": gz_size,
+                }
+            ),
+            encoding="utf-8",
+        )
         tmp_gz_path.replace(gz_path)
         tmp_meta_path.replace(meta_path)
         _log_gzip_event(
@@ -5218,7 +5553,11 @@ def _ensure_cached_gzip_tsv(lang_code: str, source: str = "") -> tuple[Path | No
             reason=(
                 "missing_cache"
                 if not existing_meta
-                else ("version_changed" if existing_meta.get("version") != version else "metadata_mismatch")
+                else (
+                    "version_changed"
+                    if existing_meta.get("version") != version
+                    else "metadata_mismatch"
+                )
             ),
             duration_ms=round((time.perf_counter() - started) * 1000, 2),
         )
@@ -5252,46 +5591,6 @@ def _build_gzip_response(gz_path: Path, filename: str) -> Response:
     )
 
 
-def _iter_runtime_gzip_targets():
-    seen: set[tuple[str, str]] = set()
-    for code, info in LANGUAGE_REGISTRY.items():
-        key = (code, "")
-        if key not in seen:
-            seen.add(key)
-            yield key
-        for source in (info.get("dict_sources") or {}).keys():
-            key = (code, str(source or "").strip())
-            if key in seen:
-                continue
-            seen.add(key)
-            yield key
-
-
-def _prebuild_runtime_gzip_cache() -> None:
-    """Build runtime .gz dictionary payloads outside the source TSVs."""
-    started = time.perf_counter()
-    _log_gzip_event("runtime_cache_prebuild_started", kind="system")
-    built = 0
-    failed = 0
-    for code, source in _iter_runtime_gzip_targets():
-        try:
-            gz_path, _version = _ensure_cached_gzip_tsv(code, source=source)
-            if gz_path:
-                built += 1
-        except Exception as exc:
-            failed += 1
-            label = f"{code}:{source}" if source else code
-            print(f"[WARN] Runtime gzip cache build failed for {label}: {type(exc).__name__}: {exc}")
-    print(f"[INFO] Runtime gzip cache ready: {built} target(s), {failed} failure(s)")
-    _log_gzip_event(
-        "runtime_cache_prebuild_finished",
-        kind="system",
-        built=built,
-        failed=failed,
-        duration_ms=round((time.perf_counter() - started) * 1000, 2),
-    )
-
-
 @app.route("/api/dict/<lang_code>")
 def serve_dict(lang_code):
     """Serve a gzipped TSV dictionary for client-side storage.
@@ -5317,36 +5616,6 @@ def serve_dict(lang_code):
     return _build_gzip_response(gz_path, fn)
 
 
-def _gemini_rows_for_headwords(lang: str, headwords: set[str]) -> list[dict]:
-    """Query CustomDictEntry for matching headwords and return TSV-shaped dicts."""
-    from db import CustomDictEntry, db as _db
-    if not headwords:
-        return []
-    # Query in chunks to avoid SQLite param limits
-    hw_list = list(headwords)
-    rows = []
-    CHUNK = 900
-    for i in range(0, len(hw_list), CHUNK):
-        chunk = hw_list[i:i + CHUNK]
-        entries = CustomDictEntry.query.filter(
-            CustomDictEntry.language == lang,
-            CustomDictEntry.headword.in_(chunk),
-        ).all()
-        for e in entries:
-            rows.append({
-                "headword": e.headword,
-                "romanization": e.romanization or "",
-                "pos": e.pos or "",
-                "glosses": e.glosses_json or "[]",
-                "forms": e.forms_json or "[]",
-                "commentary": e.commentary or "",
-                "lemma": e.lemma or "",
-                "source": e.source or "gemini",
-                "entry_id": e.entry_id or "",
-            })
-    return rows
-
-
 # ============================================================================
 # DEFUNCT DO NOT TOUCH
 # DEFUNCT DO NOT TOUCH
@@ -5357,25 +5626,6 @@ def _gemini_rows_for_headwords(lang: str, headwords: set[str]) -> list[dict]:
 # Keep this only for old callers, debugging, or rollback archaeology.
 # Do not append new lookup behavior here.
 # ============================================================================
-@app.route("/api/lookup_batch", methods=["POST"])
-def lookup_batch():
-    """Batch dictionary lookup via SQLite backend.
-
-    Expects JSON: {lang, source?, tokens: [{surface, lemma}, ...]}
-    Returns: {ok, rows: [...tsv-shaped dicts...], entry_count, query_ms}
-    """
-    import dict_lookup_sqlite
-    data = request.get_json(silent=True) or {}
-    lang = resolve_lang_code(data.get("lang", "")) or data.get("lang", "")
-    source = (data.get("source") or "").strip()
-    tokens = data.get("tokens") or []
-    if not lang:
-        return jsonify({"ok": False, "error": "missing lang"}), 400
-    sources = data.get("sources") or []  # list of source keys e.g. ["wiktionary", "jmdict"]
-    if not dict_lookup_sqlite.is_available(lang, source):
-        return jsonify({"ok": False, "error": f"No SQLite dict for {lang}"}), 404
-    result = dict_lookup_sqlite.batch_lookup(lang, tokens, source=source, sources=sources or None)
-    return jsonify(result)
 
 
 # ============================================================================
@@ -5388,25 +5638,6 @@ def lookup_batch():
 # Keep this only for old callers, debugging, or rollback archaeology.
 # Do not append new lookup behavior here.
 # ============================================================================
-@app.route("/api/lookup_single", methods=["GET"])
-def lookup_single():
-    """Single-word SQLite dictionary lookup for search bar / subsegments.
-
-    Params: ?q=word&lang=xx&source=yy
-    Returns: {ok, rows: [...tsv-shaped dicts...], entry_count, query_ms}
-    """
-    import dict_lookup_sqlite
-    q = (request.args.get("q") or "").strip()
-    lang = resolve_lang_code(request.args.get("lang", "")) or request.args.get("lang", "")
-    source = (request.args.get("source") or "").strip()
-    if not q or not lang:
-        return jsonify({"ok": False, "error": "missing q or lang"}), 400
-    sources_param = request.args.get("sources", "")
-    sources = [s.strip() for s in sources_param.split(",") if s.strip()] if sources_param else []
-    if not dict_lookup_sqlite.is_available(lang, source):
-        return jsonify({"ok": False, "error": f"No SQLite dict for {lang}"}), 404
-    result = dict_lookup_sqlite.single_lookup(lang, q, source=source, sources=sources or None)
-    return jsonify(result)
 
 
 def _registered_dict_source_items(lang_code: str) -> list[dict[str, str]]:
@@ -5480,9 +5711,7 @@ def list_languages():
         # Include dict_sources if the language has alternative dictionaries
         ds = info.get("dict_sources")
         if ds:
-            entry["dict_sources"] = {
-                k: {"label": v["label"]} for k, v in ds.items()
-            }
+            entry["dict_sources"] = {k: {"label": v["label"]} for k, v in ds.items()}
         default_source = info.get("default_dict_source")
         if default_source:
             entry["default_dict_source"] = str(default_source)
@@ -5521,6 +5750,7 @@ def _js_index_artifact_name(lang_code: str, source: str, version: str) -> str:
 def _js_index_cache_schema_version(cache_path: Path) -> int:
     try:
         import gzip as _gz
+
         raw = json.loads(_gz.decompress(cache_path.read_bytes()).decode("utf-8"))
         return int(raw.get("v") or 0)
     except Exception:
@@ -5537,17 +5767,23 @@ def _js_index_cache_is_fresh(
     """Return True if cache matches schema and is newer than all source .sqlite files."""
     if not cache_path.exists():
         return False
-    if expected_schema_version and _js_index_cache_schema_version(cache_path) != int(expected_schema_version):
+    if expected_schema_version and _js_index_cache_schema_version(cache_path) != int(
+        expected_schema_version
+    ):
         return False
     cache_mtime = cache_path.stat().st_mtime
     from dict_lookup_sqlite import APP_DB_PATH
+
     for p in db_paths:
         if p.stat().st_mtime > cache_mtime:
             return False
-    if include_custom_entries and APP_DB_PATH.exists() and APP_DB_PATH.stat().st_mtime > cache_mtime:
+    if (
+        include_custom_entries
+        and APP_DB_PATH.exists()
+        and APP_DB_PATH.stat().st_mtime > cache_mtime
+    ):
         return False
     return True
-
 
 
 @app.route("/js/hydrate", methods=["POST"])
@@ -5600,10 +5836,13 @@ def js_hydrate():
         # SQLITE_DIR / f"{alias}.sqlite".
         if storage_kind != "custom" and db_alias and db_alias != "customdb":
             if db_alias not in allowed_sqlite_aliases:
-                return jsonify({"ok": False, "error": f"Unsupported dictionary source: {db_alias}"}), 400
+                return jsonify(
+                    {"ok": False, "error": f"Unsupported dictionary source: {db_alias}"}
+                ), 400
             sqlite_stems.add(db_alias)
 
     from dict_lookup_sqlite import SQLITE_DIR as _SQLITE_DIR
+
     db_paths: list[Any] | None = None
     if sqlite_stems:
         resolved_paths = [_SQLITE_DIR / f"{stem}.sqlite" for stem in sqlite_stems]
@@ -5682,7 +5921,12 @@ def js_hydrate():
                 if pk:
                     ref_to_key[wire] = pk
 
-        response_payload = {"ok": True, "entry_store": entry_store, "ref_to_key": ref_to_key, "form_overlays": form_overlays}
+        response_payload = {
+            "ok": True,
+            "entry_store": entry_store,
+            "ref_to_key": ref_to_key,
+            "form_overlays": form_overlays,
+        }
         if enable_debug_trace:
             payload_artifact = store_debug_json_artifact(
                 debug_capture_id,
@@ -5736,7 +5980,9 @@ def js_dict_index(lang_code: str):
 
     source = request.args.get("source", "").strip().lower()
     if source and source not in ("custom",) and not _is_registered_dict_source(resolved, source):
-        return jsonify({"ok": False, "error": f"Unsupported dictionary source for {resolved}: {source}"}), 404
+        return jsonify(
+            {"ok": False, "error": f"Unsupported dictionary source for {resolved}: {source}"}
+        ), 404
 
     # Each index covers exactly one SQLite file — never bundle multiple dbs.
     if source and source not in ("custom",):
@@ -5778,6 +6024,7 @@ def js_dict_index(lang_code: str):
         index["version"] = version
         body_bytes = json.dumps(index, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         import gzip as _gz
+
         compressed = _gz.compress(body_bytes, compresslevel=6)
         try:
             cache_path.write_bytes(compressed)
@@ -5795,7 +6042,9 @@ def js_dict_index(lang_code: str):
 
     headers = {
         "Content-Type": "application/gzip",
-        "Cache-Control": "public, max-age=31536000, immutable" if is_versioned_request else "public, max-age=3600",
+        "Cache-Control": "public, max-age=31536000, immutable"
+        if is_versioned_request
+        else "public, max-age=3600",
     }
     if version:
         headers["ETag"] = f'"{version}"'
@@ -5847,6 +6096,7 @@ def _extract_version_from_gz(cache_path: Path) -> str:
     """Read version from a cached gzip index file without rebuilding."""
     try:
         import gzip as _gz
+
         raw = json.loads(_gz.decompress(cache_path.read_bytes()).decode("utf-8"))
         return str(raw.get("version") or "")
     except Exception:
@@ -5863,6 +6113,7 @@ def _prebuild_js_index_cache() -> None:
     import gzip as _gz
     import hashlib as _hashlib
     from dict_lookup_sqlite import build_compact_key_index, _resolve_db_path, _resolve_all_db_paths
+
     _JS_INDEX_CACHE_DIR.mkdir(parents=True, exist_ok=True)
     _JS_INDEX_ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     _js_index_versions.clear()
@@ -5878,7 +6129,7 @@ def _prebuild_js_index_cache() -> None:
 
         for source in db_sources:
             ver_key = f"{code}:{source}" if source else code
-            label   = ver_key
+            label = ver_key
             try:
                 if source:
                     db_path = _resolve_db_path(code, source)
@@ -5906,15 +6157,21 @@ def _prebuild_js_index_cache() -> None:
                     version = _extract_version_from_gz(cache_path)
                     skipped += 1
                 else:
-                    index = build_compact_key_index(code, db_paths=db_paths, include_custom_entries=False)
+                    index = build_compact_key_index(
+                        code, db_paths=db_paths, include_custom_entries=False
+                    )
                     index["v"] = _JS_INDEX_SCHEMA_VERSION
                     index["lang"] = code
                     if source:
                         index["source"] = source
-                    body_bytes = json.dumps(index, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                    body_bytes = json.dumps(
+                        index, ensure_ascii=False, separators=(",", ":")
+                    ).encode("utf-8")
                     version = _hashlib.sha1(body_bytes).hexdigest()[:16]
                     index["version"] = version
-                    body_bytes = json.dumps(index, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                    body_bytes = json.dumps(
+                        index, ensure_ascii=False, separators=(",", ":")
+                    ).encode("utf-8")
                     compressed = _gz.compress(body_bytes, compresslevel=6)
                     cache_path.write_bytes(compressed)
                     built += 1

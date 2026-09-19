@@ -35,8 +35,8 @@ gunicorn wsgi:app --bind 127.0.0.1:5000 --workers 1 --threads 4 --timeout 300
 
 ## Preparation and validation
 
-`convert_tsv_to_sqlite.py` contains the dictionary importer. `training/` contains corpus conversion, model training, evaluation, and upstream-patch infrastructure. The ONNX builders require their training resources plus ONNX tooling; the runtime requirements alone do not provide every research dependency.
+`tools/dictionaries/convert_tsv_to_sqlite.py` contains the dictionary importer. Run it from the repository root as `python -m tools.dictionaries.convert_tsv_to_sqlite <language>` after providing the configured input TSV. `training/` contains corpus conversion, model training, evaluation, and upstream-patch infrastructure. The ONNX builders require their training resources plus ONNX tooling; the runtime requirements alone do not provide every research dependency.
 
-The runtime is verified through the application's diagnostics. The source-only export is checked for Python syntax, JavaScript syntax, dependency/resource references, and sensitive artifacts. Full NLP and billing integration checks require external resources and independently configured test services.
+Run the model-free regression with `python -m tests.test_mwt_realign_dp`. For the same authored-code checks as CI, install `ruff==0.16.8`, then run `ruff check .` and `ruff format --check .`. The linter selects undefined names and invalid exports; it is not a full security audit.
 
-Production account records, model weights, and dictionary data are not available from this repository. No automatic download of private resources is provided.
+Full NLP, document, authentication, and billing integration checks require external resources and independently configured test services. No account records, model weights, or dictionary data are bundled.

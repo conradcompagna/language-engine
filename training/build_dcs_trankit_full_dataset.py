@@ -33,8 +33,7 @@ def ordered_chapter_paths() -> List[str]:
             if rel:
                 xml_paths.append(rel)
     existing = {
-        str(path.relative_to(FILES_DIR)).replace("\\", "/")
-        for path in FILES_DIR.rglob("*.conllu")
+        str(path.relative_to(FILES_DIR)).replace("\\", "/") for path in FILES_DIR.rglob("*.conllu")
     }
     ordered = [rel for rel in xml_paths if rel in existing]
     missing = sorted(existing - set(ordered))

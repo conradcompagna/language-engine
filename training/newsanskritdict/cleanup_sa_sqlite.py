@@ -37,6 +37,7 @@ def backup(db_path: Path) -> Path:
     ts = time.strftime("%Y%m%d_%H%M%S")
     bak = db_path.with_suffix(f".sqlite.bak_before_cleanup_{ts}")
     import shutil
+
     shutil.copy2(db_path, bak)
     log(f"backup -> {bak}")
     return bak
@@ -68,9 +69,7 @@ def main():
     # --------------------------------------------------------------
     t0 = time.time()
     # Helpful temporary index for the correlated subqueries
-    cur.execute(
-        "CREATE INDEX IF NOT EXISTS tmp_forms_ef ON forms(entry_id, form_text, morph_tags)"
-    )
+    cur.execute("CREATE INDEX IF NOT EXISTS tmp_forms_ef ON forms(entry_id, form_text, morph_tags)")
     conn.commit()
 
     # 1a) morph_tags == 'sandhied' and a plain ('' tags) row exists
@@ -107,8 +106,10 @@ def main():
     deleted_1b = cur.rowcount
     conn.commit()
 
-    log(f"step 1 sandhied-dup deletes: {deleted_1a:,} exact + {deleted_1b:,} suffix "
-        f"({time.time()-t0:.1f}s)")
+    log(
+        f"step 1 sandhied-dup deletes: {deleted_1a:,} exact + {deleted_1b:,} suffix "
+        f"({time.time() - t0:.1f}s)"
+    )
 
     # --------------------------------------------------------------
     # Step 2: empty rows
@@ -124,7 +125,7 @@ def main():
     )
     deleted_2 = cur.rowcount
     conn.commit()
-    log(f"step 2 empty-row deletes: {deleted_2:,} ({time.time()-t0:.1f}s)")
+    log(f"step 2 empty-row deletes: {deleted_2:,} ({time.time() - t0:.1f}s)")
 
     # --------------------------------------------------------------
     # Step 3: character-overlap filter vs headword
@@ -151,18 +152,20 @@ def main():
         if not (ft_set & hw_set):
             to_delete.append(fid)
 
-    log(f"step 3 scan: {total_scanned:,} rows, flagged {len(to_delete):,} for deletion "
-        f"({time.time()-t0:.1f}s)")
+    log(
+        f"step 3 scan: {total_scanned:,} rows, flagged {len(to_delete):,} for deletion "
+        f"({time.time() - t0:.1f}s)"
+    )
 
     # Batch delete by rowid
     t0 = time.time()
     del_cur = conn.cursor()
     for i in range(0, len(to_delete), CHUNK):
-        chunk = to_delete[i:i + CHUNK]
+        chunk = to_delete[i : i + CHUNK]
         placeholders = ",".join("?" * len(chunk))
         del_cur.execute(f"DELETE FROM forms WHERE id IN ({placeholders})", chunk)
     conn.commit()
-    log(f"step 3 char-overlap deletes: {len(to_delete):,} ({time.time()-t0:.1f}s)")
+    log(f"step 3 char-overlap deletes: {len(to_delete):,} ({time.time() - t0:.1f}s)")
 
     # --------------------------------------------------------------
     # Cleanup: drop tmp index, ANALYZE, VACUUM

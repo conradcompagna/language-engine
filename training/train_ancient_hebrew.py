@@ -16,16 +16,16 @@ SAVE = HERE / "trankit_save_hbo_ptnk_v1"
 CATEGORY = "customized-mwt"
 
 TRAIN_CONLLU = str(DATA / "hbo-train.conllu")
-DEV_CONLLU   = str(DATA / "hbo-dev.conllu")
-TRAIN_TXT    = str(DATA / "hbo-train.txt")
-DEV_TXT      = str(DATA / "hbo-dev.txt")
-SAVE_DIR     = str(SAVE)
+DEV_CONLLU = str(DATA / "hbo-dev.conllu")
+TRAIN_TXT = str(DATA / "hbo-train.txt")
+DEV_TXT = str(DATA / "hbo-dev.txt")
+SAVE_DIR = str(SAVE)
 
 COMMON = {
     "category": CATEGORY,
     "save_dir": SAVE_DIR,
     "train_conllu_fpath": TRAIN_CONLLU,
-    "dev_conllu_fpath":   DEV_CONLLU,
+    "dev_conllu_fpath": DEV_CONLLU,
 }
 
 TASKS = [
@@ -33,7 +33,7 @@ TASKS = [
         **COMMON,
         "task": "tokenize",
         "train_txt_fpath": TRAIN_TXT,
-        "dev_txt_fpath":   DEV_TXT,
+        "dev_txt_fpath": DEV_TXT,
     },
     {**COMMON, "task": "mwt"},
     {**COMMON, "task": "posdep"},
@@ -43,9 +43,9 @@ TASKS = [
 
 def main():
     for cfg in TASKS:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Training task: {cfg['task']}")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         trainer = trankit.TPipeline(training_config=cfg)
         trainer.train()
 

@@ -24,7 +24,7 @@ training_config = {
     "category": "tagalog-v2",
     "task": "mwt",
     "train_conllu_fpath": str(HERE / "tgl-train.conllu"),
-    "dev_conllu_fpath":   str(HERE / "tgl-dev.conllu"),
+    "dev_conllu_fpath": str(HERE / "tgl-dev.conllu"),
     "save_dir": str(SAVE_DIR),
     "embedding": "xlm-roberta-base",
     "max_epoch": 50,

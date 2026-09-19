@@ -17,7 +17,7 @@ OUT.mkdir(exist_ok=True)
 
 SPLITS = {
     "train": RARELANGS / "hbo_ptnk-ud-train.conllu",
-    "dev":   RARELANGS / "hbo_ptnk-ud-dev.conllu",
+    "dev": RARELANGS / "hbo_ptnk-ud-dev.conllu",
 }
 
 
@@ -86,12 +86,10 @@ def surface_text_from_block(token_lines):
 
 def write_split(split_name: str, src: Path):
     out_conllu = OUT / f"hbo-{split_name}.conllu"
-    out_txt    = OUT / f"hbo-{split_name}.txt"
+    out_txt = OUT / f"hbo-{split_name}.txt"
 
     sentences_written = 0
-    with out_conllu.open("w", encoding="utf-8") as fc, \
-         out_txt.open("w", encoding="utf-8") as ft:
-
+    with out_conllu.open("w", encoding="utf-8") as fc, out_txt.open("w", encoding="utf-8") as ft:
         for comments, tokens in sentence_blocks(src):
             # Write full CoNLL-U block (unchanged)
             for c in comments:

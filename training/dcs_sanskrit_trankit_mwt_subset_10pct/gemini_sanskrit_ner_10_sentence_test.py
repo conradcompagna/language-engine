@@ -22,10 +22,7 @@ INPUT_FILE = (
     / "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio"
 )
 OUT_DIR = (
-    ROOT
-    / "training"
-    / "dcs_sanskrit_trankit_mwt_subset_10pct"
-    / "gemini_ner_test_10_sentences"
+    ROOT / "training" / "dcs_sanskrit_trankit_mwt_subset_10pct" / "gemini_ner_test_10_sentences"
 )
 MODEL = "gemini-2.5-flash-lite"
 
@@ -276,8 +273,7 @@ def main() -> None:
     system_prompt, user_prompt = build_prompts(sentences)
 
     (OUT_DIR / "input_10_sentences.bio").write_text(
-        "\n\n".join("\n".join(f"{token} O" for token in sentence) for sentence in sentences)
-        + "\n",
+        "\n\n".join("\n".join(f"{token} O" for token in sentence) for sentence in sentences) + "\n",
         encoding="utf-8",
     )
     (OUT_DIR / "system_prompt.txt").write_text(system_prompt, encoding="utf-8")

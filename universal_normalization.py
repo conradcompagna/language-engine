@@ -1,4 +1,4 @@
-﻿"""
+"""
 Universal Unicode normalization + language-profile filtering bridge.
 
 Design goal for remapping:
@@ -22,9 +22,9 @@ DEFAULT_NORMALIZATION_FORM = "NFKC"
 # Arabic diacritical marks (tashkeel, maddah, superscript alef, Quranic marks).
 # Same ranges as ARABIC_STRIP_MARKS_RE in dictionary_normalization_layer.js.
 _ARABIC_DIACRITICS_RE = re.compile(
-    "[\u0610-\u061A\u0640\u064B-\u065F\u0670"
-    "\u06D6-\u06DC\u06DF-\u06E4\u06E7-\u06E8"
-    "\u06EA-\u06ED\u08CA-\u08E1\u08E3-\u08FF]"
+    "[\u0610-\u061a\u0640\u064b-\u065f\u0670"
+    "\u06d6-\u06dc\u06df-\u06e4\u06e7-\u06e8"
+    "\u06ea-\u06ed\u08ca-\u08e1\u08e3-\u08ff]"
 )
 
 _FORCED_STRIP_PUNCTUATION_LANGS = frozenset()
@@ -38,53 +38,122 @@ _FORCED_STRIP_PUNCTUATION_LANGS = frozenset()
 # ---------------------------------------------------------------------------
 
 _DEVA_VOWELS = {
-    "अ": "a", "आ": "ā", "इ": "i", "ई": "ī", "उ": "u", "ऊ": "ū",
-    "ऋ": "ṛ", "ॠ": "ṝ", "ऌ": "ḷ", "ॡ": "ḹ",
-    "ऎ": "e", "ए": "e", "ऐ": "ai", "ऒ": "o", "ओ": "o", "औ": "au",
-    "ऍ": "e", "ऑ": "o",
+    "अ": "a",
+    "आ": "ā",
+    "इ": "i",
+    "ई": "ī",
+    "उ": "u",
+    "ऊ": "ū",
+    "ऋ": "ṛ",
+    "ॠ": "ṝ",
+    "ऌ": "ḷ",
+    "ॡ": "ḹ",
+    "ऎ": "e",
+    "ए": "e",
+    "ऐ": "ai",
+    "ऒ": "o",
+    "ओ": "o",
+    "औ": "au",
+    "ऍ": "e",
+    "ऑ": "o",
 }
 
 _DEVA_VOWEL_SIGNS = {
-    "ा": "ā", "ि": "i", "ी": "ī", "ु": "u", "ू": "ū",
-    "ृ": "ṛ", "ॄ": "ṝ", "ॢ": "ḷ", "ॣ": "ḹ",
-    "ॆ": "e", "े": "e", "ै": "ai", "ॊ": "o", "ो": "o", "ौ": "au",
-    "ॅ": "e", "ॉ": "o",
+    "ा": "ā",
+    "ि": "i",
+    "ी": "ī",
+    "ु": "u",
+    "ू": "ū",
+    "ृ": "ṛ",
+    "ॄ": "ṝ",
+    "ॢ": "ḷ",
+    "ॣ": "ḹ",
+    "ॆ": "e",
+    "े": "e",
+    "ै": "ai",
+    "ॊ": "o",
+    "ो": "o",
+    "ौ": "au",
+    "ॅ": "e",
+    "ॉ": "o",
 }
 
 _DEVA_CONSONANTS = {
-    "क": "k", "ख": "kh", "ग": "g", "घ": "gh", "ङ": "ṅ",
-    "च": "c", "छ": "ch", "ज": "j", "झ": "jh", "ञ": "ñ",
-    "ट": "ṭ", "ठ": "ṭh", "ड": "ḍ", "ढ": "ḍh", "ण": "ṇ",
-    "त": "t", "थ": "th", "द": "d", "ध": "dh", "न": "n",
-    "प": "p", "फ": "ph", "ब": "b", "भ": "bh", "म": "m",
-    "य": "y", "र": "r", "ल": "l", "व": "v",
-    "श": "ś", "ष": "ṣ", "स": "s", "ह": "h",
+    "क": "k",
+    "ख": "kh",
+    "ग": "g",
+    "घ": "gh",
+    "ङ": "ṅ",
+    "च": "c",
+    "छ": "ch",
+    "ज": "j",
+    "झ": "jh",
+    "ञ": "ñ",
+    "ट": "ṭ",
+    "ठ": "ṭh",
+    "ड": "ḍ",
+    "ढ": "ḍh",
+    "ण": "ṇ",
+    "त": "t",
+    "थ": "th",
+    "द": "d",
+    "ध": "dh",
+    "न": "n",
+    "प": "p",
+    "फ": "ph",
+    "ब": "b",
+    "भ": "bh",
+    "म": "m",
+    "य": "y",
+    "र": "r",
+    "ल": "l",
+    "व": "v",
+    "श": "ś",
+    "ष": "ṣ",
+    "स": "s",
+    "ह": "h",
     "ळ": "ḷ",
     # Precomposed nukta consonants (fold to base for Sanskrit lookup)
-    "क़": "k", "ख़": "kh", "ग़": "g", "ज़": "j",
-    "ड़": "ḍ", "ढ़": "ḍh", "फ़": "ph", "य़": "y",
+    "क़": "k",
+    "ख़": "kh",
+    "ग़": "g",
+    "ज़": "j",
+    "ड़": "ḍ",
+    "ढ़": "ḍh",
+    "फ़": "ph",
+    "य़": "y",
 }
 
 _DEVA_SIGNS = {
-    "ं": "ṃ", "ः": "ḥ", "ँ": "ṃ",
+    "ं": "ṃ",
+    "ः": "ḥ",
+    "ँ": "ṃ",
     "\u0901": "ṃ",
-    "\uA8F2": "ṃ", "\uA8F3": "ṃ",
+    "\ua8f2": "ṃ",
+    "\ua8f3": "ṃ",
     "ऽ": "'",
     "ॐ": "oṃ",
-    "०": "0", "१": "1", "२": "2", "३": "3", "४": "4",
-    "५": "5", "६": "6", "७": "7", "८": "8", "९": "9",
-    "।": "|", "॥": "||",
+    "०": "0",
+    "१": "1",
+    "२": "2",
+    "३": "3",
+    "४": "4",
+    "५": "5",
+    "६": "6",
+    "७": "7",
+    "८": "8",
+    "९": "9",
+    "।": "|",
+    "॥": "||",
     "॰": "",
 }
 
-_DEVA_VIRAMA = "\u094D"
-_DEVA_NUKTA = "\u093C"
+_DEVA_VIRAMA = "\u094d"
+_DEVA_NUKTA = "\u093c"
 
 # Vedic accents, cantillation, stress marks — strip before transliterating.
-_DEVA_STRIP_RE = re.compile(
-    "[\u0951-\u0954\u0971\u1CD0-\u1CFF\uA8E0-\uA8F1\uA8F4-\uA8FB]"
-)
-_DEVA_DETECT_RE = re.compile("[\u0900-\u097F\uA8E0-\uA8FF]")
+_DEVA_STRIP_RE = re.compile("[\u0951-\u0954\u0971\u1cd0-\u1cff\ua8e0-\ua8f1\ua8f4-\ua8fb]")
+_DEVA_DETECT_RE = re.compile("[\u0900-\u097f\ua8e0-\ua8ff]")
 
 
 def _devanagari_to_iast(text: str) -> str:
@@ -130,6 +199,7 @@ def _devanagari_to_iast(text: str) -> str:
 
 def _is_sanskrit_language_key(language_key: str) -> bool:
     return language_key == "sa"
+
 
 _LANGUAGE_ALIASES = {
     "zh": "zh",
@@ -178,8 +248,6 @@ _LANGUAGE_ALIASES = {
 }
 
 
-
-
 @dataclass(frozen=True)
 class PreprocessContext:
     """Context for model-space -> original-space remapping."""
@@ -205,7 +273,7 @@ def strip_non_bmp(text: str) -> str:
     Cuneiform, emoji, supplementary CJK, and other astral-plane characters
     are stripped so they never reach Trankit or dictionary pipelines.
     """
-    return ''.join(ch for ch in text if ord(ch) <= 0xFFFF)
+    return "".join(ch for ch in text if ord(ch) <= 0xFFFF)
 
 
 def preprocess_text_for_language(
@@ -232,7 +300,9 @@ def run_with_universal_normalization(
 
     Handler must accept text as first positional argument.
     """
-    context = build_preprocess_context(text, language, normalization_form, strip_punctuation=strip_punctuation)
+    context = build_preprocess_context(
+        text, language, normalization_form, strip_punctuation=strip_punctuation
+    )
 
     text_for_handler = context.model_text if context.changed else context.original_text
     response = handler(text_for_handler, *handler_args, **handler_kwargs)
@@ -294,7 +364,9 @@ def build_preprocess_context(
         true_original = normalized
         norm_to_orig = list(range(len(normalized)))
 
-    model_text, model_to_norm = filter_text_for_language(normalized, language_key, strip_punctuation=strip_punctuation)
+    model_text, model_to_norm = filter_text_for_language(
+        normalized, language_key, strip_punctuation=strip_punctuation
+    )
     model_to_orig: List[int] = []
     orig_len = len(true_original)
     for norm_i in model_to_norm:
@@ -303,7 +375,7 @@ def build_preprocess_context(
         else:
             model_to_orig.append(0 if orig_len == 0 else orig_len - 1)
 
-    changed = (model_text != true_original)
+    changed = model_text != true_original
     return PreprocessContext(
         original_text=true_original,
         normalized_text=normalized,
@@ -397,24 +469,20 @@ def remap_response_to_original(response: Any, context: PreprocessContext) -> Any
     # parent slice, not at the child glyphs.
     mwt_mismatch_seg_indices = _collect_mwt_mismatch_seg_indices(payload)
 
-    _remap_surface_anchors_in_place(
-        payload, context.model_to_orig, context.original_text
-    )
+    _remap_surface_anchors_in_place(payload, context.model_to_orig, context.original_text)
 
     # Always rebuild segment strings from original_text using the (possibly remapped)
     # offsets — Trankit normalizes whitespace internally (e.g. \n → space) regardless
     # of whether our own normalization pipeline changed anything.
     if isinstance(segments, list) and isinstance(segment_offsets, list):
         _rebuild_segments_from_offsets_in_place(
-            context.original_text, segment_offsets, segments,
+            context.original_text,
+            segment_offsets,
+            segments,
             skip_indices=mwt_mismatch_seg_indices,
         )
-        _sync_results_with_segments(
-            payload, segments, skip_indices=mwt_mismatch_seg_indices
-        )
-        _sync_ud_overlay_with_segments(
-            payload, segments, skip_indices=mwt_mismatch_seg_indices
-        )
+        _sync_results_with_segments(payload, segments, skip_indices=mwt_mismatch_seg_indices)
+        _sync_ud_overlay_with_segments(payload, segments, skip_indices=mwt_mismatch_seg_indices)
         if debug_enabled:
             remap_rows = _build_segment_remap_rows(
                 context.original_text,
@@ -558,9 +626,7 @@ def _remap_surface_anchors_in_place(
         norm = _normalize_offset_span(anchor.get("slice"))
         if norm is None:
             continue
-        mapped = _map_model_range_with_single_map(
-            norm[0], norm[1], model_to_orig, orig_len
-        )
+        mapped = _map_model_range_with_single_map(norm[0], norm[1], model_to_orig, orig_len)
         anchor["slice"] = mapped
         s = _clamp(mapped[0], 0, orig_len)
         e = _clamp(mapped[1], s, orig_len)
@@ -576,9 +642,7 @@ def _remap_segment_offsets_in_place(
         norm = _normalize_offset_span(span)
         if norm is None:
             continue
-        mapped = _map_model_range_with_single_map(
-            norm[0], norm[1], model_to_orig, original_len
-        )
+        mapped = _map_model_range_with_single_map(norm[0], norm[1], model_to_orig, original_len)
         if (
             not isinstance(span, list)
             or len(span) < 2
@@ -679,9 +743,7 @@ def _build_segment_remap_rows(
     for idx in range(total):
         model_offset = model_offsets_before[idx] if idx < len(model_offsets_before) else None
         remapped_offset = (
-            _normalize_offset_span(remapped_offsets[idx])
-            if idx < len(remapped_offsets)
-            else None
+            _normalize_offset_span(remapped_offsets[idx]) if idx < len(remapped_offsets) else None
         )
         model_segment = model_segments_before[idx] if idx < len(model_segments_before) else ""
         remapped_segment = remapped_segments[idx] if idx < len(remapped_segments) else ""
@@ -1001,8 +1063,6 @@ def _resolve_language_key(language: Optional[str]) -> str:
         return "generic"
     key = str(language).strip().lower()
     return _LANGUAGE_ALIASES.get(key, key)
-
-
 
 
 def _clamp(value: int, low: int, high: int) -> int:

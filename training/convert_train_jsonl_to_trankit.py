@@ -151,9 +151,28 @@ def normalize_candidate(raw: dict) -> Candidate:
 
 CASE_PREFIXES = ("nom.", "acc.", "ins.", "dat.", "abl.", "gen.", "loc.", "voc.")
 VERB_PREFIXES = (
-    "pr.", "ipf.", "impf.", "fut.", "pf.", "perf.", "aor.", "opt.", "impv.",
-    "ben.", "cond.", "inj.", "subj.", "pft.", "ppf.", "caus.", "desid.", "intens.",
-    "pfp.", "ger.", "inf.", "abs.",
+    "pr.",
+    "ipf.",
+    "impf.",
+    "fut.",
+    "pf.",
+    "perf.",
+    "aor.",
+    "opt.",
+    "impv.",
+    "ben.",
+    "cond.",
+    "inj.",
+    "subj.",
+    "pft.",
+    "ppf.",
+    "caus.",
+    "desid.",
+    "intens.",
+    "pfp.",
+    "ger.",
+    "inf.",
+    "abs.",
 )
 
 
@@ -183,7 +202,9 @@ def infer_upos(candidate: Candidate) -> str:
     return "X"
 
 
-def slot_score(candidate: Candidate, gold_lemma: str, gold_tag: str, slot_index: int) -> tuple[float, bool, bool]:
+def slot_score(
+    candidate: Candidate, gold_lemma: str, gold_tag: str, slot_index: int
+) -> tuple[float, bool, bool]:
     lemma_exact = candidate.lemma == gold_lemma
     tag_exact = candidate.cng == gold_tag
     lemma_soft = gold_lemma in candidate.lemma or candidate.lemma in gold_lemma
@@ -217,7 +238,9 @@ def beam_key(state: BeamState) -> tuple[float, int, int, int, int, int]:
     )
 
 
-def choose_chunk_candidates(candidates: list[Candidate], gold_lemmas: list[str], gold_tags: list[str]) -> ChunkSelection | None:
+def choose_chunk_candidates(
+    candidates: list[Candidate], gold_lemmas: list[str], gold_tags: list[str]
+) -> ChunkSelection | None:
     if not gold_lemmas:
         return None
 
@@ -228,9 +251,14 @@ def choose_chunk_candidates(candidates: list[Candidate], gold_lemmas: list[str],
     for slot_index, (gold_lemma, gold_tag) in enumerate(zip(gold_lemmas_lattice, gold_tags)):
         scored = []
         for candidate in candidates:
-            token_score, lemma_exact, tag_exact = slot_score(candidate, gold_lemma, gold_tag, slot_index)
+            token_score, lemma_exact, tag_exact = slot_score(
+                candidate, gold_lemma, gold_tag, slot_index
+            )
             scored.append((candidate, token_score, lemma_exact, tag_exact))
-        scored.sort(key=lambda item: (item[1], item[2], item[3], item[0].position >= 0, item[0].length), reverse=True)
+        scored.sort(
+            key=lambda item: (item[1], item[2], item[3], item[0].position >= 0, item[0].length),
+            reverse=True,
+        )
         slot_options.append(scored[:MAX_OPTIONS_PER_SLOT])
 
     beams = [
@@ -262,7 +290,9 @@ def choose_chunk_candidates(candidates: list[Candidate], gold_lemmas: list[str],
                         strong_count=state.strong_count + int(lemma_exact or tag_exact),
                         positive_count=state.positive_count + int(candidate.position >= 0),
                         last_positive_position=(
-                            candidate.position if candidate.position >= 0 else state.last_positive_position
+                            candidate.position
+                            if candidate.position >= 0
+                            else state.last_positive_position
                         ),
                         used_ids=state.used_ids | {candidate.cid},
                         chosen=state.chosen + (candidate,),
@@ -301,7 +331,9 @@ def build_example(record: dict) -> SentenceExample | None:
     upos: list[str] = []
     chunk_texts: list[str] = []
 
-    for chunk_index, (gold_lemmas, gold_tags) in enumerate(zip(record["lemmas"], record["morph_tags"]), start=1):
+    for chunk_index, (gold_lemmas, gold_tags) in enumerate(
+        zip(record["lemmas"], record["morph_tags"]), start=1
+    ):
         candidates = grouped_candidates.get(chunk_index)
         if not candidates:
             return None
@@ -349,7 +381,9 @@ def format_conllu_block(example: SentenceExample) -> str:
         f"# text = {example.synthetic_text}",
         f"# orig_text = {example.original_text}",
     ]
-    for index, (form, lemma, upos) in enumerate(zip(example.forms, example.lemmas, example.upos), start=1):
+    for index, (form, lemma, upos) in enumerate(
+        zip(example.forms, example.lemmas, example.upos), start=1
+    ):
         head = "0" if index == 1 else "1"
         deprel = "root" if index == 1 else "dep"
         lines.append(f"{index}\t{form}\t{lemma}\t{upos}\t_\t_\t{head}\t{deprel}\t_\t_")
@@ -373,7 +407,9 @@ def write_outputs(
 
     txt_path.write_text("\n\n".join(paragraphs) + ("\n" if paragraphs else ""), encoding="utf-8")
     conllu_blocks = [format_conllu_block(example) for example in examples]
-    conllu_path.write_text("\n\n".join(conllu_blocks) + ("\n\n" if conllu_blocks else ""), encoding="utf-8")
+    conllu_path.write_text(
+        "\n\n".join(conllu_blocks) + ("\n\n" if conllu_blocks else ""), encoding="utf-8"
+    )
     return txt_path, conllu_path
 
 
@@ -403,7 +439,9 @@ def build_datasets(
         else:
             train_examples.append(example)
 
-    train_txt, train_conllu = write_outputs(out_dir, prefix, "train", train_examples, paragraph_size)
+    train_txt, train_conllu = write_outputs(
+        out_dir, prefix, "train", train_examples, paragraph_size
+    )
     dev_txt, dev_conllu = write_outputs(out_dir, prefix, "dev", dev_examples, paragraph_size)
 
     stats = {

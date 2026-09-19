@@ -8,10 +8,12 @@ This teaches Trankit to learn sentence segmentation.
 Also rewrites CoNLL-U with sentences grouped by document, so the
 sentence order in .txt aligns with the CoNLL-U.
 """
+
 from pathlib import Path
 from collections import OrderedDict
 
 base = Path(r"C:\Users\conra\Desktop\universal\training")
+
 
 def parse_sentences(conllu_path):
     """Parse CoNLL-U into list of (filename, sent_id, text, raw_block)."""
@@ -29,16 +31,17 @@ def parse_sentences(conllu_path):
         else:
             current_lines.append(line)
             if line.startswith("# filename = "):
-                filename = line[len("# filename = "):]
+                filename = line[len("# filename = ") :]
             elif line.startswith("# sent_id = "):
-                sent_id = int(line[len("# sent_id = "):])
+                sent_id = int(line[len("# sent_id = ") :])
             elif line.startswith("# text = "):
-                text = line[len("# text = "):]
+                text = line[len("# text = ") :]
 
     if current_lines:
         sentences.append((filename, sent_id, text, "\n".join(current_lines)))
 
     return sentences
+
 
 def group_by_doc(sentences):
     """Group sentences by filename, preserving sent_id order within each doc."""
@@ -54,6 +57,7 @@ def group_by_doc(sentences):
         docs[key].sort(key=lambda x: x[0] if x[0] is not None else 0)
 
     return docs
+
 
 def process(conllu_in, conllu_out, txt_out):
     sentences = parse_sentences(conllu_in)
@@ -79,12 +83,14 @@ def process(conllu_in, conllu_out, txt_out):
     print(f"{conllu_in.name}: {len(sentences)} sentences, {len(docs)} documents")
     print(f"  -> {conllu_out.name}, {txt_out.name}")
 
+
 # Back up originals
 for name in ["th_tud-ud-train.conllu", "th_tud-ud-dev.conllu"]:
     src = base / name
     bak = base / (name + ".bak")
     if not bak.exists():
         import shutil
+
         shutil.copy2(src, bak)
         print(f"Backed up {name} -> {name}.bak")
 

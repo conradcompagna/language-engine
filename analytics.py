@@ -4,6 +4,7 @@ Local analytics counters for Language Engine.
 This module stores aggregate operational metrics in SQLite. It intentionally
 does not log raw IP addresses, user agents, request URLs, or per-request bodies.
 """
+
 from __future__ import annotations
 
 import datetime
@@ -156,15 +157,16 @@ def admin_summary(days: int = 30) -> dict[str, Any]:
     start = today - datetime.timedelta(days=days - 1)
 
     daily_rows = (
-        AnalyticsDaily.query
-        .filter(AnalyticsDaily.date >= start)
+        AnalyticsDaily.query.filter(AnalyticsDaily.date >= start)
         .order_by(AnalyticsDaily.date.asc())
         .all()
     )
     language_rows = (
-        AnalyticsLanguageDaily.query
-        .filter(AnalyticsLanguageDaily.date >= start)
-        .order_by(AnalyticsLanguageDaily.lookup_requests.desc(), AnalyticsLanguageDaily.lookup_tokens.desc())
+        AnalyticsLanguageDaily.query.filter(AnalyticsLanguageDaily.date >= start)
+        .order_by(
+            AnalyticsLanguageDaily.lookup_requests.desc(),
+            AnalyticsLanguageDaily.lookup_tokens.desc(),
+        )
         .all()
     )
     account_rows = (
@@ -178,7 +180,9 @@ def admin_summary(days: int = 30) -> dict[str, Any]:
     active_paid_statuses = ("active", "trialing")
     totals = {
         "accounts": User.query.count(),
-        "paid_subscriptions": Subscription.query.filter(Subscription.status.in_(active_paid_statuses)).count(),
+        "paid_subscriptions": Subscription.query.filter(
+            Subscription.status.in_(active_paid_statuses)
+        ).count(),
         "landing_visits": sum(_to_int(row.landing_visits) for row in daily_rows),
         "landing_unique_visitors": sum(_to_int(row.landing_unique_visitors) for row in daily_rows),
         "lookup_requests": sum(_to_int(row.lookup_requests) for row in daily_rows),
@@ -193,22 +197,27 @@ def admin_summary(days: int = 30) -> dict[str, Any]:
     }
     totals["trankit_avg_wait_ms"] = (
         round(totals["trankit_wait_ms_total"] / totals["trankit_wait_count"], 1)
-        if totals["trankit_wait_count"] else 0
+        if totals["trankit_wait_count"]
+        else 0
     )
     totals["trankit_avg_run_ms"] = (
         round(totals["trankit_run_ms_total"] / totals["trankit_run_count"], 1)
-        if totals["trankit_run_count"] else 0
+        if totals["trankit_run_count"]
+        else 0
     )
 
     by_language: dict[str, dict[str, Any]] = {}
     for row in language_rows:
         lang = row.language or "unknown"
-        bucket = by_language.setdefault(lang, {
-            "language": lang,
-            "lookup_requests": 0,
-            "lookup_tokens": 0,
-            "lookup_dp_only_requests": 0,
-        })
+        bucket = by_language.setdefault(
+            lang,
+            {
+                "language": lang,
+                "lookup_requests": 0,
+                "lookup_tokens": 0,
+                "lookup_dp_only_requests": 0,
+            },
+        )
         bucket["lookup_requests"] += _to_int(row.lookup_requests)
         bucket["lookup_tokens"] += _to_int(row.lookup_tokens)
         bucket["lookup_dp_only_requests"] += _to_int(row.lookup_dp_only_requests)
@@ -232,19 +241,23 @@ def admin_summary(days: int = 30) -> dict[str, Any]:
                 "trankit_wait_count": _to_int(row.trankit_wait_count),
                 "trankit_avg_wait_ms": (
                     round(_to_int(row.trankit_wait_ms_total) / _to_int(row.trankit_wait_count), 1)
-                    if _to_int(row.trankit_wait_count) else 0
+                    if _to_int(row.trankit_wait_count)
+                    else 0
                 ),
                 "trankit_max_wait_ms": _to_int(row.trankit_wait_ms_max),
             }
             for row in daily_rows
         ],
         "accounts_by_day": [
-            {"date": _date_key(day), "new_accounts": _to_int(count)}
-            for day, count in account_rows
+            {"date": _date_key(day), "new_accounts": _to_int(count)} for day, count in account_rows
         ],
         "languages": sorted(
             by_language.values(),
-            key=lambda item: (item["lookup_requests"], item["lookup_tokens"], item["lookup_dp_only_requests"]),
+            key=lambda item: (
+                item["lookup_requests"],
+                item["lookup_tokens"],
+                item["lookup_dp_only_requests"],
+            ),
             reverse=True,
         ),
     }

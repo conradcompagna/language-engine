@@ -69,7 +69,9 @@ def allocate_doc_sample_sizes(counts: dict[str, int], sample_size: int) -> dict[
         raise ValueError(f"sample_size must be between 1 and {total}")
 
     if sample_size < len(docs):
-        raise ValueError("sample_size is smaller than the number of documents; cannot sample from all files.")
+        raise ValueError(
+            "sample_size is smaller than the number of documents; cannot sample from all files."
+        )
 
     allocations = {doc: 1 for doc in docs}
     remaining = sample_size - len(docs)
@@ -135,8 +137,8 @@ def split_records(records: list[SentenceRecord], seed: int) -> dict[str, list[Se
 
     buckets = {
         "train": shuffled[:train_count],
-        "dev": shuffled[train_count:train_count + dev_count],
-        "test": shuffled[train_count + dev_count:],
+        "dev": shuffled[train_count : train_count + dev_count],
+        "test": shuffled[train_count + dev_count :],
     }
     for key in buckets:
         buckets[key] = sorted(buckets[key], key=lambda record: record.order_key)
@@ -151,7 +153,9 @@ def write_subset(output_dir: Path, records: list[SentenceRecord], seed: int) -> 
     splits_txt_dir.mkdir(parents=True, exist_ok=True)
 
     ordered_records = sorted(records, key=lambda record: record.order_key)
-    (output_dir / "all.conllu").write_text(render_records_to_conllu(ordered_records), encoding="utf-8")
+    (output_dir / "all.conllu").write_text(
+        render_records_to_conllu(ordered_records), encoding="utf-8"
+    )
     (output_dir / "all.txt").write_text(render_records_to_txt(ordered_records), encoding="utf-8")
 
     split_map = split_records(ordered_records, seed + 1)
@@ -185,7 +189,9 @@ def write_subset(output_dir: Path, records: list[SentenceRecord], seed: int) -> 
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build a deterministic sampled subset from the generated Perseus CoNLL-U export.")
+    parser = argparse.ArgumentParser(
+        description="Build a deterministic sampled subset from the generated Perseus CoNLL-U export."
+    )
     parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--sample-size", type=int, default=10000)

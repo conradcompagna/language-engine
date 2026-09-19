@@ -38,7 +38,11 @@ class _PretokenizedSentence:
 
 
 def camel_tools_gate_enabled(raw_value: Optional[str] = None) -> bool:
-    value = str(raw_value if raw_value is not None else os.environ.get(CAMELTOOLS_GATE_ENV, "")).strip().lower()
+    value = (
+        str(raw_value if raw_value is not None else os.environ.get(CAMELTOOLS_GATE_ENV, ""))
+        .strip()
+        .lower()
+    )
     return value in _TRUTHY
 
 
@@ -109,7 +113,7 @@ def _iter_sentence_chunks(text: str) -> Iterator[str]:
         return
     start = 0
     for match in _SENTENCE_BREAK_RE.finditer(text):
-        chunk = text[start:match.start()]
+        chunk = text[start : match.start()]
         if chunk.strip():
             yield chunk
         start = match.end()
@@ -146,7 +150,9 @@ def _align_exact_tokens(
 
         skipped = text[cursor:start]
         if skipped.strip():
-            raise ValueError(f"Unexpected non-whitespace gap before base token {token!r}: {skipped!r}")
+            raise ValueError(
+                f"Unexpected non-whitespace gap before base token {token!r}: {skipped!r}"
+            )
 
         end = start + len(token)
         spans.append((base_offset + start, base_offset + end))
@@ -220,7 +226,7 @@ def _tokenize_sentence_chunk(
         piece_cursor = start
         for piece in surface_pieces:
             piece_end = piece_cursor + len(piece)
-            out_tokens.append(base_token[piece_cursor - start:piece_end - start])
+            out_tokens.append(base_token[piece_cursor - start : piece_end - start])
             out_spans.append((piece_cursor, piece_end))
             piece_cursor = piece_end
 

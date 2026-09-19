@@ -27,12 +27,14 @@ BASE = r"C:\Users\conra\Desktop\universal - js hybrid\training\perseus\grc_trank
 BY_DOC = os.path.join(BASE, "by_document")
 SUMMARY = os.path.join(BASE, "summary.json")
 
-OUT_DIR = r"C:\Users\conra\Desktop\universal - js hybrid\training\perseus\grc_trankit_naturalpara_10k"
+OUT_DIR = (
+    r"C:\Users\conra\Desktop\universal - js hybrid\training\perseus\grc_trankit_naturalpara_10k"
+)
 OUT_CONLLU = os.path.join(OUT_DIR, "splits")
 OUT_TXT = os.path.join(OUT_DIR, "splits_txt")
 
-MAX_SENT_CHARS = 300   # drop sentences whose # text exceeds this
-MAX_PARA_CHARS = 450   # cap paragraph size (safe margin under Trankit max_input_length=512)
+MAX_SENT_CHARS = 300  # drop sentences whose # text exceeds this
+MAX_PARA_CHARS = 450  # cap paragraph size (safe margin under Trankit max_input_length=512)
 
 # Homer is hexameter poetry; exclude from prose-focused train. Keeping 16 prose docs.
 HOMER_DOCS = {
@@ -69,7 +71,7 @@ def _sentence_from_buf(buf):
     text = None
     for c in comments:
         if c.startswith("# text = "):
-            text = c[len("# text = "):]
+            text = c[len("# text = ") :]
             break
     return {
         "comments": comments,

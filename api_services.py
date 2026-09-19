@@ -6,6 +6,7 @@ Provides:
   - Budget enforcement via ApiUsage model (hard monthly caps)
   - legacy Google Translate MT helpers kept disabled as stubs
 """
+
 import logging
 import time
 
@@ -33,11 +34,11 @@ GEMINI_MAX_READER_CONTEXT_TOKENS = 1000
 _LANG_TO_GOOGLE = {
     "zh": "zh-CN",
     "zh-Hant": "zh-TW",
-    "lzh": "zh-CN",   # classical Chinese → simplified as best effort
-    "grc": "el",       # ancient Greek → modern Greek fallback
-    "ang": "en",       # Old English → English
-    "hbo": "he",       # ancient Hebrew → modern Hebrew
-    "sa": "hi",        # Sanskrit → Hindi as fallback
+    "lzh": "zh-CN",  # classical Chinese → simplified as best effort
+    "grc": "el",  # ancient Greek → modern Greek fallback
+    "ang": "en",  # Old English → English
+    "hbo": "he",  # ancient Hebrew → modern Hebrew
+    "sa": "hi",  # Sanskrit → Hindi as fallback
 }
 
 
@@ -85,6 +86,7 @@ def _synthetic_to_dict(entry: SyntheticEntry) -> dict:
 # Gemini LLM
 # ---------------------------------------------------------------------------
 
+
 def _truncate_approx_tokens(text: str, limit: int) -> str:
     raw = str(text or "").strip()
     if not raw:
@@ -97,7 +99,9 @@ def _truncate_approx_tokens(text: str, limit: int) -> str:
 
 def _record_gemini_usage(usage: ApiUsage, usage_meta: dict) -> int:
     total_tokens = usage_meta.get("totalTokenCount", 0)
-    output_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get("thoughtsTokenCount", 0)
+    output_tokens = usage_meta.get("candidatesTokenCount", 0) + usage_meta.get(
+        "thoughtsTokenCount", 0
+    )
     prompt_tokens = usage_meta.get("promptTokenCount", max(0, total_tokens - output_tokens))
     usage.record_llm(prompt_tokens, output_tokens)
     return total_tokens
@@ -201,7 +205,8 @@ def query_gemini(
         current_pct = usage.llm_usage_percent(user)
         return {
             "ok": False,
-            "error": "Monthly LLM budget reached ($%.2f / $%.2f, %.1f%%)." % (
+            "error": "Monthly LLM budget reached ($%.2f / $%.2f, %.1f%%)."
+            % (
                 current_cost,
                 current_budget,
                 current_pct,

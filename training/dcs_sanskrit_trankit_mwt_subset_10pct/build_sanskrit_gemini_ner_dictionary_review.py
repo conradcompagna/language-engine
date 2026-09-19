@@ -32,8 +32,8 @@ FINAL_ATOMIC = GEMINI_FINAL_DIR / "sanskrit_gemini_ner_chunks_0001_1800_nonempty
 FINAL_MANIFEST = (
     GEMINI_FINAL_DIR / "sanskrit_gemini_ner_chunks_0001_1800_nonempty_fixed_manifest.tsv"
 )
-DICTIONARY_CSV = (
-    Path("C:/Users/conra/Desktop/sanskrit-master/dcs/data/conllu/lookup/dictionary.csv")
+DICTIONARY_CSV = Path(
+    "C:/Users/conra/Desktop/sanskrit-master/dcs/data/conllu/lookup/dictionary.csv"
 )
 
 
@@ -84,7 +84,9 @@ def parse_train_units() -> dict[str, list[tuple[dict[str, str], list[dict[str, s
                 units.append(
                     {
                         "parent_form": parent_form,
-                        "children": [row_info(row, current_meta, parent_form) for row in child_rows],
+                        "children": [
+                            row_info(row, current_meta, parent_form) for row in child_rows
+                        ],
                     }
                 )
             elif "." in row_id:
@@ -418,7 +420,8 @@ def main() -> None:
         ]
     ]
     for (token, tag, lemma_id), rec in sorted(
-        aggregate.items(), key=lambda item: (item[0][1], -int(item[1]["count"]), item[0][0], item[0][2])
+        aggregate.items(),
+        key=lambda item: (item[0][1], -int(item[1]["count"]), item[0][0], item[0][2]),
     ):
         review_rows.append(
             [
@@ -450,9 +453,7 @@ def main() -> None:
     summary = {
         "unique_token_tag_lemma_rows": len(review_rows) - 1,
         "non_o_occurrences": len(occurrence_rows) - 1,
-        "missing_dictionary_rows": sum(
-            1 for row in review_rows[1:] if row[9] == "yes"
-        ),
+        "missing_dictionary_rows": sum(1 for row in review_rows[1:] if row[9] == "yes"),
         "review_file": str(review_path),
         "occurrences_file": str(occurrences_path),
     }

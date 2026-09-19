@@ -16,6 +16,7 @@ last_lookup = None  # Dict with debug snapshot, or None
 _json_artifacts = {}  # {(capture_id, slug): {"text": str, "meta": dict}}
 _MAX_JSON_ARTIFACTS = 1
 
+
 def _env_bool(name: str, default: bool) -> bool:
     raw = os.environ.get(name)
     if raw is None:

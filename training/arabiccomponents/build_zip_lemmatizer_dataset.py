@@ -35,7 +35,9 @@ def to_conllu_sentence(sent_id: str, form: str, lemma: str, upos: str, source: s
     )
 
 
-def load_candidates() -> tuple[dict[tuple[str, str], Counter], dict[tuple[str, str, str], set[str]]]:
+def load_candidates() -> tuple[
+    dict[tuple[str, str], Counter], dict[tuple[str, str, str], set[str]]
+]:
     counts: dict[tuple[str, str], Counter] = defaultdict(Counter)
     provenance: dict[tuple[str, str, str], set[str]] = defaultdict(set)
     with zipfile.ZipFile(ZIP_PATH) as zf:

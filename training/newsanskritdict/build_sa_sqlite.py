@@ -34,7 +34,7 @@ import unicodedata
 from pathlib import Path
 
 THIS_DIR = Path(__file__).resolve().parent
-ROOT = THIS_DIR.parent.parent          # project root
+ROOT = THIS_DIR.parent.parent  # project root
 CSV_PATH = THIS_DIR / "data" / "conllu" / "lookup" / "dictionary.csv"
 CONLLU_ROOT = THIS_DIR / "data" / "conllu" / "files"
 OUT_PATH = ROOT / "dict_sqlite" / "sa.sqlite"
@@ -78,44 +78,72 @@ def normalize_pos(raw):
 # ------------------------------------------------------------------------
 FEAT_MAP = {
     "Case": {
-        "Nom": "nominative", "Gen": "genitive", "Dat": "dative",
-        "Acc": "accusative", "Abl": "ablative", "Ins": "instrumental",
-        "Loc": "locative", "Voc": "vocative", "Cpd": "compound",
+        "Nom": "nominative",
+        "Gen": "genitive",
+        "Dat": "dative",
+        "Acc": "accusative",
+        "Abl": "ablative",
+        "Ins": "instrumental",
+        "Loc": "locative",
+        "Voc": "vocative",
+        "Cpd": "compound",
     },
     "Gender": {"Masc": "masculine", "Fem": "feminine", "Neut": "neuter"},
     "Number": {"Sing": "singular", "Dual": "dual", "Plur": "plural"},
     "Mood": {
-        "Ind": "indicative", "Imp": "imperative", "Opt": "optative",
-        "Cond": "conditional", "Sub": "subjunctive",
-        "Jus": "jussive", "Prec": "precative",
+        "Ind": "indicative",
+        "Imp": "imperative",
+        "Opt": "optative",
+        "Cond": "conditional",
+        "Sub": "subjunctive",
+        "Jus": "jussive",
+        "Prec": "precative",
     },
     "Person": {"1": "first-person", "2": "second-person", "3": "third-person"},
     "Tense": {
-        "Pres": "present", "Past": "past", "Fut": "future",
-        "Aor": "aorist", "Perf": "perfect", "Imp": "imperfect",
-        "Impf": "imperfect", "Pqp": "pluperfect",
+        "Pres": "present",
+        "Past": "past",
+        "Fut": "future",
+        "Aor": "aorist",
+        "Perf": "perfect",
+        "Imp": "imperfect",
+        "Impf": "imperfect",
+        "Pqp": "pluperfect",
     },
     "Voice": {"Act": "active", "Pass": "passive", "Mid": "middle"},
     "VerbForm": {
-        "Part": "participle", "Conv": "converb", "Fin": "finite",
-        "Inf": "infinitive", "Ger": "gerundive", "Gdv": "gerundive",
+        "Part": "participle",
+        "Conv": "converb",
+        "Fin": "finite",
+        "Inf": "infinitive",
+        "Ger": "gerundive",
+        "Gdv": "gerundive",
         "Vnoun": "verbal-noun",
     },
     "Aspect": {
-        "Perf": "perfective", "Imp": "imperfective",
-        "Hab": "habitual", "Iter": "iterative",
+        "Perf": "perfective",
+        "Imp": "imperfective",
+        "Hab": "habitual",
+        "Iter": "iterative",
     },
     "Degree": {"Cmp": "comparative", "Sup": "superlative", "Pos": "positive"},
     "Definite": {"Def": "definite", "Ind": "indefinite"},
     "Formation": {
-        "root": "formation-root", "them": "formation-thematic",
-        "s": "formation-sigmatic", "peri": "formation-periphrastic",
-        "red": "formation-reduplicated", "is": "formation-is",
+        "root": "formation-root",
+        "them": "formation-thematic",
+        "s": "formation-sigmatic",
+        "peri": "formation-periphrastic",
+        "red": "formation-reduplicated",
+        "is": "formation-is",
         "sa": "formation-sa",
     },
     "PronType": {
-        "Dem": "demonstrative", "Int": "interrogative", "Rel": "relative",
-        "Prs": "personal", "Neg": "negative", "Tot": "total",
+        "Dem": "demonstrative",
+        "Int": "interrogative",
+        "Rel": "relative",
+        "Prs": "personal",
+        "Neg": "negative",
+        "Tot": "total",
         "Ind": "indefinite",
     },
     "NumType": {"Card": "cardinal", "Ord": "ordinal", "Mult": "multiplicative"},
@@ -126,10 +154,24 @@ FEAT_MAP = {
 }
 # Order of feature categories in the output string (stable across inputs)
 FEAT_ORDER = [
-    "Case", "Gender", "Number",
-    "Person", "Mood", "Tense", "Voice", "VerbForm", "Aspect",
-    "Degree", "Definite", "Formation",
-    "PronType", "NumType", "Reflex", "Polarity", "Foreign", "Compound",
+    "Case",
+    "Gender",
+    "Number",
+    "Person",
+    "Mood",
+    "Tense",
+    "Voice",
+    "VerbForm",
+    "Aspect",
+    "Degree",
+    "Definite",
+    "Formation",
+    "PronType",
+    "NumType",
+    "Reflex",
+    "Polarity",
+    "Foreign",
+    "Compound",
 ]
 
 
@@ -239,9 +281,7 @@ def build_entries(conn):
             # Split on ';' into discrete senses
             senses = [s.strip() for s in meanings_raw.split(";") if s.strip()]
             if senses:
-                glosses_json = json.dumps(
-                    [{"glosses": [s]} for s in senses], ensure_ascii=False
-                )
+                glosses_json = json.dumps([{"glosses": [s]} for s in senses], ensure_ascii=False)
             else:
                 glosses_json = "[]"
 
@@ -249,18 +289,18 @@ def build_entries(conn):
                 (
                     lemma_id,
                     word,
-                    "",                 # romanization
+                    "",  # romanization
                     pos,
                     glosses_json,
-                    "[]",               # forms (attachment field, unused)
-                    "",                 # commentary
-                    "",                 # lemma (headword serves as lemma)
-                    "",                 # etymology
-                    0,                  # etymology_number
-                    "dcs",              # source
-                    str(lemma_id),      # entry_id (string of lemma_id)
-                    "",                 # tags
-                    "compact",          # format
+                    "[]",  # forms (attachment field, unused)
+                    "",  # commentary
+                    "",  # lemma (headword serves as lemma)
+                    "",  # etymology
+                    0,  # etymology_number
+                    "dcs",  # source
+                    str(lemma_id),  # entry_id (string of lemma_id)
+                    "",  # tags
+                    "compact",  # format
                 )
             )
             headwords_by_id[lemma_id] = norm_cmp(word)
@@ -272,7 +312,7 @@ def build_entries(conn):
         rows,
     )
     conn.commit()
-    print(f"  inserted {len(rows)} entries in {time.time()-t0:.1f}s", flush=True)
+    print(f"  inserted {len(rows)} entries in {time.time() - t0:.1f}s", flush=True)
     print("  POS distribution:", pos_counter, flush=True)
     return headwords_by_id
 
@@ -378,9 +418,7 @@ def scan_conllu(conn, headwords_by_id):
                     unsandhied_n = norm_cmp(unsandhied)
 
                     surface_keep = (
-                        bool(surface)
-                        and surface_n != headword_norm
-                        and not is_junk_form(surface)
+                        bool(surface) and surface_n != headword_norm and not is_junk_form(surface)
                     )
                     unsandhied_keep = (
                         bool(unsandhied)
@@ -395,9 +433,7 @@ def scan_conllu(conn, headwords_by_id):
                     if unsandhied_keep:
                         # Tag as 'sandhied' per user's convention for the
                         # orthographic counterpart of the surface form.
-                        tags_with_sandhi = (
-                            morph + ";" + SANDHIED_TAG if morph else SANDHIED_TAG
-                        )
+                        tags_with_sandhi = morph + ";" + SANDHIED_TAG if morph else SANDHIED_TAG
                         batch.append((lemma_id, unsandhied, tags_with_sandhi))
                         stats["recorded"] += 1
 
@@ -414,14 +450,14 @@ def scan_conllu(conn, headwords_by_id):
             rate = (idx + 1) / elapsed if elapsed > 0 else 0
             eta = (total - idx - 1) / rate if rate > 0 else 0
             print(
-                f"  {idx+1}/{total} files  tokens={stats['tokens']:,}  "
+                f"  {idx + 1}/{total} files  tokens={stats['tokens']:,}  "
                 f"recorded={stats['recorded']:,}  elapsed={elapsed:.0f}s  eta={eta:.0f}s",
                 flush=True,
             )
 
     flush()
     conn.commit()
-    print(f"  scan complete in {time.time()-t0:.0f}s", flush=True)
+    print(f"  scan complete in {time.time() - t0:.0f}s", flush=True)
     print(f"  stats: {stats}", flush=True)
     # post count
     row = cur.execute("SELECT COUNT(*) FROM forms_stage").fetchone()
@@ -471,6 +507,7 @@ def finalize(conn, scan_stats):
 
     # meta
     import datetime
+
     meta = [
         ("lang_code", "sa"),
         ("source_label", "default"),

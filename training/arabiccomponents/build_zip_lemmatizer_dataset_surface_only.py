@@ -18,7 +18,9 @@ SOURCE_FILES = ["ara-master/ara_atb", "ara-master/ara_new", "ara-master/ara"]
 RNG = random.Random(42)
 
 
-def to_conllu_sentence(sent_id: str, form: str, lemma: str, upos: str, xpos: str, source: str) -> str:
+def to_conllu_sentence(
+    sent_id: str, form: str, lemma: str, upos: str, xpos: str, source: str
+) -> str:
     return "\n".join(
         [
             f"# sent_id = {sent_id}",

@@ -112,18 +112,16 @@ def build_mwt_outputs() -> None:
     selected_dev_in_corpus_order = [s for s in sentences if s in selected_dev_set]
     patched_train = [patch_mwt_sentence(sentence) for sentence in sentences]
     patched_dev = [patch_mwt_sentence(sentence) for sentence in selected_dev_in_corpus_order]
-    tokenizer_dev = [build_mwt_tokenizer_input(sentence) for sentence in selected_dev_in_corpus_order]
+    tokenizer_dev = [
+        build_mwt_tokenizer_input(sentence) for sentence in selected_dev_in_corpus_order
+    ]
 
     write_sentences(MWT_TRAIN_OUT, patched_train)
     write_sentences(MWT_DEV_OUT, patched_dev)
     write_sentences(MWT_DEV_TOKENIZER_OUT, tokenizer_dev)
 
-    print(
-        f"MWT full-train written: {MWT_TRAIN_OUT.name} ({len(patched_train)} sentences)"
-    )
-    print(
-        f"MWT compat-dev written: {MWT_DEV_OUT.name} ({len(patched_dev)} sentences)"
-    )
+    print(f"MWT full-train written: {MWT_TRAIN_OUT.name} ({len(patched_train)} sentences)")
+    print(f"MWT compat-dev written: {MWT_DEV_OUT.name} ({len(patched_dev)} sentences)")
     print(
         f"MWT tokenizer-dev written: {MWT_DEV_TOKENIZER_OUT.name} ({len(tokenizer_dev)} sentences)"
     )
@@ -140,12 +138,8 @@ def build_lemma_outputs() -> None:
     write_sentences(LEMMA_TRAIN_OUT, train_sentences)
     write_sentences(LEMMA_DEV_OUT, dev_sentences)
 
-    print(
-        f"Lemma train written: {LEMMA_TRAIN_OUT.name} ({len(train_sentences)} sentences)"
-    )
-    print(
-        f"Lemma dev written: {LEMMA_DEV_OUT.name} ({len(dev_sentences)} sentences)"
-    )
+    print(f"Lemma train written: {LEMMA_TRAIN_OUT.name} ({len(train_sentences)} sentences)")
+    print(f"Lemma dev written: {LEMMA_DEV_OUT.name} ({len(dev_sentences)} sentences)")
 
 
 def main() -> None:

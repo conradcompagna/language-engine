@@ -56,6 +56,7 @@ def fix_head(sentence: str) -> str:
 
 def split_conllu(src: Path, train_dst: Path, dev_dst: Path, dev_ratio: float = 0.05):
     import random
+
     text = src.read_text(encoding="utf-8")
     sentences = [fix_head(s.strip()) for s in text.strip().split("\n\n") if s.strip()]
     random.seed(42)
@@ -91,22 +92,26 @@ def main():
     (SAVE / "xlm-roberta-base" / "customized-mwt" / "preds").mkdir(parents=True, exist_ok=True)
 
     print("\n=== Training MWT ===")
-    trankit.TPipeline(training_config={
-        "category": CATEGORY,
-        "task": "mwt",
-        "save_dir": SAVE_DIR,
-        "train_conllu_fpath": mwt_train,
-        "dev_conllu_fpath": mwt_dev,
-    }).train()
+    trankit.TPipeline(
+        training_config={
+            "category": CATEGORY,
+            "task": "mwt",
+            "save_dir": SAVE_DIR,
+            "train_conllu_fpath": mwt_train,
+            "dev_conllu_fpath": mwt_dev,
+        }
+    ).train()
 
     print("\n=== Training Lemmatizer ===")
-    trankit.TPipeline(training_config={
-        "category": CATEGORY,
-        "task": "lemmatize",
-        "save_dir": SAVE_DIR,
-        "train_conllu_fpath": lem_train,
-        "dev_conllu_fpath": lem_dev,
-    }).train()
+    trankit.TPipeline(
+        training_config={
+            "category": CATEGORY,
+            "task": "lemmatize",
+            "save_dir": SAVE_DIR,
+            "train_conllu_fpath": lem_train,
+            "dev_conllu_fpath": lem_dev,
+        }
+    ).train()
 
     print("\nDone. Model saved to:", SAVE_DIR)
 

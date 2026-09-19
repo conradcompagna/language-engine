@@ -23,7 +23,9 @@ ENGLISH_PROSE_HINT_RE = re.compile(
     r"declension|conjugation|dialect|modern|standard|swahili|absent|table)\b",
     re.IGNORECASE,
 )
-ALTERNATION_LABEL_RE = re.compile(r"^[A-Za-z][A-Za-z-]*-[A-Za-z][A-Za-z-]*\s+alternation$", re.IGNORECASE)
+ALTERNATION_LABEL_RE = re.compile(
+    r"^[A-Za-z][A-Za-z-]*-[A-Za-z][A-Za-z-]*\s+alternation$", re.IGNORECASE
+)
 ROMAN_NUMERAL_RE = re.compile(
     r"^(?=.+)(?:M{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3}))\.?$"
 )
@@ -65,99 +67,238 @@ CLASS_CODE_RE = re.compile(
 )
 BROKEN_TEMPLATE_RE = re.compile(r"(?:\{\{\{.+\}\}\}|[{}]|[()]{0,1}.+\([^-)]*$)")
 
-HARD_DROP_TAGS = frozenset({
-    "class",
-    "classifier",
-    "counter",
-    "table-tags",
-    "inflection-template",
-    "multiword-construction",
-    "includes-article",
-    "auxiliary",
-})
+HARD_DROP_TAGS = frozenset(
+    {
+        "class",
+        "classifier",
+        "counter",
+        "table-tags",
+        "inflection-template",
+        "multiword-construction",
+        "includes-article",
+        "auxiliary",
+    }
+)
 
-RULE_A_EXEMPT_DBS = frozenset({
-    "ja",
-    "ja-jmdict",
-    "ko",
-    "ko-krdict",
-    "grc",
-    "zh",
-    "zh-cc-cedict",
-    "zh-hant",
-    "zh-hant-cc-cedict",
-    "lzh",
-    "lzh-wiktionary",
-    "vi",
-})
+RULE_A_EXEMPT_DBS = frozenset(
+    {
+        "ja",
+        "ja-jmdict",
+        "ko",
+        "ko-krdict",
+        "grc",
+        "zh",
+        "zh-cc-cedict",
+        "zh-hant",
+        "zh-hant-cc-cedict",
+        "lzh",
+        "lzh-wiktionary",
+        "vi",
+    }
+)
 
-NON_KAIKKI_DBS = frozenset({
-    "ja-jmdict",
-    "ko-krdict",
-    "zh-cc-cedict",
-    "zh-hant-cc-cedict",
-    "grc-lsj",
-    "ang-bt",
-    "sa",
-})
+NON_KAIKKI_DBS = frozenset(
+    {
+        "ja-jmdict",
+        "ko-krdict",
+        "zh-cc-cedict",
+        "zh-hant-cc-cedict",
+        "grc-lsj",
+        "ang-bt",
+        "sa",
+    }
+)
 
-SYNTHETIC_COLLAPSE_TRIGGERS = frozenset({
-    # Pure inflectional morphology only.
-    # Number
-    "singular", "plural", "dual",
-    # Case
-    "nominative", "accusative", "dative", "genitive", "vocative", "ablative",
-    "locative", "instrumental", "prepositional", "partitive", "oblique",
-    # Gender
-    "masculine", "feminine", "neuter",
-    # Person
-    "first-person", "second-person", "third-person",
-    # Tense
-    "present", "past", "future", "imperfect", "perfect", "pluperfect", "preterite", "aorist",
-    # Aspect
-    "perfective", "imperfective", "progressive", "continuative", "habitual",
-    "contemplative", "prospective",
-    # Mood
-    "indicative", "subjunctive", "conditional", "imperative", "optative",
-    # Non-finite forms
-    "infinitive", "gerund", "participle", "supine", "conjunctive",
-    # Voice
-    "active", "passive", "mediopassive", "reflexive", "causative", "agentive",
-    # Definiteness / polarity
-    "definite", "indefinite", "negative",
-    # Possession / comparison / size
-    "possessive", "comparative", "superlative", "augmentative", "diminutive",
-    # Generic morphology markers
-    "inflection", "inflected",
-})
+SYNTHETIC_COLLAPSE_TRIGGERS = frozenset(
+    {
+        # Pure inflectional morphology only.
+        # Number
+        "singular",
+        "plural",
+        "dual",
+        # Case
+        "nominative",
+        "accusative",
+        "dative",
+        "genitive",
+        "vocative",
+        "ablative",
+        "locative",
+        "instrumental",
+        "prepositional",
+        "partitive",
+        "oblique",
+        # Gender
+        "masculine",
+        "feminine",
+        "neuter",
+        # Person
+        "first-person",
+        "second-person",
+        "third-person",
+        # Tense
+        "present",
+        "past",
+        "future",
+        "imperfect",
+        "perfect",
+        "pluperfect",
+        "preterite",
+        "aorist",
+        # Aspect
+        "perfective",
+        "imperfective",
+        "progressive",
+        "continuative",
+        "habitual",
+        "contemplative",
+        "prospective",
+        # Mood
+        "indicative",
+        "subjunctive",
+        "conditional",
+        "imperative",
+        "optative",
+        # Non-finite forms
+        "infinitive",
+        "gerund",
+        "participle",
+        "supine",
+        "conjunctive",
+        # Voice
+        "active",
+        "passive",
+        "mediopassive",
+        "reflexive",
+        "causative",
+        "agentive",
+        # Definiteness / polarity
+        "definite",
+        "indefinite",
+        "negative",
+        # Possession / comparison / size
+        "possessive",
+        "comparative",
+        "superlative",
+        "augmentative",
+        "diminutive",
+        # Generic morphology markers
+        "inflection",
+        "inflected",
+    }
+)
 
 # Targets that are never valid collapse destinations even if they happen to
 # exist as headwords in a dictionary (English/Romance/Germanic articles,
 # determiners, prepositions, copulas, generic English connectives). The donor's
 # gloss is almost always an English-prose definition when the target is one of
 # these; collapsing in that case produces nonsense.
-TARGET_BLACKLIST = frozenset({
-    # English articles, prepositions, copulas, conjunctions, demonstratives
-    "a", "an", "the", "of", "in", "on", "at", "to", "by", "for", "with",
-    "and", "or", "but", "as", "is", "are", "was", "were", "be", "been",
-    "being", "this", "that", "these", "those", "it", "its", "their", "his",
-    "her", "my", "your", "our", "him", "she", "we", "you", "they", "them",
-    "from", "into", "such", "any", "all", "each", "no", "not", "than", "so",
-    # Romance articles / common particles
-    "el", "la", "lo", "los", "las", "le", "les", "il", "i", "gli",
-    "de", "da", "del", "della", "delle", "dei", "degli", "des", "du", "au",
-    "aux", "un", "una", "uno", "ein", "eine", "einer", "einem", "einen",
-    # Germanic articles
-    "der", "den", "dem", "das", "die", "des",
-    # Dutch
-    "uw", "het",
-    # Irish
-    "an",
-    # English/Latin-script trigger words that are themselves headwords (avoid
-    # pointing to a literal trigger word as the target)
-    "instrumental", "verbal", "adverbial", "pronominal", "adjectival",
-    "predicative", "attributive",
-})
+TARGET_BLACKLIST = frozenset(
+    {
+        # English articles, prepositions, copulas, conjunctions, demonstratives
+        "a",
+        "an",
+        "the",
+        "of",
+        "in",
+        "on",
+        "at",
+        "to",
+        "by",
+        "for",
+        "with",
+        "and",
+        "or",
+        "but",
+        "as",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "this",
+        "that",
+        "these",
+        "those",
+        "it",
+        "its",
+        "their",
+        "his",
+        "her",
+        "my",
+        "your",
+        "our",
+        "him",
+        "she",
+        "we",
+        "you",
+        "they",
+        "them",
+        "from",
+        "into",
+        "such",
+        "any",
+        "all",
+        "each",
+        "no",
+        "not",
+        "than",
+        "so",
+        # Romance articles / common particles
+        "el",
+        "la",
+        "lo",
+        "los",
+        "las",
+        "le",
+        "les",
+        "il",
+        "i",
+        "gli",
+        "de",
+        "da",
+        "del",
+        "della",
+        "delle",
+        "dei",
+        "degli",
+        "des",
+        "du",
+        "au",
+        "aux",
+        "un",
+        "una",
+        "uno",
+        "ein",
+        "eine",
+        "einer",
+        "einem",
+        "einen",
+        # Germanic articles
+        "der",
+        "den",
+        "dem",
+        "das",
+        "die",
+        "des",
+        # Dutch
+        "uw",
+        "het",
+        # Irish
+        "an",
+        # English/Latin-script trigger words that are themselves headwords (avoid
+        # pointing to a literal trigger word as the target)
+        "instrumental",
+        "verbal",
+        "adverbial",
+        "pronominal",
+        "adjectival",
+        "predicative",
+        "attributive",
+    }
+)
 
 
 def is_kaikki_db(db_name: str) -> bool:
@@ -272,52 +413,58 @@ def compute_synthetic_collapses(conn, alias: str, db_name: str) -> dict:
 #     return out
 
 
-CODELIKE_TEXT_EXEMPT_DBS = frozenset({
-    "ja",
-    "ja-jmdict",
-    "ko",
-    "ko-krdict",
-    "zh",
-    "zh-cc-cedict",
-    "zh-hant",
-    "zh-hant-cc-cedict",
-    "lzh",
-    "lzh-wiktionary",
-    "vi",
-})
+CODELIKE_TEXT_EXEMPT_DBS = frozenset(
+    {
+        "ja",
+        "ja-jmdict",
+        "ko",
+        "ko-krdict",
+        "zh",
+        "zh-cc-cedict",
+        "zh-hant",
+        "zh-hant-cc-cedict",
+        "lzh",
+        "lzh-wiktionary",
+        "vi",
+    }
+)
 
-RULE_A_EXEMPT_TAGS = frozenset({
-    "baybayin",
-    "hanja",
-    "hangeul",
-    "cjk",
-    "hán-nôm",
-    "han-nom",
-    "hannom",
-})
+RULE_A_EXEMPT_TAGS = frozenset(
+    {
+        "baybayin",
+        "hanja",
+        "hangeul",
+        "cjk",
+        "hán-nôm",
+        "han-nom",
+        "hannom",
+    }
+)
 
-ALWAYS_KEEP_TAGS = frozenset({
-    "reading",
-    "romanization",
-    "romanisation",
-    "transliteration",
-    "baybayin",
-    "hanja",
-    "hangeul",
-    "hangul",
-    "cjk",
-    "hán-nôm",
-    "han-nom",
-    "hannom",
-    "hiragana",
-    "katakana",
-    "romaji",
-    "pinyin",
-    "bopomofo",
-    "jyutping",
-    "kana",
-    "revised",
-})
+ALWAYS_KEEP_TAGS = frozenset(
+    {
+        "reading",
+        "romanization",
+        "romanisation",
+        "transliteration",
+        "baybayin",
+        "hanja",
+        "hangeul",
+        "hangul",
+        "cjk",
+        "hán-nôm",
+        "han-nom",
+        "hannom",
+        "hiragana",
+        "katakana",
+        "romaji",
+        "pinyin",
+        "bopomofo",
+        "jyutping",
+        "kana",
+        "revised",
+    }
+)
 
 ALWAYS_KEEP_TAG_SUBSTRINGS = (
     "romanization",
@@ -333,112 +480,136 @@ ALWAYS_KEEP_TAG_SUBSTRINGS = (
     "yale",
 )
 
-FANOUT_EXEMPT_DBS = frozenset({
-    "ja",
-    "ja-jmdict",
-    "ko",
-    "ko-krdict",
-    "grc",
-    "lzh",
-    "lzh-wiktionary",
-    "zh",
-    "zh-cc-cedict",
-    "zh-hant",
-    "zh-hant-cc-cedict",
-})
+FANOUT_EXEMPT_DBS = frozenset(
+    {
+        "ja",
+        "ja-jmdict",
+        "ko",
+        "ko-krdict",
+        "grc",
+        "lzh",
+        "lzh-wiktionary",
+        "zh",
+        "zh-cc-cedict",
+        "zh-hant",
+        "zh-hant-cc-cedict",
+    }
+)
 
 FORM_EXACT_BLACKLISTS: dict[str, frozenset[str]] = {
-    "ja": frozenset({
-        "For other desiderative forms",
-        "intransitive godan",
-        "intransitive ichidan",
-    }),
-    "ko": frozenset({
-        "no hanja",
-        "—時計",
-    }),
-    "ko-krdict": frozenset({
-        "no hanja",
-        "—時計",
-    }),
-    "grc": frozenset({
-        "Second declension",
-        "Third declension",
-        "First declension",
-        "First and second declension",
-        "first",
-        "third declension",
-        "declension",
-        "εἶμεν",
-        "εἶτε",
-        "εἶτον",
-        "εἴτην",
-        "tēîsĭnĭ",
-        "tēîsĭnĭn",
-        "toîs",
-        "τῷ",
-        "τοῖς",
-        "τοῦ",
-        "οἱ",
-        "ὁ",
-        "τὸν",
-        "τοῖσῐ",
-        "τοῖσῐν",
-        "τοὺς",
-        "-σῐν",
-        "τᾱ́ν",
-    }),
+    "ja": frozenset(
+        {
+            "For other desiderative forms",
+            "intransitive godan",
+            "intransitive ichidan",
+        }
+    ),
+    "ko": frozenset(
+        {
+            "no hanja",
+            "—時計",
+        }
+    ),
+    "ko-krdict": frozenset(
+        {
+            "no hanja",
+            "—時計",
+        }
+    ),
+    "grc": frozenset(
+        {
+            "Second declension",
+            "Third declension",
+            "First declension",
+            "First and second declension",
+            "first",
+            "third declension",
+            "declension",
+            "εἶμεν",
+            "εἶτε",
+            "εἶτον",
+            "εἴτην",
+            "tēîsĭnĭ",
+            "tēîsĭnĭn",
+            "toîs",
+            "τῷ",
+            "τοῖς",
+            "τοῦ",
+            "οἱ",
+            "ὁ",
+            "τὸν",
+            "τοῖσῐ",
+            "τοῖσῐν",
+            "τοὺς",
+            "-σῐν",
+            "τᾱ́ν",
+        }
+    ),
 }
 
 FORM_EXACT_WHITELISTS: dict[str, frozenset[str]] = {
-    "ar": frozenset({
-        "إِنْجْلِيزِيَّة",
-        "إِنْقْلِيزِيَّة",
-        "إِنْكْلِيزِيَّة",
-    }),
-    "hi": frozenset({
-        "انتظار",
-    }),
-    "it": frozenset({
-        "guard rail",
-        "guard-rail",
-        "guardaraglio",
-        "guardarai",
-        "guardarail",
-        "guardaraile",
-        "guardaraille",
-        "guardarailo",
-        "guardarrai",
-        "guardarrail",
-        "guardarraile",
-        "guardarraille",
-        "guardrail",
-    }),
-    "pt": frozenset({
-        "meya",
-    }),
-    "ta": frozenset({
-        "ஆகுவது",
-    }),
-    "tl": frozenset({
-        "ᜋᜄ᜔",
-        "ᜒᜈ᜔",
-        "ᜓᜋ᜔",
-        "ᜋᜅ᜔",
-        "ᜂᜋ᜔",
-        "ᜁ",
-        "ᜈᜅ᜔",
-        "ᜐᜎ",
-        "ᜂ",
-        "ᜉᜒᜉᜒ",
-        "ᜇᜒ",
-        "ᜉᜉ",
-        "ᜋᜓᜎᜒ",
-        "ᜐᜒ",
-    }),
-    "vi": frozenset({
-        "折",
-    }),
+    "ar": frozenset(
+        {
+            "إِنْجْلِيزِيَّة",
+            "إِنْقْلِيزِيَّة",
+            "إِنْكْلِيزِيَّة",
+        }
+    ),
+    "hi": frozenset(
+        {
+            "انتظار",
+        }
+    ),
+    "it": frozenset(
+        {
+            "guard rail",
+            "guard-rail",
+            "guardaraglio",
+            "guardarai",
+            "guardarail",
+            "guardaraile",
+            "guardaraille",
+            "guardarailo",
+            "guardarrai",
+            "guardarrail",
+            "guardarraile",
+            "guardarraille",
+            "guardrail",
+        }
+    ),
+    "pt": frozenset(
+        {
+            "meya",
+        }
+    ),
+    "ta": frozenset(
+        {
+            "ஆகுவது",
+        }
+    ),
+    "tl": frozenset(
+        {
+            "ᜋᜄ᜔",
+            "ᜒᜈ᜔",
+            "ᜓᜋ᜔",
+            "ᜋᜅ᜔",
+            "ᜂᜋ᜔",
+            "ᜁ",
+            "ᜈᜅ᜔",
+            "ᜐᜎ",
+            "ᜂ",
+            "ᜉᜒᜉᜒ",
+            "ᜇᜒ",
+            "ᜉᜉ",
+            "ᜋᜓᜎᜒ",
+            "ᜐᜒ",
+        }
+    ),
+    "vi": frozenset(
+        {
+            "折",
+        }
+    ),
 }
 
 
@@ -498,11 +669,21 @@ def _has_any_letter(text: str) -> bool:
 @lru_cache(maxsize=250000)
 def _char_script(ch: str) -> str:
     code = ord(ch)
-    if 0x0041 <= code <= 0x024F or 0x1E00 <= code <= 0x1EFF or 0x2C60 <= code <= 0x2C7F or 0xA720 <= code <= 0xA7FF:
+    if (
+        0x0041 <= code <= 0x024F
+        or 0x1E00 <= code <= 0x1EFF
+        or 0x2C60 <= code <= 0x2C7F
+        or 0xA720 <= code <= 0xA7FF
+    ):
         return "Latin"
     if 0x0370 <= code <= 0x03FF or 0x1F00 <= code <= 0x1FFF:
         return "Greek"
-    if 0x0400 <= code <= 0x052F or 0x2DE0 <= code <= 0x2DFF or 0xA640 <= code <= 0xA69F or 0x1C80 <= code <= 0x1C8F:
+    if (
+        0x0400 <= code <= 0x052F
+        or 0x2DE0 <= code <= 0x2DFF
+        or 0xA640 <= code <= 0xA69F
+        or 0x1C80 <= code <= 0x1C8F
+    ):
         return "Cyrillic"
     if 0x0590 <= code <= 0x05FF or 0xFB1D <= code <= 0xFB4F:
         return "Hebrew"
@@ -620,11 +801,15 @@ def is_fanout_exempt_db(db_name: str) -> bool:
 
 
 def is_exact_whitelist(db_name: str, form_text: str) -> bool:
-    return normalize_text(form_text) in FORM_EXACT_WHITELISTS.get(normalize_db_name(db_name), frozenset())
+    return normalize_text(form_text) in FORM_EXACT_WHITELISTS.get(
+        normalize_db_name(db_name), frozenset()
+    )
 
 
 def is_exact_blacklist(db_name: str, form_text: str) -> bool:
-    return normalize_text(form_text) in FORM_EXACT_BLACKLISTS.get(normalize_db_name(db_name), frozenset())
+    return normalize_text(form_text) in FORM_EXACT_BLACKLISTS.get(
+        normalize_db_name(db_name), frozenset()
+    )
 
 
 def occurrence_tag_cut_reason(raw_tags: str | Iterable[str]) -> str:
@@ -665,7 +850,9 @@ def _looks_hebrew_mishkal_placeholder(text: str) -> bool:
         return False
     if not HEBREW_MISHKAL_RE.match(s):
         return False
-    base = "".join(ch for ch in unicodedata.normalize("NFKD", s) if unicodedata.category(ch).startswith("L"))
+    base = "".join(
+        ch for ch in unicodedata.normalize("NFKD", s) if unicodedata.category(ch).startswith("L")
+    )
     if not base:
         return False
     return "קטל" in base or "קטר" in base
@@ -700,7 +887,9 @@ def rule_a_exempt(db_name: str, raw_tags: str | Iterable[str]) -> bool:
     return bool(split_tags_casefold(raw_tags) & RULE_A_EXEMPT_TAGS)
 
 
-def occurrence_rule_a_cut_reason(db_name: str, form_text: str, headword: str, raw_tags: str | Iterable[str]) -> str:
+def occurrence_rule_a_cut_reason(
+    db_name: str, form_text: str, headword: str, raw_tags: str | Iterable[str]
+) -> str:
     if rule_a_exempt(db_name, raw_tags):
         return ""
     if word_count(form_text) != word_count(headword):
@@ -732,7 +921,9 @@ def _zero_overlap_cross_script(form_text: str, headword: str) -> bool:
     return True
 
 
-def occurrence_cut_reason(db_name: str, form_text: str, headword: str, raw_tags: str | Iterable[str]) -> str:
+def occurrence_cut_reason(
+    db_name: str, form_text: str, headword: str, raw_tags: str | Iterable[str]
+) -> str:
     if str(form_text or "") == str(headword or "") and form_text:
         return "hard_text:identical_to_headword"
     if _hyphen_affix_mismatch(form_text, headword):

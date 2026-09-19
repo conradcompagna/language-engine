@@ -3,6 +3,7 @@ Training monitor for Ancient Greek tokenizer.
 Runs trankit training in a subprocess and monitors the log file.
 Kills the run if token F1 is not improving after 3 complete epochs.
 """
+
 import subprocess
 import sys
 import os
@@ -16,7 +17,9 @@ SAVE_DIR = BASE / "training" / "t_grc10k_tok1"
 CUSTOMIZED_DIR = SAVE_DIR / "xlm-roberta-base" / "customized"
 LOG_FILE = CUSTOMIZED_DIR / "logs" / "tokenize.training"
 TRAIN_TXT = BASE / "training" / "perseus" / "grc_trankit_sampled_10000" / "splits_txt" / "train.txt"
-TRAIN_CONLLU = BASE / "training" / "perseus" / "grc_trankit_sampled_10000" / "splits" / "train.conllu"
+TRAIN_CONLLU = (
+    BASE / "training" / "perseus" / "grc_trankit_sampled_10000" / "splits" / "train.conllu"
+)
 DEV_TXT = BASE / "training" / "perseus" / "grc_trankit_sampled_10000" / "splits_txt" / "dev.txt"
 DEV_CONLLU = BASE / "training" / "perseus" / "grc_trankit_sampled_10000" / "splits" / "dev.conllu"
 
@@ -91,7 +94,10 @@ def check_should_abort(scores):
 def run_training():
     """Start the trankit training process."""
     cmd = [
-        sys.executable, "-X", "utf8", "-c",
+        sys.executable,
+        "-X",
+        "utf8",
+        "-c",
         f"""import trankit; trankit.TPipeline(training_config={{
             'category': 'customized',
             'task': 'tokenize',
@@ -100,7 +106,7 @@ def run_training():
             'train_conllu_fpath': r'{TRAIN_CONLLU}',
             'dev_txt_fpath': r'{DEV_TXT}',
             'dev_conllu_fpath': r'{DEV_CONLLU}',
-        }}).train()"""
+        }}).train()""",
     ]
 
     env = os.environ.copy()
@@ -181,7 +187,9 @@ def monitor_training(proc):
     scores = parse_scores_from_log()
     if scores:
         best = max(scores, key=lambda x: x[1])
-        print(f"\nFinal best: Epoch {best[0]}, Tokens F1: {best[1]:.2f}%, Sentences F1: {best[2]:.2f}%")
+        print(
+            f"\nFinal best: Epoch {best[0]}, Tokens F1: {best[1]:.2f}%, Sentences F1: {best[2]:.2f}%"
+        )
         return best[1] >= 90.0
     return False
 

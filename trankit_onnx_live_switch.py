@@ -59,7 +59,14 @@ def _disable_hidden_states(module: Any) -> Dict[str, Any]:
 
 def _force_eval_mode(pipeline: Any) -> Dict[str, Any]:
     targets = []
-    for attr in ["_embedding_layers", "_tokenizer", "_tagger", "_ner_model", "_lemma_model", "_mwt_model"]:
+    for attr in [
+        "_embedding_layers",
+        "_tokenizer",
+        "_tagger",
+        "_ner_model",
+        "_lemma_model",
+        "_mwt_model",
+    ]:
         value = getattr(pipeline, attr, None)
         if isinstance(value, dict):
             for key, module in value.items():
@@ -158,16 +165,18 @@ def _install_tokenizer_dynamic_padding_patch() -> Dict[str, Any]:
                 -100 if piece_id >= len(wordpieces) else wordpiece_labels[piece_id]
                 for piece_id in range(max(0, len(piece_idxs) - 2))
             ]
-            data.append(tokenizer_iterators.Instance(
-                paragraph_index=paragraph_index,
-                wordpieces=wordpieces,
-                wordpiece_labels=wordpiece_labels,
-                wordpiece_ends=wordpiece_ends,
-                piece_idxs=piece_idxs,
-                attention_masks=attention_masks,
-                token_type_idxs=token_type_idxs,
-                wordpiece_num=len(wordpieces),
-            ))
+            data.append(
+                tokenizer_iterators.Instance(
+                    paragraph_index=paragraph_index,
+                    wordpieces=wordpieces,
+                    wordpiece_labels=wordpiece_labels,
+                    wordpiece_ends=wordpiece_ends,
+                    piece_idxs=piece_idxs,
+                    attention_masks=attention_masks,
+                    token_type_idxs=token_type_idxs,
+                    wordpiece_num=len(wordpieces),
+                )
+            )
         self.data = data
 
     def collate_fn_dynamic(self: Any, batch: Any) -> Any:
@@ -200,10 +209,18 @@ def _install_tokenizer_dynamic_padding_patch() -> Dict[str, Any]:
             wordpieces=batch_wordpieces,
             wordpiece_labels=batch_wordpiece_labels,
             wordpiece_ends=batch_wordpiece_ends,
-            piece_idxs=torch_module.tensor(batch_piece_idxs, dtype=torch_module.long, device=self.config.device),
-            attention_masks=torch_module.tensor(batch_attention_masks, dtype=torch_module.long, device=self.config.device),
-            token_type_idxs=torch_module.tensor(batch_token_type_idxs, dtype=torch_module.long, device=self.config.device),
-            wordpiece_num=torch_module.tensor(batch_wordpiece_num, dtype=torch_module.long, device=self.config.device),
+            piece_idxs=torch_module.tensor(
+                batch_piece_idxs, dtype=torch_module.long, device=self.config.device
+            ),
+            attention_masks=torch_module.tensor(
+                batch_attention_masks, dtype=torch_module.long, device=self.config.device
+            ),
+            token_type_idxs=torch_module.tensor(
+                batch_token_type_idxs, dtype=torch_module.long, device=self.config.device
+            ),
+            wordpiece_num=torch_module.tensor(
+                batch_wordpiece_num, dtype=torch_module.long, device=self.config.device
+            ),
         )
 
     dataset_cls._live_onnx_original_numberize = original_numberize
@@ -399,10 +416,12 @@ def install_live_onnx_pipeline(pipeline: Any) -> Dict[str, Any]:
     """Install the live ONNX CPU runtime into an already-loaded Trankit pipeline."""
     prepare_newpipeline_environment()
     if not MANIFEST_PATH.exists():
-        raise RuntimeError(f"NEWPIPELINE=1 but compressed runtime manifest is missing: {MANIFEST_PATH}")
+        raise RuntimeError(
+            f"NEWPIPELINE=1 but compressed runtime manifest is missing: {MANIFEST_PATH}"
+        )
 
     import torch  # type: ignore
-    from sandbox_trankit_compressed_runtime import install_compressed_runtime
+    from trankit_compressed_runtime import install_compressed_runtime
 
     eval_report = _force_eval_mode(pipeline)
     hidden_report = _disable_hidden_states(getattr(pipeline, "_embedding_layers", pipeline))
@@ -417,9 +436,13 @@ def install_live_onnx_pipeline(pipeline: Any) -> Dict[str, Any]:
     if not isinstance(ort_tuning, dict) or not ort_tuning.get("applied"):
         raise RuntimeError(f"NEWPIPELINE=1 but ORT session tuning was not applied: {ort_tuning}")
 
-    quant_report = compressed_report.get("pytorch_quantization") if isinstance(compressed_report, dict) else {}
+    quant_report = (
+        compressed_report.get("pytorch_quantization") if isinstance(compressed_report, dict) else {}
+    )
     if not isinstance(quant_report, dict) or not quant_report.get("quantized"):
-        raise RuntimeError("NEWPIPELINE=1 but PyTorch task-module quantization did not quantize any modules")
+        raise RuntimeError(
+            "NEWPIPELINE=1 but PyTorch task-module quantization did not quantize any modules"
+        )
 
     required_reports = {
         "tokenizer_dynamic_padding": tokenizer_padding_report,

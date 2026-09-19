@@ -83,3 +83,5 @@ stanza_resources/
 .trankit_onnx_cache/
 dict_sqlite/
 sandbox_adapter_bank_deps/
+
+.ruff_cache/

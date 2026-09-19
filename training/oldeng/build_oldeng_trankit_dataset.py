@@ -255,7 +255,9 @@ def write_outputs(split: str, grouped_docs: list[list[SentenceBlock]]) -> dict[s
     )
 
     annotation_stats = count_annotations(grouped_conllu_path(split))
-    paragraph_avg = round(sum(paragraph_lengths) / len(paragraph_lengths), 2) if paragraph_lengths else 0.0
+    paragraph_avg = (
+        round(sum(paragraph_lengths) / len(paragraph_lengths), 2) if paragraph_lengths else 0.0
+    )
     return {
         "grouped_conllu": str(grouped_conllu_path(split).relative_to(BASE_DIR.parent.parent)),
         "raw_text": str(raw_text_path(split).relative_to(BASE_DIR.parent.parent)),
