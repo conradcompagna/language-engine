@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Contact | Language Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='le-logo.svg') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='reader.css') }}?v={{ mtime('reader.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='top_nav.css') }}?v={{ mtime('top_nav.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='contact_support.css') }}?v={{ mtime('contact_support.css') }}"/>
+</head>
+<body class="contact-page">
+{% include "_top_nav.html" %}
+<script>
+  function updateUpgradeNavButton(){
+    var btn = document.querySelector('[data-upgrade-nav]');
+    if(!btn) return;
+    fetch('/payments/status').then(function(r){return r.json()}).then(function(d){
+      btn.style.display = (d && d.ok && !d.is_subscribed) ? '' : 'none';
+    }).catch(function(){ btn.style.display = 'none'; });
+  }
+  fetch('/auth/me').then(function(r){return r.json()}).then(function(d){
+    if(!d.ok||!d.user){window.location.href='/';}
+    else { updateUpgradeNavButton(); }
+  }).catch(function(){});
+</script>
+
+<main class="contact-wrap">
+  <section class="contact-card">
+    <h1>Contact</h1>
+    <form id="contactForm" class="contact-form">
+      <label class="contact-label">
+        Type
+        <select id="contactType" class="contact-select" required>
+          <option value="Question">Question</option>
+          <option value="Bug report">Bug report</option>
+          <option value="Site improvement suggestion">Site improvement suggestion</option>
+          <option value="Billing or subscription issue">Billing or subscription issue</option>
+          <option value="Misc">Misc</option>
+        </select>
+      </label>
+      <label class="contact-label">
+        Title
+        <input id="contactSubject" class="contact-input" type="text" maxlength="160" required>
+      </label>
+      <label class="contact-label">
+        Message
+        <textarea id="contactMessage" class="contact-textarea" maxlength="5000" required></textarea>
+      </label>
+      <div class="contact-actions">
+        <div id="contactStatus" class="contact-status" aria-live="polite"></div>
+        <button id="contactSubmit" type="submit" class="contact-submit">Send Message</button>
+      </div>
+    </form>
+  </section>
+</main>
+<script src="{{ url_for('static', filename='contact_support.js') }}?v={{ mtime('contact_support.js') }}"></script>
+</body>
+</html>

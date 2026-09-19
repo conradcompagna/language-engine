@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Reader | Language Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='le-logo.svg') }}"/>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='reader.css') }}?v={{ mtime('reader.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='top_nav.css') }}?v={{ mtime('top_nav.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='contact_support.css') }}?v={{ mtime('contact_support.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='docrender/docrender.css') }}?v={{ mtime('docrender/docrender.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='docrender/canonical_reader.css') }}?v={{ mtime('docrender/canonical_reader.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='pronunciation_popup.css') }}?v={{ mtime('pronunciation_popup.css') }}"/>
+</head>
+<body>
+<!-- Auth header bar (static, non-floating) -->
+{% include "_top_nav.html" %}
+<script>
+  function updateUpgradeNavButton(){
+    var btn = document.querySelector('[data-upgrade-nav]');
+    if(!btn) return;
+    fetch('/payments/status').then(function(r){return r.json()}).then(function(d){
+      btn.style.display = (d && d.ok && !d.is_subscribed) ? '' : 'none';
+    }).catch(function(){ btn.style.display = 'none'; });
+  }
+  fetch('/auth/me').then(function(r){return r.json()}).then(function(d){
+    if(!d.ok||!d.user){window.location.href='/';}
+    else { updateUpgradeNavButton(); }
+  }).catch(function(){});
+</script>
+<div id="leContentWrap">
+<!-- Left Menu Toggle (mirrors dictionary panel toggle) -->
+<button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M9 5l7 7-7 7"/>
+  </svg>
+</button>
+<!-- Left Sidebar Menu -->
+<div id="left-menu" class="left-menu collapsed">
+  <div class="menu-content">
+    <!-- Settings Section -->
+    <div class="menu-section open" data-section="settings">
+      <div class="menu-section-content">
+        <div class="menu-group">
+          <div class="menu-group-title">Overlays</div>
+          <label class="menu-toggle-label">
+            <input type="checkbox" id="toggleUdOverlay" checked>
+            <span class="menu-toggle-switch"></span>
+            <span>Dependency web</span>
+          </label>
+          <label class="menu-toggle-label">
+            <input type="checkbox" id="toggleChunkHighlight" checked>
+            <span class="menu-toggle-switch"></span>
+            <span>POS shading</span>
+          </label>
+          <label class="menu-toggle-label">
+            <input type="checkbox" id="toggleNerOverlay" checked>
+            <span class="menu-toggle-switch"></span>
+            <span>NER labels</span>
+          </label>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">Popups</div>
+          <label class="menu-toggle-label">
+            <input type="checkbox" id="toggleGrammarPopup" checked>
+            <span class="menu-toggle-switch"></span>
+            <span>Grammar</span>
+          </label>
+          <label class="menu-toggle-label">
+            <input type="checkbox" id="toggleDictPopup" checked>
+            <span class="menu-toggle-switch"></span>
+            <span>Dictionary</span>
+          </label>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">LLM Settings</div>
+          <label class="menu-toggle-label" data-native-tooltip title="Paid feature; uses monthly token budget">
+            <input type="checkbox" id="toggleLlmGloss">
+            <span class="menu-toggle-switch"></span>
+            <span>LLM Gloss ⚡</span>
+          </label>
+          <label class="menu-toggle-label" data-native-tooltip title="Paid feature; uses monthly token budget">
+            <input type="checkbox" id="toggleSentenceTranslations" checked>
+            <span class="menu-toggle-switch"></span>
+            <span>Translation tablet ⚡</span>
+          </label>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">NLP</div>
+          <label class="menu-toggle-label" id="manualSentenceSegmentationLabel" data-native-tooltip title="Recommended setting">
+            <input type="checkbox" id="toggleManualSentenceSegmentation">
+            <span class="menu-toggle-switch"></span>
+            <span>Manual sentence segmentation <span style="font-size:11px;opacity:0.7;">(Sanskrit / Classical Chinese)</span></span>
+          </label>
+        </div>
+        <div class="menu-group" id="pdfTextSourceGroup" style="display:none;">
+          <div class="menu-group-title">PDF Options</div>
+          <label class="menu-toggle-label">
+            <input type="checkbox" id="togglePdfOcrCleanup">
+            <span class="menu-toggle-switch"></span>
+            <span>OCR cleanup</span>
+          </label>
+          <div class="menu-hint">Applies the compact PDF text postpass for OCR-heavy files. Off keeps original page geometry.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="main-container">
+  <div id="reader-app">
+    <div id="dropZone" class="reader-input-container">
+      <!-- Top control row: language, dictionary, TSV, progress bar -->
+      <div class="reader-control-row reader-control-top">
+        <select id="languageSelect" class="language-select">
+          <option value="" selected disabled>&#8212; select language &#8212;</option>
+          <option value="ar">Arabic</option>
+          <option value="hy">Armenian</option>
+          <option value="lzh">Chinese (Classical)</option>
+          <option value="zh">Chinese (Simplified)</option>
+          <option value="zh" data-trankit="traditional-chinese">Chinese (Traditional)</option>
+          <option value="nl">Dutch</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="el">Greek</option>
+          <option value="grc">Greek (Ancient)</option>
+          <option value="he">Hebrew</option>
+          <option value="hi">Hindi</option>
+          <option value="id">Indonesian</option>
+          <option value="it">Italian</option>
+          <option value="ja">Japanese</option>
+          <option value="ko">Korean</option>
+          <option value="la">Latin</option>
+          <option value="ang">Old English</option>
+          <option value="fa">Persian</option>
+          <option value="pt">Portuguese</option>
+          <option value="ru">Russian</option>
+          <option value="sa">Sanskrit</option>
+          <option value="es">Spanish</option>
+          <option value="sw">Swahili</option>
+          <option value="tl">Tagalog</option>
+          <option value="th">Thai</option>
+          <option value="tr">Turkish</option>
+          <option value="vi">Vietnamese</option>
+        </select>
+        <select id="dictSourceSelect" class="language-select" style="min-width:100px;" disabled>
+          <option value="" selected>Dictionary sources</option>
+        </select>
+        <div id="dictSourceCheckboxes" style="display:none;position:absolute;z-index:1000;background:#fff;border:1px solid #ccc;border-radius:4px;padding:6px 8px;box-shadow:0 2px 8px rgba(0,0,0,.15);min-width:160px;">
+        </div>
+        <span id="tsvPill" class="file-name-pill" style="display:none;">
+          <span id="tsvFileName" class="file-name-text"></span>
+          <button type="button" id="clearTsvBtn" class="file-clear-btn" title="Clear custom dictionary">&times;</button>
+        </span>
+        <div id="dictProgressWrap" class="dict-progress-wrap" style="display:none;">
+          <div class="dict-progress-track">
+            <div id="dictProgressBar" class="dict-progress-bar"></div>
+          </div>
+          <span id="dictProgressText" class="dict-progress-text"></span>
+        </div>
+      </div>
+      <textarea id="sourceText" class="reader-textarea" placeholder=""></textarea>
+      <div id="docToolbar" class="doc-toolbar" style="display:none;">
+        <div class="doc-toolbar-left">
+          <span id="docPageLabel" class="doc-page-label">Page 1 / 1</span>
+          <input type="number" id="docPageNumberInput" class="doc-page-number-input" min="1" step="1" aria-label="Go to page">
+        </div>
+        <div id="docCapabilityControls" class="doc-toolbar-controls doc-capability-controls" style="display:none;">
+          <div class="doc-nav-menu-wrap">
+            <button type="button" id="docContentsButton" class="doc-text-btn doc-contents-btn" aria-label="Open contents" aria-expanded="false">Contents</button>
+            <div id="docContentsMenu" class="doc-nav-menu" hidden>
+              <div id="docNavMenuMeta" class="doc-nav-menu-meta">No contents</div>
+              <div id="docNavMenuList" class="doc-nav-menu-list"></div>
+            </div>
+          </div>
+          <div class="doc-search-menu-wrap">
+            <input type="text" id="docSearchField" class="doc-search-input" placeholder="Search" autocomplete="off">
+            <div id="docSearchMenu" class="doc-search-menu" hidden>
+              <div id="docSearchMenuMeta" class="doc-nav-menu-meta">Type to search</div>
+              <div id="docSearchMenuList" class="doc-nav-menu-list"></div>
+            </div>
+          </div>
+          <button type="button" id="docSearchPrevButton" class="doc-icon-btn" aria-label="Previous match">&lt;</button>
+          <button type="button" id="docSearchNextButton" class="doc-icon-btn" aria-label="Next match">&gt;</button>
+          <span id="docSearchCountLabel" class="doc-search-count">0/0</span>
+          <button type="button" id="docSearchClearButton" class="doc-icon-btn" aria-label="Clear search">x</button>
+        </div>
+        <div id="pdfDocControls" class="doc-toolbar-controls pdf-doc-controls" style="display:none;">
+          <button type="button" id="pdfModeButton" class="doc-icon-btn" aria-label="Toggle drag or highlight mode" data-native-tooltip title="Text selector">&#9998;</button>
+          <button type="button" id="pdfZoomOutButton" class="doc-icon-btn" aria-label="Zoom out">-</button>
+          <button type="button" id="pdfZoomResetButton" class="doc-text-btn" aria-label="Reset zoom">Reset</button>
+          <button type="button" id="pdfZoomInButton" class="doc-icon-btn" aria-label="Zoom in">+</button>
+        </div>
+        <div id="webDocControls" class="doc-toolbar-controls web-doc-controls" style="display:none;">
+          <button type="button" id="webInspectorButton" class="doc-icon-btn web-inspector-btn" aria-label="Source inspector" data-native-tooltip title="Text selector">&#8982;</button>
+          <!-- Chunked Trankit lookup toggle disabled: paragraph breaks now provide natural chunk boundaries to the normal lookup path.
+          <button type="button" id="trankitChunkLookupButton" class="doc-icon-btn trankit-chunk-lookup-btn" aria-label="Chunked lookup" style="display:none;">
+            <span class="trankit-chunk-lookup-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+          -->
+          <span id="webInspectorStatus" class="web-inspector-status" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div id="docViewportWrap" class="doc-viewport-wrap" style="display:none;">
+        <div id="sourcePager" class="reader-pager" style="display:none;"></div>
+        <div id="docPageNavigator" class="doc-page-navigator" aria-label="Document page navigator">
+          <button type="button" id="docNavPrev" class="doc-nav-btn" aria-label="Previous page">▲</button>
+          <div id="docNavTrack" class="doc-nav-track">
+            <div id="docNavThumb" class="doc-nav-thumb"></div>
+          </div>
+          <button type="button" id="docNavNext" class="doc-nav-btn" aria-label="Next page">▼</button>
+        </div>
+      </div>
+      <!-- Bottom control row: lookup btn | file upload, file pills -->
+      <div class="reader-control-row reader-control-bottom">
+        <div class="reader-control-left">
+          <span id="leLookupAnchor"></span>
+          <span id="statusText" class="status-inline" style="display:none;" aria-hidden="true"></span>
+        </div>
+        <div class="reader-control-right">
+          <button type="button" id="fileButton" class="file-button" data-native-tooltip title="Accepted files: .txt, .pdf, .docx, .epub, .mobi, .azw3, .fb2, .fbz, .html">Choose file...</button>
+          <span id="fileNamePill" class="file-name-pill" style="display:none;">
+            <span id="fileNameText" class="file-name-text"></span>
+            <button type="button" id="clearFileBtn" class="file-clear-btn" title="Clear file">&times;</button>
+          </span>
+          <span id="rawTextPill" class="file-name-pill" style="display:none;" title="Clear pasted text">
+            <span id="rawTextText" class="file-name-text"></span>
+            <button type="button" id="clearRawTextBtn" class="file-clear-btn" title="Clear pasted text">&times;</button>
+          </span>
+          <label id="origViewToggle" class="orig-view-toggle" style="display:none;" title="Show original document layout with text overlay">
+            <input type="checkbox" id="origViewCheckbox">
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">Original</span>
+          </label>
+          <input type="file"
+                 id="fileInput"
+                 accept=".txt,.pdf,.docx,.epub,.mobi,.azw3,.fb2,.fbz,.html,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/epub+zip"
+                 style="display:none;">
+        </div>
+      </div>
+    </div>
+    <div id="renderedText" class="reader-output"></div>
+    <!-- DISABLED FOR DEPLOYMENT: Dependency tree view container
+    <div id="depTreeView" class="dep-tree-view" style="display:none;"></div>
+    -->
+  </div>
+</div>
+<button id="panel-toggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M15 19l-7-7 7-7"/>
+  </svg>
+</button>
+<div id="side-panel">
+  <div id="panel-header">
+    <div id="search-container">
+      <div class="search-row">
+        <input type="text" id="dict-search" placeholder="">
+        <button id="search-btn">Search</button>
+        <button id="fuzzy-toggle" type="button" aria-pressed="false" data-native-tooltip title="Find nearest matches" style="margin-left:4px;width:30px;padding:0;font-size:15px;line-height:1;cursor:pointer;box-sizing:border-box;">&#8776;</button>
+      </div>
+    </div>
+  </div>
+  <div id="panel-scroll-area">
+    <div id="token-banner" style="display:none;"></div>
+    <div id="synth-entry-bar" style="display:none;"></div>
+    <div id="panel-content">
+      <div id="panel-placeholder"></div>
+    </div>
+  </div>
+</div>
+</div><!-- /leContentWrap -->
+<div id="hoverPopupContainer" class="popup-container">
+  <div id="g2pPopup" class="pronunciation-popup"></div>
+  <div id="notePopup" class="note-popup"></div>
+  <div id="hoverPopup" class="dict-popup"></div>
+  <div id="udPopup" class="ud-popup"></div>
+  <div id="grammarPopup" class="grammar-popup"></div>
+</div>
+<div id="subsegmentPopupsContainer" class="subsegment-popups-container"></div>
+  <!-- Flashcard overlay -->
+<div id="flashcardOverlay" class="flashcard-overlay" style="display:none;">
+  <div class="flashcard-modal">
+    <div class="flashcard-header">
+      <button type="button" id="flashcardCloseBtn" class="flashcard-close-btn" title="Close">&times;</button>
+    </div>
+    <div id="flashcardWord" class="flashcard-word">...</div>
+    <button type="button" id="flashcardShowAnswerBtn" class="flashcard-show-answer-btn">Show Answer</button>
+    <div id="flashcardAnswer" class="flashcard-answer" style="display:none;">
+      <div id="flashcardPronunciation" class="flashcard-section"></div>
+      <div id="flashcardDictionary" class="flashcard-section"></div>
+      <div id="flashcardGrammar" class="flashcard-section"></div>
+      <div id="flashcardCommentSection" class="flashcard-section">
+        <div class="flashcard-section-title">Comment</div>
+        <textarea id="flashcardAnnotation" class="flashcard-annotation-textarea" rows="2" placeholder="Add your notes..."></textarea>
+      </div>
+    </div>
+    <div id="flashcardGradeButtons" class="flashcard-grade-buttons" style="display:none;">
+      <button type="button" id="flashcardDontKnowBtn" class="flashcard-grade-btn flashcard-grade-unknown">I don't know</button>
+      <button type="button" id="flashcardKnowBtn" class="flashcard-grade-btn flashcard-grade-known">I know this</button>
+    </div>
+    <div id="flashcardMessage" class="flashcard-message"></div>
+    <div id="flashcardStats" class="flashcard-stats"></div>
+  </div>
+</div>
+  <script>
+    window.APP_DICT_VERSION = "{{ app_dict_version }}";
+    window.APP_DICT_INDEX_URLS = {{ js_index_urls|tojson }};
+    window.LE_DEBUG_COLLECTION_ENABLED = {{ 'true' if is_debug_collection_enabled() else 'false' }};
+  </script>
+  <script src="{{ url_for('static', filename='TRANKIT_TAGS.js') }}?v={{ mtime('TRANKIT_TAGS.js') }}"></script>
+  <script src="{{ url_for('static', filename='reader_wikt.js') }}?v={{ mtime('reader_wikt.js') }}"></script>
+  <script src="{{ url_for('static', filename='panel_segment_renderer.js') }}?v={{ mtime('panel_segment_renderer.js') }}"></script>
+  <script src="{{ url_for('static', filename='dict_popup_clamp.js') }}?v={{ mtime('dict_popup_clamp.js') }}"></script>
+  <script src="{{ url_for('static', filename='dictionary_normalization_layer.js') }}?v={{ mtime('dictionary_normalization_layer.js') }}"></script>
+  <script src="{{ url_for('static', filename='grapheme_pronunciation_profiles.js') }}?v={{ mtime('grapheme_pronunciation_profiles.js') }}"></script>
+  <script src="{{ url_for('static', filename='dictionary_engine_hybrid.js') }}?v={{ mtime('dictionary_engine_hybrid.js') }}"></script>
+  <script src="{{ url_for('static', filename='dictionary_client_hybrid.js') }}?v={{ mtime('dictionary_client_hybrid.js') }}"></script>
+  <script src="{{ url_for('static', filename='user_contributions.js') }}?v={{ mtime('user_contributions.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/jszip/jszip.min.js') }}?v={{ mtime('vendor/jszip/jszip.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/dompurify/purify.min.js') }}?v={{ mtime('vendor/dompurify/purify.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/mammoth/mammoth.browser.min.js') }}?v={{ mtime('vendor/mammoth/mammoth.browser.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/pdfjs/pdf.min.js') }}?v={{ mtime('vendor/pdfjs/pdf.min.js') }}"></script>
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "{{ url_for('static', filename='vendor/pdfjs/pdf.worker.min.js') }}?v={{ mtime('vendor/pdfjs/pdf.worker.min.js') }}";
+    }
+  </script>
+  <script src="{{ url_for('static', filename='docrender/parsers.js') }}?v={{ mtime('docrender/parsers.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/canonical_style.js') }}?v={{ mtime('docrender/canonical_style.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/canonical_model.js') }}?v={{ mtime('docrender/canonical_model.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/canonical_builder.js') }}?v={{ mtime('docrender/canonical_builder.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/canonical_pdf_extractor.js') }}?v={{ mtime('docrender/canonical_pdf_extractor.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/web_snapshot_renderer.js') }}?v={{ mtime('docrender/web_snapshot_renderer.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/canonical_web_extractor.js') }}?v={{ mtime('docrender/canonical_web_extractor.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/canonical_lookup.js') }}?v={{ mtime('docrender/canonical_lookup.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/canonical_annotator.js') }}?v={{ mtime('docrender/canonical_annotator.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/canonical_renderer.js') }}?v={{ mtime('docrender/canonical_renderer.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/canonical_controller.js') }}?v={{ mtime('docrender/canonical_controller.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/loader.js') }}?v={{ mtime('docrender/loader.js') }}"></script>
+  <script src="{{ url_for('static', filename='reader.js') }}?v={{ mtime('reader.js') }}"></script>
+  <script src="{{ url_for('static', filename='lookup_gate.js') }}?v={{ mtime('lookup_gate.js') }}"></script>
+  <script src="{{ url_for('static', filename='marked.min.js') }}?v={{ mtime('marked.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='llm_assistant.js') }}?v={{ mtime('llm_assistant.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='trankit-chunk-debugger/trankit_chunk_debugger.css') }}?v={{ mtime('trankit-chunk-debugger/trankit_chunk_debugger.css') }}">
+  <script src="{{ url_for('static', filename='trankit-chunk-debugger/trankit_chunk_debugger.js') }}?v={{ mtime('trankit-chunk-debugger/trankit_chunk_debugger.js') }}"></script>
+</body>
+</html>

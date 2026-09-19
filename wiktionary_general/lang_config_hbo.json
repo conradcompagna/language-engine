@@ -1,0 +1,14 @@
+{
+    "display_name": "Ancient Hebrew",
+    "code": "hbo",
+    "font_family": "\"Noto Sans Hebrew\", \"Segoe UI\", system-ui, sans-serif",
+    "ner_labels": {
+        "PER": "Person",
+        "PERSON": "Person",
+        "LOC": "Location",
+        "LOCATION": "Location",
+        "ORG": "Organization",
+        "ORGANIZATION": "Organization",
+        "GPE": "Geopolitical Entity"
+    }
+}

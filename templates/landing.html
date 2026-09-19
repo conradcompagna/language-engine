@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% set base_url = public_base_url or request.url_root.rstrip('/') %}
+<meta charset="utf-8"/>
+<title>Language Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="Read PDFs, ebooks, and web text in 30+ languages with NLP-powered dictionary lookup, morphology, dependency parsing, and AI notes."/>
+<link rel="canonical" href="{{ base_url }}/"/>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='le-logo.svg') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='pronunciation_popup.css') }}"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Language Engine",
+  "url": {{ (base_url ~ "/")|tojson }},
+  "logo": {{ (base_url ~ url_for('static', filename='le-logo.svg'))|tojson }}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Language Engine",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "url": {{ (base_url ~ "/")|tojson }},
+  "description": "NLP-powered reading software for dictionary lookup, morphology, dependency parsing, and AI notes across 30+ languages.",
+  "offers": [
+    {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "name": "Free"
+    },
+    {
+      "@type": "Offer",
+      "price": "10",
+      "priceCurrency": "USD",
+      "name": "Pro Monthly"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav class="le-nav" id="leNav">
+  <div class="le-nav-inner">
+    <a href="/"><img src="{{ url_for('static', filename='le-logo.svg') }}" alt="Language Engine" class="le-nav-logo"/></a>
+    <div class="le-nav-links">
+      <a href="#showcase" class="le-nav-link">Showcase</a>
+      <a href="#features" class="le-nav-link">Features</a>
+      <a href="#video" class="le-nav-link">Preview</a>
+      <a href="#languages" class="le-nav-link">Languages</a>
+      <a href="#pricing" class="le-nav-link">Pricing</a>
+      <button class="le-btn le-btn-ghost" id="btnSignIn" onclick="openAuthModal('login')">Sign In</button>
+      <button class="le-btn le-btn-primary" onclick="openAuthModal('signup')">Get Started</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="le-hero">
+  <div class="le-hero-inner">
+    <h1>NLP-powered reading app<br/><span>for in-depth textual analysis</span></h1>
+    <p class="le-hero-sub">
+      A transformer-based reading environment that tokenizes, parses, annotates, and assigns dictionary entries to text in 30+ modern and historical languages. Reads a variety of input formats &mdash; PDF, HTML snapshots, Word documents, EPUBs.
+    </p>
+    <p class="le-hero-sub-2">
+      Built for serious learners and professionals who want research-grade linguistic understanding.
+    </p>
+    <div class="le-hero-actions">
+      <button class="le-btn le-btn-primary" onclick="openAuthModal('signup')" style="padding: 14px 36px; font-size: 16px;">Start Reading Free</button>
+      <a href="#video" class="le-btn le-btn-outline" style="padding: 14px 36px; font-size: 16px;">See How It Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LIVE LOOKUP SHOWCASE
+     ============================================================ -->
+<section class="le-hero-showcase le-live-showcase" id="showcase" aria-labelledby="showcaseTitle">
+  <div class="le-live-showcase-heading">
+    <h2 id="showcaseTitle">Output showcase</h2>
+    <div class="le-live-showcase-tabs" id="showcaseTabs" aria-label="Showcase languages"></div>
+  </div>
+
+  <div class="le-showcase-frame le-live-showcase-frame">
+    <div class="le-live-showcase-body">
+      <div class="le-reader-shell">
+        <div id="renderedText" class="le-live-reader-surface"></div>
+        <div id="showcaseAttribution" class="le-live-showcase-attribution"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="hoverPopupContainer" class="popup-container">
+    <div id="hoverPopup" class="dict-popup"></div>
+    <div id="grammarPopup" class="grammar-popup"></div>
+    <div id="udPopup" class="ud-popup"></div>
+    <div id="g2pPopup" class="pronunciation-popup"></div>
+    <div id="notePopup" class="note-popup"></div>
+  </div>
+  <div id="subsegmentPopupsContainer" class="subsegment-popups-container"></div>
+
+  <div class="le-reader-shim" aria-hidden="true">
+    <span id="statusText"></span>
+    <span id="statusCounts"></span>
+    <textarea id="sourceText"></textarea>
+    <div id="sourcePager"></div>
+    <div id="docToolbar"></div>
+    <div id="docViewportWrap"></div>
+    <div id="docPageLabel"></div>
+    <input id="docPageNumberInput"/>
+    <div id="docPageNavigator"></div>
+    <button id="docNavPrev" type="button"></button>
+    <button id="docNavNext" type="button"></button>
+    <div id="docNavTrack"><div id="docNavThumb"></div></div>
+    <div id="pdfDocControls"></div>
+    <button id="pdfModeButton" type="button"></button>
+    <button id="pdfZoomOutButton" type="button"></button>
+    <button id="pdfZoomResetButton" type="button"></button>
+    <button id="pdfZoomInButton" type="button"></button>
+    <input id="pdfSearchField"/>
+    <button id="pdfSearchPrevButton" type="button"></button>
+    <button id="pdfSearchNextButton" type="button"></button>
+    <span id="pdfSearchCountLabel"></span>
+    <button id="pdfSearchClearButton" type="button"></button>
+    <div id="docCapabilityControls"></div>
+    <button id="docContentsButton" type="button"></button>
+    <div id="docContentsMenu"></div>
+    <div id="docNavMenuMeta"></div>
+    <div id="docNavMenuList"></div>
+    <input id="docSearchField"/>
+    <button id="docSearchPrevButton" type="button"></button>
+    <button id="docSearchNextButton" type="button"></button>
+    <span id="docSearchCountLabel"></span>
+    <button id="docSearchClearButton" type="button"></button>
+    <div id="docSearchMenu"></div>
+    <div id="docSearchMenuMeta"></div>
+    <div id="docSearchMenuList"></div>
+    <div id="webDocControls"></div>
+    <button id="webInspectorButton" type="button"></button>
+    <button id="trankitChunkLookupButton" type="button"></button>
+    <span id="webInspectorStatus"></span>
+    <div id="depTreeView"></div>
+    <div id="dropZone"></div>
+    <input id="fileInput" type="file"/>
+    <button id="fileButton" type="button"></button>
+    <div id="fileNamePill"></div>
+    <span id="fileNameText"></span>
+    <button id="clearFileBtn" type="button"></button>
+    <div id="rawTextPill"></div>
+    <span id="rawTextText"></span>
+    <button id="clearRawTextBtn" type="button"></button>
+    <div id="side-panel"><div id="panel-content"></div></div>
+    <button id="panel-toggle" type="button"></button>
+    <div id="top-nav"></div>
+    <div id="main-container"></div>
+    <input id="dict-search"/>
+    <button id="search-btn" type="button"></button>
+    <div id="token-banner"></div>
+    <div id="synth-entry-bar"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURE BLOCKS &mdash; image-paired, alternating, per-pane mini-carousels
+     ============================================================ -->
+
+<!-- Block 1: PDF / ebook / Word doc -->
+<section class="le-fblock le-section-alt" id="features">
+  <div class="le-fblock-inner">
+    <div class="le-fblock-image le-fblock-carousel">
+      <div class="le-fbc-track">
+        <div class="le-fbc-slide is-active">
+          <img src="{{ url_for('static', filename='marketing/screenshots/02_greek_pdf_annotated_bottom_lander_crop.png') }}" alt="Greek PDF page with inspectable annotated text, POS shading, and grammar popup"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/17_word_doc_turkish.png') }}" alt="Turkish Word document loaded into the reader"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/05_armenian_pdf_page.png') }}" alt="Armenian PDF page rendered in the reader"/>
+        </div>
+      </div>
+      <button class="le-fbc-nav le-fbc-prev" aria-label="Previous" type="button">&#8249;</button>
+      <button class="le-fbc-nav le-fbc-next" aria-label="Next" type="button">&#8250;</button>
+      <div class="le-fbc-dots">
+        <button class="le-fbc-dot is-active" data-slide="0" type="button" aria-label="Slide 1"></button>
+        <button class="le-fbc-dot" data-slide="1" type="button" aria-label="Slide 2"></button>
+        <button class="le-fbc-dot" data-slide="2" type="button" aria-label="Slide 3"></button>
+      </div>
+    </div>
+    <div class="le-fblock-text">
+      <h3>Read PDFs, ebooks, and Word docs with their layout intact</h3>
+      <p>Documents are ingested with their original page geometry preserved &mdash; page numbers, running headers, centred text blocks, line wrapping, and book typography. Dependency arcs are drawn directly over the live text, so syntax is visible on the page.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Block 2: Web snapshots / Language Capture extension -->
+<section class="le-fblock">
+  <div class="le-fblock-inner">
+    <div class="le-fblock-image le-fblock-carousel">
+      <div class="le-fbc-track">
+        <div class="le-fbc-slide is-active">
+          <img src="{{ url_for('static', filename='marketing/screenshots/22_turkish_web_capture_clean.png') }}" alt="Turkish website capture prepared for the reader"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/20_turkish_web_iframe_render.png') }}" alt="Turkish web snapshot rendered with high-fidelity site layout"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/21_turkish_geometric_lookup.png') }}" alt="Turkish web snapshot with lookup over geometrically aware text"/>
+        </div>
+      </div>
+      <button class="le-fbc-nav le-fbc-prev" aria-label="Previous" type="button">&#8249;</button>
+      <button class="le-fbc-nav le-fbc-next" aria-label="Next" type="button">&#8250;</button>
+      <div class="le-fbc-dots">
+        <button class="le-fbc-dot is-active" data-slide="0" type="button" aria-label="Slide 1"></button>
+        <button class="le-fbc-dot" data-slide="1" type="button" aria-label="Slide 2"></button>
+        <button class="le-fbc-dot" data-slide="2" type="button" aria-label="Slide 3"></button>
+      </div>
+    </div>
+    <div class="le-fblock-text">
+      <h3>Read web snapshots the same way</h3>
+      <p>Save an HTML snapshot of any web page with the companion Chrome extension &mdash; <a href="https://chromewebstore.google.com/detail/language-engine-capture/moljdhkmokgdglimghgkenhbeccpognn" class="le-inline-chrome-link"><strong>Language Capture</strong></a> &mdash; and load it into the reader as a frozen, fully-analysable text. Infoboxes, hyperlinks, and visual structure stay intact.</p>
+      <p>Use the selector tool to highlight specific chunks of prose for lookup.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Block 3: Tokenization (sandhi, clitics, scriptio continua) -->
+<section class="le-fblock le-section-alt">
+  <div class="le-fblock-inner">
+    <div class="le-fblock-image le-fblock-carousel">
+      <div class="le-fbc-track">
+        <div class="le-fbc-slide is-active">
+          <img src="{{ url_for('static', filename='marketing/screenshots/14_sanskrit_sandhi_split.png') }}" alt="Sanskrit sandhi compound decomposed into its constituent morphemes"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/09_arabic_clitic_tokenization_20260510_113408.png') }}" alt="Arabic word with clitic prefix split off from the host"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/11_japanese_tokenization_lander_crop.png') }}" alt="Japanese sentence segmented into individual tokens despite no whitespace"/>
+        </div>
+      </div>
+      <button class="le-fbc-nav le-fbc-prev" aria-label="Previous" type="button">&#8249;</button>
+      <button class="le-fbc-nav le-fbc-next" aria-label="Next" type="button">&#8250;</button>
+      <div class="le-fbc-dots">
+        <button class="le-fbc-dot is-active" data-slide="0" type="button" aria-label="Slide 1"></button>
+        <button class="le-fbc-dot" data-slide="1" type="button" aria-label="Slide 2"></button>
+        <button class="le-fbc-dot" data-slide="2" type="button" aria-label="Slide 3"></button>
+      </div>
+    </div>
+    <div class="le-fblock-text">
+      <h3>Tokenization across writing systems</h3>
+      <p>Arabic clitics are split off from their host words. Sanskrit sandhi chains are decomposed into their constituent morphemes. Scriptio continua languages &mdash; Thai, Japanese, Chinese &mdash; are segmented by a powerful multilingual transformer pretrained on 2.6 terabytes of text from over 100 languages.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Block 4: Hover dictionary popup -->
+<section class="le-fblock" id="dictionaries">
+  <div class="le-fblock-inner">
+    <div class="le-fblock-image le-fblock-carousel">
+      <div class="le-fbc-track">
+        <div class="le-fbc-slide is-active">
+          <img src="{{ url_for('static', filename='marketing/screenshots/15_vietnamese_dict_entry.png') }}" alt="Vietnamese dictionary entry popup"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/16_old_english_dict_entry.png') }}" alt="Old English dictionary entry popup"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/18_turkish_mescidin_dict.png') }}" alt="Turkish dictionary entry popup with cropped focus"/>
+        </div>
+      </div>
+      <button class="le-fbc-nav le-fbc-prev" aria-label="Previous" type="button">&#8249;</button>
+      <button class="le-fbc-nav le-fbc-next" aria-label="Next" type="button">&#8250;</button>
+      <div class="le-fbc-dots">
+        <button class="le-fbc-dot is-active" data-slide="0" type="button" aria-label="Slide 1"></button>
+        <button class="le-fbc-dot" data-slide="1" type="button" aria-label="Slide 2"></button>
+        <button class="le-fbc-dot" data-slide="2" type="button" aria-label="Slide 3"></button>
+      </div>
+    </div>
+    <div class="le-fblock-text">
+      <h3>Hover any word for layered dictionary lookup</h3>
+      <p>Hovering a token surfaces a stack of curated dictionaries assembled per language &mdash; Wiktionary alongside specialist sources like JMDict (Japanese), CC-CEDICT (Chinese), KRDICT (Korean), and historical lexica for classical languages.</p>
+      <p>Entries are filtered by lemma and POS, so you only see context-suitable candidates.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Block 5: Grammar popup zoom (POS / fine-grained POS / morph features / lemma) -->
+<section class="le-fblock le-section-alt">
+  <div class="le-fblock-inner">
+    <div class="le-fblock-image le-fblock-carousel">
+      <div class="le-fbc-track">
+        <div class="le-fbc-slide is-active">
+          <img src="{{ url_for('static', filename='marketing/screenshots/04_greek_inflected_verb_lander_crop.png') }}" alt="Greek inflected verb grammar popup with full feature bundle"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/03_greek_noun_stack_grammar_lander_crop.png') }}" alt="Greek noun stack with case, gender, number"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/09_arabic_grammar_lander_crop.png') }}" alt="Arabic token card with POS, dependency role, morphology, and gloss"/>
+        </div>
+      </div>
+      <button class="le-fbc-nav le-fbc-prev" aria-label="Previous" type="button">&#8249;</button>
+      <button class="le-fbc-nav le-fbc-next" aria-label="Next" type="button">&#8250;</button>
+      <div class="le-fbc-dots">
+        <button class="le-fbc-dot is-active" data-slide="0" type="button" aria-label="Slide 1"></button>
+        <button class="le-fbc-dot" data-slide="1" type="button" aria-label="Slide 2"></button>
+        <button class="le-fbc-dot" data-slide="2" type="button" aria-label="Slide 3"></button>
+      </div>
+    </div>
+    <div class="le-fblock-text">
+      <h3>Dictionary entries given grammatical shape</h3>
+      <p>Each entry is annotated with a POS tag, a language-specific fine-grained POS tag, a grapheme-level script/romanization breakdown, and a full morphological feature bundle: aspect, mood, tense, voice, person, number, case, gender and more. Inflected forms are also resolved back to their dictionary lemma.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Block 6: Dependency parse + NER -->
+<section class="le-fblock">
+  <div class="le-fblock-inner">
+    <div class="le-fblock-image le-fblock-carousel">
+      <div class="le-fbc-track">
+        <div class="le-fbc-slide is-active">
+          <img src="{{ url_for('static', filename='marketing/screenshots/13_turkish_ner_dep_popup.png') }}" alt="Turkish sentence with dependency arcs, POS shading, NER chip, dictionary popup, and grammar popup"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/06_armenian_sentence_structure_lander_crop.png') }}" alt="Armenian sentence with dependency arcs and grammar popup"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/sentence_structure_dependency_parse_20260510_002422.png') }}" alt="Sentence with dependency arcs, POS shading, dictionary popup, and grammar popup"/>
+        </div>
+      </div>
+      <button class="le-fbc-nav le-fbc-prev" aria-label="Previous" type="button">&#8249;</button>
+      <button class="le-fbc-nav le-fbc-next" aria-label="Next" type="button">&#8250;</button>
+      <div class="le-fbc-dots">
+        <button class="le-fbc-dot is-active" data-slide="0" type="button" aria-label="Slide 1"></button>
+        <button class="le-fbc-dot" data-slide="1" type="button" aria-label="Slide 2"></button>
+        <button class="le-fbc-dot" data-slide="2" type="button" aria-label="Slide 3"></button>
+      </div>
+    </div>
+    <div class="le-fblock-text">
+      <h3>Sentence structure visible at a glance</h3>
+      <p>Sentence structure is rendered visually onscreen through dependency arcs drawn over the live text, accompanied by POS shading to give shape to phrase and clause boundaries. Each word&rsquo;s grammatical role in the sentence is flagged, marking out subjects, objects, verbs and function words.</p>
+      <p>Named entities are tagged with colour-coded chips so you can scan a passage at a glance for the who, what, where and when.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Block 7: LLM integration (Gemini) -->
+<section class="le-fblock le-section-alt">
+  <div class="le-fblock-inner">
+    <div class="le-fblock-image le-fblock-carousel">
+      <div class="le-fbc-track">
+        <div class="le-fbc-slide is-active">
+          <img src="{{ url_for('static', filename='marketing/screenshots/12_context_aware_assistant_lander_crop.png') }}" alt="Context-aware reading assistant"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/07_armenian_synthetic_entry_lander_crop.png') }}" alt="Armenian synthetic dictionary entry"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/10_arabic_synthetic_entry_lander_crop.png') }}" alt="Arabic synthetic dictionary entry"/>
+        </div>
+        <div class="le-fbc-slide">
+          <img src="{{ url_for('static', filename='marketing/screenshots/01_thai_translation_overlay_lander_crop.png') }}" alt="Thai sentence-level translation"/>
+        </div>
+      </div>
+      <button class="le-fbc-nav le-fbc-prev" aria-label="Previous" type="button">&#8249;</button>
+      <button class="le-fbc-nav le-fbc-next" aria-label="Next" type="button">&#8250;</button>
+      <div class="le-fbc-dots">
+        <button class="le-fbc-dot is-active" data-slide="0" type="button" aria-label="Slide 1"></button>
+        <button class="le-fbc-dot" data-slide="1" type="button" aria-label="Slide 2"></button>
+        <button class="le-fbc-dot" data-slide="2" type="button" aria-label="Slide 3"></button>
+        <button class="le-fbc-dot" data-slide="3" type="button" aria-label="Slide 4"></button>
+      </div>
+    </div>
+    <div class="le-fblock-text">
+      <h3>Crowdsourced LLM annotations</h3>
+      <p>Per-token glosses for word-sense disambiguation in context. On-demand synthetic dictionary entries for forms not covered by the existing sources. Sentence-level translations anchored to the source text. Free-form notes attached to dictionary entries. All of the above are community-editable &mdash; once one user generates an annotation, every other reader can see, alter, and benefit from it.</p>
+      <p>A built-in LLM chatbot always has your page loaded as context, and can answer any questions you might have.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VIDEO PREVIEW CAROUSEL
+     ============================================================ -->
+<section class="le-section le-section-video" id="video">
+  <div class="le-section-inner">
+    <div class="le-video-carousel" id="previewVideoCarousel">
+      <div class="le-video-tabs" role="tablist" aria-label="Preview clips">
+        <button class="le-video-tab is-active" type="button" data-preview-video
+                data-video-src="{{ url_for('static', filename='marketing/video/newvids/01_web_snapshot_capture.mp4') }}"
+                data-video-poster="{{ url_for('static', filename='marketing/video/newvids/01_web_snapshot_capture.jpg') }}"
+                aria-selected="true">Capture web pages</button>
+        <button class="le-video-tab" type="button" data-preview-video
+                data-video-src="{{ url_for('static', filename='marketing/video/newvids/02_arabic_web_lookup.mp4') }}"
+                data-video-poster="{{ url_for('static', filename='marketing/video/newvids/02_arabic_web_lookup.jpg') }}"
+                aria-selected="false">Inspect live web text</button>
+        <button class="le-video-tab" type="button" data-preview-video
+                data-video-src="{{ url_for('static', filename='marketing/video/newvids/03_pdf_layout_lookup.mp4') }}"
+                data-video-poster="{{ url_for('static', filename='marketing/video/newvids/03_pdf_layout_lookup.jpg') }}"
+                aria-selected="false">Read PDFs in place</button>
+        <button class="le-video-tab" type="button" data-preview-video
+                data-video-src="{{ url_for('static', filename='marketing/video/newvids/04_synthetic_dictionary_entry.mp4') }}"
+                data-video-poster="{{ url_for('static', filename='marketing/video/newvids/04_synthetic_dictionary_entry.jpg') }}"
+                aria-selected="false">Fill dictionary gaps</button>
+        <button class="le-video-tab" type="button" data-preview-video
+                data-video-src="{{ url_for('static', filename='marketing/video/newvids/05_sentence_translation_hover.mp4') }}"
+                data-video-poster="{{ url_for('static', filename='marketing/video/newvids/05_sentence_translation_hover.jpg') }}"
+                aria-selected="false">Translate in context</button>
+        <button class="le-video-tab" type="button" data-preview-video
+                data-video-src="{{ url_for('static', filename='marketing/video/newvids/06_contextual_assistant.mp4') }}"
+                data-video-poster="{{ url_for('static', filename='marketing/video/newvids/06_contextual_assistant.jpg') }}"
+                aria-selected="false">Ask the assistant</button>
+      </div>
+
+      <div class="le-video-frame">
+        <video id="previewVideo" controls preload="none" playsinline
+               poster="{{ url_for('static', filename='marketing/video/newvids/01_web_snapshot_capture.jpg') }}">
+          <source id="previewVideoSource" data-src="{{ url_for('static', filename='marketing/video/newvids/01_web_snapshot_capture.mp4') }}" type="video/mp4"/>
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LANGUAGES
+     ============================================================ -->
+<section class="le-section" id="languages">
+  <div class="le-section-inner">
+    <div class="le-section-header">
+      <h2>30+ languages</h2>
+      <p>The world&rsquo;s most widely spoken modern languages, plus the classical languages that open up the heritage of major civilisations.</p>
+    </div>
+    <div class="le-lang-columns">
+      <div class="le-lang-col">
+        <h3>Historical &amp; Classical</h3>
+        <div class="le-lang-list">
+          <span class="le-lang-pill">Classical Chinese</span>
+          <span class="le-lang-pill">Ancient Greek</span>
+          <span class="le-lang-pill">Latin</span>
+          <span class="le-lang-pill">Sanskrit</span>
+          <span class="le-lang-pill">Old English</span>
+        </div>
+      </div>
+      <div class="le-lang-col">
+        <h3>Modern</h3>
+        <div class="le-lang-list">
+          <span class="le-lang-pill">Chinese</span>
+          <span class="le-lang-pill">Traditional Chinese</span>
+          <span class="le-lang-pill">Japanese</span>
+          <span class="le-lang-pill">Korean</span>
+          <span class="le-lang-pill">Vietnamese</span>
+          <span class="le-lang-pill">French</span>
+          <span class="le-lang-pill">Spanish</span>
+          <span class="le-lang-pill">German</span>
+          <span class="le-lang-pill">Italian</span>
+          <span class="le-lang-pill">Portuguese</span>
+          <span class="le-lang-pill">Russian</span>
+          <span class="le-lang-pill">Dutch</span>
+          <span class="le-lang-pill">Greek</span>
+          <span class="le-lang-pill">Arabic</span>
+          <span class="le-lang-pill">Hebrew</span>
+          <span class="le-lang-pill">Hindi</span>
+          <span class="le-lang-pill">Persian</span>
+          <span class="le-lang-pill">Turkish</span>
+          <span class="le-lang-pill">Indonesian</span>
+          <span class="le-lang-pill">Thai</span>
+          <span class="le-lang-pill">Tagalog</span>
+          <span class="le-lang-pill">Swahili</span>
+          <span class="le-lang-pill">Armenian</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRICING
+     ============================================================ -->
+<section class="le-section le-section-alt" id="pricing">
+  <div class="le-section-inner">
+    <div class="le-pricing-row">
+      <div class="le-pricing-card">
+        <div class="le-pricing-tier">Free</div>
+        <div class="le-price">$0<span class="le-price-period"> / month</span></div>
+        <ul class="le-pricing-features">
+          <li><span class="le-check">&#10003;</span> Full NLP pipeline</li>
+          <li><span class="le-check">&#10003;</span> Dictionary entries across all 30+ languages</li>
+          <li><span class="le-check">&#10003;</span> 1,000 tokens per day</li>
+          <li><span class="le-check">&#10003;</span> No credit card required</li>
+        </ul>
+        <button class="le-btn le-btn-primary" style="width:100%; padding: 14px; font-size: 16px;" onclick="openAuthModal('signup')">Get Started</button>
+      </div>
+      <div class="le-pricing-card le-pricing-card-pro">
+        <div class="le-pricing-tier le-pricing-tier-pro">Pro</div>
+        <div class="le-billing-toggle" aria-label="Pro billing cycle">
+          <button class="le-billing-toggle-option is-active" type="button" data-pro-billing="monthly" aria-pressed="true">Monthly</button>
+          <button class="le-billing-toggle-option" type="button" data-pro-billing="yearly" aria-pressed="false">Yearly</button>
+        </div>
+        <div class="le-price"><span id="proPriceAmount">$10</span><span class="le-price-period" id="proPricePeriod"> / month</span></div>
+        <div class="le-pricing-meta" id="proPriceMeta">Monthly billing</div>
+        <ul class="le-pricing-features">
+          <li><span class="le-check">&#10003;</span> Unlimited access</li>
+          <li><span class="le-check">&#10003;</span> Unlocks all LLM features:
+            <ul class="le-pricing-sublist">
+              <li>Per-token glosses</li>
+              <li>Sentence-level translations</li>
+              <li>Built-in chatbot with full page context</li>
+              <li>Synthetic dictionary entry creation</li>
+              <li>Free-form note creation on entries</li>
+            </ul>
+          </li>
+          <li><span class="le-check">&#10003;</span> <span id="proBillingBenefitText">Cancel anytime</span></li>
+        </ul>
+        <button class="le-btn le-btn-primary" style="width:100%; padding: 14px; font-size: 16px;" onclick="startProSignup()">Get Started</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="le-footer">
+  <p>&copy; 2026 Language Engine. All rights reserved.</p>
+</footer>
+
+<!-- ============================================================
+     AUTH MODAL
+     ============================================================ -->
+<div class="le-modal-overlay" id="authModal">
+  <div class="le-modal">
+    <button class="le-modal-close" onclick="closeAuthModal()" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+
+    <!-- SIGNUP VIEW -->
+    <div id="authSignup">
+      <h2>Create your account</h2>
+      <p class="le-modal-sub">Free to start. 1,000 tokens per day, no card required.</p>
+      <form id="signupForm" onsubmit="return handleSignup(event)">
+        <div class="le-form-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" name="email" required autocomplete="email" placeholder="you@example.com"/>
+          <div class="le-form-error" id="signupEmailError"></div>
+        </div>
+        <div class="le-form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" name="password" required autocomplete="new-password" minlength="8" placeholder="At least 8 characters"/>
+          <div class="le-form-error" id="signupPasswordError"></div>
+        </div>
+        <button type="submit" class="le-btn le-btn-primary" style="width:100%; padding:12px; font-size:15px;">Create Account</button>
+      </form>
+      <div class="le-divider"><span>or</span></div>
+      <button class="le-btn-google" onclick="handleGoogleAuth()">
+        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <p class="le-modal-switch">Already have an account? <a onclick="switchAuthView('login')">Sign in</a></p>
+    </div>
+
+    <!-- LOGIN VIEW -->
+    <div id="authLogin" style="display:none;">
+      <h2>Welcome back</h2>
+      <p class="le-modal-sub">Sign in to continue reading.</p>
+      <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="le-form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" name="email" required autocomplete="email" placeholder="you@example.com"/>
+          <div class="le-form-error" id="loginEmailError"></div>
+        </div>
+        <div class="le-form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" name="password" required autocomplete="current-password" placeholder="Your password"/>
+          <div class="le-form-error" id="loginPasswordError"></div>
+        </div>
+        <button type="submit" class="le-btn le-btn-primary" style="width:100%; padding:12px; font-size:15px;">Sign In</button>
+      </form>
+      <div class="le-divider"><span>or</span></div>
+      <button class="le-btn-google" onclick="handleGoogleAuth()">
+        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <p class="le-modal-switch"><a onclick="switchAuthView('forgot')">Forgot password?</a></p>
+      <p class="le-modal-switch">Don't have an account? <a onclick="switchAuthView('signup')">Sign up</a></p>
+    </div>
+
+    <!-- FORGOT PASSWORD VIEW -->
+    <div id="authForgot" style="display:none;">
+      <h2>Reset password</h2>
+      <p class="le-modal-sub">Enter your account email and we'll send a reset link.</p>
+      <form id="forgotForm" onsubmit="return handleForgotPassword(event)">
+        <div class="le-form-group">
+          <label for="forgotEmail">Email</label>
+          <input type="email" id="forgotEmail" name="email" required autocomplete="email" placeholder="you@example.com"/>
+          <div class="le-form-error" id="forgotEmailError"></div>
+        </div>
+        <button type="submit" class="le-btn le-btn-primary" style="width:100%; padding:12px; font-size:15px;">Send Reset Link</button>
+      </form>
+      <p class="le-modal-switch"><a onclick="switchAuthView('login')">Back to sign in</a></p>
+    </div>
+
+    <!-- RESET PASSWORD VIEW -->
+    <div id="authReset" style="display:none;">
+      <h2>Choose a new password</h2>
+      <p class="le-modal-sub">Enter a new password for your account.</p>
+      <form id="resetForm" onsubmit="return handleResetPassword(event)">
+        <input type="hidden" id="resetToken"/>
+        <div class="le-form-group">
+          <label for="resetPassword">New password</label>
+          <input type="password" id="resetPassword" name="password" required autocomplete="new-password" minlength="8" placeholder="At least 8 characters"/>
+          <div class="le-form-error" id="resetPasswordError"></div>
+        </div>
+        <button type="submit" class="le-btn le-btn-primary" style="width:100%; padding:12px; font-size:15px;">Update Password</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>window.LE_READER_SHOWCASE_MODE = true;</script>
+<script src="{{ url_for('static', filename='TRANKIT_TAGS.js') }}"></script>
+<script src="{{ url_for('static', filename='reader_wikt.js') }}"></script>
+<script src="{{ url_for('static', filename='dict_popup_clamp.js') }}"></script>
+<script src="{{ url_for('static', filename='grapheme_pronunciation_profiles.js') }}"></script>
+<script src="{{ url_for('static', filename='reader.js') }}"></script>
+<script src="{{ url_for('static', filename='landing_showcase.js') }}"></script>
+<script src="{{ url_for('static', filename='landing.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+    "display_name": "Urdu",
+    "code": "ur",
+    "font_family": "\"Noto Nastaliq Urdu\", \"Noto Sans Arabic\", \"Noto Sans\", \"Segoe UI\", system-ui, sans-serif",
+    "text_direction": "rtl",
+    "ner_labels": {
+        "PER": "Person",
+        "PERSON": "Person",
+        "LOC": "Location",
+        "LOCATION": "Location",
+        "ORG": "Organization",
+        "ORGANIZATION": "Organization",
+        "GPE": "Geopolitical Entity",
+        "DATE": "Date",
+        "TIME": "Time",
+        "CARDINAL": "Cardinal Number",
+        "ORDINAL": "Ordinal Number",
+        "MONEY": "Money",
+        "PERCENT": "Percentage",
+        "QUANTITY": "Quantity",
+        "NORP": "Nationality / Religious / Political Group",
+        "EVENT": "Event"
+    }
+}

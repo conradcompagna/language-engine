@@ -1,0 +1,155 @@
+/* canonical_reader.css
+ * Bottom-pane textual skeleton renderer.
+ * Source-document CSS should not be required here; this is controlled app DOM.
+ */
+#renderedText.canonical-reader-active,
+#renderedText .canonical-page {
+  box-sizing: border-box;
+}
+
+#renderedText.canonical-reader-active {
+  white-space: normal !important;
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  overflow-clip-margin: var(--reader-effect-overflow, 72px);
+  background: var(--le-white, #fff);
+}
+
+#renderedText.canonical-reader-active.canonical-web-rect-slice-active {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  overflow-clip-margin: var(--reader-effect-overflow, 72px);
+}
+
+.canonical-page {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100%;
+  color: inherit;
+  background: transparent;
+}
+
+#renderedText.canonical-reader-active .canonical-page,
+#renderedText.canonical-reader-active .canonical-page .canonical-block,
+#renderedText.canonical-reader-active .canonical-page .canonical-run,
+#renderedText.canonical-reader-active .canonical-page .reader-token,
+#renderedText.canonical-reader-active .canonical-page .reader-token * {
+  color: var(--le-slate-900, #111827) !important;
+}
+
+.canonical-page-flow {
+  padding: 16px 24px;
+}
+
+.canonical-page-fixed {
+  margin: 0 auto;
+  overflow: visible;
+  transform-origin: 0 0;
+  background: #fff;
+}
+
+#renderedText.canonical-web-rect-slice-active .canonical-page-web-rect-slice {
+  overflow: hidden !important;
+  max-height: none !important;
+  max-width: none !important;
+}
+
+.canonical-page-fixed-wrap {
+  position: relative;
+  box-sizing: content-box;
+  overflow: hidden;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.18);
+}
+
+.canonical-block {
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  margin: 0 0 0.75em 0;
+}
+
+.canonical-block-heading {
+  font-weight: 700;
+  margin: 0.8em 0 0.45em;
+}
+
+.canonical-block-listItem {
+  margin-left: 1.5em;
+}
+
+.canonical-block-listItem::before {
+  content: "• ";
+}
+
+.canonical-block-quote {
+  margin-left: 1.25em;
+  padding-left: 0.75em;
+  border-left: 3px solid rgba(100, 116, 139, 0.35);
+}
+
+.canonical-block-pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+}
+
+.canonical-separator-block {
+  height: 0;
+  margin: 0;
+  line-height: 0;
+}
+
+.canonical-page-fixed .canonical-block {
+  margin: 0;
+  white-space: normal;
+  overflow: visible;
+}
+
+.canonical-run {
+  white-space: pre-wrap;
+}
+
+.canonical-run-fixed {
+  position: absolute;
+  display: inline-block;
+  white-space: pre !important;
+  transform-origin: 0 0;
+  overflow: visible;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  max-width: none !important;
+}
+
+.canonical-run-fixed .reader-token,
+.canonical-run-fixed .reader-token-fill-hit {
+  display: inline;
+  white-space: inherit !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.canonical-hidden-separator {
+  position: absolute !important;
+  left: -99999px !important;
+  top: -99999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+.reader-token.canonical-token {
+  position: relative;
+}
+
+.reader-token.canonical-token.has-fill-hits .reader-token-fill-hit,
+.reader-token.canonical-token .reader-token-fill-hit {
+  position: relative;
+  z-index: 3;
+}

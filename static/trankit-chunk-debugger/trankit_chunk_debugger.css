@@ -1,0 +1,246 @@
+#trankitChunkDebuggerButton {
+  position: fixed;
+  right: 22px;
+  bottom: 18px;
+  z-index: 2147483600;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.24);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+#trankitChunkDebuggerButton.tcdb-active {
+  background: #ff2bd6;
+  border-color: #ff2bd6;
+}
+
+#trankitChunkDebuggerButton.tcdb-empty {
+  background: #7f1d1d;
+  border-color: #991b1b;
+}
+
+#trankitChunkDebuggerButton .tcdb-icon {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+}
+
+#trankitChunkDebuggerButton .tcdb-icon span {
+  display: block;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+}
+
+#trankitChunkWordsButton {
+  position: fixed;
+  right: 76px;
+  bottom: 22px;
+  z-index: 2147483600;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(8px);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+}
+
+#trankitChunkWordsButton.tcdb-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+#trankitChunkWordsButton.tcdb-active {
+  border-color: #10b981;
+  background: #10b981;
+  color: #ffffff;
+}
+
+#trankitChunkWordsButton:disabled {
+  cursor: default;
+}
+
+.trankit-chunk-lookup-btn,
+#trankitChunkLookupButton {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+}
+
+#trankitChunkLookupButton:not(.active),
+#trankitChunkLookupButton[aria-pressed="false"] {
+  border-color: var(--le-slate-300) !important;
+  background: var(--le-white) !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+
+#trankitChunkLookupButton:not(.active):hover,
+#trankitChunkLookupButton:not(.active):focus,
+#trankitChunkLookupButton[aria-pressed="false"]:hover,
+#trankitChunkLookupButton[aria-pressed="false"]:focus {
+  border-color: var(--le-slate-400) !important;
+  background: var(--le-white) !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+
+#trankitChunkLookupButton.active,
+#trankitChunkLookupButton.active:hover,
+#trankitChunkLookupButton.active:focus,
+#trankitChunkLookupButton.active:active,
+#trankitChunkLookupButton[aria-pressed="true"],
+#trankitChunkLookupButton[aria-pressed="true"]:hover,
+#trankitChunkLookupButton[aria-pressed="true"]:focus,
+#trankitChunkLookupButton[aria-pressed="true"]:active {
+  border-color: #ff2bd6 !important;
+  background: #ff2bd6 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.trankit-chunk-lookup-icon {
+  width: 17px;
+  height: 17px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+}
+
+.trankit-chunk-lookup-icon span {
+  display: block;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+}
+
+.trankit-chunk-lookup-icon span:first-child {
+  grid-column: 1 / 3;
+}
+
+#trankitChunkOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483599;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.tcdb-stage {
+  position: fixed;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.tcdb-stage-content {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.tcdb-box {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+  border-radius: 5px;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65);
+  pointer-events: none;
+}
+
+.tcdb-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tcdb-run {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  background: transparent;
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+.tcdb-line {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px dashed currentColor;
+  border-radius: 4px;
+  background: transparent;
+  opacity: 0.78;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.38);
+  pointer-events: none;
+}
+
+.tcdb-word {
+  position: absolute;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.tcdb-edge-svg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.tcdb-edge {
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  opacity: 0.24;
+}
+
+.tcdb-run-layer {
+  z-index: 2;
+}
+
+.tcdb-word-layer {
+  z-index: 1;
+}
+
+.tcdb-line-layer {
+  z-index: 3;
+}
+
+.tcdb-chunk-layer {
+  z-index: 4;
+}

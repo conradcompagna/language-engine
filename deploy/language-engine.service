@@ -1,0 +1,15 @@
+[Unit]
+Description=Language Engine Gunicorn service
+After=network.target
+
+[Service]
+User=language-engine
+Group=www-data
+WorkingDirectory=/srv/language-engine/app
+EnvironmentFile=/srv/language-engine/app/.env
+ExecStart=/srv/language-engine/venv/bin/gunicorn wsgi:app --bind 127.0.0.1:5000 --workers $LE_GUNICORN_WORKERS --threads $LE_GUNICORN_THREADS --timeout 300 --graceful-timeout 300 --keep-alive 5 --limit-request-line 0 --limit-request-field_size 0 --access-logfile /srv/language-engine/logs/access.log --error-logfile /srv/language-engine/logs/error.log
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

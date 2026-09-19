@@ -1,0 +1,25 @@
+{
+    "display_name": "Swahili",
+    "code": "sw",
+    "font_family": "\"Segoe UI\", system-ui, sans-serif",
+    "ner_labels": {
+        "PER": "Person",
+        "PERSON": "Person",
+        "LOC": "Location",
+        "LOCATION": "Location",
+        "ORG": "Organization",
+        "ORGANIZATION": "Organization",
+        "GPE": "Geopolitical Entity",
+        "CARDINAL": "Cardinal Number",
+        "DATE": "Date",
+        "TIME": "Time",
+        "LANGUAGE": "Language",
+        "LAW": "Law",
+        "MONEY": "Money",
+        "NORP": "Nationality / Religious / Political Group",
+        "ORDINAL": "Ordinal Number",
+        "PERCENT": "Percentage",
+        "PRODUCT": "Product",
+        "QUANTITY": "Quantity"
+    }
+}

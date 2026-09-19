@@ -1,0 +1,16 @@
+{
+    "display_name": "Tagalog",
+    "code": "tl",
+    "font_family": "\"Segoe UI\", system-ui, sans-serif",
+    "ner_labels": {
+        "PER": "Person",
+        "PERSON": "Person",
+        "LOC": "Location",
+        "LOCATION": "Location",
+        "ORG": "Organization",
+        "ORGANIZATION": "Organization",
+        "GPE": "Geopolitical Entity",
+        "DATE": "Date",
+        "TIME": "Time"
+    }
+}
