@@ -11,7 +11,7 @@ I built Language Engine to bring close reading and language research into one wo
 ## Engineering highlights
 
 - **Hybrid search architecture:** browser-side dynamic programming over compact lexical indexes; batch SQLite hydration fetches full entries only after candidate selection. IndexedDB caches indexes between sessions.
-- **Multilingual neural inference:** Trankit integration, custom training pipelines, multi-word-token alignment, and a shared dynamic-INT8 ONNX encoder with language/task adapter inputs.
+- **Multilingual neural inference:** Trankit integration, multi-word-token alignment, and a shared dynamic-INT8 ONNX encoder with language/task adapter inputs.
 - **A complete reading interface:** PDF, ebook, Word, and web-page ingestion; dictionary popups, dependency trees, entity overlays, annotations, pronunciation, and contextual language assistance.
 - **Product infrastructure:** Flask authentication, Google sign-in, Stripe subscriptions, server-side quotas and usage budgets, account management, and Gunicorn/Nginx deployment configuration.
 
@@ -27,8 +27,7 @@ The code includes **34 language display configurations and 27 enabled NLP regist
 | Browser segmentation and hydration | [dictionary_client_hybrid.js](static/dictionary_client_hybrid.js) |
 | Lexical indexes and SQLite access | [dict_lookup_sqlite.py](dict_lookup_sqlite.py) |
 | Neural inference and alignment | [language_registry.py](language_registry.py), [pipeline_common.py](pipeline_common.py), [trankit_compressed_runtime.py](trankit_compressed_runtime.py) |
-| Training and preparation | [training/](training/), [tools/](tools/) |
-| Regression checks and performance work | [tests/](tests/), [benchmarks/](benchmarks/) |
+| Runtime regression checks | [tests/](tests/) |
 | Deployment | [wsgi.py](wsgi.py), [deploy/](deploy/) |
 
 ## Run the lightweight checks

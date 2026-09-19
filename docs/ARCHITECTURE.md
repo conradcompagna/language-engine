@@ -19,10 +19,10 @@ flowchart LR
 
 ## Application boundaries
 
-`document_handling.py` ingests documents and caches pages. `auth.py`, `payments.py`, and `db.py` implement identity, subscription state, and persistence. `api_services.py` and `gemini_dict.py` enforce usage budgets around contextual assistance and generated dictionary entries.
+`auth.py`, `payments.py`, and `db.py` implement identity, subscription state, and persistence. `api_services.py` and `gemini_dict.py` enforce usage budgets around contextual assistance and generated dictionary entries.
 
 The reader still calls supplementary segmentation endpoints in `router.py`; `sqlite_segmenter.py` remains part of that connected code. The current shared browser stack is the main reading path.
 
 ## Repository layout
 
-The root contains the application modules. `static/` and `templates/` contain the browser interface; `deploy/` contains hosting templates. Offline dictionary/model preparation lives in `tools/`, model and corpus work in `training/`, repeatable checks in `tests/`, and performance experiments in `benchmarks/`.
+The root contains the application modules. `static/` and `templates/` contain the browser interface; `deploy/` contains hosting templates. `tools/normalize_keys.js` supplies runtime key normalization, and `tests/` contains repeatable runtime regression checks. Models and dictionary data are provisioned separately.

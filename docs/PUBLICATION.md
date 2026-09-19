@@ -2,7 +2,7 @@
 
 ## Included
 
-Flask/JavaScript application, language configurations, inference, dictionary preparation, training source, tests, and deployment templates.
+Flask/JavaScript application, language configurations, neural inference and dictionary lookup infrastructure, runtime tests, and deployment templates.
 
 ## External resources
 

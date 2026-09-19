@@ -33,9 +33,7 @@ gunicorn wsgi:app --bind 127.0.0.1:5000 --workers 1 --threads 4 --timeout 300
 
 `deploy/` provides service and reverse-proxy templates. Set your own domain, paths, credentials, and operational settings. These are templates, not a deployment command to run against the original website.
 
-## Preparation and validation
-
-`tools/dictionaries/convert_tsv_to_sqlite.py` contains the dictionary importer. Run it from the repository root as `python -m tools.dictionaries.convert_tsv_to_sqlite <language>` after providing the configured input TSV. `training/` contains corpus conversion, model training, evaluation, and upstream-patch infrastructure. The ONNX builders require their training resources plus ONNX tooling; the runtime requirements alone do not provide every research dependency.
+## Validation
 
 Run the model-free regression with `python -m tests.test_mwt_realign_dp`. For the same authored-code checks as CI, install `ruff==0.16.8`, then run `ruff check .` and `ruff format --check .`. The linter selects undefined names and invalid exports; it is not a full security audit.
 
