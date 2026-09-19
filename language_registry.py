@@ -158,7 +158,6 @@ LANGUAGE_REGISTRY: Dict[str, Dict[str, Any]] = {
         "trankit_name": "arabic",
         "trankit_treebank": "UD_Arabic-PADT",
         "has_mwt": True,
-        "tokenizer_path": "native",
         "aliases": ["arabic"],
         "dict_file": "wiktionary general pipeline/converted_tsv/dict-arabic.tsv",
         "dict_kwargs": {"lang_code": "ar"},
@@ -1602,17 +1601,6 @@ def run_trankit(
             if lang_code == "lzh":
                 return _run_trankit_lzh_sentencewise(_trankit_pipeline, text)
 
-            if lang_code == "ar":
-                tokenizer_path = get_tokenizer_path(lang_code)
-                if tokenizer_path == "cameltools":
-                    from camel_tools_arabic_tokenizer import (
-                        run_trankit_with_camel_tools_tokenization,
-                    )
-
-                    return run_trankit_with_camel_tools_tokenization(_trankit_pipeline, text)
-                if tokenizer_path != "native":
-                    raise RuntimeError(f"Unsupported Arabic tokenizer_path: {tokenizer_path!r}")
-
             return _trankit_pipeline(text)
     finally:
         run_ms = (time.perf_counter() - run_started) * 1000.0
@@ -1637,15 +1625,6 @@ def _run_trankit_chunk_locked(
 
     if lang_code == "lzh":
         return _run_trankit_lzh_sentencewise(pipeline, text)
-
-    if lang_code == "ar":
-        tokenizer_path = get_tokenizer_path(lang_code)
-        if tokenizer_path == "cameltools":
-            from camel_tools_arabic_tokenizer import run_trankit_with_camel_tools_tokenization
-
-            return run_trankit_with_camel_tools_tokenization(pipeline, text)
-        if tokenizer_path != "native":
-            raise RuntimeError(f"Unsupported Arabic tokenizer_path: {tokenizer_path!r}")
 
     return pipeline(text)
 
@@ -1686,14 +1665,6 @@ def _tokenize_trankit_chunk_locked(
             lang_code,
             strip_punctuation_after_segmentation=strip_punctuation_after_manual_sentence_segmentation,
         )
-
-    if lang_code == "ar":
-        tokenizer_path = get_tokenizer_path(lang_code)
-        if tokenizer_path != "native":
-            raise RuntimeError(
-                "Geometry chunk boundaries require Trankit's native tokenizer; "
-                f"unsupported Arabic tokenizer_path: {tokenizer_path!r}"
-            )
 
     return _tokenized_sentences_from_doc(pipeline.tokenize(text), text)
 
@@ -1868,14 +1839,6 @@ def get_tsv_path(lang_code: str) -> Optional[Path]:
         return None
     p = APP_ROOT / dict_file
     return p if p.exists() else None
-
-
-def get_tokenizer_path(lang_code: str) -> str:
-    """Return the active tokenizer path for a language."""
-    info = LANGUAGE_REGISTRY.get(lang_code)
-    if not info:
-        return "native"
-    return str(info.get("tokenizer_path", "native") or "native").strip().lower()
 
 
 # ---------------------------------------------------------------------------

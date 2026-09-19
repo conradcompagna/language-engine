@@ -341,7 +341,6 @@
     return rows;
   }
   var _uiRenderDebugState = null;
-  var _uiRenderDebugSyncTimer = 0;
   var _uiRenderDebugPanelSeq = 0;
   var _uiRenderDebugEventSeq = 0;
   var _uiRenderDebugCollectionEnabled = false;
@@ -515,33 +514,6 @@
     }
     return null;
   }
-  function queueUiRenderDebugSync() {
-    if (!isUiRenderDebugEnabled()) return;
-    if (_uiRenderDebugSyncTimer) clearTimeout(_uiRenderDebugSyncTimer);
-    _uiRenderDebugSyncTimer = setTimeout(function() {
-      _uiRenderDebugSyncTimer = 0;
-      var debugState = ensureUiRenderDebugState();
-      var captureId = getUiRenderDebugCaptureId();
-      if (!debugState || !captureId) return;
-      debugState.updated_at = Date.now();
-      fetch('/debug/live_lookup_capture', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          debug_capture_id: captureId,
-          debug_ui_render_trace: sanitizeUiRenderDebugValue(debugState, 0)
-        })
-      }).then(function(resp) {
-        if (resp && !resp.ok) {
-          console.warn('UI render debug capture failed:', resp.status);
-        }
-      }).catch(function(err) {
-        console.warn('UI render debug capture failed:', err);
-      });
-    }, 180);
-  }
   function traceUiRenderEvent(type, details, options) {
     var debugState = ensureUiRenderDebugState();
     if (!debugState) return null;
@@ -575,7 +547,6 @@
       debugState.general_events.push(event);
       trimUiRenderDebugCollection(debugState.general_events, 500);
     }
-    queueUiRenderDebugSync();
     return event;
   }
   function startUiRenderPanelSession(meta) {
@@ -629,7 +600,6 @@
     };
     session.snapshots.push(snapshot);
     trimUiRenderDebugCollection(session.snapshots, 24);
-    queueUiRenderDebugSync();
     return snapshot;
   }
   function captureUiRenderBannerSnapshot(reason, data) {
@@ -649,7 +619,6 @@
     };
     debugState.banner_snapshots.push(sanitizeUiRenderDebugValue(snapshot, 0));
     trimUiRenderDebugCollection(debugState.banner_snapshots, 16);
-    queueUiRenderDebugSync();
     return snapshot;
   }
   window.ReaderUiDebug = window.ReaderUiDebug || {};
@@ -6777,9 +6746,7 @@ function applyOffsetsAsTokenSpansOnDom(sliceRoot, data, preWalkedTextRuns) {
   var latestOrthBreakdownSeq = 0;   // Sequence counter to discard stale orth responses
   var latestSegments = null;
   var _currentPopupSentenceCtx = '';
-  var depTreeExperimentPopup = null;
   var depTreeExperimentLastHoveredSegIdx = -1;
-  var depTreeExperimentPopupUrl = '/static/dep_tree_popup_experiment.html';
   var depTreeInlineInitialized = false;
   var depTreeInlineController = null;
   var depTreeInlineFabStateKey = 'le_dep_tree_fab_state_v1';
@@ -13536,68 +13503,17 @@ function handlePagerScrollStop() {
     event.preventDefault();
   }
 
-  function syncDepTreeExperimentViews(reason) {
-    var inlineSynced = syncInlineDepTree(reason);
-    var popupSynced = syncDepTreeExperimentPopup(reason);
-    return inlineSynced || popupSynced;
-  }
-
-  function isDepTreeExperimentPopupOpen() {
-    return !!(depTreeExperimentPopup && !depTreeExperimentPopup.closed);
-  }
-
-  function syncDepTreeExperimentPopup(reason) {
-    if (!isDepTreeExperimentPopupOpen()) return false;
-    try {
-      depTreeExperimentPopup.postMessage({
-        type: 'le:dep-tree-experiment-payload',
-        reason: String(reason || '').trim(),
-        payload: buildDepTreeExperimentSentencePayload(depTreeExperimentLastHoveredSegIdx)
-      }, window.location.origin);
-      return true;
-    } catch (_e) {
-      return false;
-    }
-  }
-
   function noteDepTreeExperimentHover(segIdx, reason) {
     if (!isFinite(Number(segIdx)) || Number(segIdx) < 0) return false;
     depTreeExperimentLastHoveredSegIdx = Number(segIdx);
-    return syncDepTreeExperimentViews(reason || 'hover');
+    return syncInlineDepTree(reason || 'hover');
   }
-
-  function openDepTreeExperimentPopup() {
-    if (!isDepTreeExperimentPopupOpen()) {
-      depTreeExperimentPopup = window.open(
-        depTreeExperimentPopupUrl,
-        'LEDepTreeExperiment',
-        'popup=yes,width=1280,height=860,resizable=yes,scrollbars=yes'
-      );
-    }
-    if (!isDepTreeExperimentPopupOpen()) return null;
-    try { depTreeExperimentPopup.focus(); } catch (_e) {}
-    window.setTimeout(function() {
-      syncDepTreeExperimentPopup('open');
-    }, 200);
-    return depTreeExperimentPopup;
-  }
-
-  window.addEventListener('message', function(event) {
-    if (event.origin !== window.location.origin) return;
-    var data = event.data || {};
-    if (!data || typeof data !== 'object') return;
-    if (data.type === 'le:dep-tree-experiment-ready' || data.type === 'le:dep-tree-experiment-request-refresh') {
-      depTreeExperimentPopup = event.source || depTreeExperimentPopup;
-      syncDepTreeExperimentPopup(data.type === 'le:dep-tree-experiment-ready' ? 'ready' : 'refresh');
-    }
-  });
 
   try {
     window.DepTreeExperimentBridge = {
       open: openInlineDepTreeTool,
-      openPopup: openDepTreeExperimentPopup,
       sync: function() {
-        return syncDepTreeExperimentViews('manual');
+        return syncInlineDepTree('manual');
       },
       getCurrentSentence: function() {
         return buildDepTreeExperimentSentencePayload(depTreeExperimentLastHoveredSegIdx);
@@ -13608,7 +13524,6 @@ function handlePagerScrollStop() {
     };
     window.openLegacyDepTreeTool = openInlineDepTreeTool;
     window.openDepTreeViewTestApp = openInlineDepTreeTool;
-    window.openLegacyDepTreePopup = openDepTreeExperimentPopup;
   } catch (_e) {}
 
   function getLiveHoveredMwtPartIdx(segIdx) {
@@ -16539,7 +16454,7 @@ function handlePagerScrollStop() {
   }
 
   // Context Window algorithm - computes tokens to highlight based on tree-contiguous spans
-  // This is a direct port from dep_tree_view.js _applyContextWindowHighlight
+  // Highlight the dependency context around the selected token.
   function computeContextWindowTokens(segIdx) {
     // Use canonical segment index (first segment if part of collapsed NER span)
     var canonicalIdx = getCanonicalSegIdx(segIdx);
@@ -20018,7 +19933,7 @@ function handlePagerScrollStop() {
       renderTokenBanner(_bannerActiveFillKey);
     }
     refreshSeparateGrammarPopup();
-    syncDepTreeExperimentViews('llm-gloss-refresh');
+    syncInlineDepTree('llm-gloss-refresh');
   }
   function _refreshLlmDecompUI() {
     if (tokenMapData && document.getElementById('token-banner')) {
@@ -24241,7 +24156,7 @@ function handlePagerScrollStop() {
       renderedText.innerHTML = '<div class="reader-output-placeholder">No segments found.</div>';
       statusText.textContent = 'No segments.';
       statusCounts.textContent = '';
-      syncDepTreeExperimentViews('no-segments');
+      syncInlineDepTree('no-segments');
       return;
     }
     var text = (data && data.display_text) ? data.display_text : (rawText != null ? rawText : (sourceText.value || ''));
@@ -24268,7 +24183,7 @@ function handlePagerScrollStop() {
       depTreeController.fills = fillsDict;
       depTreeController.setData({ segments: segments, udOverlay: latestUdOverlay, originalText: text });
     }
-    syncDepTreeExperimentViews('render-segments');
+    syncInlineDepTree('render-segments');
     var frag = document.createDocumentFragment();
     var segmentOffsets = (data && Array.isArray(data.segment_offsets)) ? data.segment_offsets : null;
     var grammarCount = 0, unknownCount = 0;
@@ -31940,7 +31855,7 @@ function handlePagerScrollStop() {
     renderSegments: renderSegments
   };
 
-  // Expose functions for dep_tree_view.js click handling
+  // Expose dictionary popup helpers for the reader interface.
   window.togglePanel = togglePanel;
   window.displayDictEntry = displayDictEntry;
   window.lookupAndDisplay = lookupAndDisplay;

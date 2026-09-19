@@ -74,7 +74,6 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 LE_GEMINI_COMMS_LOG = _env_bool("LE_GEMINI_COMMS_LOG", default=False)
 
 # Production runtime switches
-ENABLE_DEBUG_PANEL = _env_bool("LE_ENABLE_DEBUG_PANEL", default=not IS_PRODUCTION)
 ENABLE_LEGACY_DOCUMENT_ROUTES = _env_bool(
     "LE_ENABLE_LEGACY_DOCUMENT_ROUTES", default=not IS_PRODUCTION
 )

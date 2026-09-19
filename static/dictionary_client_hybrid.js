@@ -9750,26 +9750,6 @@
     };
   }
 
-  function buildDebugUiDictMeta(langCode, dictSource) {
-    var code = String(langCode || "").toLowerCase();
-    var source = String(dictSource || "");
-    var meta = {
-      lang_code: code,
-      dict_source: source
-    };
-    if (source !== "custom" || !code) return Promise.resolve(meta);
-    var record = getCustomUploadRecord(code);
-    if (record && record.gz && record.gz.length) {
-      meta.custom_tsv = {
-        file_name: String(record.file_name || "custom.tsv"),
-        row_count: Number(record.entry_count || 0),
-        compressed_bytes: Number(record.gz.length || 0),
-        timestamp: Number(record.uploaded_at || 0)
-      };
-    }
-    return Promise.resolve(meta);
-  }
-
   function buildWinnerRefDebugUid(ref) {
     if (!ref || typeof ref !== "object") return "";
     var storageKind = String(ref.storage_kind || "sqlite").trim().toLowerCase() || "sqlite";
@@ -9814,23 +9794,6 @@
       clonedRef._norm_kinds = [];
     }
     return clonedRef;
-  }
-
-  function buildLookupRequestDebugSummary(parsedUrl) {
-    if (!parsedUrl) return null;
-    var query = {};
-    var searchParams = parsedUrl.searchParams;
-    if (searchParams && typeof searchParams.forEach === "function") {
-      searchParams.forEach(function(value, key) {
-        query[String(key || "")] = String(value || "");
-      });
-    }
-    return {
-      method: "GET",
-      path: String(parsedUrl.pathname || "/lookup"),
-      url: String((parsedUrl.pathname || "/lookup") + (parsedUrl.search || "")),
-      query: query
-    };
   }
 
   function parseLookupJsonBody(init) {
@@ -9991,39 +9954,6 @@
     };
   }
 
-  function syncLiveDebugLookupCapture(payload, langCode, dictSource, sqliteCapture) {
-    var merged = (payload && typeof payload === "object") ? payload : null;
-    var captureId = String((merged && merged.debug_capture_id) || "").trim();
-    if (!captureId) return Promise.resolve();
-    var sqliteDebugCapture = (sqliteCapture && typeof sqliteCapture === "object") ? sqliteCapture : null;
-    return buildDebugUiDictMeta(langCode, dictSource).then(function(meta) {
-      return fetch("/debug/live_lookup_capture", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          debug_capture_id: captureId,
-          debug_ui_capture_mode: "live_client_merged_lookup",
-          debug_ui_dict_source: String(dictSource || ""),
-          debug_ui_dict_meta: meta,
-          debug_ui_lookup_timing: (merged && merged.debug_ui_lookup_timing && typeof merged.debug_ui_lookup_timing === "object")
-            ? merged.debug_ui_lookup_timing
-            : null,
-          debug_ui_results: Array.isArray(merged.results) ? merged.results : [],
-          debug_ui_results_by_seg: Array.isArray(merged.results_by_seg) ? merged.results_by_seg : [],
-          debug_ui_sqlite_capture: sqliteDebugCapture
-        })
-      });
-    }).then(function(resp) {
-      if (resp && !resp.ok) {
-        console.warn("Live debug capture failed:", resp.status);
-      }
-    }).catch(function(err) {
-      console.warn("Live debug capture failed:", err);
-    });
-  }
-
   function maybeDecorateLookupResponse(response, parsedUrl) {
     if (!response || !response.ok) return Promise.resolve(response);
     var contentType = String(response.headers.get("Content-Type") || "");
@@ -10037,13 +9967,6 @@
       }).then(function(merged) {
         var captureId = String((merged && merged.debug_capture_id) || "").trim();
         if (captureId) {
-          var sqliteCapture = (merged && typeof merged.debug_ui_sqlite_capture === "object")
-            ? merged.debug_ui_sqlite_capture
-            : null;
-          if (sqliteCapture) {
-            sqliteCapture.lookup_request = buildLookupRequestDebugSummary(parsedUrl);
-          }
-          syncLiveDebugLookupCapture(merged, langCode, dictSource, sqliteCapture);
           if (merged && Object.prototype.hasOwnProperty.call(merged, "debug_ui_sqlite_capture")) {
             delete merged.debug_ui_sqlite_capture;
           }
@@ -10744,13 +10667,6 @@
                     jsQ
                   );
                 }
-                var sqliteCapture = (merged && typeof merged.debug_ui_sqlite_capture === "object")
-                  ? merged.debug_ui_sqlite_capture
-                  : null;
-                if (sqliteCapture) {
-                  sqliteCapture.lookup_request = buildLookupRequestDebugSummary(requestParsed);
-                }
-                syncLiveDebugLookupCapture(merged, jsLang, getDictSource(), sqliteCapture);
                 if (merged && Object.prototype.hasOwnProperty.call(merged, "debug_ui_sqlite_capture")) {
                   delete merged.debug_ui_sqlite_capture;
                 }

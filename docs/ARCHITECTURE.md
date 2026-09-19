@@ -15,7 +15,7 @@ flowchart LR
 
 `dict_lookup_sqlite.py` builds compact indexes and retrieves dictionary rows. `tools/normalize_keys.js` supplies the JavaScript normalization used during indexing and is a runtime dependency. `sqlite_prune_policy.py` supplies the shared entry-pruning policy.
 
-`pipeline_common.py` handles NLP results, including the alignment of expanded multi-word tokens back to the selected surface text. `language_registry.py` selects models and loads language display configurations from `wiktionary_general/`. Compressed encoder execution is implemented in `trankit_compressed_runtime.py` and `trankit_onnx_live_switch.py`.
+`pipeline_common.py` handles NLP results, including the alignment of expanded multi-word tokens back to the selected surface text. `language_registry.py` selects models and loads language display configurations from `wiktionary_general/`. Arabic uses Trankit's native tokenizer. Compressed encoder execution is implemented in `trankit_compressed_runtime.py` and `trankit_onnx_live_switch.py`.
 
 ## Application boundaries
 
@@ -26,3 +26,5 @@ The reader still calls supplementary segmentation endpoints in `router.py`; `sql
 ## Repository layout
 
 The root contains the application modules. `static/` and `templates/` contain the browser interface; `deploy/` contains hosting templates. `tools/normalize_keys.js` supplies runtime key normalization, and `tests/` contains repeatable runtime regression checks. Models and dictionary data are provisioned separately.
+
+`static/foliate-js/` contains the ebook renderer and its browser dependencies. `static/trankit-chunk-debugger/` provides both geometry diagnostics and `buildLookupChunks()`, which the canonical reading flow requires.

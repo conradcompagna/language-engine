@@ -43,7 +43,6 @@ from language_registry import (
     resolve_lang_code,
     get_folder_map,
     get_tsv_path,
-    get_tokenizer_path,
     run_trankit,
     run_trankit_chunk_boundaries,
     init_all,
@@ -53,7 +52,6 @@ from pipeline_common import (
     _build_jmdict_forms_meta_bundle,
     process_lookup_nlp_only,
 )
-from debug_panel import debug_bp
 from debug_trace_runtime import (
     finish_trace,
     record_decoration_event,
@@ -477,8 +475,6 @@ with app.app_context():
         le_db.session.rollback()
         print(f"[WARN] Account-content attribution cleanup failed: {type(exc).__name__}: {exc}")
 
-if le_config.ENABLE_DEBUG_PANEL:
-    app.register_blueprint(debug_bp)
 app.config["MAX_CONTENT_LENGTH"] = 500 * 1024 * 1024  # 500 MB
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
@@ -6063,18 +6059,6 @@ def serve_js_index_artifact(filename: str):
     return response
 
 
-@app.route("/tools/legacy_dep_tree_view.js")
-def serve_legacy_dep_tree_view_js():
-    response = send_from_directory(
-        app.root_path,
-        "dep_tree_view.js",
-        mimetype="application/javascript",
-        max_age=0,
-    )
-    response.headers["Cache-Control"] = "no-cache"
-    return response
-
-
 @app.route("/ping")
 def ping():
     return jsonify({"ok": True, "msg": "neural_reader alive"})
@@ -6218,14 +6202,7 @@ def preload_startup_resources():
         return
     print("[INFO] Pre-loading all resources...")
     init_all()
-    _arabic_tokenizer_path = get_tokenizer_path("ar")
-    if _arabic_tokenizer_path == "native":
-        _arabic_tokenizer_label = "native Trankit"
-    elif _arabic_tokenizer_path == "cameltools":
-        _arabic_tokenizer_label = "CAMeL Tools"
-    else:
-        _arabic_tokenizer_label = _arabic_tokenizer_path
-    print(f"[INFO] Arabic tokenizer path locked to: {_arabic_tokenizer_label}")
+    print("[INFO] Arabic tokenizer: native Trankit")
     print("[INFO] Arabic MWT expander locked to: disabled")
     print("[INFO] Pre-building JS compact key index cache...")
     _prebuild_js_index_cache()
