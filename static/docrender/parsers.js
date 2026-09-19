@@ -538,69 +538,6 @@
   }
 
 
-  // ---- EPUB ----
-  function _xmlText(doc, sel) {
-    var el = doc.querySelector(sel);
-    return el && el.textContent ? el.textContent.trim() : "";
-  }
-  function _dirname(p) { var i = p.lastIndexOf("/"); return i === -1 ? "" : p.slice(0, i + 1); }
-  function _joinPath(base, rel) {
-    if (!base) return rel;
-    if (/^[a-z]+:/i.test(rel)) return rel;
-    var stack = base.split("/").filter(Boolean);
-    var parts = rel.split("/");
-    for (var i = 0; i < parts.length; i++) {
-      var part = parts[i];
-      if (!part || part === ".") continue;
-      if (part === "..") stack.pop(); else stack.push(part);
-    }
-    return stack.join("/");
-  }
-
-  async function parseEpubFile(file) {
-    if (!global.JSZip) throw new Error("EPUB needs JSZip (jszip.min.js).");
-    var zip = await global.JSZip.loadAsync(await file.arrayBuffer());
-    var containerXml = await zip.file("META-INF/container.xml").async("text");
-    var container = new DOMParser().parseFromString(containerXml, "application/xml");
-    var opfPath = container.querySelector("rootfile").getAttribute("full-path");
-    var opfText = await zip.file(opfPath).async("text");
-    var opf = new DOMParser().parseFromString(opfText, "application/xml");
-    var base = _dirname(opfPath);
-    var meta = {
-      format: "EPUB", parser: "docrender epub",
-      title: _xmlText(opf, "metadata > title") || _xmlText(opf, "dc\\:title") || file.name,
-      creator: _xmlText(opf, "metadata > creator")
-    };
-    var manifest = new Map();
-    Array.from(opf.querySelectorAll("manifest > item")).forEach(function (item) {
-      manifest.set(item.getAttribute("id"), { href: item.getAttribute("href"), mediaType: item.getAttribute("media-type") });
-    });
-    var naturalPages = [];
-    var spine = Array.from(opf.querySelectorAll("spine > itemref"));
-    for (var s = 0; s < spine.length; s++) {
-      var itemref = spine[s];
-      var item = manifest.get(itemref.getAttribute("idref"));
-      if (!item || !/html|xhtml/i.test(item.mediaType || item.href)) continue;
-      var path = _joinPath(base, item.href);
-      var f = zip.file(path);
-      if (!f) continue;
-      var raw = await f.async("text");
-      var cleaned = cleanHtml(raw);
-      var dom = new DOMParser().parseFromString(cleaned, "text/html");
-      dom.querySelectorAll("a").forEach(function (a) { a.setAttribute("data-href", a.getAttribute("href") || ""); a.removeAttribute("href"); });
-      var wrap = document.createElement("div");
-      wrap.className = "docrender-epub-chapter";
-      wrap.innerHTML = dom.body.innerHTML;
-      var page = _finalizePage(wrap);
-      naturalPages.push({ html: wrap.outerHTML, text: page.text, textMap: _prefixTextMap(page.textMap, [0]) });
-    }
-    return {
-      richHtml: naturalPages.map(function (p) { return p.html; }).join(""),
-      naturalPages: naturalPages,
-      meta: meta
-    };
-  }
-
   // ---- DOCX ----
   async function _renderWithMammoth(arrayBuffer) {
     if (!global.mammoth || !global.mammoth.convertToHtml) {

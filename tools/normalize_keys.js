@@ -7,7 +7,7 @@
  * Input lines:  {"text": "...", "lang": "..."}
  * Output lines: {"text": "...", "lang": "...", "key": "..."}
  *
- * Called by dict_lookup_sqlite.py and convert_tsv_to_sqlite.py as a subprocess.
+ * Called by dict_lookup_sqlite.py as a subprocess during compact-index construction.
  */
 
 "use strict";

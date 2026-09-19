@@ -1,8 +1,8 @@
 """
 gemini_dict.py — Gemini Flash Lite synthetic dictionary generation.
 
-Entries are stored as TSV files in gemini_generated_tsvs/{lang_code}.tsv:
-    headword\tromanization\tpos\tglosses\tforms\tcommentary\tlemma
+Entries are stored in SQLite CustomDictEntry rows with headword,
+romanization, POS, glosses, forms, commentary and lemma fields.
 
 Each surface token is stored as its own singleton row.  The canonical/lemma
 form (if different from the surface) and Gemini's commentary tags are stored
@@ -634,20 +634,16 @@ def _call_gemini(
             time.sleep(5)
             continue
         if resp.status_code != 200:
-            log.warning("Gemini dict: HTTP %d response body: %s", resp.status_code, resp.text[:500])
+            log.warning(
+                "Gemini dict: HTTP %d response body: %s",
+                resp.status_code,
+                resp.text[:500],
+            )
         resp.raise_for_status()
         break
     else:
         resp.raise_for_status()
     data = resp.json()
-
-    # Log the full communication
-    try:
-        from gemini_log import log_gemini_call
-
-        log_gemini_call("dict_generation", GEMINI_DICT_MODEL, payload, data)
-    except Exception:
-        pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
@@ -839,7 +835,11 @@ def generate_entry_note(
             gl_txt = "; ".join(str(g).strip() for g in gl if str(g or "").strip())[:160]
             is_target = bool(f.get("is_target"))
             tag = "TARGET" if is_target else "other"
-            parts = [f"[{tag}]", f"surface={surf}" if surf else "", f"headword={hw}" if hw else ""]
+            parts = [
+                f"[{tag}]",
+                f"surface={surf}" if surf else "",
+                f"headword={hw}" if hw else "",
+            ]
             if gl_txt:
                 parts.append(f"glosses={gl_txt}")
             fills_lines.append(" ".join(p for p in parts if p))
@@ -1086,13 +1086,6 @@ def generate_entry_decomp(
     except Exception as e:
         log.warning("generate_entry_decomp: request failed: %s", e)
         return {"ok": False, "error": "LLM service error."}
-
-    try:
-        from gemini_log import log_gemini_call
-
-        log_gemini_call("entry_decomp_generate", used_model, payload, data)
-    except Exception:
-        pass
 
     usage_meta_raw = data.get("usageMetadata") or {}
     total = usage_meta_raw.get("totalTokenCount", 0)
@@ -1596,20 +1589,7 @@ def call_gloss_chunk(
         data = resp.json()
     except Exception as e:
         log.warning("LLM gloss chunk failed: %s", e)
-        try:
-            from gemini_log import log_gemini_call
-
-            log_gemini_call("llm_gloss", GEMINI_DICT_MODEL, payload, None, error=str(e))
-        except Exception:
-            pass
         return None, {}
-
-    try:
-        from gemini_log import log_gemini_call
-
-        log_gemini_call("llm_gloss", GEMINI_DICT_MODEL, payload, data)
-    except Exception:
-        pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
@@ -1833,20 +1813,7 @@ def call_decomp_chunk(
         data = resp.json()
     except Exception as e:
         log.warning("LLM decomp chunk failed: %s", e)
-        try:
-            from gemini_log import log_gemini_call
-
-            log_gemini_call("llm_decomp", GEMINI_DICT_MODEL, payload, None, error=str(e))
-        except Exception:
-            pass
         return None, {}
-
-    try:
-        from gemini_log import log_gemini_call
-
-        log_gemini_call("llm_decomp", GEMINI_DICT_MODEL, payload, data)
-    except Exception:
-        pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
@@ -2078,20 +2045,7 @@ def call_decomp_chunk(
         data = resp.json()
     except Exception as e:
         log.warning("LLM decomp chunk failed: %s", e)
-        try:
-            from gemini_log import log_gemini_call
-
-            log_gemini_call("llm_decomp", GEMINI_DICT_MODEL, payload, None, error=str(e))
-        except Exception:
-            pass
         return None, {}
-
-    try:
-        from gemini_log import log_gemini_call
-
-        log_gemini_call("llm_decomp", GEMINI_DICT_MODEL, payload, data)
-    except Exception:
-        pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
@@ -2226,7 +2180,11 @@ def call_orth_chunk(
                 time.sleep(5)
                 continue
             if resp.status_code != 200:
-                log.warning("Orth breakdown chunk: HTTP %d: %s", resp.status_code, resp.text[:500])
+                log.warning(
+                    "Orth breakdown chunk: HTTP %d: %s",
+                    resp.status_code,
+                    resp.text[:500],
+                )
             resp.raise_for_status()
             break
         else:
@@ -2234,20 +2192,7 @@ def call_orth_chunk(
         data = resp.json()
     except Exception as e:
         log.warning("Orth breakdown chunk failed: %s", e)
-        try:
-            from gemini_log import log_gemini_call
-
-            log_gemini_call("orth_breakdown", GEMINI_DICT_MODEL, payload, None, error=str(e))
-        except Exception:
-            pass
         return None, {}
-
-    try:
-        from gemini_log import log_gemini_call
-
-        log_gemini_call("orth_breakdown", GEMINI_DICT_MODEL, payload, data)
-    except Exception:
-        pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
@@ -2608,7 +2553,8 @@ def iter_custom_entry_tsv_lines(lang_code: str, batch_size: int = 500):
             _tsv_escape(entry.romanization or ""),
             _tsv_escape(entry.pos or ""),
             json.dumps(
-                _glosses_to_senses(normalized_glosses, entry.source or "gemini"), ensure_ascii=False
+                _glosses_to_senses(normalized_glosses, entry.source or "gemini"),
+                ensure_ascii=False,
             ),
             json.dumps(_normalize_forms(_json_load_list(entry.forms_json)), ensure_ascii=False),
             _tsv_escape(entry.commentary or ""),
@@ -2698,7 +2644,7 @@ def update_tsv_entry(
 
 
 def remove_tsv_entry(lang_code: str, headword: str, entry_id: str = "") -> bool:
-    from db import db, CustomDictEntry
+    from db import db
 
     entry = _query_custom_entry(lang_code, headword=headword, entry_id=entry_id)
     if not entry:
@@ -3099,7 +3045,12 @@ def recognize_ner_mwe_for_overlay(
     if not getattr(user, "is_authenticated", False):
         return {"ok": False, "error": "Not logged in.", "ents": []}
     if getattr(user, "tier", "free") == "free":
-        return {"ok": False, "error": "Paid feature.", "upgrade_required": True, "ents": []}
+        return {
+            "ok": False,
+            "error": "Paid feature.",
+            "upgrade_required": True,
+            "ents": [],
+        }
 
     sentences, meta = _gemini_ner_sentence_inputs(segments, ud_overlay, lang_code)
     if not sentences:
@@ -3111,7 +3062,12 @@ def recognize_ner_mwe_for_overlay(
         _db.session.add(usage)
     usage._maybe_reset(user)
     if not usage.can_use_llm(user):
-        return {"ok": False, "error": "Monthly LLM budget reached.", "ents": [], "meta": meta}
+        return {
+            "ok": False,
+            "error": "Monthly LLM budget reached.",
+            "ents": [],
+            "meta": meta,
+        }
 
     model = TIER_CAPS.get(user.tier, {}).get("gemini_model") or GEMINI_DICT_MODEL
     src_obj, keys = _gemini_ner_request_object(sentences)
@@ -3154,29 +3110,15 @@ def recognize_ner_mwe_for_overlay(
             resp.raise_for_status()
         data = resp.json()
     except requests.exceptions.Timeout:
-        try:
-            from gemini_log import log_gemini_call
-
-            log_gemini_call("gemini_ner", model, payload, None, error="timeout")
-        except Exception:
-            pass
-        return {"ok": False, "error": "LLM request timed out.", "ents": [], "meta": meta}
+        return {
+            "ok": False,
+            "error": "LLM request timed out.",
+            "ents": [],
+            "meta": meta,
+        }
     except Exception as e:
         log.warning("Gemini NER failed: %s", e)
-        try:
-            from gemini_log import log_gemini_call
-
-            log_gemini_call("gemini_ner", model, payload, None, error=str(e))
-        except Exception:
-            pass
         return {"ok": False, "error": "LLM service error.", "ents": [], "meta": meta}
-
-    try:
-        from gemini_log import log_gemini_call
-
-        log_gemini_call("gemini_ner", model, payload, data)
-    except Exception:
-        pass
 
     usage_meta = data.get("usageMetadata") or {}
     total_tokens = usage_meta.get("totalTokenCount", 0)
@@ -3191,7 +3133,12 @@ def recognize_ner_mwe_for_overlay(
 
     candidates = data.get("candidates", [])
     if not candidates:
-        return {"ok": False, "error": "No response from model.", "ents": [], "meta": meta}
+        return {
+            "ok": False,
+            "error": "No response from model.",
+            "ents": [],
+            "meta": meta,
+        }
     parts = candidates[0].get("content", {}).get("parts", [])
     text = "".join(p.get("text", "") for p in parts).strip()
     try:
@@ -3199,7 +3146,12 @@ def recognize_ner_mwe_for_overlay(
         if not isinstance(parsed, dict):
             raise ValueError("not an object")
     except Exception:
-        return {"ok": False, "error": "Malformed NER response.", "ents": [], "meta": meta}
+        return {
+            "ok": False,
+            "error": "Malformed NER response.",
+            "ents": [],
+            "meta": meta,
+        }
 
     ents = _parse_gemini_ner_object(parsed, sentences, segments, lang_code)
     usage.record_llm(usage_counts.get("prompt_tokens", 0), usage_counts.get("response_tokens", 0))
@@ -3236,7 +3188,6 @@ def translate_sentences(
     """
     from db import ApiUsage, db as _db
     from config import TIER_CAPS
-    from gemini_log import log_gemini_call
     from api_services import _record_gemini_usage
 
     if not GEMINI_API_KEY:
@@ -3322,7 +3273,7 @@ def translate_sentences(
         else:
             resp.raise_for_status()
         data = resp.json()
-        usage_meta = log_gemini_call("sentence_xlate", model, payload, data)
+        usage_meta = data.get("usageMetadata", {})
         candidates = data.get("candidates", [])
         if not candidates:
             return {"ok": False, "error": "No response from model."}

@@ -2117,9 +2117,9 @@
       flowBlocks: [],
       source: { kind: 'webSnapshotRectSlice' }
     };
-    if (global.TrankitChunkDebugger &&
-        typeof global.TrankitChunkDebugger.applyLookupChunkParagraphBreaks === 'function') {
-      global.TrankitChunkDebugger.applyLookupChunkParagraphBreaks(doc.pages[0], {
+    if (global.LookupChunks &&
+        typeof global.LookupChunks.applyLookupChunkParagraphBreaks === 'function') {
+      global.LookupChunks.applyLookupChunkParagraphBreaks(doc.pages[0], {
         sourceKind: 'web-geometry-chunk-paragraph'
       });
       if (doc.pages[0] && doc.pages[0].source) {

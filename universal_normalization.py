@@ -2,7 +2,7 @@
 Universal Unicode normalization + language-profile filtering bridge.
 
 Design goal for remapping:
-- Use a simple Claude-style offset remap with one map:
+- Use a simple character offset remap with one map:
   model_index -> original_index.
 - Keep universal normalization + filtering at router level.
 """
@@ -308,8 +308,6 @@ def run_with_universal_normalization(
     response = handler(text_for_handler, *handler_args, **handler_kwargs)
     response = _postprocess_response_for_language(response, context.language_key)
     remapped = remap_response_to_original(response, context)
-    if not isinstance(remapped, dict) and _debug_collection_enabled():
-        _publish_preprocess_debug(context, remapped, [])
     return remapped
 
 
@@ -435,7 +433,7 @@ def remap_response_to_original(response: Any, context: PreprocessContext) -> Any
     """
     Remap known response fields from model-space back to original input.
 
-    Uses simple Claude-style offset mapping:
+    Uses simple character offset mapping:
       orig_start = model_to_orig[start]
       orig_end = model_to_orig[end-1] + 1
     """
@@ -443,8 +441,6 @@ def remap_response_to_original(response: Any, context: PreprocessContext) -> Any
         return response
 
     payload = response
-    remap_rows: List[Dict[str, Any]] = []
-    debug_enabled = _debug_collection_enabled()
 
     if "q" in payload:
         payload["q"] = context.original_text
@@ -453,8 +449,6 @@ def remap_response_to_original(response: Any, context: PreprocessContext) -> Any
 
     segment_offsets = payload.get("segment_offsets")
     segments = payload.get("segments")
-    model_offsets_before = _copy_segment_offsets(segment_offsets) if debug_enabled else []
-    model_segments_before = list(segments) if (debug_enabled and isinstance(segments, list)) else []
 
     if isinstance(segment_offsets, list):
         _remap_segment_offsets_in_place(
@@ -483,17 +477,6 @@ def remap_response_to_original(response: Any, context: PreprocessContext) -> Any
         )
         _sync_results_with_segments(payload, segments, skip_indices=mwt_mismatch_seg_indices)
         _sync_ud_overlay_with_segments(payload, segments, skip_indices=mwt_mismatch_seg_indices)
-        if debug_enabled:
-            remap_rows = _build_segment_remap_rows(
-                context.original_text,
-                model_offsets_before,
-                model_segments_before,
-                segment_offsets,
-                segments,
-            )
-
-    if debug_enabled:
-        _publish_preprocess_debug(context, payload, remap_rows)
     return payload
 
 
@@ -703,15 +686,6 @@ def _rebuild_segments_from_offsets_in_place(
         segments[idx] = original_text[start:end]
 
 
-def _copy_segment_offsets(segment_offsets: Any) -> List[Optional[List[int]]]:
-    copied: List[Optional[List[int]]] = []
-    if not isinstance(segment_offsets, list):
-        return copied
-    for span in segment_offsets:
-        copied.append(_normalize_offset_span(span))
-    return copied
-
-
 def _normalize_offset_span(span: Any) -> Optional[List[int]]:
     if not isinstance(span, (list, tuple)) or len(span) < 2:
         return None
@@ -719,58 +693,6 @@ def _normalize_offset_span(span: Any) -> Optional[List[int]]:
         return [int(span[0]), int(span[1])]
     except (TypeError, ValueError):
         return None
-
-
-def _build_segment_remap_rows(
-    original_text: str,
-    model_offsets_before: List[Optional[List[int]]],
-    model_segments_before: List[Any],
-    remapped_offsets: Any,
-    remapped_segments: Any,
-) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
-    if not isinstance(remapped_offsets, list) or not isinstance(remapped_segments, list):
-        return rows
-
-    total = max(
-        len(model_offsets_before),
-        len(model_segments_before),
-        len(remapped_offsets),
-        len(remapped_segments),
-    )
-    orig_len = len(original_text)
-
-    for idx in range(total):
-        model_offset = model_offsets_before[idx] if idx < len(model_offsets_before) else None
-        remapped_offset = (
-            _normalize_offset_span(remapped_offsets[idx]) if idx < len(remapped_offsets) else None
-        )
-        model_segment = model_segments_before[idx] if idx < len(model_segments_before) else ""
-        remapped_segment = remapped_segments[idx] if idx < len(remapped_segments) else ""
-
-        model_seg_text = "" if model_segment is None else str(model_segment)
-        remapped_seg_text = "" if remapped_segment is None else str(remapped_segment)
-        if model_offset == remapped_offset and model_seg_text == remapped_seg_text:
-            continue
-
-        original_slice = ""
-        if remapped_offset is not None:
-            s = _clamp(remapped_offset[0], 0, orig_len)
-            e = _clamp(remapped_offset[1], s, orig_len)
-            original_slice = original_text[s:e]
-
-        rows.append(
-            {
-                "seg_i": idx,
-                "model_segment": model_seg_text,
-                "model_offset": model_offset,
-                "remapped_segment": remapped_seg_text,
-                "original_offset": remapped_offset,
-                "original_slice": original_slice,
-            }
-        )
-
-    return rows
 
 
 def _sync_results_with_segments(
@@ -831,126 +753,6 @@ def _sync_ud_overlay_with_segments(
             start = _clamp(start, 0, seg_count)
             end = _clamp(end, start, seg_count)
             ent["text"] = "".join(str(s) for s in segments[start:end])
-
-
-def _publish_preprocess_debug(
-    context: PreprocessContext,
-    payload: Any,
-    remap_rows: List[Dict[str, Any]],
-) -> None:
-    try:
-        from debug_store import is_debug_collection_enabled, update_debug_snapshot
-
-        if not is_debug_collection_enabled():
-            return
-
-        normalization_change_rows = _build_normalization_change_rows(
-            context.original_text,
-            context.normalized_text,
-        )
-        segment_original_discrepancies = _build_segment_original_discrepancy_rows(
-            context.original_text,
-            payload,
-        )
-
-        patch = {
-            "original_text": context.original_text,
-            "normalized_text": context.normalized_text,
-            "filtered_text": context.model_text,
-            "preprocess_changed": context.changed,
-            "preprocess_language": context.language_key,
-            "preprocess_normalization_form": context.normalization_form,
-            "normalization_change_rows": normalization_change_rows,
-            "normalized_segment_remaps": remap_rows,
-            "segment_original_discrepancies": segment_original_discrepancies,
-        }
-        if isinstance(payload, dict):
-            patch["lookup_ok"] = bool(payload.get("ok", False))
-
-        update_debug_snapshot(patch)
-    except Exception:
-        # Debug panel is optional; never affect lookup flow.
-        pass
-
-
-def _debug_collection_enabled() -> bool:
-    try:
-        from debug_store import is_debug_collection_enabled
-
-        return bool(is_debug_collection_enabled())
-    except Exception:
-        return False
-
-
-def _build_normalization_change_rows(
-    original_text: str,
-    normalized_text: str,
-) -> List[Dict[str, Any]]:
-    if original_text == normalized_text:
-        return []
-
-    rows: List[Dict[str, Any]] = []
-    matcher = difflib.SequenceMatcher(a=original_text, b=normalized_text, autojunk=False)
-    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-        if tag == "equal":
-            continue
-        rows.append(
-            {
-                "op": tag,
-                "original_offset": [i1, i2],
-                "normalized_offset": [j1, j2],
-                "original_text": original_text[i1:i2],
-                "normalized_text": normalized_text[j1:j2],
-            }
-        )
-    return rows
-
-
-def _build_segment_original_discrepancy_rows(
-    original_text: str,
-    payload: Any,
-) -> List[Dict[str, Any]]:
-    if not isinstance(payload, dict):
-        return []
-
-    segments = payload.get("segments")
-    offsets = payload.get("segment_offsets")
-    if not isinstance(segments, list) or not isinstance(offsets, list):
-        return []
-
-    rows: List[Dict[str, Any]] = []
-    orig_len = len(original_text)
-    total = max(len(segments), len(offsets))
-    for idx in range(total):
-        seg_raw = segments[idx] if idx < len(segments) else ""
-        seg_text = "" if seg_raw is None else str(seg_raw)
-        span = _normalize_offset_span(offsets[idx]) if idx < len(offsets) else None
-        if span is None:
-            rows.append(
-                {
-                    "seg_i": idx,
-                    "issue": "missing_or_invalid_offset",
-                    "segment": seg_text,
-                    "segment_offset": None,
-                    "original_slice": "",
-                }
-            )
-            continue
-
-        start = _clamp(span[0], 0, orig_len)
-        end = _clamp(span[1], start, orig_len)
-        original_slice = original_text[start:end]
-        if seg_text != original_slice:
-            rows.append(
-                {
-                    "seg_i": idx,
-                    "issue": "segment_text_mismatch",
-                    "segment": seg_text,
-                    "segment_offset": [start, end],
-                    "original_slice": original_slice,
-                }
-            )
-    return rows
 
 
 def _chain_via_renormalize(

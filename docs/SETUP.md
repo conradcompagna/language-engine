@@ -33,8 +33,4 @@ gunicorn wsgi:app --bind 127.0.0.1:5000 --workers 1 --threads 4 --timeout 300
 
 `deploy/` provides service and reverse-proxy templates. Set your own domain, paths, credentials, and operational settings. These are templates, not a deployment command to run against the original website.
 
-## Validation
-
-Run the model-free regression with `python -m tests.test_mwt_realign_dp`. For the same authored-code checks as CI, install `ruff==0.16.8`, then run `ruff check .` and `ruff format --check .`. The linter selects undefined names and invalid exports; it is not a full security audit.
-
-Full NLP, document, authentication, and billing integration checks require external resources and independently configured test services. No account records, model weights, or dictionary data are bundled.
+Running the full application requires the external resources above. Account and billing features also require independently configured service credentials.

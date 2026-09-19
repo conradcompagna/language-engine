@@ -7,17 +7,9 @@ source spans and constructs the shared dependency/entity overlay.
 from __future__ import annotations
 
 import re
-import uuid
-from typing import Any, Callable, Dict, List, Optional, Tuple
-
-from debug_store import (
-    is_mwt_realign_debug_enabled,
-    push_mwt_realign_trace,
-)
-from debug_trace_runtime import is_trace_active, trace_scope
+from typing import Any, Dict, List, Optional, Tuple
 from trankit_mwt_expansion import (
     language_supports_mwt,
-    maybe_expand_mwt_doc,
 )
 
 # ---------------------------------------------------------------------------
@@ -273,7 +265,6 @@ def _realign_mwt_children(parts: list, surface: str) -> None:
     """
     n = len(parts)
     surface_len = len(surface)
-    debug_on = is_mwt_realign_debug_enabled()
 
     if n == 0 or surface_len == 0:
         for p in parts:
@@ -282,14 +273,6 @@ def _realign_mwt_children(parts: list, surface: str) -> None:
             p.setdefault("_realign_pass", "empty")
             probe = _mwt_probe_text(p)
             p["surface_char_map"] = [0] * len(probe)
-        if debug_on:
-            push_mwt_realign_trace(
-                {
-                    "surface": surface,
-                    "children": [],
-                    "note": "empty",
-                }
-            )
         return
 
     probes = [_mwt_probe_text(p) for p in parts]
@@ -308,23 +291,6 @@ def _realign_mwt_children(parts: list, surface: str) -> None:
             p["surface_char_map"] = [cursor + k for k in range(plen)]
             p["_realign_pass"] = "trivial"
             cursor += plen
-        if debug_on:
-            push_mwt_realign_trace(
-                {
-                    "surface": surface,
-                    "children": [
-                        {
-                            "probe": probes[i],
-                            "slice": parts[i]["surface_slice"],
-                            "char_map": parts[i]["surface_char_map"],
-                            "pass": "trivial",
-                            "opcodes": [],
-                        }
-                        for i in range(n)
-                    ],
-                    "note": "trivial_equality",
-                }
-            )
         return
 
     solved = _solve_mwt_partition_dp(probes, surface)
@@ -342,24 +308,6 @@ def _realign_mwt_children(parts: list, surface: str) -> None:
         p["surface_slice"] = list(solved[i]["surface_slice"])
         p["surface_char_map"] = list(solved[i]["surface_char_map"])
         p["_realign_pass"] = "dp"
-
-    if debug_on:
-        push_mwt_realign_trace(
-            {
-                "surface": surface,
-                "children": [
-                    {
-                        "probe": probes[i],
-                        "slice": list(parts[i]["surface_slice"]),
-                        "char_map": list(parts[i]["surface_char_map"]),
-                        "pass": parts[i]["_realign_pass"],
-                        "opcodes": list(solved[i]["opcodes"] if i < len(solved) else []),
-                    }
-                    for i in range(n)
-                ],
-                "note": "dp",
-            }
-        )
 
 
 def _lookup_to_int(value: Any, default: Optional[int] = None) -> Optional[int]:
@@ -907,27 +855,13 @@ def build_ud_overlay(
                     # equality fast path handles non-sandhi MWT (des=de+les).
                     if collected_parts:
                         _realign_mwt_children(collected_parts, parent_surface_text)
-                        # Propagate realigner output back onto the original
-                        # mwt_expanded_words rows. surface_slice is always
-                        # written (authoritative anchor). _realign_pass is
-                        # debug-only and only attached when debug collection
-                        # is enabled, so the payload stays clean in prod.
-                        _debug_on = False
-                        try:
-                            from debug_store import is_debug_collection_enabled as _is_dbg
-
-                            _debug_on = bool(_is_dbg())
-                        except Exception:
-                            _debug_on = False
                         for _cp in collected_parts:
                             _pi = _cp.get("part_index")
                             if isinstance(_pi, int) and 0 <= _pi < len(expanded_rows):
                                 _raw = expanded_rows[_pi]
                                 if isinstance(_raw, dict):
                                     _raw["surface_slice"] = _cp.get("surface_slice")
-                                    if _debug_on:
-                                        _raw["_realign_pass"] = _cp.get("_realign_pass")
-                            if not _debug_on and "_realign_pass" in _cp:
+                            if "_realign_pass" in _cp:
                                 _cp.pop("_realign_pass", None)
                     mwt_parts.extend(collected_parts)
                 for sw_edge in subword_edges:
@@ -1227,8 +1161,6 @@ def process_lookup_nlp_only(
     text: str,
     trankit_doc: dict,
     trankit_lang: str = "",
-    enable_debug_capture: bool = True,
-    debug_capture_id: str = "",
 ) -> Dict[str, Any]:
     """
     NLP-only lookup response: tokenization + UD annotations, no dictionary calls.
@@ -1242,99 +1174,49 @@ def process_lookup_nlp_only(
     model_text = text
     original_text = model_text
     doc = trankit_doc
-    trace_active = bool(enable_debug_capture and is_trace_active())
-
-    if trace_active:
-        with trace_scope("flatten_mwt_doc", label="Flatten MWT Doc", language=trankit_lang):
-            try:
-                doc_for_pipeline, mwt_meta = _flatten_lookup_trankit_doc(doc, trankit_lang)
-            except Exception as e:
-                doc_for_pipeline = doc
-                mwt_meta = {
-                    "applied": False,
-                    "supports_mwt": bool(language_supports_mwt(trankit_lang)),
-                    "language": str(trankit_lang or ""),
-                    "expanded_token_count": 0,
-                    "surface_token_count": 0,
-                    "error": f"{type(e).__name__}: {e}",
-                }
-    else:
-        try:
-            doc_for_pipeline, mwt_meta = _flatten_lookup_trankit_doc(doc, trankit_lang)
-        except Exception as e:
-            doc_for_pipeline = doc
-            mwt_meta = {
-                "applied": False,
-                "supports_mwt": bool(language_supports_mwt(trankit_lang)),
-                "language": str(trankit_lang or ""),
-                "expanded_token_count": 0,
-                "surface_token_count": 0,
-                "error": f"{type(e).__name__}: {e}",
-            }
+    try:
+        doc_for_pipeline, mwt_meta = _flatten_lookup_trankit_doc(doc, trankit_lang)
+    except Exception as e:
+        doc_for_pipeline = doc
+        mwt_meta = {
+            "applied": False,
+            "supports_mwt": bool(language_supports_mwt(trankit_lang)),
+            "language": str(trankit_lang or ""),
+            "expanded_token_count": 0,
+            "surface_token_count": 0,
+            "error": f"{type(e).__name__}: {e}",
+        }
 
     sentences_data = doc_for_pipeline.get("sentences", [])
     segments: List[str] = []
     segment_offsets: List[List[int]] = []
     global_offset_by_sent_tok: Dict = {}
+    for sent_idx, sent in enumerate(sentences_data):
+        sent_tokens = sent.get("tokens", [])
+        for tok_idx, tok in enumerate(sent_tokens):
+            global_idx = len(segments)
+            global_offset_by_sent_tok[(sent_idx, tok_idx)] = global_idx
 
-    if trace_active:
-        with trace_scope(
-            "collect_segments", label="Collect Segments", sentence_count=len(sentences_data)
-        ):
-            for sent_idx, sent in enumerate(sentences_data):
-                sent_tokens = sent.get("tokens", [])
-                for tok_idx, tok in enumerate(sent_tokens):
-                    global_idx = len(segments)
-                    global_offset_by_sent_tok[(sent_idx, tok_idx)] = global_idx
+            tok_text = tok.get("text", "")
+            segments.append(tok_text)
 
-                    tok_text = tok.get("text", "")
-                    segments.append(tok_text)
+            dspan = tok.get("dspan")
+            span = tok.get("span")
+            if dspan and isinstance(dspan, (list, tuple)) and len(dspan) >= 2:
+                model_start, model_end = int(dspan[0]), int(dspan[1])
+            elif span and isinstance(span, (list, tuple)) and len(span) >= 2:
+                model_start, model_end = int(span[0]), int(span[1])
+            else:
+                model_start, model_end = 0, len(tok_text)
 
-                    dspan = tok.get("dspan")
-                    span = tok.get("span")
-                    if dspan and isinstance(dspan, (list, tuple)) and len(dspan) >= 2:
-                        model_start, model_end = int(dspan[0]), int(dspan[1])
-                    elif span and isinstance(span, (list, tuple)) and len(span) >= 2:
-                        model_start, model_end = int(span[0]), int(span[1])
-                    else:
-                        model_start, model_end = 0, len(tok_text)
+            if model_end < model_start:
+                model_end = model_start
 
-                    if model_end < model_start:
-                        model_end = model_start
-
-                    segment_offsets.append([model_start, model_end])
-    else:
-        for sent_idx, sent in enumerate(sentences_data):
-            sent_tokens = sent.get("tokens", [])
-            for tok_idx, tok in enumerate(sent_tokens):
-                global_idx = len(segments)
-                global_offset_by_sent_tok[(sent_idx, tok_idx)] = global_idx
-
-                tok_text = tok.get("text", "")
-                segments.append(tok_text)
-
-                dspan = tok.get("dspan")
-                span = tok.get("span")
-                if dspan and isinstance(dspan, (list, tuple)) and len(dspan) >= 2:
-                    model_start, model_end = int(dspan[0]), int(dspan[1])
-                elif span and isinstance(span, (list, tuple)) and len(span) >= 2:
-                    model_start, model_end = int(span[0]), int(span[1])
-                else:
-                    model_start, model_end = 0, len(tok_text)
-
-                if model_end < model_start:
-                    model_end = model_start
-
-                segment_offsets.append([model_start, model_end])
+            segment_offsets.append([model_start, model_end])
 
     if not segments:
         return {"ok": False, "error": "no tokens produced"}
-
-    if trace_active:
-        with trace_scope("build_ud_overlay", label="Build UD Overlay", segment_count=len(segments)):
-            ud_overlay = build_ud_overlay(sentences_data, segments, global_offset_by_sent_tok)
-    else:
-        ud_overlay = build_ud_overlay(sentences_data, segments, global_offset_by_sent_tok)
+    ud_overlay = build_ud_overlay(sentences_data, segments, global_offset_by_sent_tok)
 
     response = {
         "ok": True,
@@ -1349,65 +1231,4 @@ def process_lookup_nlp_only(
         "mwt_meta": mwt_meta,
     }
 
-    if not enable_debug_capture:
-        return response
-
-    capture_id = str(debug_capture_id or "").strip() or uuid.uuid4().hex
-
-    # Debug snapshot: NLP-only path still needs a full snapshot so /debug/data
-    # has token + segment context even when dictionary merge is client-side.
-    debug_collection_enabled = False
-    store_debug_snapshot_fn = None
-    try:
-        from debug_store import is_debug_collection_enabled, store_debug_snapshot
-
-        debug_collection_enabled = bool(is_debug_collection_enabled())
-        store_debug_snapshot_fn = store_debug_snapshot
-    except Exception:
-        debug_collection_enabled = False
-        store_debug_snapshot_fn = None
-
-    if debug_collection_enabled and callable(store_debug_snapshot_fn):
-        try:
-            if trace_active:
-                with trace_scope("store_debug_snapshot", label="Store Debug Snapshot"):
-                    store_debug_snapshot_fn(
-                        {
-                            "debug_capture_id": capture_id,
-                            "language": trankit_lang,
-                            "original_text": original_text,
-                            "filtered_text": model_text,
-                            "raw_trankit_doc": doc,
-                            "pipeline_trankit_doc": doc_for_pipeline,
-                            "mwt_meta": mwt_meta,
-                            "segments": segments,
-                            "segment_offsets": segment_offsets,
-                            "results": [],
-                            "results_by_seg": [],
-                            "grammar_overlay": {"tokens": [], "links": []},
-                            "ud_overlay": ud_overlay,
-                        }
-                    )
-            else:
-                store_debug_snapshot_fn(
-                    {
-                        "debug_capture_id": capture_id,
-                        "language": trankit_lang,
-                        "original_text": original_text,
-                        "filtered_text": model_text,
-                        "raw_trankit_doc": doc,
-                        "pipeline_trankit_doc": doc_for_pipeline,
-                        "mwt_meta": mwt_meta,
-                        "segments": segments,
-                        "segment_offsets": segment_offsets,
-                        "results": [],
-                        "results_by_seg": [],
-                        "grammar_overlay": {"tokens": [], "links": []},
-                        "ud_overlay": ud_overlay,
-                    }
-                )
-        except Exception:
-            pass
-
-    response["debug_capture_id"] = capture_id
     return response

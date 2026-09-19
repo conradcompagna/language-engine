@@ -802,9 +802,9 @@
       mergedRunCount: mergeInfo.mergedCount || 0,
       runMergeGapThresholdPx: mergeInfo.mergeGapThresholdPx || 0
     });
-    if (global.TrankitChunkDebugger &&
-        typeof global.TrankitChunkDebugger.applyLookupChunkParagraphBreaks === 'function') {
-      global.TrankitChunkDebugger.applyLookupChunkParagraphBreaks(page, {
+    if (global.LookupChunks &&
+        typeof global.LookupChunks.applyLookupChunkParagraphBreaks === 'function') {
+      global.LookupChunks.applyLookupChunkParagraphBreaks(page, {
         sourceKind: 'pdf-geometry-chunk-paragraph'
       });
     }

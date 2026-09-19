@@ -21,10 +21,10 @@ flowchart LR
 
 `auth.py`, `payments.py`, and `db.py` implement identity, subscription state, and persistence. `api_services.py` and `gemini_dict.py` enforce usage budgets around contextual assistance and generated dictionary entries.
 
-The reader still calls supplementary segmentation endpoints in `router.py`; `sqlite_segmenter.py` remains part of that connected code. The current shared browser stack is the main reading path.
+Dictionary-only lookups run in the browser through the shared hybrid engine; the server hydrates the selected entries.
 
 ## Repository layout
 
-The root contains the application modules. `static/` and `templates/` contain the browser interface; `deploy/` contains hosting templates. `tools/normalize_keys.js` supplies runtime key normalization, and `tests/` contains repeatable runtime regression checks. Models and dictionary data are provisioned separately.
+The root contains the application modules. `static/` and `templates/` contain the browser interface; `deploy/` contains hosting templates. `tools/normalize_keys.js` supplies runtime key normalization. Models and dictionary data are provisioned separately.
 
-`static/foliate-js/` contains the ebook renderer and its browser dependencies. `static/trankit-chunk-debugger/` provides both geometry diagnostics and `buildLookupChunks()`, which the canonical reading flow requires.
+`static/foliate-js/` contains the ebook renderer and its browser dependencies. `static/docrender/lookup_chunks.js` groups page geometry into paragraph boundaries during PDF and web-snapshot extraction.

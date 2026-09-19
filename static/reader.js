@@ -3252,17 +3252,7 @@
     }
     return fallbackSeg;
   }
-  function buildSubsegmentsUrl(token, options) {
-    var langForUrl = (options && options.lang) ? String(options.lang) : String(currentLanguage || '');
-    var url = '/subsegments?token=' + encodeURIComponent(String(token || '')) + '&lang=' + encodeURIComponent(langForUrl);
-    if (options && options.decompose) {
-      var adapter = getLanguageAdapter(langForUrl);
-      if (adapter && adapter.supportsDecomposeSubsegments === true) {
-        url += '&decompose=1';
-      }
-    }
-    return url;
-  }
+
   function mergePanelEntryLanguageFields(targetEntry, parentEntry) {
     var adapter = getLanguageAdapter();
     if (adapter && typeof adapter.mergePanelEntryFields === 'function') {
@@ -7780,10 +7770,10 @@ function applyOffsetsAsTokenSpansOnDom(sliceRoot, data, preWalkedTextRuns) {
         getLookupChunks: function(page) {
           if (TRANKIT_CHUNK_LOOKUP_DISABLED) return null;
           if (!trankitChunkLookupEnabled) return null;
-          if (!window.TrankitChunkDebugger || typeof window.TrankitChunkDebugger.buildLookupChunks !== 'function') {
+          if (!window.LookupChunks || typeof window.LookupChunks.buildLookupChunks !== 'function') {
             throw new Error('Trankit chunk lookup module is unavailable.');
           }
-          return window.TrankitChunkDebugger.buildLookupChunks(page, {
+          return window.LookupChunks.buildLookupChunks(page, {
             drawRuns: false,
             drawLines: false,
             drawEdges: false
@@ -7968,25 +7958,16 @@ function applyOffsetsAsTokenSpansOnDom(sliceRoot, data, preWalkedTextRuns) {
       });
   }
 
-  function trankitChunkDebuggerIsEnabled() {
-    return !!(window.TrankitChunkDebugger &&
-      typeof window.TrankitChunkDebugger.isEnabled === 'function' &&
-      window.TrankitChunkDebugger.isEnabled());
-  }
 
-  function refreshTrankitChunkDebuggerIfEnabled() {
-    if (!trankitChunkDebuggerIsEnabled()) return;
-    if (window.TrankitChunkDebugger && typeof window.TrankitChunkDebugger.refresh === 'function') {
-      try { window.TrankitChunkDebugger.refresh(); } catch (_e) {}
-    }
-  }
+
+
 
   function warmPdfCanonicalPage(pageIdx, reason) {
     if (inputMode !== 'pdf') return Promise.resolve(false);
     var idx = Math.max(0, Math.min((docPages.length || 1) - 1, Math.floor(Number(pageIdx) || 0)));
     return ensurePdfCanonicalPage(idx, { silent: true, reason: reason || 'visual-page' })
       .then(function(ok) {
-        if (ok && inputMode === 'pdf') refreshTrankitChunkDebuggerIfEnabled();
+
         return !!ok;
       })
       .catch(function(err) {
@@ -18820,17 +18801,7 @@ function handlePagerScrollStop() {
       }
     }
     _refreshLlmGlossUI();
-    if (cacheHits.length) {
-      try {
-        fetch('/api/llm_glosses/cache_hit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lang: lang, hits: cacheHits }),
-          keepalive: true,
-        }).catch(function(){});
-        console.debug('[llm_gloss cache] sentence hits:', cacheHits.length, cacheHits);
-      } catch (e) {}
-    }
+
     if (!chunksToSend.length) return;
 
     // Strip the server-facing payload down to what the endpoint expects.
@@ -19153,16 +19124,7 @@ function handlePagerScrollStop() {
     }
     _refreshLlmDecompUI();
 
-    if (cacheHits.length) {
-      try {
-        fetch('/api/llm_decomps/cache_hit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lang: lang, hits: cacheHits }),
-          keepalive: true,
-        }).catch(function(){});
-      } catch (e) {}
-    }
+
     if (!chunksToSend.length) return;
 
     fetch('/api/llm_decomps', {
@@ -19452,16 +19414,7 @@ function handlePagerScrollStop() {
     }
     _refreshLlmDecompUI();
 
-    if (cacheHits.length) {
-      try {
-        fetch('/api/llm_decomps/cache_hit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lang: lang, hits: cacheHits }),
-          keepalive: true,
-        }).catch(function(){});
-      } catch (e) {}
-    }
+
     if (!chunksToSend.length) return;
 
     fetch('/api/llm_decomps', {
@@ -20095,7 +20048,6 @@ function handlePagerScrollStop() {
     url += '&collapse_ner_spans=' + (displaySettings.collapseNerUd ? '1' : '0');
     url += '&gemini_ner=0';
     url += '&dp_resegment=' + (displaySettings.dpResegment ? '1' : '0');
-    url += '&debug_capture=' + (DEBUG_CAPTURE_PROTOTYPE_ENABLED ? '1' : '0');
     url += '&strip_punctuation=0';
     url += '&manual_sentence_segmentation=' + (getManualSentenceSegmentationForLanguage(currentLanguage) ? '1' : '0');
     url += '&lang=' + encodeURIComponent(currentLanguage);
@@ -20108,7 +20060,6 @@ function handlePagerScrollStop() {
     url += '&split_fill=' + (displaySettings.splitDictFill ? '1' : '0');
     url += '&collapse_ner_spans=' + (displaySettings.collapseNerUd ? '1' : '0');
     url += '&gemini_ner=0';
-    url += '&debug_capture=' + (DEBUG_CAPTURE_PROTOTYPE_ENABLED ? '1' : '0');
     url += '&strip_punctuation=0';
     url += '&manual_sentence_segmentation=' + (getManualSentenceSegmentationForLanguage(currentLanguage) ? '1' : '0');
     url += '&lite=1';
@@ -20116,20 +20067,7 @@ function handlePagerScrollStop() {
     if (currentTrankitOverride) url += '&trankit=' + encodeURIComponent(currentTrankitOverride);
     return appendLmWeightsToUrl(url);
   }
-  function buildLookupUrlRaw(q, exact, lemma, upos, xpos) {
-    var url = '/lookup?q=' + encodeURIComponent(q || '');
-    url += '&raw=1';
-    if (exact) url += '&exact=1';
-    if (lemma) url += '&lemma=' + encodeURIComponent(lemma);
-    if (upos) url += '&upos=' + encodeURIComponent(upos);
-    if (xpos) url += '&xpos=' + encodeURIComponent(xpos);
-    url += '&stanza_ner=' + (displaySettings.stanzaNer ? '1' : '0');
-    url += '&collapse_ner_spans=' + (displaySettings.collapseNerUd ? '1' : '0');
-    url += '&dp_resegment=' + (displaySettings.dpResegment ? '1' : '0');
-    url += '&debug_capture=' + (DEBUG_CAPTURE_PROTOTYPE_ENABLED ? '1' : '0');
-    url += '&lang=' + encodeURIComponent(currentLanguage);
-    return appendLmWeightsToUrl(url);
-  }
+
   function syncStripPunctuationControl() {
     if (!toggleStripPunctuation) return;
     toggleStripPunctuation.checked = false;
@@ -22104,13 +22042,13 @@ function handlePagerScrollStop() {
     // If we have structured_blocks, use them for proper document structure
     var blocks = Array.isArray(pageData.structured_blocks) ? pageData.structured_blocks : null;
     var words = Array.isArray(pageData.words) ? pageData.words : [];
-    
+
     if (blocks && blocks.length > 0) {
       // Sort blocks by Y position (min_y) for proper vertical ordering
       var sortedBlocks = blocks.slice().sort(function(a, b) {
         return (a.min_y || 0) - (b.min_y || 0);
       });
-      
+
       var text = '';
       for (var bi = 0; bi < sortedBlocks.length; bi++) {
         if (bi > 0) text += '\n\n';  // Paragraph break between blocks
@@ -22133,10 +22071,10 @@ function handlePagerScrollStop() {
       }
       return text;
     }
-    
+
     // Fallback: group words by Y, sort by X within each line
     if (!words.length) return '';
-    
+
     // Compute median height for line detection
     var medianH = 12;
     var allHeights = [];
@@ -22148,36 +22086,36 @@ function handlePagerScrollStop() {
       var mid = Math.floor(allHeights.length / 2);
       medianH = allHeights.length % 2 ? allHeights[mid] : (allHeights[mid-1] + allHeights[mid]) / 2;
     }
-    
+
     // Group words into lines by Y
     var lineGroups = [];
     var currentLineY = -999;
     var currentLineWords = [];
-    
+
     for (var wi = 0; wi < words.length; wi++) {
       var w = words[wi];
       if (!w || !w.text) continue;
-      
+
       var y = (typeof w.y === 'number') ? w.y : 0;
       var h = (typeof w.h === 'number' && w.h > 0) ? w.h : medianH;
-      
+
       if (currentLineY >= 0 && Math.abs(y - currentLineY) > h * 0.5) {
         if (currentLineWords.length > 0) {
           lineGroups.push({ y: currentLineY, words: currentLineWords });
         }
         currentLineWords = [];
       }
-      
+
       currentLineWords.push(w);
       currentLineY = y;
     }
     if (currentLineWords.length > 0) {
       lineGroups.push({ y: currentLineY, words: currentLineWords });
     }
-    
+
     // Sort lines by Y
     lineGroups.sort(function(a, b) { return a.y - b.y; });
-    
+
     // Build text: lines separated by \n, words sorted by X and separated by space
     var text = '';
     for (var li = 0; li < lineGroups.length; li++) {
@@ -23703,16 +23641,16 @@ function handlePagerScrollStop() {
     // This must match exactly for character-level mapping to work
     var wordOffsets = [];
     var charPos = 0;
-    
+
     var structuredBlocks = (pageData && Array.isArray(pageData.structured_blocks)) ? pageData.structured_blocks : null;
     var words = (pageData && Array.isArray(pageData.words)) ? pageData.words : pdfWords;
-    
+
     if (structuredBlocks && structuredBlocks.length > 0) {
       // Sort blocks by Y position - MUST match buildLayoutTextFromWords and render loop
       var sortedBlocks = structuredBlocks.slice().sort(function(a, b) {
         return (a.min_y || 0) - (b.min_y || 0);
       });
-      
+
       var spanIdx = 0;
       for (var bi = 0; bi < sortedBlocks.length; bi++) {
         if (bi > 0) charPos += 2;  // '\n\n' paragraph break
@@ -23753,36 +23691,36 @@ function handlePagerScrollStop() {
         var mid = Math.floor(allHeights.length / 2);
         medianH = allHeights.length % 2 ? allHeights[mid] : (allHeights[mid-1] + allHeights[mid]) / 2;
       }
-      
+
       // Group words into lines by Y
       var lineGroups = [];
       var currentLineY = -999;
       var currentLineWords = [];
-      
+
       for (var wi = 0; wi < words.length; wi++) {
         var w = words[wi];
         if (!w || !w.text) continue;
-        
+
         var y = (typeof w.y === 'number') ? w.y : 0;
         var h = (typeof w.h === 'number' && w.h > 0) ? w.h : medianH;
-        
+
         if (currentLineY >= 0 && Math.abs(y - currentLineY) > h * 0.5) {
           if (currentLineWords.length > 0) {
             lineGroups.push({ y: currentLineY, words: currentLineWords });
           }
           currentLineWords = [];
         }
-        
+
         currentLineWords.push(w);
         currentLineY = y;
       }
       if (currentLineWords.length > 0) {
         lineGroups.push({ y: currentLineY, words: currentLineWords });
       }
-      
+
       // Sort lines by Y
       lineGroups.sort(function(a, b) { return a.y - b.y; });
-      
+
       // Build offsets: lines separated by \n, words sorted by X and separated by space
       for (var li = 0; li < lineGroups.length; li++) {
         if (li > 0) charPos += 1;  // '\n' line break
@@ -24279,7 +24217,7 @@ function handlePagerScrollStop() {
         // Render structured flowing text layout - each word positioned by its actual X coordinate
         var structuredBlocks = pageData.structured_blocks || [];
         var words = pageData.words || [];
-        
+
         // Create container
         var container = document.createElement('div');
         container.className = 'structured-text-container';
@@ -24290,10 +24228,10 @@ function handlePagerScrollStop() {
           var containerHeight = containerWidth * (pageData.height / pageData.width);
           container.style.height = containerHeight + 'px';
         }
-        
+
         // Global word spans array for annotation mapping
         var allWordSpans = [];
-        
+
         var pageFontSizes = [];
         var fontCounts = {};
         if (structuredBlocks.length > 0) {
@@ -24388,7 +24326,7 @@ function handlePagerScrollStop() {
                 wordSpan.dataset.bboxY = String(w.y || 0);
                 wordSpan.dataset.bboxW = String(w.w || 0);
                 wordSpan.dataset.bboxH = String(w.h || 0);
-                
+
                 var leftPct = ((w.x || 0) / pageData.width) * 100;
                 var topPct = ((w.y || 0) / pageData.height) * 100;
                 wordSpan.style.cssText = 'position:absolute;left:' + leftPct + '%;top:' + topPct + '%;white-space:nowrap;';
@@ -24410,7 +24348,7 @@ function handlePagerScrollStop() {
                 if (useFontSize && scaleFactor > 0) {
                   wordSpan.style.fontSize = (Number(useFontSize) * scaleFactor) + 'px';
                 }
-                
+
                 container.appendChild(wordSpan);
                 allWordSpans.push(wordSpan);
               }
@@ -24423,7 +24361,7 @@ function handlePagerScrollStop() {
           var currentLineY = -999;
           var currentLineWords = [];
           var medianH = 12;
-          
+
           // Compute median height
           var allHeights = [];
           for (var wi = 0; wi < words.length; wi++) {
@@ -24434,14 +24372,14 @@ function handlePagerScrollStop() {
             var mid = Math.floor(allHeights.length / 2);
             medianH = allHeights.length % 2 ? allHeights[mid] : (allHeights[mid-1] + allHeights[mid]) / 2;
           }
-          
+
           for (var wi = 0; wi < words.length; wi++) {
             var w = words[wi];
             if (!w || !w.text) continue;
-            
+
             var y = (typeof w.y === 'number') ? w.y : 0;
             var h = (typeof w.h === 'number' && w.h > 0) ? w.h : medianH;
-            
+
             // Check for new line
             if (currentLineY >= 0 && Math.abs(y - currentLineY) > h * 0.5) {
               if (currentLineWords.length > 0) {
@@ -24449,17 +24387,17 @@ function handlePagerScrollStop() {
               }
               currentLineWords = [];
             }
-            
+
             currentLineWords.push(w);
             currentLineY = y;
           }
           if (currentLineWords.length > 0) {
             lineGroups.push({ y: currentLineY, words: currentLineWords });
           }
-          
+
           // Sort lines by Y
           lineGroups.sort(function(a, b) { return a.y - b.y; });
-          
+
           // Render each line with individually positioned words. Iteration
           // order MUST match buildLayoutTextFromWords' fallback branch: lines
           // sorted by Y (above), words within each line sorted by X, with \n
@@ -24487,7 +24425,7 @@ function handlePagerScrollStop() {
               wordSpan.dataset.bboxY = String(w.y || 0);
               wordSpan.dataset.bboxW = String(w.w || 0);
               wordSpan.dataset.bboxH = String(w.h || 0);
-              
+
               // Position each word by its actual X coordinate
               var leftPct = ((w.x || 0) / pageData.width) * 100;
               var topPct = ((w.y || 0) / pageData.height) * 100;
@@ -24510,7 +24448,7 @@ function handlePagerScrollStop() {
               if (useFontSize2 && scaleFactor > 0) {
                 wordSpan.style.fontSize = (Number(useFontSize2) * scaleFactor) + 'px';
               }
-              
+
               container.appendChild(wordSpan);
               allWordSpans.push(wordSpan);
             }
@@ -25062,7 +25000,7 @@ function handlePagerScrollStop() {
       }
 
       positionPopup(clientX, clientY);
-      positionSubsegmentPopups();
+
     }
 
     container.onmousemove = function(ev) {
@@ -25729,31 +25667,7 @@ function handlePagerScrollStop() {
     }
     displayWordPopup(dictHtml, word, segIdx, g2pData);
   }
-  function renderSubsegmentPopups(subsegments, posData) {
-    // Create popup elements for each subsegment via shared template
-    for (var i = 0; i < subsegments.length; i++) {
-      var sub = subsegments[i];
-      if (!sub || !sub.head) continue;
 
-      var popupDiv = document.createElement('div');
-      popupDiv.className = 'subsegment-popup';
-      applyLanguagePresentationToElement(popupDiv, { direction: 'ltr', alignText: false });
-
-      var block = renderDictTemplate(sub, sub.head, {
-        showHead: false,
-        showRomanUnknown: true,
-        showSensesKnown: true
-      });
-      popupDiv.innerHTML = block.html;
-      subsegmentPopupsContainer.appendChild(popupDiv);
-    }
-
-    // Show the container if we have subsegments
-    if (subsegmentPopupsContainer.children.length > 0) {
-      subsegmentPopupsContainer.style.display = 'flex';
-      positionSubsegmentPopups();
-    }
-  }
 
   // Render dict_fill entries as separate popups inside the given container (left-to-right order).
   // These participate in the existing hover popup collision detection since they're children of hoverPopupContainer.
@@ -25786,90 +25700,9 @@ function handlePagerScrollStop() {
     }
   }
 
-  function fetchAndDisplaySubsegmentPopups(word) {
-    if (!word || !subsegmentPopupsContainer) return;
-    var requestLang = String(currentLanguage || '');
 
-    // Clear existing subsegment popups
-    subsegmentPopupsContainer.innerHTML = '';
-    subsegmentPopupsContainer.style.display = 'none';
 
-    flushLookupCachesForToken(word, requestLang);
-    fetch('/subsegments?token=' + encodeURIComponent(word) + '&lang=' + encodeURIComponent(requestLang))
-      .then(function(resp) { return resp.json(); })
-      .then(function(data) {
-        if (!data.ok || !data.subsegments || data.subsegments.length < 1) {
-          return;
-        }
 
-        var subsegments = data.subsegments;
-        // Cache the result
-        setSubsegEntry(word, subsegments, false, requestLang);
-
-        renderSubsegmentPopups(subsegments);
-      })
-      .catch(function(err) {
-        console.error('Failed to fetch subsegments:', err);
-      });
-  }
-
-  function positionSubsegmentPopups() {
-    if (!subsegmentPopupsContainer || !hoverPopupContainer) return;
-    if (subsegmentPopupsContainer.style.display === 'none') return;
-    if (hoverPopupContainer.style.display === 'none') return;
-
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
-    invalidateUiRectFor(hoverPopupContainer);
-    var mainRect = getUiRect(hoverPopupContainer);
-    var gap = 8;
-    var pad = 8;
-
-    // Start with vertical (column) layout
-    subsegmentPopupsContainer.style.flexDirection = 'column';
-    subsegmentPopupsContainer.style.flexWrap = 'nowrap';
-    subsegmentPopupsContainer.style.left = '0px';
-    subsegmentPopupsContainer.style.top = '0px';
-    invalidateUiRectFor(subsegmentPopupsContainer);
-    var subRect = getUiRect(subsegmentPopupsContainer);
-    var subW = subRect.width;
-    var subH = subRect.height;
-
-    // If vertical layout is too tall, switch to horizontal (row)
-    if (subH > vh - pad * 2) {
-      subsegmentPopupsContainer.style.flexDirection = 'row';
-      subsegmentPopupsContainer.style.flexWrap = 'wrap';
-      invalidateUiRectFor(subsegmentPopupsContainer);
-      subRect = getUiRect(subsegmentPopupsContainer);
-      subW = subRect.width;
-      subH = subRect.height;
-    }
-
-    // Try right of main popup first
-    var x = mainRect.right + gap;
-    var y = mainRect.top;
-
-    // If goes off right edge, try left of main popup
-    if (x + subW > vw - pad) {
-      x = mainRect.left - gap - subW;
-    }
-
-    // If still off left edge, position at left edge
-    if (x < pad) {
-      x = pad;
-    }
-
-    // Vertical: keep on screen
-    if (y + subH > vh - pad) {
-      y = vh - pad - subH;
-    }
-    if (y < pad) {
-      y = pad;
-    }
-
-    subsegmentPopupsContainer.style.left = x + 'px';
-    subsegmentPopupsContainer.style.top = y + 'px';
-  }
 
   function displayWordPopup(dictHtml, word, segIdx, g2pData) {
     currentPopupHead = word;
@@ -25918,9 +25751,7 @@ function handlePagerScrollStop() {
       updateNotePopupForHead(word);
     }
     // Fetch and display subsegment popups if enabled
-    if (displaySettings.subsegmentPopups && subsegmentPopupsContainer && word) {
-      fetchAndDisplaySubsegmentPopups(word);
-    } else if (subsegmentPopupsContainer) {
+    if (subsegmentPopupsContainer) {
       subsegmentPopupsContainer.style.display = 'none';
       subsegmentPopupsContainer.innerHTML = '';
     }
@@ -27044,9 +26875,7 @@ function handlePagerScrollStop() {
     var hasUnknown = isUnk || dictFill.some(function(p) { return isUnknownDictEntry(p); });
     var fuzzyUnknownPiece = (fullData && fullData.fuzzyUnknownPiece) ? fullData.fuzzyUnknownPiece : '';
     var fuzzyForceWholeToken = !!(fullData && fullData.fuzzyForceWholeToken);
-    if (hasUnknown && allowFuzzy && fuzzyUnknownPiece) {
-      html += '<div id="dict-fuzzy-results"></div>';
-    }
+
     html += '</div>';
     panelContent.innerHTML = html;
 
@@ -27113,287 +26942,13 @@ function handlePagerScrollStop() {
     // Token Info chip removed � replaced by token banner above panel
 
     // Auto-trigger fuzzy matching if there's unknown content
-    if (hasUnknown && allowFuzzy && fuzzyUnknownPiece) {
-      var fuzzyToken = (fullData && fullData.fuzzyBaseToken) ? fullData.fuzzyBaseToken : head;
-      var fuzzyNoIsland = !!(fullData && fullData.fuzzyNoIsland);
-      if (fullData && typeof fullData.fuzzySegIdx === 'number' && isFinite(fullData.fuzzySegIdx)) {
-        runSmartFuzzyMatching(fuzzyToken, { segIdx: fullData.fuzzySegIdx, noIsland: fuzzyNoIsland, unknownPiece: fuzzyUnknownPiece, forceWholeToken: fuzzyForceWholeToken });
-      } else if (fuzzyNoIsland) {
-        runSmartFuzzyMatching(fuzzyToken, { noIsland: true, unknownPiece: fuzzyUnknownPiece, forceWholeToken: fuzzyForceWholeToken });
-      } else {
-        runSmartFuzzyMatching(fuzzyToken, { unknownPiece: fuzzyUnknownPiece, forceWholeToken: fuzzyForceWholeToken });
-      }
-    }
+
   }
   // Segment a fuzzy headword into hoverable component spans
-  function segmentFuzzyHeadword(el) {
-    var fHead = el.getAttribute('data-fuzzy-head');
-    if (!fHead) return;
-    var requestLang = String(currentLanguage || '');
-    fetch(buildSubsegmentsUrl(fHead, { decompose: true, lang: requestLang }))
-      .then(function(resp) { return resp.json(); })
-      .then(function(data) {
-        var components = [];
-        if (data.ok && data.subsegments && data.subsegments.length >= 1) {
-          components = data.subsegments;
-          setSubsegEntry(fHead, components, true, requestLang);
-        } else {
-          // Can't break down - use the word itself
-          components = [{ head: fHead }];
-        }
-        // Replace content with hoverable spans
-        var psrApi = window.PanelSegmentRenderer || null;
-        var html = '';
-        for (var ci = 0; ci < components.length; ci++) {
-          var comp = components[ci];
-          var compHead = comp.head || fHead;
-          if (psrApi && typeof psrApi.renderLookupSpanHtml === 'function') {
-            html += psrApi.renderLookupSpanHtml(compHead);
-          } else {
-            html += escapeHtml(compHead);
-          }
-        }
-        el.innerHTML = html;
-        if (psrApi && typeof psrApi.processPanel === 'function') {
-          psrApi.processPanel(el, requestLang);
-        }
 
-        // Prefetch dict entries for fuzzy components so side-panel hover is not lazy.
-        components.forEach(function(comp) {
-          var compHead = comp && comp.head ? String(comp.head) : '';
-          if (!compHead || getExactSidePanelLookupEntry(compHead, requestLang, {})) return;
-          fetchExactSidePanelLookupEntry(compHead, requestLang, { cacheResult: true }).catch(function() {});
-        });
-      })
-      .catch(function() {
-        // On error, make the whole word hoverable
-        var psrApi = window.PanelSegmentRenderer || null;
-        el.innerHTML = (psrApi && typeof psrApi.renderLookupSpanHtml === 'function')
-          ? psrApi.renderLookupSpanHtml(fHead)
-          : escapeHtml(fHead);
-        if (psrApi && typeof psrApi.processPanel === 'function') {
-          psrApi.processPanel(el, currentLanguage || '');
-        }
-      });
-  }
-  function runSmartFuzzyMatching(baseToken, options) {
-    // Distance-first fuzzy matching with unigram LM as tie-breaker.
-    // Runs on the clicked token, then checks for larger island matches.
-    var container = document.getElementById('dict-fuzzy-results');
-    if (!container || !baseToken) return;
 
-    var tokenIdx = -1;
-    var cacheKey = null;
-    var noIsland = !!(options && options.noIsland);
-    var forceWholeToken = !!(options && options.forceWholeToken);
-    if (forceWholeToken) {
-      noIsland = true;
-    }
-    var unknownPiece = (options && options.unknownPiece) ? String(options.unknownPiece) : '';
-    if (!unknownPiece) return;
-    if (options && typeof options.segIdx === 'number' && isFinite(options.segIdx) && options.segIdx >= 0) {
-      tokenIdx = options.segIdx;
-      cacheKey = 'seg:' + tokenIdx + (unknownPiece ? '|unk:' + unknownPiece : '') + (forceWholeToken ? '|force:1' : '');
-    }
 
-    if (cacheKey && fuzzyCache.has(cacheKey)) {
-      renderFuzzyResults(container, fuzzyCache.get(cacheKey), baseToken);
-      return;
-    }
 
-    function isMyanmarWordToken(tok) {
-      if (!tok) return false;
-      if (tok.indexOf('။') >= 0 || tok.indexOf('၊') >= 0) return false;
-      for (var i = 0; i < tok.length; i++) {
-        var cp = tok.charCodeAt(i);
-        var isCore = (cp >= 0x1000 && cp <= 0x109F);
-        var isExtA = (cp >= 0xA9E0 && cp <= 0xA9FF);
-        var isExtB = (cp >= 0xAA60 && cp <= 0xAA7F);
-        if (!(isCore || isExtA || isExtB)) return false;
-      }
-      return true;
-    }
-
-    function buildIslandSpansFromOffsets(segments, offsets) {
-      if (!segments || !offsets || segments.length !== offsets.length) return null;
-      var spans = [];
-      var islandStart = null;
-      var prevEnd = null;
-      for (var i = 0; i < segments.length; i++) {
-        var seg = segments[i];
-        var off = offsets[i];
-        if (!off || off.length < 2 || !isMyanmarWordToken(seg)) {
-          if (islandStart !== null) {
-            spans.push([islandStart, i]);
-            islandStart = null;
-          }
-          prevEnd = null;
-          continue;
-        }
-        var s = Number(off[0]);
-        var e = Number(off[1]);
-        if (islandStart === null) {
-          islandStart = i;
-        } else if (prevEnd !== null && s !== prevEnd) {
-          spans.push([islandStart, i]);
-          islandStart = i;
-        }
-        prevEnd = e;
-      }
-      if (islandStart !== null) spans.push([islandStart, segments.length]);
-      return spans;
-    }
-
-    // Extract island tokens from latestData
-    var islandTokens = [];
-    var tokenIdxInIsland = -1;
-    if (!noIsland && latestData && Array.isArray(latestData.segments)) {
-      var segments = latestData.segments;
-      var islandSpans = null;
-      if (Array.isArray(latestData.segment_offsets) && latestData.segment_offsets.length === segments.length) {
-        islandSpans = buildIslandSpansFromOffsets(segments, latestData.segment_offsets);
-      }
-      if (!islandSpans || !islandSpans.length) {
-        islandSpans = latestData.island_spans || [];
-      }
-      if (tokenIdx < 0 || tokenIdx >= segments.length) {
-        // Find the index of this token (fallback by text match)
-        for (var i = 0; i < segments.length; i++) {
-          if (segments[i] === baseToken) {
-            tokenIdx = i;
-            break;
-          }
-        }
-      }
-      if (tokenIdx >= 0 && tokenIdx < segments.length) {
-        // Find which island this token belongs to and extract all island tokens
-        for (var si = 0; si < islandSpans.length; si++) {
-          var span = islandSpans[si];
-          var start = span[0], end = span[1];
-          if (tokenIdx >= start && tokenIdx < end) {
-            islandTokens = segments.slice(start, end);
-            tokenIdxInIsland = tokenIdx - start;
-            break;
-          }
-        }
-      }
-    }
-
-    if (!cacheKey) {
-      // Create cache key from base token + island
-      cacheKey = baseToken + '|' + islandTokens.join(',') + '|' + tokenIdxInIsland + (unknownPiece ? '|unk:' + unknownPiece : '') + (forceWholeToken ? '|force:1' : '');
-      if (fuzzyCache.has(cacheKey)) {
-        renderFuzzyResults(container, fuzzyCache.get(cacheKey), baseToken);
-        return;
-      }
-    }
-
-    container.innerHTML = '<div class="dict-unknown">Finding spelling suggestions...</div>';
-
-    fetch('/api/fuzzy_smart', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        base_token: baseToken,
-        max_edit_distance: 2,
-        max_suggestions: 10,
-        island_tokens: islandTokens,
-        token_idx_in_island: tokenIdxInIsland,
-        unknown_piece: unknownPiece,
-        force_whole_token: forceWholeToken
-      })
-    })
-      .then(function(resp) { return resp.json(); })
-      .then(function(data) {
-        if (!data || !data.ok) {
-          container.innerHTML = '<div class="dict-unknown">[fuzzy unavailable]</div>';
-          return;
-        }
-
-        // Cache the results
-        fuzzyCache.set(cacheKey, data);
-
-        // Render the results
-        renderFuzzyResults(container, data, baseToken);
-      })
-      .catch(function(err) {
-        console.error('Fuzzy matching error:', err);
-        container.innerHTML = '<div class="dict-unknown">[fuzzy request failed]</div>';
-      });
-  }
-
-  function renderFuzzyResults(container, data, baseToken) {
-    var final = data.final || {};
-    var groups = Array.isArray(data.groups) ? data.groups : [];
-    var sugg = final.suggestions || [];
-    var fuzziedStr = final.fuzzied_string || baseToken;
-
-    var html = '<div class="dict-fuzzy-section"><div class="dict-fuzzy-header">FUZZY SUGGESTIONS</div>';
-    if (data && typeof data.distance_used === 'number') {
-      html += '<div class="dict-unknown" style="margin-top:2px;font-size:0.85em;color:#666;">Edit distance: ' + escapeHtml(String(data.distance_used)) + '</div>';
-    }
-
-    if (final.removed_known && final.removed_known.length) {
-      html += '<div class="dict-unknown" style="margin-top:2px;font-size:0.85em;color:#666;">Subtracted known words: ' + final.removed_known.map(escapeHtml).join(', ') + '</div>';
-    }
-    if (final.kept_pieces && final.kept_pieces.length > 1) {
-      html += '<div class="dict-unknown" style="margin-top:2px;font-size:0.85em;color:#666;">Final word components: ' + final.kept_pieces.map(escapeHtml).join(' + ') + '</div>';
-    }
-
-    function buildEntryListHtml(list, label) {
-      if (!list || !list.length) return '';
-      var out = '';
-      if (label) {
-        out += '<div class="dict-unknown" style="margin-top:6px;font-size:0.85em;color:#666;">' + escapeHtml(label) + '</div>';
-      }
-      var ordered = list.slice ? list.slice() : list;
-      for (var si = 0; si < ordered.length; si++) {
-        var fm = ordered[si] || {};
-        var fHead = fm.head || fm.candidate || '';
-        if (!fHead) continue;
-        out += '<div class="dict-fuzzy-entry">';
-        out += '<span class="dict-fuzzy-head" data-fuzzy-head="' + escapeHtml(fHead) + '">' + escapeHtml(fHead) + '</span>';
-        var fSenses = fm.senses || (fm.gloss ? [fm.gloss] : []);
-        if (fSenses.length) {
-          out += '<div class="dict-fuzzy-senses">' + renderSenseLines(fSenses, fHead) + '</div>';
-        }
-        out += '</div>';
-      }
-      return out;
-    }
-
-    if (groups.length) {
-      for (var gi = 0; gi < groups.length; gi++) {
-        var g = groups[gi] || {};
-        var gTokens = Array.isArray(g.span_tokens) ? g.span_tokens : [];
-        var gLabel = gTokens.length ? gTokens.join(' + ') : (g.span_text || '');
-        if (gLabel) {
-          html += '<div class="dict-unknown" style="margin-top:6px;font-size:0.85em;color:#666;">';
-          html += 'Tokens: ' + escapeHtml(gLabel);
-          html += '</div>';
-        }
-        var gEntries = Array.isArray(g.entries) ? g.entries : [];
-        html += buildEntryListHtml(gEntries, '');
-      }
-    } else if (sugg.length) {
-      html += buildEntryListHtml(sugg, '');
-    } else {
-      html += '<div class="dict-unknown">[no spelling suggestions found for "' + escapeHtml(fuzziedStr) + '"]</div>';
-    }
-
-    html += '</div>';
-    container.innerHTML = html;
-
-    var fuzzyHeadEls = container.querySelectorAll('.dict-fuzzy-head[data-fuzzy-head]');
-    for (var fi = 0; fi < fuzzyHeadEls.length; fi++) {
-      segmentFuzzyHeadword(fuzzyHeadEls[fi]);
-    }
-
-    var fuzzySenses = container.querySelectorAll('.dict-fuzzy-senses');
-    for (var i = 0; i < fuzzySenses.length; i++) {
-      segmentBurmeseInElement(fuzzySenses[i]);
-    }
-  }
   function isPanelSegResultUnknown(res) {
     if (!res) return true;
     if (!res.source || res.source === 'UNKNOWN' || res.source === 'PUNCT') return true;
@@ -28288,9 +27843,9 @@ function handlePagerScrollStop() {
     if (_decompFloatState === 'edit') return true; // don't disturb edit mode
     // If view is already showing on this block, keep it visible
     if (_decompFloatState === 'view' && _decompFloatBlock === block) return true;
-    
+
     var cached = _getDecompCached(block);
-    
+
     if (cached) {
       // Decomp exists: show view directly (no click needed)
       _renderDecompView(block, cached);
@@ -30583,39 +30138,7 @@ function handlePagerScrollStop() {
     return fetchExactSidePanelLookupEntry(seg, langOverride, lookupOptions || {});
   }
   // Show simple dict popup (NO fuzzy matches)
-  function showHeadwordDecompPopup(seg) {
-    // For headword-component hovers: fetch greedy decomposition via
-    // /subsegments?decompose=1 and show the sub-parts, not the original entry.
-    var requestLang = String(currentLanguage || '');
-    flushLookupCachesForToken(seg, requestLang);
-    fetch(buildSubsegmentsUrl(seg, { decompose: true, lang: requestLang }))
-      .then(function(resp) { return resp.json(); })
-      .then(function(data) {
-        var subs = (data && data.ok && Array.isArray(data.subsegments)) ? data.subsegments : [];
-        setSubsegEntry(seg, subs, true, requestLang);
-        for (var si = 0; si < subs.length; si++) {
-          var sub = subs[si];
-          var subHead = getEntryDisplayHead(sub, '');
-          if (sub && subHead) setLookupFragmentEntry(sub, subHead, requestLang);
-        }
-        // Filter out the headword itself � only show true sub-parts
-        var parts = [];
-        for (var i = 0; i < subs.length; i++) {
-          var s = subs[i] || {};
-          var sh = getEntryDisplayHead(s, '');
-          if (sh && sh !== seg) parts.push(s);
-        }
-        if (parts.length) {
-          renderSubsegmentsPopupSimple(seg, parts);
-        } else {
-          // No decomposition available � don't show the same entry again
-          hidePopup();
-        }
-      })
-      .catch(function() {
-        hidePopup();
-      });
-  }
+
   function showDictPopupSimple(seg, lookupOptions) {
     var requestLang = String(currentLanguage || '');
     var lookupOpts = lookupOptions || {};
@@ -31501,13 +31024,13 @@ function handlePagerScrollStop() {
     positionSidePanelPopup(hoverPopupContainer, lastMouseX, lastMouseY);
   }
 
-  // Append community entries, annotation box, upgrade nudge, and synthetic annotation UI
+  // Show the paid-entry prompt for unknown tokens.
   function _appendUnknownExtras(container, seg, lang, entry) {
-    var UC = window.UserContributions;
+    var UC = window.UnknownEntryPrompt;
     if (!UC) return;
     // Legacy Google Translate synthetic-entry annotation UI disabled.
-    UC.renderAnnotationBox(seg, lang, container);
-    UC.renderCommunityEntries(seg, lang, container);
+
+
     if (!entry || !entry.senses || !entry.senses.length) {
       UC.renderUpgradeNudge(container);
     }
@@ -31914,190 +31437,4 @@ function handlePagerScrollStop() {
   // ---- Web snapshot lookup helper ----
   window.__LE_performWebSnapshotLookup = performWebSnapshotLookup;
 
-  // ---- Trankit chunk debugger bridge ----
-  // Read-only hook for the standalone chunk visualizer. It builds/returns the
-  // same canonical page data that lookup would use, without changing rendering,
-  // layout, lookup state, or document pagination.
-  function cloneChunkDebugPayload(value) {
-    try { return JSON.parse(JSON.stringify(value)); }
-    catch (_e) { return value || null; }
-  }
-
-  function chunkDebugResult(doc, page, mode, source) {
-    if (!page) {
-      return {
-        ok: false,
-        mode: mode || inputMode || '',
-        source: source || '',
-        error: 'No canonical page available.'
-      };
-    }
-    return {
-      ok: true,
-      mode: mode || inputMode || '',
-      source: source || '',
-      activePageIndex: Math.max(0, Math.floor(Number(activePageIndex) || 0)),
-      docMeta: cloneChunkDebugPayload(doc && doc.meta || {}),
-      page: cloneChunkDebugPayload(page)
-    };
-  }
-
-  window.__LE_getChunkDebugPage = function() {
-    var idx = Math.max(0, Math.floor(Number(activePageIndex) || 0));
-    var doc = null;
-    if (inputMode === 'pdf' && canonicalDoc && canonicalDoc.pages && canonicalDoc.pages.length) {
-      idx = Math.max(0, Math.min(canonicalDoc.pages.length - 1, idx));
-      return chunkDebugResult(canonicalDoc, canonicalDoc.pages[idx], 'pdf', 'canonical-pdf');
-    }
-    if (isActiveWebSnapshotDocument() && window.DocRenderWebSnapshotRenderer &&
-        typeof window.DocRenderWebSnapshotRenderer.extractVisibleCanonicalDocument === 'function') {
-      var webState = getActiveWebSnapshotState();
-      if (webState) {
-        doc = window.DocRenderWebSnapshotRenderer.extractVisibleCanonicalDocument(webState, { margin: 8 });
-        if (doc && doc.pages && doc.pages[0]) return chunkDebugResult(doc, doc.pages[0], 'html', 'web-visible-slice');
-      }
-    }
-    if ((isActiveFoliateFlowDocument() || isActiveEpubDocument()) && window.DocRenderWebSnapshotRenderer &&
-        typeof window.DocRenderWebSnapshotRenderer.extractVisibleCanonicalDocument === 'function') {
-      var pageNum = Math.max(0, Math.floor(Number(isActiveFoliateFlowDocument() ? activePageIndex : epubJsCurrentPageNum) || 0));
-      var foliateState = buildFoliateRectSliceState({
-        sourceRenderer: 'foliate',
-        parser: 'foliate-rect-slice-debug',
-        sourcePageIndex: pageNum,
-        sourceSectionIndex: foliateCurrentSectionIndex(),
-        sourceSectionPageIndex: foliateVisualPageIndex()
-      });
-      if (foliateState) {
-        doc = window.DocRenderWebSnapshotRenderer.extractVisibleCanonicalDocument(foliateState, { margin: 8 });
-        if (doc && doc.pages && doc.pages[0]) return chunkDebugResult(doc, doc.pages[0], 'html', 'foliate-visible-slice');
-      }
-    }
-    if (canonicalDoc && canonicalDoc.pages && canonicalDoc.pages.length) {
-      idx = Math.max(0, Math.min(canonicalDoc.pages.length - 1, idx));
-      return chunkDebugResult(canonicalDoc, canonicalDoc.pages[idx], inputMode || 'canonical', 'canonical-current');
-    }
-    return chunkDebugResult(null, null, inputMode || '', '');
-  };
-
-  // ---- Debug dump: __LE_debugDump() / __LE_debugDumpJson() ----
-  // Closes over the module-scoped latestData / latestSegments / latestUdOverlay
-  // so the live values (not snapshots) get serialized at call time.
-  function _ledd_safe(fn, fallback) {
-    try { return fn(); } catch (e) { return fallback; }
-  }
-  function _ledd_rect(el) {
-    var r = _ledd_safe(function () { return el.getBoundingClientRect(); }, null);
-    if (!r) return null;
-    return { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
-  }
-  function _ledd_dataset(el) {
-    if (!el || !el.dataset) return null;
-    var out = {};
-    for (var k in el.dataset) { if (Object.prototype.hasOwnProperty.call(el.dataset, k)) out[k] = el.dataset[k]; }
-    return out;
-  }
-  function _ledd_tokenSummary(el, idx) {
-    return {
-      idx: idx,
-      text: (el.textContent || '').slice(0, 120),
-      class: String(el.className || ''),
-      data: _ledd_dataset(el),
-      style_bg: _ledd_safe(function () { return el.style && el.style.backgroundColor; }, ''),
-      style_color: _ledd_safe(function () { return el.style && el.style.color; }, ''),
-      title: el.getAttribute ? el.getAttribute('title') : null,
-      rect: _ledd_rect(el),
-      fill_hit_count: el.querySelectorAll ? el.querySelectorAll('.reader-token-fill-hit').length : 0
-    };
-  }
-  function _ledd_fillHitSummary(el, idx) {
-    return {
-      idx: idx,
-      text: (el.textContent || '').slice(0, 80),
-      class: String(el.className || ''),
-      data: _ledd_dataset(el),
-      rect: _ledd_rect(el)
-    };
-  }
-  function _ledd_udSvgSummary() {
-    var svg = document.getElementById('ud-svg-overlay');
-    if (!svg) return null;
-    var kids = Array.prototype.slice.call(svg.children || []);
-    return {
-      child_count: kids.length,
-      bbox: _ledd_rect(svg),
-      children: kids.slice(0, 200).map(function (n) {
-        return {
-          tag: n.tagName,
-          class: String(n.getAttribute('class') || ''),
-          d: n.getAttribute('d'),
-          x1: n.getAttribute('x1'), y1: n.getAttribute('y1'),
-          x2: n.getAttribute('x2'), y2: n.getAttribute('y2'),
-          x: n.getAttribute('x'), y: n.getAttribute('y'),
-          stroke: n.getAttribute('stroke'),
-          fill: n.getAttribute('fill'),
-          text: (n.textContent || '').slice(0, 60)
-        };
-      })
-    };
-  }
-  window.__LE_debugDump = function (opts) {
-    opts = opts || {};
-    var maxTokens = Number(opts.maxTokens) > 0 ? Number(opts.maxTokens) : 300;
-    var tokenEls = document.querySelectorAll('.reader-token');
-    var fillHitEls = document.querySelectorAll('.reader-token-fill-hit');
-    var tokens = [];
-    for (var i = 0; i < Math.min(tokenEls.length, maxTokens); i++) tokens.push(_ledd_tokenSummary(tokenEls[i], i));
-    var fillHits = [];
-    for (var j = 0; j < Math.min(fillHitEls.length, maxTokens); j++) fillHits.push(_ledd_fillHitSummary(fillHitEls[j], j));
-    // Slim latestData — entry_store can be massive; surface its size only.
-    var slimData = null;
-    if (latestData && typeof latestData === 'object') {
-      slimData = {
-        keys: Object.keys(latestData),
-        results_by_seg: latestData.results_by_seg,
-        ud_overlay: latestData.ud_overlay,
-        grammar_overlay: latestData.grammar_overlay,
-        entry_store_size: latestData.entry_store ? Object.keys(latestData.entry_store).length : 0
-      };
-    }
-    return {
-      counts: {
-        reader_tokens_dom: tokenEls.length,
-        fill_hits_dom: fillHitEls.length,
-        latestSegments: (latestSegments && latestSegments.length) || 0,
-        latestUdOverlay_tokens: (latestUdOverlay && latestUdOverlay.tokens && latestUdOverlay.tokens.length) || 0,
-        latestUdOverlay_sentences: (latestUdOverlay && latestUdOverlay.sentences && latestUdOverlay.sentences.length) || 0
-      },
-      latestSegments: latestSegments,
-      latestUdOverlay: latestUdOverlay,
-      latestData: slimData,
-      dom: {
-        tokens: tokens,
-        fill_hits: fillHits,
-        ud_overlay: _ledd_udSvgSummary()
-      }
-    };
-  };
-  window.__LE_debugDumpJson = function (opts) {
-    var dump = window.__LE_debugDump(opts);
-    try { return JSON.stringify(dump, null, 2); }
-    catch (e) {
-      // Fall back to a stripped-down dump if circular refs sneak in.
-      return JSON.stringify({ error: String(e), counts: dump.counts }, null, 2);
-    }
-  };
-  window.__LE_debugCopy = function (opts) {
-    var s = window.__LE_debugDumpJson(opts);
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(s).then(function () {
-        console.log('[__LE_debugCopy] copied', s.length, 'chars to clipboard');
-      }, function (err) {
-        console.warn('[__LE_debugCopy] clipboard write failed:', err);
-        console.log(s);
-      });
-    } else {
-      console.log(s);
-    }
-    return s.length;
-  };
 })();

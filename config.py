@@ -71,7 +71,6 @@ GOOGLE_TRANSLATE_API_KEY = os.environ.get("GOOGLE_TRANSLATE_API_KEY", "")
 
 # Gemini API
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-LE_GEMINI_COMMS_LOG = _env_bool("LE_GEMINI_COMMS_LOG", default=False)
 
 # Production runtime switches
 ENABLE_LEGACY_DOCUMENT_ROUTES = _env_bool(

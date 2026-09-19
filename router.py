@@ -36,7 +36,6 @@ from flask import (
 from flask_cors import CORS
 from flask_login import current_user
 from universal_normalization import (
-    build_preprocess_context,
     run_with_universal_normalization,
 )
 from language_registry import (
@@ -49,21 +48,7 @@ from language_registry import (
     LANGUAGE_REGISTRY,
 )
 from pipeline_common import (
-    _build_jmdict_forms_meta_bundle,
     process_lookup_nlp_only,
-)
-from debug_trace_runtime import (
-    finish_trace,
-    record_decoration_event,
-    start_trace,
-    stop_trace,
-    trace_scope,
-)
-from debug_store import (
-    get_debug_snapshot,
-    is_debug_collection_enabled,
-    store_debug_json_artifact,
-    update_debug_snapshot,
 )
 
 # ---------------------------------------------------------------------------
@@ -89,14 +74,15 @@ def _static_mtime(filename):
 
 
 app.jinja_env.globals["mtime"] = _static_mtime
-app.jinja_env.globals["is_debug_collection_enabled"] = is_debug_collection_enabled
 
 
 def _inject_extension_snapshot_style(html: str) -> str:
     html = re.sub(r"<script\b[^>]*>[\s\S]*?</script\s*>", "", html, flags=re.I)
     html = re.sub(r"\s+on[a-zA-Z]+\s*=\s*(\"[^\"]*\"|'[^']*'|[^\s>]+)", "", html)
     html = re.sub(
-        r"(?i)(href|src|xlink:href)\s*=\s*(['\"])\s*javascript:[\s\S]*?\2", r"\1=\"#\"", html
+        r"(?i)(href|src|xlink:href)\s*=\s*(['\"])\s*javascript:[\s\S]*?\2",
+        r"\1=\"#\"",
+        html,
     )
     style = """
 <style id="docrender-monolith-inert-style">
@@ -323,7 +309,11 @@ with app.app_context():
 
     le_db.create_all()
     # Migrate: add Gemini token usage columns if missing
-    for column_name in ("llm_tokens_used", "llm_prompt_tokens_used", "llm_output_tokens_used"):
+    for column_name in (
+        "llm_tokens_used",
+        "llm_prompt_tokens_used",
+        "llm_output_tokens_used",
+    ):
         try:
             le_db.session.execute(sqlalchemy.text(f"SELECT {column_name} FROM api_usage LIMIT 1"))
         except Exception:
@@ -460,7 +450,11 @@ with app.app_context():
                 "user_id",
                 "UPDATE entry_decomps SET user_id = NULL WHERE user_id IS NOT NULL",
             ),
-            ("custom_entry_deletion_votes", None, "DELETE FROM custom_entry_deletion_votes"),
+            (
+                "custom_entry_deletion_votes",
+                None,
+                "DELETE FROM custom_entry_deletion_votes",
+            ),
             ("gemini_deletion_votes", None, "DELETE FROM gemini_deletion_votes"),
             ("gemini_entry_owners", None, "DELETE FROM gemini_entry_owners"),
             ("synthetic_annotations", None, "DELETE FROM synthetic_annotations"),
@@ -517,7 +511,10 @@ def _normalize_trankit_upos_doc(doc: Any, lang_code: str) -> Any:
 
 
 def _get_custom_dict_entry(
-    entry_id: str = "", entry_row_id: int | str = 0, language: str = "", headword: str = ""
+    entry_id: str = "",
+    entry_row_id: int | str = 0,
+    language: str = "",
+    headword: str = "",
 ):
     from db import CustomDictEntry
 
@@ -560,7 +557,6 @@ def _delete_custom_entry(entry) -> bool:
         return False
 
     le_db.session.commit()
-    _invalidate_sqlite_segmenter_cache(entry.language, lookup_texts)
     return True
 
 
@@ -668,8 +664,6 @@ _ACTUAL_RESOLUTION_LABELS = {
     "lemma_partial_override": "exact lemma parts + greedy gaps",
 }
 
-_segmenter_cache: dict[tuple[str, tuple[str, ...], bool], Any] = {}
-_segmenter_cache_lock = threading.Lock()
 
 
 def _dedupe_text_list(values: Sequence[Any] | None) -> list[str]:
@@ -716,41 +710,6 @@ def _get_requested_sources(payload: dict[str, Any] | None = None) -> list[str]:
     return _normalize_selected_sources(source_list, single_source)
 
 
-def _split_segmenter_sources(
-    selected_sources: Sequence[str] | None,
-) -> tuple[list[str], bool, bool]:
-    selected = _normalize_selected_sources(selected_sources)
-    if not selected:
-        return [], True, False
-    include_custom = "custom" in selected
-    db_sources = [src for src in selected if src != "custom"]
-    custom_only = include_custom and not db_sources
-    return db_sources, include_custom, custom_only
-
-
-def _get_sqlite_segmenter(lang_code: str, selected_sources: Sequence[str] | None):
-    from sqlite_segmenter import SQLiteDictionarySegmenter
-
-    lang = str(lang_code or "").strip().lower()
-    if not lang:
-        return None
-    db_sources, include_custom, custom_only = _split_segmenter_sources(selected_sources)
-    if custom_only:
-        return None
-    cache_key = (lang, tuple(db_sources), include_custom)
-    with _segmenter_cache_lock:
-        cached = _segmenter_cache.get(cache_key)
-        if cached is not None:
-            return cached
-        segmenter = SQLiteDictionarySegmenter(
-            lang,
-            sources=db_sources or None,
-            include_custom_entries=include_custom,
-        )
-        _segmenter_cache[cache_key] = segmenter
-        return segmenter
-
-
 def _collect_lookup_texts_for_entry(entry: dict[str, Any] | None) -> list[str]:
     out: list[str] = []
     seen: set[str] = set()
@@ -765,7 +724,15 @@ def _collect_lookup_texts_for_entry(entry: dict[str, Any] | None) -> list[str]:
     if not isinstance(entry, dict):
         return out
 
-    for key in ("headword", "surface_form", "head", "text", "lemma", "lemma_form", "morph_base"):
+    for key in (
+        "headword",
+        "surface_form",
+        "head",
+        "text",
+        "lemma",
+        "lemma_form",
+        "morph_base",
+    ):
         add_text(entry.get(key))
 
     forms = entry.get("forms")
@@ -777,26 +744,6 @@ def _collect_lookup_texts_for_entry(entry: dict[str, Any] | None) -> list[str]:
                 add_text(form.get("word") or form.get("form") or form.get("headword"))
 
     return out
-
-
-def _invalidate_sqlite_segmenter_cache(
-    lang_code: str = "", lookup_texts: Sequence[str] | str | None = None
-) -> None:
-    lang = str(lang_code or "").strip().lower()
-    texts = _dedupe_text_list(
-        [lookup_texts] if isinstance(lookup_texts, str) else list(lookup_texts or [])
-    )
-    if not lang or not texts:
-        return
-    with _segmenter_cache_lock:
-        for key, segmenter in list(_segmenter_cache.items()):
-            if not key or key[0] != lang:
-                continue
-            if segmenter is not None and hasattr(segmenter, "invalidate_lookup_texts"):
-                try:
-                    segmenter.invalidate_lookup_texts(texts)
-                except Exception:
-                    pass
 
 
 def _entry_source_tag(entry: dict[str, Any] | None) -> str:
@@ -811,167 +758,6 @@ def _entry_reading(entry: dict[str, Any] | None) -> str:
     return str(
         entry.get("reading") or entry.get("romanization") or entry.get("pinyin") or ""
     ).strip()
-
-
-def _entry_pos(entry: dict[str, Any] | None) -> str:
-    if not isinstance(entry, dict):
-        return ""
-    return str(entry.get("pos") or entry.get("pos_raw") or "").strip()
-
-
-def _clone_entry_with_nlp(
-    entry: dict[str, Any] | None, upos: str = "", xpos: str = ""
-) -> dict[str, Any]:
-    if not isinstance(entry, dict):
-        return {}
-    clone = dict(entry)
-    upos_value = str(upos or "").strip()
-    xpos_value = str(xpos or "").strip()
-    clone["upos"] = upos_value
-    clone["xpos"] = xpos_value
-    clone["tag"] = xpos_value
-    if upos_value:
-        clone["upos_label"] = upos_value
-        clone["upos_color"] = _LOOKUP_UPOS_COLORS.get(upos_value, "#d1d5db")
-    else:
-        clone.pop("upos_label", None)
-        clone.pop("upos_color", None)
-    return clone
-
-
-def _decorate_entries_with_nlp(
-    entries: Sequence[dict[str, Any]] | None, upos: str = "", xpos: str = ""
-) -> list[dict[str, Any]]:
-    out: list[dict[str, Any]] = []
-    for raw in entries or []:
-        if not isinstance(raw, dict):
-            continue
-        out.append(_clone_entry_with_nlp(raw, upos, xpos))
-    return out
-
-
-def _fill_effective_upos(fill_row: Mapping[str, Any] | None, fallback_upos: str = "") -> str:
-    if not isinstance(fill_row, Mapping):
-        return str(fallback_upos or "").strip()
-    return str(fill_row.get("_lemma_upos_hint") or fallback_upos or "").strip()
-
-
-def _fill_effective_xpos(fill_row: Mapping[str, Any] | None, fallback_xpos: str = "") -> str:
-    if not isinstance(fill_row, Mapping):
-        return str(fallback_xpos or "").strip()
-    return str(
-        fill_row.get("_xpos_hint") or fill_row.get("_lemma_xpos_hint") or fallback_xpos or ""
-    ).strip()
-
-
-def _entry_senses_lines(entry: dict[str, Any] | None, fallback_head: str = "") -> list[str]:
-    if not isinstance(entry, dict):
-        return []
-    senses = entry.get("senses") or []
-    head = str(entry.get("surface_form") or entry.get("headword") or fallback_head or "")
-    roman = _entry_reading(entry)
-    pos = _entry_pos(entry)
-    out: list[str] = []
-    if isinstance(senses, list) and senses:
-        first = senses[0]
-        if isinstance(first, dict):
-            for idx, sense in enumerate(senses):
-                glosses = [
-                    str(g or "").strip()
-                    for g in list(sense.get("glosses") or [])
-                    if str(g or "").strip()
-                ]
-                if not glosses:
-                    continue
-                line = "; ".join(glosses)
-                if idx == 0:
-                    out.append(f"{head}	{roman}	{pos}	{line}")
-                else:
-                    out.append(f"			{line}")
-            return out
-        for idx, sense in enumerate(senses):
-            line = str(sense or "").strip()
-            if not line:
-                continue
-            if "	" in line:
-                out.append(line)
-            elif idx == 0:
-                out.append(f"{head}	{roman}	{pos}	{line}")
-            else:
-                out.append(f"			{line}")
-
-        return out
-    glosses = entry.get("glosses")
-    if isinstance(glosses, list) and glosses:
-        for idx, gloss in enumerate(glosses):
-            line = str(gloss or "").strip()
-            if not line:
-                continue
-            if idx == 0:
-                out.append(f"{head}	{roman}	{pos}	{line}")
-            else:
-                out.append(f"			{line}")
-    return out
-
-
-def _merge_all_entries(head: str, entries: Sequence[dict[str, Any]] | None) -> list[str]:
-    seen: set[str] = set()
-    out: list[str] = []
-    for entry in entries or []:
-        for line in _entry_senses_lines(entry, fallback_head=head):
-            if not line or line in seen:
-                continue
-            seen.add(line)
-            out.append(line)
-    return out
-
-
-def _build_entry_groups(
-    entries: Sequence[dict[str, Any]] | None, surface: str
-) -> list[dict[str, Any]]:
-    groups: list[dict[str, Any]] = []
-    for entry in entries or []:
-        headword = str(entry.get("surface_form") or entry.get("headword") or surface or "").strip()
-        base_headword = str(entry.get("headword") or "").strip()
-        pos_group: dict[str, Any] = {
-            "headword": headword,
-            "base_headword": base_headword,
-            "is_inflected_surface": bool(headword and base_headword and headword != base_headword),
-            "reading": _entry_reading(entry),
-            "pos": _entry_pos(entry),
-            "senses": copy.deepcopy(entry.get("senses_full") or entry.get("senses") or []),
-        }
-        morph_info = _dedupe_text_list(
-            entry.get("morph_info")
-            if isinstance(entry.get("morph_info"), list)
-            else [entry.get("morph_info")]
-        )
-        morph_base = str(entry.get("morph_base") or "").strip()
-        grammar = str(entry.get("grammar") or "").strip()
-        if morph_info:
-            pos_group["morph_info"] = morph_info
-        if morph_base:
-            pos_group["morph_base"] = morph_base
-        if grammar:
-            pos_group["grammar"] = grammar
-        for forms_key in ("hanja_forms", "hangeul_forms"):
-            forms_val = entry.get(forms_key)
-            if isinstance(forms_val, list) and forms_val:
-                pos_group[forms_key] = copy.deepcopy(forms_val)
-        group: dict[str, Any] = {
-            "headword": headword,
-            "reading": _entry_reading(entry),
-            "pos_groups": [pos_group],
-        }
-        etymology = str(entry.get("etymology") or "")
-        if etymology:
-            group["etymology"] = etymology
-        for list_key in ("alt_forms", "synonyms", "antonyms", "derived", "related"):
-            list_val = entry.get(list_key)
-            if isinstance(list_val, list) and list_val:
-                group[list_key] = copy.deepcopy(list_val)
-        groups.append(group)
-    return groups
 
 
 _NOUN_AFFIX_POS = (
@@ -1017,283 +803,6 @@ _ALWAYS_FILTERED_POS = frozenset({"character", "romanization", "syllable", "punc
 _GREEDY_FILTER_MODES = frozenset(
     {"greedy", "lemma_greedy", "lemma_partial_greedy", "greedy_lemma_mismatch"}
 )
-
-
-def _split_upos_tags(raw_upos: Any) -> list[str]:
-    text = str(raw_upos or "").strip()
-    if not text:
-        return []
-    parts = (
-        [text] if "+" not in text else [part.strip() for part in text.split("+") if part.strip()]
-    )
-    return [part.upper() for part in parts if part]
-
-
-def _entry_etym_key(entry: dict[str, Any] | None) -> str:
-    if not isinstance(entry, dict):
-        return "t:"
-    try:
-        etym_num = int(entry.get("etymology_number") or 0)
-    except Exception:
-        etym_num = 0
-    if etym_num > 0:
-        return f"n:{etym_num}"
-    return f"t:{str(entry.get('etymology') or '')}"
-
-
-def _entry_filter_identity(entry: dict[str, Any] | None) -> tuple[str, ...]:
-    if not isinstance(entry, dict):
-        return ("",)
-    return (
-        str(entry.get("entry_id") or ""),
-        str(entry.get("headword") or ""),
-        str(entry.get("surface_form") or ""),
-        str(entry.get("reading") or entry.get("romanization") or ""),
-        str(entry.get("pos_raw") or entry.get("pos") or "").strip().lower(),
-        str(entry.get("etymology_number") or ""),
-        str(entry.get("etymology") or ""),
-        str(entry.get("_source") or entry.get("source") or ""),
-        str(entry.get("morph_base") or ""),
-    )
-
-
-def _dedupe_entry_list(entries: Sequence[dict[str, Any]] | None) -> list[dict[str, Any]]:
-    out: list[dict[str, Any]] = []
-    seen: set[tuple[str, ...]] = set()
-    for entry in entries or []:
-        if not isinstance(entry, dict):
-            continue
-        ident = _entry_filter_identity(entry)
-        if ident in seen:
-            continue
-        seen.add(ident)
-        out.append(entry)
-    return out
-
-
-def _get_language_upos_extra_pos(lang_code: str, upos_tag: str) -> list[str]:
-    lang = str(lang_code or "").strip().lower()
-    tag = str(upos_tag or "").strip().upper()
-    raw = (_LANGUAGE_UPOS_EXTRA_POS.get(lang) or {}).get(tag) or []
-    return [str(item or "").strip().lower() for item in raw if str(item or "").strip()]
-
-
-def _split_entries_by_upos(
-    entries: Sequence[dict[str, Any]] | None,
-    upos: str,
-    *,
-    lang_code: str = "",
-    greedy_match: bool = False,
-    greedy_multi_fill: bool = False,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    base_entries = [entry for entry in list(entries or []) if isinstance(entry, dict)]
-    if not base_entries:
-        return [], []
-
-    greedy_mode = bool(greedy_match or greedy_multi_fill)
-    affix_preferred = set(_NOUN_AFFIX_POS) if greedy_mode else set()
-    active_always_filtered = set(_ALWAYS_FILTERED_POS)
-    if greedy_mode:
-        active_always_filtered.difference_update(affix_preferred)
-
-    if len(base_entries) <= 1:
-        only_pos = (
-            str(base_entries[0].get("pos_raw") or base_entries[0].get("pos") or "").strip().lower()
-        )
-        if only_pos in active_always_filtered:
-            return [], base_entries[:]
-        return base_entries[:], []
-
-    upos_tags = _split_upos_tags(upos)
-    allowed: set[str] = set()
-    recognized = False
-    for tag in upos_tags:
-        mapped = [
-            str(item or "").strip().lower()
-            for item in _UPOS_TO_KAIKKI_POS.get(tag, [])
-            if str(item or "").strip()
-        ]
-        extra_mapped = _get_language_upos_extra_pos(lang_code, tag)
-        combined = mapped + extra_mapped
-        if not combined:
-            continue
-        recognized = True
-        allowed.update(combined)
-
-    if not upos_tags or not recognized or not allowed:
-        pri: list[dict[str, Any]] = []
-        oth: list[dict[str, Any]] = []
-        has_affix_preferred = greedy_mode and any(
-            str(entry.get("pos_raw") or entry.get("pos") or "").strip().lower() in affix_preferred
-            for entry in base_entries
-        )
-        for entry in base_entries:
-            pos_raw = str(entry.get("pos_raw") or entry.get("pos") or "").strip().lower()
-            if has_affix_preferred:
-                if pos_raw in affix_preferred:
-                    pri.append(entry)
-                else:
-                    oth.append(entry)
-                continue
-            if pos_raw in active_always_filtered:
-                oth.append(entry)
-            else:
-                pri.append(entry)
-        return pri, oth
-
-    etym_groups: dict[str, list[dict[str, Any]]] = {}
-    etym_order: list[str] = []
-    for entry in base_entries:
-        key = _entry_etym_key(entry)
-        if key not in etym_groups:
-            etym_groups[key] = []
-            etym_order.append(key)
-        etym_groups[key].append(entry)
-
-    primary: list[dict[str, Any]] = []
-    other: list[dict[str, Any]] = []
-    for key in etym_order:
-        group = etym_groups.get(key) or []
-        group_primary: list[dict[str, Any]] = []
-        group_other: list[dict[str, Any]] = []
-        has_allowed_match = False
-        for entry in group:
-            pos_raw = str(entry.get("pos_raw") or entry.get("pos") or "").strip().lower()
-            if pos_raw in active_always_filtered:
-                group_other.append(entry)
-                continue
-            if pos_raw in allowed or pos_raw in affix_preferred:
-                has_allowed_match = True
-                group_primary.append(entry)
-            elif pos_raw in _FILTER_EXEMPT_POS:
-                group_primary.append(entry)
-            else:
-                group_other.append(entry)
-        if has_allowed_match:
-            primary.extend(group_primary)
-            other.extend(group_other)
-        elif group_primary:
-            primary.extend(group_primary)
-            other.extend(group_other)
-        else:
-            other.extend(group)
-
-    if not primary:
-        non_always_filtered: list[dict[str, Any]] = []
-        always_filtered: list[dict[str, Any]] = []
-        for entry in base_entries:
-            pos_raw = str(entry.get("pos_raw") or entry.get("pos") or "").strip().lower()
-            if pos_raw in active_always_filtered:
-                always_filtered.append(entry)
-            else:
-                non_always_filtered.append(entry)
-        if non_always_filtered and always_filtered:
-            return non_always_filtered, always_filtered
-        if always_filtered:
-            return [], always_filtered
-        return base_entries[:], []
-
-    return primary, other
-
-
-def _split_entries_for_display(
-    entries: Sequence[dict[str, Any]] | None,
-    *,
-    lang_code: str = "",
-    upos: str = "",
-    fill_mode: str = "",
-    greedy_multi_fill: bool = False,
-    preferred_entries: Sequence[dict[str, Any]] | None = None,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    base_entries = _dedupe_entry_list(entries)
-    if not base_entries:
-        return [], []
-
-    preferred_idents = {
-        _entry_filter_identity(entry)
-        for entry in list(preferred_entries or [])
-        if isinstance(entry, dict)
-    }
-    preferred_subset = [
-        entry for entry in base_entries if _entry_filter_identity(entry) in preferred_idents
-    ]
-    use_preferred_subset = 0 < len(preferred_subset) < len(base_entries)
-    candidate_entries = preferred_subset if use_preferred_subset else base_entries
-    candidate_idents = {_entry_filter_identity(entry) for entry in candidate_entries}
-    remainder_entries = [
-        entry for entry in base_entries if _entry_filter_identity(entry) not in candidate_idents
-    ]
-
-    primary, other = _split_entries_by_upos(
-        candidate_entries,
-        upos,
-        lang_code=lang_code,
-        greedy_match=str(fill_mode or "").strip().lower() in _GREEDY_FILTER_MODES,
-        greedy_multi_fill=greedy_multi_fill,
-    )
-    shown_entries = _dedupe_entry_list(primary or candidate_entries)
-    shown_idents = {_entry_filter_identity(entry) for entry in shown_entries}
-    combined_other = list(other or []) + remainder_entries
-    hidden_entries = [
-        entry
-        for entry in _dedupe_entry_list(combined_other)
-        if _entry_filter_identity(entry) not in shown_idents
-    ]
-    return shown_entries, hidden_entries
-
-
-def _build_fill_surface_slices(
-    surface: str, fills: Sequence[dict[str, Any]] | None
-) -> list[dict[str, Any]]:
-    surface_text = str(surface or "")
-    rows = list(fills or [])
-    if not surface_text or len(rows) < 2:
-        return []
-
-    explicit_rows = 0
-    explicit_valid = True
-    explicit_slices: dict[tuple[int, int], dict[str, Any]] = {}
-    for idx, row in enumerate(rows):
-        start_raw = row.get("_surface_start")
-        end_raw = row.get("_surface_end")
-        if start_raw is None and end_raw is None:
-            continue
-        explicit_rows += 1
-        try:
-            start = int(start_raw)
-            end = int(end_raw)
-        except Exception:
-            explicit_valid = False
-            break
-        if start < 0 or end <= start or end > len(surface_text):
-            explicit_valid = False
-            break
-        explicit_slices.setdefault((start, end), {"start": start, "end": end, "fill_indexes": []})[
-            "fill_indexes"
-        ].append(idx)
-    if explicit_rows == len(rows) and explicit_valid:
-        ordered = sorted(explicit_slices.values(), key=lambda item: (item["start"], item["end"]))
-        last_end = 0
-        for item in ordered:
-            if item["start"] < last_end:
-                return []
-            item["fill_indexes"].sort()
-            last_end = item["end"]
-        return ordered
-
-    cursor = 0
-    slices: list[dict[str, Any]] = []
-    for idx, row in enumerate(rows):
-        piece = str(row.get("text") or row.get("head") or "")
-        if not piece:
-            return []
-        if surface_text[cursor : cursor + len(piece)] != piece:
-            return []
-        slices.append({"start": cursor, "end": cursor + len(piece), "fill_indexes": [idx]})
-        cursor += len(piece)
-    if cursor != len(surface_text):
-        return []
-    return slices
 
 
 def _safe_json_load(raw: Any) -> Any:
@@ -1408,7 +917,9 @@ def _split_special_display_form_tags(raw_tags: Any) -> list[str]:
     return out
 
 
-def _merge_entry_form_rows(*row_groups: Sequence[Sequence[str]] | None) -> list[list[str]]:
+def _merge_entry_form_rows(
+    *row_groups: Sequence[Sequence[str]] | None,
+) -> list[list[str]]:
     out: list[list[str]] = []
     seen: set[tuple[str, str, str]] = set()
     for group in row_groups:
@@ -1508,28 +1019,6 @@ def _build_entry_forms_payload(
     return out
 
 
-def _canonical_entry_forms(entry: Mapping[str, Any] | None) -> dict[str, Any]:
-    return _build_entry_forms_payload(entry, include_matched_rows=True)
-
-
-def _build_entry_spelling_header(entry: Mapping[str, Any] | None) -> str:
-    if not isinstance(entry, Mapping):
-        return ""
-    existing = str(entry.get("spelling_header") or "").strip()
-    if existing:
-        return existing
-    kanji = _list_text_values(entry.get("kanji"))
-    readings = _list_text_values(entry.get("readings"))
-    if kanji:
-        head = "・".join(kanji)
-        if readings:
-            head += "【" + "・".join(readings) + "】"
-        return head
-    if readings:
-        return "・".join(readings)
-    return ""
-
-
 def _canonical_entry_senses(entry: Mapping[str, Any] | None) -> list[Any]:
     if not isinstance(entry, Mapping):
         return []
@@ -1577,126 +1066,6 @@ def _canonical_entry_senses(entry: Mapping[str, Any] | None) -> list[Any]:
         text = str(raw or "").strip()
         if text:
             out.append({"glosses": [text]})
-    return out
-
-
-def _canonical_entry_payload(entry: Mapping[str, Any] | None) -> dict[str, Any]:
-    if not isinstance(entry, Mapping):
-        return {}
-    raw_entry_id = str(entry.get("entry_id") or "").strip()
-    headword = str(entry.get("headword") or entry.get("surface_form") or "").strip()
-    surface_form = str(entry.get("surface_form") or "").strip()
-    # For form-index matches the server entry has no surface_form but does have
-    # _matched_forms with the actual form text that triggered the match.
-    if not surface_form and str(entry.get("_match_kind") or "").strip().lower() == "form":
-        _mfs = entry.get("_matched_forms") or []
-        if isinstance(_mfs, list) and _mfs:
-            _form_match_key = str(entry.get("_form_match_key") or "").strip()
-            _chosen = None
-            if _form_match_key:
-                for _mf in _mfs:
-                    if _form_match_key in (_mf.get("index_keys") or []):
-                        _chosen = _mf
-                        break
-            if _chosen is None:
-                _chosen = _mfs[0]
-            _ft = str(
-                (_chosen or {}).get("display_text") or (_chosen or {}).get("form_text") or ""
-            ).strip()
-            if _ft and _ft != headword:
-                surface_form = _ft
-    reading = _entry_reading(dict(entry))
-    pos = str(entry.get("pos") or "").strip()
-    pos_raw = str(entry.get("pos_raw") or pos or "").strip()
-    senses = _canonical_entry_senses(entry)
-    forms = _canonical_entry_forms(entry)
-    forms_meta = _build_jmdict_forms_meta_bundle(dict(entry))
-    spelling_header = _build_entry_spelling_header(entry)
-    source_tag = _entry_source_tag(dict(entry)) or str(entry.get("source") or "").strip()
-    commentary = str(entry.get("_commentary") or entry.get("commentary") or "").strip()
-    lemma = str(entry.get("_lemma") or entry.get("lemma") or entry.get("lemma_form") or "").strip()
-    morph_info_raw = entry.get("morph_info")
-    morph_info = (
-        morph_info_raw
-        if isinstance(morph_info_raw, list)
-        else ([morph_info_raw] if morph_info_raw else [])
-    )
-    if not morph_info and commentary and source_tag in {"gemini", "user_created"}:
-        morph_info = [commentary]
-    # For form-index matches, morph tags live in _matched_forms[].tags and the
-    # base word is the entry headword itself.  Pull them in when not already set.
-    matched_forms = entry.get("_matched_forms") or []
-    if not morph_info and isinstance(matched_forms, list):
-        seen_tags: set[str] = set()
-        collected: list[str] = []
-        for mf in matched_forms:
-            raw_tags = str(mf.get("tags") or "").strip() if isinstance(mf, dict) else ""
-            if raw_tags and raw_tags not in seen_tags:
-                seen_tags.add(raw_tags)
-                collected.append(raw_tags)
-        if collected:
-            morph_info = collected
-
-    out: dict[str, Any] = {
-        "entry_id": raw_entry_id,
-        "headword": headword,
-        "source": source_tag,
-        "senses": senses,
-    }
-    if raw_entry_id:
-        out["_source_entry_id"] = raw_entry_id
-    if surface_form and surface_form != headword:
-        out["surface_form"] = surface_form
-    if reading:
-        out["reading"] = reading
-    if pos:
-        out["pos"] = pos
-    if pos_raw:
-        out["pos_raw"] = pos_raw
-    if forms:
-        out["forms"] = forms
-    if forms_meta:
-        out["forms_meta"] = forms_meta
-    if spelling_header:
-        out["spelling_header"] = spelling_header
-    if commentary:
-        out["commentary"] = commentary
-        out["_commentary"] = commentary
-    if lemma:
-        out["lemma"] = lemma
-        out["_lemma"] = lemma
-    morph_base = str(entry.get("morph_base") or "").strip()
-    if not morph_base and lemma and source_tag in {"gemini", "user_created"}:
-        morph_base = lemma
-    # For form-index matches, the entry headword is the canonical base form.
-    if not morph_base and isinstance(matched_forms, list) and matched_forms:
-        morph_base = headword
-    if morph_base:
-        out["morph_base"] = morph_base
-    clean_morph_info = [str(item or "").strip() for item in morph_info if str(item or "").strip()]
-    if clean_morph_info:
-        out["morph_info"] = clean_morph_info
-    clean_matched_forms = [copy.deepcopy(mf) for mf in matched_forms if isinstance(mf, Mapping)]
-    if clean_matched_forms:
-        out["_matched_forms"] = clean_matched_forms
-    storage_kind = str(entry.get("_storage_kind") or "").strip().lower()
-    if storage_kind:
-        out["_storage_kind"] = storage_kind
-    storage_db_alias = str(entry.get("_storage_db_alias") or "").strip()
-    if storage_db_alias:
-        out["_storage_db_alias"] = storage_db_alias
-    storage_row_id = int(entry.get("_storage_row_id") or 0)
-    if storage_row_id > 0:
-        out["_storage_row_id"] = storage_row_id
-    match_kind = str(entry.get("_match_kind") or "").strip().lower()
-    if match_kind:
-        out["_match_kind"] = match_kind
-    form_match_key = str(entry.get("_form_match_key") or "").strip()
-    if form_match_key:
-        out["_form_match_key"] = form_match_key
-    grammar = str(entry.get("grammar") or "").strip()
-    if grammar:
-        out["grammar"] = grammar
     return out
 
 
@@ -2004,322 +1373,6 @@ def _shape_korean_synthetic_stem_entry(
     entry["morph_base"] = headword
 
 
-def _sqlite_runtime_entry_id(entry: Mapping[str, Any] | None) -> str:
-    if not isinstance(entry, Mapping):
-        return ""
-    storage_kind = str(entry.get("_storage_kind") or "").strip().lower()
-    if storage_kind != "sqlite":
-        return ""
-    db_alias = str(entry.get("_storage_db_alias") or "").strip()
-    try:
-        row_id = int(entry.get("_storage_row_id") or 0)
-    except Exception:
-        row_id = 0
-    if not db_alias or row_id <= 0:
-        return ""
-    return f"sqlite|{db_alias}|{row_id}"
-
-
-def _entry_store_key(entry: Mapping[str, Any] | None) -> str:
-    canonical = _canonical_entry_payload(entry)
-    sqlite_runtime_id = _sqlite_runtime_entry_id(canonical)
-    if sqlite_runtime_id:
-        return sqlite_runtime_id
-    explicit = str(canonical.get("entry_id") or "").strip()
-    if explicit:
-        return explicit
-    digest = hashlib.sha1(
-        json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode(
-            "utf-8"
-        )
-    ).hexdigest()
-    return f"anon:{digest}"
-
-
-def _intern_entry(entry_store: dict[str, dict[str, Any]], entry: Mapping[str, Any] | None) -> str:
-    canonical = _canonical_entry_payload(entry)
-    if not canonical:
-        return ""
-    key = _entry_store_key(entry)
-    canonical["entry_id"] = key
-    if key not in entry_store:
-        entry_store[key] = canonical
-        return key
-
-    existing = entry_store[key]
-
-    matched_forms: list[dict[str, Any]] = []
-    for raw in list(existing.get("_matched_forms") or []):
-        if isinstance(raw, Mapping):
-            matched_forms.append(copy.deepcopy(dict(raw)))
-    for raw in list(canonical.get("_matched_forms") or []):
-        if not isinstance(raw, Mapping):
-            continue
-        cloned = copy.deepcopy(dict(raw))
-        if cloned not in matched_forms:
-            matched_forms.append(cloned)
-    if matched_forms:
-        existing["_matched_forms"] = matched_forms
-
-    existing_forms = existing.get("forms")
-    if isinstance(existing_forms, Mapping):
-        merged_forms: dict[str, Any] = copy.deepcopy(dict(existing_forms))
-    else:
-        merged_forms = {}
-    incoming_forms = canonical.get("forms")
-    if isinstance(incoming_forms, Mapping):
-        incoming_forms = dict(incoming_forms)
-        merged_rows = _normalize_entry_form_rows(
-            merged_forms.get("rows")
-        ) + _normalize_entry_form_rows(incoming_forms.get("rows"))
-        if matched_forms:
-            merged_rows += _normalize_entry_form_rows(matched_forms)
-        if merged_rows:
-            seen_rows: set[tuple[str, str, str]] = set()
-            deduped_rows: list[list[str]] = []
-            for row in merged_rows:
-                row_key = tuple(row)
-                if row_key in seen_rows:
-                    continue
-                seen_rows.add(row_key)
-                deduped_rows.append(row)
-            merged_forms["rows"] = deduped_rows
-        for form_key in ("kanji", "readings", "alt", "hanja", "hangeul", "cjk"):
-            values = _list_text_values(merged_forms.get(form_key)) + _list_text_values(
-                incoming_forms.get(form_key)
-            )
-            if values:
-                deduped_values: list[str] = []
-                seen_values: set[str] = set()
-                for value in values:
-                    if value in seen_values:
-                        continue
-                    seen_values.add(value)
-                    deduped_values.append(value)
-                merged_forms[form_key] = deduped_values
-    elif matched_forms:
-        merged_rows = _normalize_entry_form_rows(matched_forms)
-        if merged_rows:
-            merged_forms["rows"] = merged_rows
-    if merged_forms:
-        existing["forms"] = merged_forms
-
-    merged_morph = _list_text_values(existing.get("morph_info")) + _list_text_values(
-        canonical.get("morph_info")
-    )
-    if matched_forms:
-        merged_morph += [
-            str(mf.get("tags") or "").strip() for mf in matched_forms if isinstance(mf, Mapping)
-        ]
-    if merged_morph:
-        deduped_morph: list[str] = []
-        seen_morph: set[str] = set()
-        for morph in merged_morph:
-            if not morph or morph in seen_morph:
-                continue
-            seen_morph.add(morph)
-            deduped_morph.append(morph)
-        if deduped_morph:
-            existing["morph_info"] = deduped_morph
-
-    if not existing.get("morph_base") and canonical.get("morph_base"):
-        existing["morph_base"] = canonical["morph_base"]
-    if not existing.get("_storage_kind") and canonical.get("_storage_kind"):
-        existing["_storage_kind"] = canonical["_storage_kind"]
-    if not existing.get("_storage_db_alias") and canonical.get("_storage_db_alias"):
-        existing["_storage_db_alias"] = canonical["_storage_db_alias"]
-    if not existing.get("_storage_row_id") and canonical.get("_storage_row_id"):
-        existing["_storage_row_id"] = canonical["_storage_row_id"]
-    if not existing.get("_source_entry_id") and canonical.get("_source_entry_id"):
-        existing["_source_entry_id"] = canonical["_source_entry_id"]
-    if not existing.get("_match_kind") and canonical.get("_match_kind"):
-        existing["_match_kind"] = canonical["_match_kind"]
-    if not existing.get("_form_match_key") and canonical.get("_form_match_key"):
-        existing["_form_match_key"] = canonical["_form_match_key"]
-    return key
-
-
-def _collect_interned_entry_ids(
-    entry_store: dict[str, dict[str, Any]],
-    entries: Sequence[Mapping[str, Any]] | None,
-) -> list[str]:
-    out: list[str] = []
-    seen: set[str] = set()
-    for entry in entries or []:
-        key = _intern_entry(entry_store, entry)
-        if not key or key in seen:
-            continue
-        seen.add(key)
-        out.append(key)
-    return out
-
-
-def _build_resolution_payload(
-    category: str,
-    resolved_via: str,
-    fill_mode: str,
-    lemma_oracle_used: bool,
-    lemma_oracle_outcome: str,
-    fills: Sequence[dict[str, Any]] | None,
-    exact_lemma_match_count: int,
-    partial_gap_count: int = 0,
-    partial_exact_lemma_count: int = 0,
-    partial_missing_lemma_count: int = 0,
-) -> dict[str, Any]:
-    meta = _build_resolution_actual(
-        category,
-        resolved_via,
-        fill_mode,
-        lemma_oracle_used,
-        lemma_oracle_outcome,
-        fills,
-        exact_lemma_match_count,
-        partial_gap_count=partial_gap_count,
-        partial_exact_lemma_count=partial_exact_lemma_count,
-        partial_missing_lemma_count=partial_missing_lemma_count,
-    )
-    out = {
-        "category": str(meta.get("category") or ""),
-        "compare_kind": str(meta.get("compare_kind") or ""),
-        "resolved_via": str(meta.get("resolved_via") or ""),
-        "fill_mode": str(meta.get("fill_mode") or ""),
-        "lemma_oracle_used": bool(meta.get("lemma_oracle_used")),
-        "lemma_oracle_outcome": str(meta.get("lemma_oracle_outcome") or ""),
-        "exact_surface_match": bool(meta.get("exact_surface_match")),
-        "exact_matches_lemma": bool(meta.get("exact_matches_lemma")),
-        "exact_lemma_match_count": int(meta.get("exact_lemma_match_count") or 0),
-        "has_lemma_linked_fill": bool(meta.get("has_lemma_linked_fill")),
-    }
-    if partial_exact_lemma_count > 0:
-        out["partial_exact_lemma_count"] = int(partial_exact_lemma_count)
-    if partial_missing_lemma_count > 0:
-        out["partial_missing_lemma_count"] = int(partial_missing_lemma_count)
-    if partial_gap_count > 0:
-        out["partial_gap_count"] = int(partial_gap_count)
-    return out
-
-
-def _build_canonical_fills(
-    fills: Sequence[dict[str, Any]] | None,
-    surface_text: str,
-    resolved_via: str,
-    entry_store: dict[str, dict[str, Any]],
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    annotated = _annotate_fill_resolution_links(fills, resolved_via)
-    slices = _build_fill_surface_slices(surface_text, annotated)
-    slice_by_index: dict[int, tuple[int, int]] = {}
-    for item in slices:
-        try:
-            start = int(item.get("start"))
-            end = int(item.get("end"))
-        except Exception:
-            continue
-        for raw_idx in list(item.get("fill_indexes") or []):
-            try:
-                fill_idx = int(raw_idx)
-            except Exception:
-                continue
-            slice_by_index[fill_idx] = (start, end)
-
-    out: list[dict[str, Any]] = []
-    for idx, row in enumerate(annotated):
-        raw_entries = _dedupe_entry_list(list(row.get("entries") or []))
-        entry_ids = _collect_interned_entry_ids(entry_store, raw_entries)
-        if not entry_ids:
-            continue
-
-        start = row.get("_surface_start")
-        end = row.get("_surface_end")
-        try:
-            start_i = int(start)
-            end_i = int(end)
-        except Exception:
-            start_i, end_i = slice_by_index.get(idx, (0, 0))
-        if len(annotated) == 1 and (end_i <= start_i or end_i > len(surface_text)):
-            start_i, end_i = 0, len(surface_text)
-
-        fill_payload: dict[str, Any] = {
-            "entry_ids": entry_ids,
-            "start": max(0, start_i),
-            "end": min(len(surface_text), end_i if end_i > start_i else len(surface_text)),
-        }
-
-        hint_fields = (
-            ("_lemma_part_index", "lemma_part_index"),
-            ("_lemma_upos_hint", "lemma_upos_hint"),
-            ("_lemma_xpos_hint", "lemma_xpos_hint"),
-            ("_xpos_hint", "xpos_hint"),
-            ("_lemma_promoted", "lemma_promoted"),
-            ("_lemma_override", "lemma_override"),
-        )
-        for raw_key, out_key in hint_fields:
-            value = row.get(raw_key)
-            if value not in (None, "", []):
-                fill_payload[out_key] = copy.deepcopy(value)
-        if row.get("resolution_linked_to_lemma"):
-            fill_payload["resolution_linked_to_lemma"] = True
-        resolution_source = str(row.get("resolution_source") or "").strip()
-        if resolution_source:
-            fill_payload["resolution_source"] = resolution_source
-        out.append(fill_payload)
-    return out, annotated
-
-
-def _trim_grammar_overlay(grammar_overlay: Mapping[str, Any] | None) -> dict[str, Any]:
-    overlay = grammar_overlay or {}
-    return {"tokens": copy.deepcopy(list(overlay.get("tokens") or []))}
-
-
-def _trim_ud_overlay(ud_overlay: Mapping[str, Any] | None) -> dict[str, Any]:
-    overlay = ud_overlay or {}
-    tokens: list[dict[str, Any]] = []
-    allowed_token_keys = (
-        "i",
-        "doc_i",
-        "head",
-        "heads",
-        "dep",
-        "lemma",
-        "lemma_raw",
-        "lemma_suffix",
-        "tag",
-        "upos",
-        "feats",
-        "text",
-        "seg_span",
-        "mwt_parts",
-    )
-    for raw in list(overlay.get("tokens") or []):
-        if not isinstance(raw, Mapping):
-            continue
-        token: dict[str, Any] = {}
-        for key in allowed_token_keys:
-            if key in raw:
-                token[key] = copy.deepcopy(raw.get(key))
-        tokens.append(token)
-    return {
-        "ok": bool(overlay.get("ok")),
-        "tokens": tokens,
-        "edges": copy.deepcopy(list(overlay.get("edges") or [])),
-        "ents": copy.deepcopy(list(overlay.get("ents") or [])),
-        "roots": copy.deepcopy(list(overlay.get("roots") or [])),
-        "sentences": copy.deepcopy(list(overlay.get("sentences") or [])),
-    }
-
-
-def _build_lookup_payload_base(lookup_data: Mapping[str, Any] | None) -> dict[str, Any]:
-    data = lookup_data or {}
-    display_text = str(data.get("display_text") or data.get("q") or "")
-    return {
-        "ok": bool(data.get("ok", True)),
-        "display_text": display_text,
-        "segments": copy.deepcopy(list(data.get("segments") or [])),
-        "segment_offsets": copy.deepcopy(list(data.get("segment_offsets") or [])),
-        "grammar_overlay": _trim_grammar_overlay(data.get("grammar_overlay") or {}),
-        "ud_overlay": _trim_ud_overlay(data.get("ud_overlay") or {}),
-    }
-
-
 def _client_accepts_gzip() -> bool:
     return "gzip" in str(request.headers.get("Accept-Encoding") or "").lower()
 
@@ -2330,19 +1383,10 @@ def _lookup_json_response(
     extra_headers: Mapping[str, Any] | None = None,
 ) -> Response:
     body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    headers = {"Content-Type": "application/json; charset=utf-8", "Vary": "Accept-Encoding"}
-    if isinstance(payload, Mapping):
-        trace = payload.get("sqlite_debug_trace")
-        if isinstance(trace, Mapping):
-            try:
-                total_ms = float(trace.get("total_ms") or 0.0)
-            except Exception:
-                total_ms = 0.0
-            if total_ms > 0.0:
-                headers["X-Debug-Server-Ms"] = f"{total_ms:.3f}"
-            request_kind = str(trace.get("request_kind") or "").strip()
-            if request_kind:
-                headers["X-Debug-Request-Kind"] = request_kind
+    headers = {
+        "Content-Type": "application/json; charset=utf-8",
+        "Vary": "Accept-Encoding",
+    }
     if isinstance(extra_headers, Mapping):
         for key, value in extra_headers.items():
             if value is None:
@@ -2352,957 +1396,6 @@ def _lookup_json_response(
         body = _response_gzip.compress(body, compresslevel=6)
         headers["Content-Encoding"] = "gzip"
     return Response(body, status=status, headers=headers)
-
-
-def _annotate_fill_resolution_links(
-    fills: Sequence[dict[str, Any]] | None, resolved_via: str
-) -> list[dict[str, Any]]:
-    rows: list[dict[str, Any]] = []
-    path = str(resolved_via or "").strip().lower()
-    whole_lemma_path = path in {"lemma", "lemma_override"}
-    for raw in fills or []:
-        row = dict(raw)
-        linked = bool(
-            row.get("_lemma_promoted")
-            or row.get("lemma_promoted")
-            or row.get("_lemma_override")
-            or row.get("lemma_override")
-        )
-        if not linked and whole_lemma_path and str(row.get("source") or "").upper() != "UNKNOWN":
-            linked = True
-        row["resolution_linked_to_lemma"] = linked
-        if linked:
-            if path == "lemma_override" or row.get("_lemma_override") or row.get("lemma_override"):
-                row["resolution_source"] = "lemma_override"
-            elif whole_lemma_path and not (row.get("_lemma_promoted") or row.get("lemma_promoted")):
-                row["resolution_source"] = "lemma"
-            else:
-                row["resolution_source"] = "lemma_promoted"
-        else:
-            row["resolution_source"] = "surface"
-        rows.append(row)
-    return rows
-
-
-def _build_resolution_route_steps(
-    category: str, lemma_oracle_used: bool, partial_gap_count: int = 0
-) -> tuple[str, list[dict[str, str]]]:
-    category_key = str(category or "").strip().lower()
-    if category_key == "exact_lemma_match":
-        return "surface_exact_lemma_match", [
-            {"code": "surface_exact_lookup", "text": "surface exact lookup matched", "detail": ""},
-            {
-                "code": "lemma_check",
-                "text": "lemma check found an underlying lemma match",
-                "detail": "",
-            },
-        ]
-    if category_key == "exact_match":
-        steps = [
-            {"code": "surface_exact_lookup", "text": "surface exact lookup matched", "detail": ""}
-        ]
-        if lemma_oracle_used:
-            steps.append(
-                {
-                    "code": "lemma_check",
-                    "text": "lemma check kept the surface exact result",
-                    "detail": "",
-                }
-            )
-            return "surface_exact_lemma_checked", steps
-        return "surface_exact", steps
-    if category_key == "lemma_partial_override":
-        return "surface_no_match_then_partial_lemma_exact_then_gap_greedy", [
-            {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-            {
-                "code": "lemma_exact_parts",
-                "text": "exact lemma parts were aligned onto the surface",
-                "detail": "",
-            },
-            {
-                "code": "lemma_gap_greedy",
-                "text": "greedy DP filled the remaining uncovered spans"
-                if partial_gap_count > 0
-                else "no uncovered spans remained after exact lemma-part alignment",
-                "detail": "",
-            },
-        ]
-    if category_key == "lemma_override":
-        return "surface_no_match_then_lemma_exact_parts", [
-            {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-            {
-                "code": "lemma_exact_parts",
-                "text": "all lemma parts resolved by exact lookup",
-                "detail": "",
-            },
-            {"code": "lemma_override", "text": "lemma exact-part alignment selected", "detail": ""},
-        ]
-    if category_key == "greedy_lemma_match":
-        return "surface_greedy_lemma_match", [
-            {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-            {
-                "code": "lemma_greedy",
-                "text": "lemma-aware greedy DP selected lemma-linked pieces",
-                "detail": "",
-            },
-        ]
-    if category_key == "greedy_segmentation":
-        return "surface_greedy", [
-            {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-            {
-                "code": "lemma_greedy" if lemma_oracle_used else "surface_greedy",
-                "text": "lemma-aware greedy DP selected a surface path"
-                if lemma_oracle_used
-                else "surface greedy DP selected the final path",
-                "detail": "",
-            },
-        ]
-    if lemma_oracle_used:
-        return "surface_no_match_after_lemma_check", [
-            {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-            {
-                "code": "lemma_greedy",
-                "text": "lemma-aware greedy DP found no known dictionary path",
-                "detail": "",
-            },
-        ]
-    return "surface_no_match", [
-        {"code": "surface_exact_lookup", "text": "surface exact lookup missed", "detail": ""},
-        {
-            "code": "surface_greedy",
-            "text": "surface greedy DP found no known dictionary path",
-            "detail": "",
-        },
-    ]
-
-
-def _build_resolution_route_text(route_steps: Sequence[Mapping[str, Any]] | None) -> str:
-    out: list[str] = []
-    for step in route_steps or []:
-        text = str(step.get("text") or "").strip()
-        detail = str(step.get("detail") or "").strip()
-        if not text:
-            continue
-        out.append(f"{text} ({detail})" if detail else text)
-    return " -> ".join(out)
-
-
-def _build_resolution_actual(
-    category: str,
-    resolved_via: str,
-    fill_mode: str,
-    lemma_oracle_used: bool,
-    lemma_oracle_outcome: str,
-    fills: Sequence[dict[str, Any]] | None,
-    exact_lemma_match_count: int,
-    partial_gap_count: int = 0,
-    partial_exact_lemma_count: int = 0,
-    partial_missing_lemma_count: int = 0,
-) -> dict[str, Any]:
-    rows = list(fills or [])
-    known_piece_count = 0
-    unknown_piece_count = 0
-    lemma_linked_fill_indexes: list[int] = []
-    lemma_linked_keys: set[str] = set()
-    for idx, row in enumerate(rows):
-        if str(row.get("source") or "").upper() == "UNKNOWN":
-            unknown_piece_count += 1
-        else:
-            known_piece_count += 1
-        if row.get("resolution_linked_to_lemma"):
-            lemma_linked_fill_indexes.append(idx)
-            lemma_key = str(
-                row.get("_lemma_override")
-                or row.get("_lemma_promoted")
-                or row.get("lemma_form")
-                or row.get("morph_base")
-                or ""
-            ).strip()
-            if lemma_key:
-                lemma_linked_keys.add(lemma_key)
-    final_text = ""
-    if known_piece_count > 0:
-        parts = [
-            f"via={str(resolved_via or '').strip().lower()}",
-            f"mode={str(fill_mode or '').strip().lower()}",
-            f"pieces={len(rows)}",
-            f"known={known_piece_count}",
-        ]
-        if unknown_piece_count > 0:
-            parts.append(f"unknown={unknown_piece_count}")
-        if lemma_linked_fill_indexes:
-            parts.append(f"lemma-linked={len(lemma_linked_fill_indexes)}")
-        if exact_lemma_match_count > 0:
-            parts.append(f"lemma-exact={exact_lemma_match_count}")
-        final_text = " | ".join(parts)
-    category_key = str(category or "").strip().lower()
-    route_code, route_steps = _build_resolution_route_steps(
-        category_key, bool(lemma_oracle_used), int(partial_gap_count or 0)
-    )
-    out = {
-        "category": category_key,
-        "label": _ACTUAL_RESOLUTION_LABELS.get(category_key, "") if category_key else "",
-        "route_code": route_code,
-        "route_steps": route_steps,
-        "route_text": _build_resolution_route_text(route_steps),
-        "final_text": final_text,
-        "compare_kind": "surface"
-        if category_key
-        in {"exact_lemma_match", "greedy_lemma_match", "lemma_override", "lemma_partial_override"}
-        else ("lemma" if lemma_oracle_used else ""),
-        "resolved_via": str(resolved_via or "").strip().lower(),
-        "fill_mode": str(fill_mode or "").strip().lower(),
-        "lemma_oracle_used": bool(lemma_oracle_used),
-        "lemma_oracle_outcome": str(lemma_oracle_outcome or "").strip().lower(),
-        "exact_surface_match": category_key in {"exact_match", "exact_lemma_match"},
-        "exact_matches_lemma": category_key == "exact_lemma_match",
-        "exact_lemma_match_count": int(exact_lemma_match_count or 0),
-        "has_lemma_linked_fill": bool(lemma_linked_fill_indexes),
-        "lemma_linked_fill_indexes": lemma_linked_fill_indexes,
-        "lemma_linked_distinct_count": len(lemma_linked_keys),
-        "final_result": {
-            "total_piece_count": len(rows),
-            "known_piece_count": known_piece_count,
-            "unknown_piece_count": unknown_piece_count,
-            "lemma_linked_piece_count": len(lemma_linked_fill_indexes),
-        },
-    }
-    if partial_exact_lemma_count > 0:
-        out["partial_exact_lemma_count"] = int(partial_exact_lemma_count)
-    if partial_missing_lemma_count > 0:
-        out["partial_missing_lemma_count"] = int(partial_missing_lemma_count)
-    if partial_gap_count > 0:
-        out["partial_gap_count"] = int(partial_gap_count)
-    return out
-
-
-def _infer_resolution_category(
-    surface_lookup: dict[str, Any],
-    fill: dict[str, Any] | None,
-    all_entries: Sequence[dict[str, Any]] | None,
-) -> str:
-    resolved_via = str(surface_lookup.get("resolved_via") or "").strip().lower()
-    exact_lemma_match_count = int(surface_lookup.get("exact_lemma_match_count") or 0)
-    fill_mode = str((fill or {}).get("mode") or "").strip().lower()
-    if surface_lookup.get("exact_entries"):
-        if exact_lemma_match_count > 0:
-            return "exact_lemma_match"
-        return "exact_match"
-    if resolved_via in {"lemma", "lemma_override"}:
-        return "lemma_override"
-    if resolved_via == "lemma_partial_override":
-        return "lemma_partial_override"
-    if fill and fill.get("has_lemma_promotion"):
-        return "greedy_lemma_match"
-    if all_entries:
-        return "greedy_segmentation"
-    return ""
-
-
-def _prepare_fill_entries(
-    fills: Sequence[dict[str, Any]] | None,
-    surface_text: str,
-    segmenter: Any,
-    lang_code: str,
-    upos: str,
-    xpos: str,
-    fill_mode: str,
-    resolved_via: str,
-    debug_trace: bool = False,
-) -> list[dict[str, Any]]:
-    out: list[dict[str, Any]] = []
-    known_fill_count = sum(
-        1 for raw in list(fills or []) if str((raw or {}).get("source") or "").upper() != "UNKNOWN"
-    )
-    greedy_multi_fill = (
-        str(fill_mode or "").strip().lower() in _GREEDY_FILTER_MODES and known_fill_count > 1
-    )
-    for raw in fills or []:
-        row = dict(raw)
-        effective_upos = _fill_effective_upos(row, upos)
-        effective_xpos = _fill_effective_xpos(row, xpos)
-        fill_entries = _decorate_entries_with_nlp(
-            row.get("entries") or [], effective_upos, effective_xpos
-        )
-        lookup_head = str(row.get("head") or row.get("text") or surface_text or "")
-        shown_entries, hidden_entries = _split_entries_for_display(
-            fill_entries,
-            lang_code=lang_code,
-            upos=effective_upos,
-            fill_mode=fill_mode,
-            greedy_multi_fill=greedy_multi_fill,
-        )
-        row["senses_all"] = (
-            _merge_all_entries(lookup_head, fill_entries)
-            if fill_entries
-            else list(row.get("senses") or [])
-        )
-        row["senses"] = (
-            _merge_all_entries(lookup_head, shown_entries)
-            if shown_entries
-            else list(row["senses_all"])
-        )
-        row["senses_hover"] = list(row["senses"])
-        row["senses_hover_other"] = (
-            _merge_all_entries(lookup_head, hidden_entries) if hidden_entries else []
-        )
-        row["hover_has_alt_senses"] = bool(row["senses_hover_other"])
-        row["entry_groups_all"] = (
-            _build_entry_groups(fill_entries, lookup_head) if fill_entries else []
-        )
-        row["entry_groups"] = (
-            _build_entry_groups(shown_entries or fill_entries, lookup_head)
-            if (shown_entries or fill_entries)
-            else []
-        )
-        if hidden_entries:
-            row["entry_groups_hover"] = (
-                _build_entry_groups(shown_entries, lookup_head) if shown_entries else []
-            )
-            row["entry_groups_other"] = _build_entry_groups(hidden_entries, lookup_head)
-        row["entries"] = shown_entries or fill_entries
-        row["all_entries"] = fill_entries
-        chosen = (
-            segmenter._choose_entry(lookup_head, shown_entries or fill_entries)
-            if fill_entries
-            else None
-        )
-        if chosen and not row.get("roman"):
-            row["roman"] = _entry_reading(chosen)
-        if shown_entries or fill_entries:
-            src_tag = _entry_source_tag((shown_entries or fill_entries)[0])
-            if src_tag:
-                row["_dict_source"] = src_tag
-        row["upos"] = effective_upos
-        row["xpos"] = effective_xpos
-        row["tag"] = effective_xpos
-        if effective_upos:
-            row["upos_label"] = effective_upos
-            row["upos_color"] = _LOOKUP_UPOS_COLORS.get(effective_upos, "#d1d5db")
-        if debug_trace:
-            record_decoration_event(
-                "fill_row",
-                {
-                    "surface_text": str(surface_text or ""),
-                    "fill_mode": str(fill_mode or ""),
-                    "resolved_via": str(resolved_via or ""),
-                    "text": str(row.get("text") or ""),
-                    "head": str(row.get("head") or ""),
-                    "lemma_upos_hint": str(row.get("_lemma_upos_hint") or ""),
-                    "lemma_xpos_hint": str(row.get("_lemma_xpos_hint") or ""),
-                    "xpos_hint": str(row.get("_xpos_hint") or ""),
-                    "effective_upos": effective_upos,
-                    "effective_xpos": effective_xpos,
-                    "entry_count": len(fill_entries),
-                    "shown_entry_count": len(shown_entries or fill_entries),
-                    "other_entry_count": len(hidden_entries),
-                    "entries": [
-                        {
-                            "headword": str(ent.get("headword") or ent.get("surface_form") or ""),
-                            "pos_raw": str(ent.get("pos_raw") or ent.get("pos") or ""),
-                            "upos": str(ent.get("upos") or ""),
-                            "xpos": str(ent.get("xpos") or ent.get("tag") or ""),
-                            "tag": str(ent.get("tag") or ent.get("xpos") or ""),
-                        }
-                        for ent in fill_entries[:20]
-                        if isinstance(ent, dict)
-                    ],
-                },
-            )
-        out.append(row)
-    return _annotate_fill_resolution_links(out, resolved_via)
-
-
-def _build_unknown_result(
-    word: str,
-    upos: str,
-    xpos: str,
-    deprel: str,
-    lemma: str,
-    feats: str,
-    idx: int,
-    lemma_raw: str,
-    lemma_suffix: str,
-) -> dict[str, Any]:
-    entry = {
-        "seg_i": idx,
-        "surface_form": word,
-        "upos": upos,
-        "tag": xpos,
-        "dep": deprel,
-        "feats": feats or "",
-        "fills": [],
-        "resolution": {
-            "category": "",
-            "compare_kind": "",
-            "resolved_via": "surface",
-            "fill_mode": "greedy",
-            "lemma_oracle_used": False,
-            "lemma_oracle_outcome": "",
-            "exact_surface_match": False,
-            "exact_matches_lemma": False,
-            "exact_lemma_match_count": 0,
-            "has_lemma_linked_fill": False,
-        },
-    }
-    if lemma:
-        entry["lemma"] = lemma
-    if lemma_raw:
-        entry["lemma_raw"] = lemma_raw
-    if lemma_suffix:
-        entry["lemma_suffix"] = lemma_suffix
-    return entry
-
-
-def _extract_token_map(lookup_data: dict[str, Any]) -> dict[int, dict[str, Any]]:
-    out: dict[int, dict[str, Any]] = {}
-    ud_overlay = lookup_data.get("ud_overlay") or {}
-    for raw in list(ud_overlay.get("tokens") or []):
-        try:
-            idx = int(raw.get("i"))
-        except Exception:
-            continue
-        if idx < 0:
-            continue
-        out[idx] = raw
-    return out
-
-
-def _build_segment_result(
-    word: str,
-    token: dict[str, Any],
-    seg_idx: int,
-    segmenter: Any,
-    lang_code: str,
-    entry_store: dict[str, dict[str, Any]],
-    debug_trace: bool = False,
-) -> dict[str, Any]:
-    upos = str(token.get("upos") or "X")
-    deprel = str(token.get("dep") or "dep")
-    xpos = str(token.get("tag") or "")
-    lemma = str(token.get("lemma") or "")
-    lemma_raw = str(token.get("lemma_raw") or lemma or "")
-    lemma_suffix = str(token.get("lemma_suffix") or "")
-    feats = str(token.get("feats") or "")
-
-    if segmenter is None:
-        return _build_unknown_result(
-            word, upos, xpos, deprel, lemma, feats, seg_idx, lemma_raw, lemma_suffix
-        )
-
-    if debug_trace:
-        with trace_scope(
-            "segment_result",
-            label="Segment Result",
-            token=word,
-            seg_i=seg_idx,
-            upos=upos,
-            xpos=xpos,
-            lemma=lemma,
-        ):
-            surface_lookup = segmenter.build_surface_lemma_aware_lookup(
-                word, lemma, upos=upos, xpos=xpos, debug=debug_trace
-            )
-            fill = surface_lookup.get("fill") or {}
-            all_entries = list(surface_lookup.get("all_entries") or [])
-            preferred_entries = list(surface_lookup.get("preferred_entries") or all_entries)
-            output_all_entries = _decorate_entries_with_nlp(all_entries, upos, xpos)
-            output_preferred_entries = _decorate_entries_with_nlp(preferred_entries, upos, xpos)
-            dict_head = str(surface_lookup.get("dict_head") or word)
-            resolved_via = str(surface_lookup.get("resolved_via") or "surface")
-            lemma_oracle_used = bool(surface_lookup.get("lemma_oracle_used"))
-            lemma_oracle_outcome = str(surface_lookup.get("lemma_oracle_outcome") or "")
-            fill_mode = str(fill.get("mode") or "greedy")
-            exact_lemma_match_count = int(surface_lookup.get("exact_lemma_match_count") or 0)
-            partial_exact_lemma_count = int(surface_lookup.get("partial_exact_lemma_count") or 0)
-            partial_missing_lemma_count = int(
-                surface_lookup.get("partial_missing_lemma_count") or 0
-            )
-            partial_gap_count = int(surface_lookup.get("partial_gap_count") or 0)
-            lemma_override_parts = list(surface_lookup.get("lemma_override_parts") or [])
-            shown_entries, other_entries = _split_entries_for_display(
-                output_all_entries,
-                lang_code=lang_code,
-                upos=upos,
-                fill_mode=fill_mode,
-                preferred_entries=output_preferred_entries,
-            )
-            chosen_main = segmenter._choose_entry(
-                dict_head, shown_entries or output_preferred_entries or output_all_entries
-            )
-    else:
-        surface_lookup = segmenter.build_surface_lemma_aware_lookup(
-            word, lemma, upos=upos, xpos=xpos, debug=False
-        )
-        fill = surface_lookup.get("fill") or {}
-        all_entries = list(surface_lookup.get("all_entries") or [])
-        preferred_entries = list(surface_lookup.get("preferred_entries") or all_entries)
-        output_all_entries = _decorate_entries_with_nlp(all_entries, upos, xpos)
-        output_preferred_entries = _decorate_entries_with_nlp(preferred_entries, upos, xpos)
-        dict_head = str(surface_lookup.get("dict_head") or word)
-        resolved_via = str(surface_lookup.get("resolved_via") or "surface")
-        lemma_oracle_used = bool(surface_lookup.get("lemma_oracle_used"))
-        lemma_oracle_outcome = str(surface_lookup.get("lemma_oracle_outcome") or "")
-        fill_mode = str(fill.get("mode") or "greedy")
-        exact_lemma_match_count = int(surface_lookup.get("exact_lemma_match_count") or 0)
-        partial_exact_lemma_count = int(surface_lookup.get("partial_exact_lemma_count") or 0)
-        partial_missing_lemma_count = int(surface_lookup.get("partial_missing_lemma_count") or 0)
-        partial_gap_count = int(surface_lookup.get("partial_gap_count") or 0)
-        lemma_override_parts = list(surface_lookup.get("lemma_override_parts") or [])
-        shown_entries, other_entries = _split_entries_for_display(
-            output_all_entries,
-            lang_code=lang_code,
-            upos=upos,
-            fill_mode=fill_mode,
-            preferred_entries=output_preferred_entries,
-        )
-        chosen_main = segmenter._choose_entry(
-            dict_head, shown_entries or output_preferred_entries or output_all_entries
-        )
-
-    entry: dict[str, Any] = {
-        "seg_i": seg_idx,
-        "surface_form": word,
-        "upos": upos,
-        "tag": xpos,
-        "dep": deprel,
-        "feats": feats,
-        "fills": [],
-    }
-    if lemma:
-        entry["lemma"] = lemma
-    if lemma_raw:
-        entry["lemma_raw"] = lemma_raw
-    if lemma_suffix:
-        entry["lemma_suffix"] = lemma_suffix
-    if token.get("g2p") is not None:
-        entry["g2p"] = copy.deepcopy(token.get("g2p"))
-
-    if chosen_main:
-        primary_entry = _canonical_entry_payload(chosen_main)
-        display_head = str(
-            primary_entry.get("surface_form") or primary_entry.get("headword") or dict_head or word
-        ).strip()
-        if display_head:
-            entry["head"] = display_head
-        headword = str(primary_entry.get("headword") or "").strip()
-        if headword:
-            entry["headword"] = headword
-        reading = str(primary_entry.get("reading") or "").strip()
-        if reading:
-            entry["reading"] = reading
-        dict_pos = str(primary_entry.get("pos") or "").strip()
-        if dict_pos:
-            entry["pos"] = dict_pos
-        dict_pos_raw = str(primary_entry.get("pos_raw") or "").strip()
-        if dict_pos_raw:
-            entry["pos_raw"] = dict_pos_raw
-        source_tag = str(primary_entry.get("source") or "").strip()
-        if source_tag:
-            entry["source"] = source_tag
-        structured_senses = copy.deepcopy(list(primary_entry.get("senses") or []))
-        if structured_senses:
-            entry["senses_full"] = structured_senses
-            entry["senses"] = _flatten_structured_senses(structured_senses)
-        for copy_key in ("forms", "forms_meta", "morph_base", "morph_info", "grammar"):
-            if primary_entry.get(copy_key) not in (None, "", [], {}):
-                entry[copy_key] = copy.deepcopy(primary_entry.get(copy_key))
-
-    canonical_fills, resolution_rows = _build_canonical_fills(
-        fill.get("fills") or [],
-        word,
-        resolved_via,
-        entry_store,
-    )
-    if not canonical_fills and all_entries:
-        fallback_entries = shown_entries or output_preferred_entries or output_all_entries
-        entry_ids = _collect_interned_entry_ids(entry_store, _dedupe_entry_list(fallback_entries))
-        if entry_ids:
-            synthetic_fill: dict[str, Any] = {
-                "start": 0,
-                "end": len(word),
-                "entry_ids": entry_ids,
-            }
-            whole_lemma_path = resolved_via in {"lemma", "lemma_override"}
-            if whole_lemma_path:
-                synthetic_fill["resolution_linked_to_lemma"] = True
-                synthetic_fill["resolution_source"] = (
-                    "lemma_override" if resolved_via == "lemma_override" else "lemma"
-                )
-            canonical_fills = [synthetic_fill]
-            resolution_rows = [
-                {
-                    "text": word,
-                    "source": "DICT",
-                    "resolution_linked_to_lemma": bool(
-                        synthetic_fill.get("resolution_linked_to_lemma")
-                    ),
-                    "resolution_source": str(synthetic_fill.get("resolution_source") or "surface"),
-                }
-            ]
-    entry["fills"] = canonical_fills
-    category = _infer_resolution_category(surface_lookup, fill, all_entries)
-    if partial_gap_count > 0:
-        entry["partial_gap_count"] = partial_gap_count
-    if partial_missing_lemma_count > 0:
-        entry["partial_missing_lemma_count"] = partial_missing_lemma_count
-    if lemma_override_parts:
-        entry["lemma_override_parts"] = lemma_override_parts
-    entry["resolution"] = _build_resolution_payload(
-        category,
-        resolved_via,
-        fill_mode,
-        lemma_oracle_used,
-        lemma_oracle_outcome,
-        resolution_rows,
-        exact_lemma_match_count,
-        partial_gap_count=partial_gap_count,
-        partial_exact_lemma_count=partial_exact_lemma_count,
-        partial_missing_lemma_count=partial_missing_lemma_count,
-    )
-    if debug_trace:
-        record_decoration_event(
-            "segment_result",
-            {
-                "seg_i": seg_idx,
-                "token": word,
-                "upos": upos,
-                "xpos": xpos,
-                "lemma": lemma,
-                "resolved_via": resolved_via,
-                "fill_mode": fill_mode,
-                "entry_count": len(output_all_entries),
-                "shown_entry_count": len(shown_entries or output_all_entries),
-                "other_entry_count": len(other_entries),
-                "entries": [
-                    {
-                        "headword": str(ent.get("headword") or ent.get("surface_form") or ""),
-                        "pos_raw": str(ent.get("pos_raw") or ent.get("pos") or ""),
-                        "upos": str(ent.get("upos") or ""),
-                        "xpos": str(ent.get("xpos") or ent.get("tag") or ""),
-                        "tag": str(ent.get("tag") or ent.get("xpos") or ""),
-                    }
-                    for ent in output_all_entries[:20]
-                    if isinstance(ent, dict)
-                ],
-                "fill_row_count": len(canonical_fills),
-                "lemma_override_parts": copy.deepcopy(lemma_override_parts),
-            },
-        )
-
-    if debug_trace:
-        entry["_debug_lookup_scoring"] = {
-            "token": word,
-            "lemma_text": lemma,
-            "resolved_via": resolved_via,
-            "outcome": lemma_oracle_outcome,
-            "fill_mode": fill_mode,
-            "has_lemma_promotion": bool(fill.get("has_lemma_promotion")),
-            "lemma_override_parts": lemma_override_parts,
-            "lemma_oracle_used": lemma_oracle_used,
-            "lemma_oracle_outcome": lemma_oracle_outcome,
-            "partial_exact_lemma_count": partial_exact_lemma_count,
-            "partial_missing_lemma_count": partial_missing_lemma_count,
-            "partial_gap_count": partial_gap_count,
-            "resolution": entry["resolution"],
-        }
-        if isinstance(fill.get("dp_debug"), dict):
-            entry["_debug_greedy_main"] = fill.get("dp_debug")
-
-    return entry
-
-
-def _build_results_by_seg(
-    lookup_data: dict[str, Any],
-    lang_code: str,
-    selected_sources: Sequence[str] | None,
-    debug_trace: bool = False,
-) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
-    segments = list(lookup_data.get("segments") or [])
-    token_map = _extract_token_map(lookup_data)
-    segmenter = _get_sqlite_segmenter(lang_code, selected_sources)
-    entry_store: dict[str, dict[str, Any]] = {}
-    if debug_trace:
-        with trace_scope(
-            "build_results_by_seg",
-            label="Build Results By Segment",
-            language=lang_code,
-            segment_count=len(segments),
-        ):
-            results: list[dict[str, Any]] = []
-            for idx, raw_word in enumerate(segments):
-                word = str(raw_word or "")
-                token = token_map.get(idx) or {}
-                results.append(
-                    _build_segment_result(
-                        word, token, idx, segmenter, lang_code, entry_store, debug_trace=debug_trace
-                    )
-                )
-            return results, entry_store
-    results: list[dict[str, Any]] = []
-    for idx, raw_word in enumerate(segments):
-        word = str(raw_word or "")
-        token = token_map.get(idx) or {}
-        results.append(
-            _build_segment_result(
-                word, token, idx, segmenter, lang_code, entry_store, debug_trace=False
-            )
-        )
-    return results, entry_store
-
-
-def _update_backend_debug_snapshot(
-    *,
-    capture_id: str,
-    lang_code: str,
-    query_text: str,
-    merged_payload: Mapping[str, Any],
-    sqlite_debug_trace: Mapping[str, Any] | None,
-) -> None:
-    snap = get_debug_snapshot()
-    existing_trace = None
-    if isinstance(snap, Mapping):
-        current_capture_id = str(snap.get("debug_capture_id") or "").strip()
-        if current_capture_id and current_capture_id == str(capture_id or "").strip():
-            existing_trace = snap.get("sqlite_debug_trace")
-    patch: dict[str, Any] = {
-        "debug_capture_id": str(capture_id or "").strip(),
-        "language": str(lang_code or "").strip().lower(),
-        "q": str(query_text or ""),
-        "results": copy.deepcopy(list(merged_payload.get("results") or [])),
-        "results_by_seg": copy.deepcopy(list(merged_payload.get("results_by_seg") or [])),
-        "segments": copy.deepcopy(list(merged_payload.get("segments") or [])),
-        "segment_offsets": copy.deepcopy(list(merged_payload.get("segment_offsets") or [])),
-        "ud_overlay": copy.deepcopy(merged_payload.get("ud_overlay") or {}),
-        "grammar_overlay": copy.deepcopy(merged_payload.get("grammar_overlay") or {}),
-    }
-    if isinstance(sqlite_debug_trace, Mapping):
-        patch["sqlite_debug_trace"] = _merge_debug_trace_payloads(
-            existing_trace, sqlite_debug_trace
-        )
-    update_debug_snapshot(patch)
-
-
-def _attach_sqlite_debug_trace_to_capture(
-    *, capture_id: str, sqlite_debug_trace: Mapping[str, Any] | None
-) -> None:
-    capture = str(capture_id or "").strip()
-    if not capture or not isinstance(sqlite_debug_trace, Mapping):
-        return
-    snap = get_debug_snapshot()
-    if not isinstance(snap, Mapping):
-        return
-    current_capture_id = str(snap.get("debug_capture_id") or "").strip()
-    if not current_capture_id or current_capture_id != capture:
-        return
-    update_debug_snapshot(
-        {
-            "sqlite_debug_trace": _merge_debug_trace_payloads(
-                snap.get("sqlite_debug_trace"), sqlite_debug_trace
-            ),
-        }
-    )
-
-
-def _prepare_debug_trace_payload(
-    trace_payload: Mapping[str, Any] | None,
-    *,
-    request_kind: str,
-    label: str,
-    payload_artifact: Mapping[str, Any] | None = None,
-    drop_final_payload: bool = False,
-) -> dict[str, Any] | None:
-    if not isinstance(trace_payload, Mapping):
-        return None
-    out = copy.deepcopy(dict(trace_payload))
-    if drop_final_payload:
-        out.pop("final_payload", None)
-    if isinstance(payload_artifact, Mapping):
-        out["final_payload_artifact"] = copy.deepcopy(dict(payload_artifact))
-    out["request_kind"] = str(request_kind or "").strip()
-    root = out.get("timing_tree")
-    if isinstance(root, Mapping):
-        root_copy = copy.deepcopy(dict(root))
-        root_copy["label"] = str(
-            label or root_copy.get("label") or root_copy.get("name") or ""
-        ).strip()
-        meta = root_copy.get("meta")
-        meta_copy = copy.deepcopy(dict(meta)) if isinstance(meta, Mapping) else {}
-        meta_copy["request_kind"] = str(request_kind or "").strip()
-        root_copy["meta"] = meta_copy
-        out["timing_tree"] = root_copy
-    return out
-
-
-def _merge_debug_trace_payloads(
-    existing: Mapping[str, Any] | None,
-    incoming: Mapping[str, Any] | None,
-) -> dict[str, Any] | None:
-    if not isinstance(existing, Mapping) and not isinstance(incoming, Mapping):
-        return None
-    if not isinstance(existing, Mapping):
-        return copy.deepcopy(dict(incoming or {}))
-    if not isinstance(incoming, Mapping):
-        return copy.deepcopy(dict(existing))
-
-    existing_copy = copy.deepcopy(dict(existing))
-    incoming_copy = copy.deepcopy(dict(incoming))
-
-    def _collect_trace_roots(trace: Mapping[str, Any]) -> list[dict[str, Any]]:
-        root = trace.get("timing_tree")
-        if not isinstance(root, Mapping):
-            return []
-        root_name = str(root.get("name") or "").strip()
-        children = root.get("children")
-        if root_name == "lookup_capture_aggregate" and isinstance(children, list):
-            return [copy.deepcopy(dict(child)) for child in children if isinstance(child, Mapping)]
-        return [copy.deepcopy(dict(root))]
-
-    merged_children = _collect_trace_roots(existing_copy) + _collect_trace_roots(incoming_copy)
-    total_ms = 0.0
-    for child in merged_children:
-        try:
-            total_ms += float(child.get("duration_ms") or 0.0)
-        except Exception:
-            continue
-
-    out = existing_copy
-    out["debug_capture_id"] = str(
-        incoming_copy.get("debug_capture_id") or existing_copy.get("debug_capture_id") or ""
-    ).strip()
-    out["language"] = (
-        str(incoming_copy.get("language") or existing_copy.get("language") or "").strip().lower()
-    )
-    out["q"] = str(incoming_copy.get("q") or existing_copy.get("q") or "")
-    try:
-        started_existing = float(existing_copy.get("started_at") or 0.0)
-    except Exception:
-        started_existing = 0.0
-    try:
-        started_incoming = float(incoming_copy.get("started_at") or 0.0)
-    except Exception:
-        started_incoming = 0.0
-    if started_existing > 0.0 and started_incoming > 0.0:
-        out["started_at"] = min(started_existing, started_incoming)
-    else:
-        out["started_at"] = started_existing or started_incoming or 0.0
-    out["total_ms"] = round(total_ms, 3)
-    out["timing_tree"] = {
-        "name": "lookup_capture_aggregate",
-        "label": "Lookup Capture Requests",
-        "meta": {"request_count": len(merged_children)},
-        "started_ms": 0.0,
-        "duration_ms": round(total_ms, 3),
-        "children": merged_children,
-    }
-    for bucket in (
-        "normalizations",
-        "sqlite_queries",
-        "retrievals",
-        "segmenter_events",
-        "decoration_events",
-    ):
-        merged_bucket = []
-        for src in (existing_copy, incoming_copy):
-            rows = src.get(bucket)
-            if isinstance(rows, list):
-                merged_bucket.extend(copy.deepcopy(rows))
-        out[bucket] = merged_bucket
-    if incoming_copy.get("final_payload") is not None:
-        out["final_payload"] = copy.deepcopy(incoming_copy.get("final_payload"))
-    elif existing_copy.get("final_payload") is not None:
-        out["final_payload"] = copy.deepcopy(existing_copy.get("final_payload"))
-    if incoming_copy.get("final_payload_artifact") is not None:
-        out["final_payload_artifact"] = copy.deepcopy(incoming_copy.get("final_payload_artifact"))
-    elif existing_copy.get("final_payload_artifact") is not None:
-        out["final_payload_artifact"] = copy.deepcopy(existing_copy.get("final_payload_artifact"))
-    return out
-
-
-def _build_lookup_dp_only_payload(
-    word: str,
-    lang_code: str,
-    selected_sources: Sequence[str] | None,
-    lemma: str = "",
-    upos: str = "",
-    xpos: str = "",
-    exact_only: bool = False,
-    debug_trace: bool = False,
-) -> dict[str, Any]:
-    token = str(word or "")
-    if not token.strip():
-        return {"ok": False, "error": "empty"}
-    upos_hint = str(upos or "").strip().upper()
-    xpos_hint = str(xpos or "").strip()
-    lookup_data = {
-        "ok": True,
-        "display_text": token,
-        "segments": [token],
-        "segment_offsets": [[0, len(token)]],
-        "grammar_overlay": {"tokens": []},
-        "ud_overlay": {
-            "ok": False,
-            "tokens": [
-                {
-                    "i": 0,
-                    "doc_i": 0,
-                    "head": 0,
-                    "dep": "dep",
-                    "text": token,
-                    "upos": upos_hint or "X",
-                    "tag": xpos_hint,
-                    "lemma": str(lemma or ""),
-                    "lemma_raw": str(lemma or ""),
-                    "lemma_suffix": "",
-                    "feats": "",
-                }
-            ],
-            "edges": [],
-            "roots": [],
-            "ents": [],
-            "sentences": [],
-        },
-    }
-    results_by_seg, entry_store = _build_results_by_seg(
-        lookup_data, lang_code, selected_sources, debug_trace=debug_trace
-    )
-    result = (
-        results_by_seg[0]
-        if results_by_seg
-        else _build_unknown_result(
-            token, upos_hint or "unknown", xpos_hint, "dep", lemma, "", 0, lemma, ""
-        )
-    )
-    payload = _build_lookup_payload_base(lookup_data)
-    payload["results_by_seg"] = [result]
-    payload["entry_store"] = entry_store
-    return payload
-
-
-def _build_subsegments_payload(
-    token: str, lang_code: str, selected_sources: Sequence[str] | None, decompose: bool = False
-) -> dict[str, Any]:
-    text = str(token or "")
-    if not text.strip():
-        return {"ok": False, "error": "empty"}
-    segmenter = _get_sqlite_segmenter(lang_code, selected_sources)
-    if segmenter is None:
-        return {"ok": True, "token": text, "subsegments": [], "mode": "greedy"}
-    fill = segmenter.fill_token(
-        text, {"allowExact": not decompose, "excludeWhole": bool(decompose)}
-    )
-    mode = str(fill.get("mode") or "greedy")
-    prepared = _prepare_fill_entries(
-        fill.get("fills") or [], text, segmenter, lang_code, "", "", mode, "surface"
-    )
-    if decompose and text:
-        prepared = [row for row in prepared if str(row.get("head") or "") != text]
-    return {
-        "ok": True,
-        "token": text,
-        "subsegments": prepared,
-        "mode": mode,
-    }
 
 
 # ---------------------------------------------------------------------------
@@ -3783,18 +1876,6 @@ def lookup():
     if not q and isinstance(json_body, Mapping):
         q = str(json_body.get("q") or "")
     raw_lang = str(request.args.get("lang") or json_body.get("lang") or "zh").strip().lower()
-    use_raw = str(request.args.get("raw") or "").strip().lower() in {"1", "true", "yes", "raw"}
-    exact_only = str(request.args.get("exact") or "").strip().lower() in {
-        "1",
-        "true",
-        "yes",
-        "exact",
-    }
-    raw_debug_capture = request.args.get("debug_capture")
-    requested_debug_capture = (
-        False if raw_debug_capture is None else _lookup_bool(raw_debug_capture)
-    )
-    enable_debug_capture = bool(requested_debug_capture and is_debug_collection_enabled())
     strip_punctuation = False
     manual_sentence_segmentation = _lookup_bool(request.args.get("manual_sentence_segmentation"))
     gemini_ner_requested = False
@@ -3824,105 +1905,8 @@ def lookup():
     chunked_trankit_requested = False
     prepared_trankit_chunks: list[dict[str, Any]] = []
 
-    if use_raw:
-        trace_token = None
-        trace_capture_id = ""
-        trace_payload = None
-        if enable_debug_capture:
-            trace_token, trace_state = start_trace(language=lang_code, query=q)
-            trace_capture_id = str(trace_state.get("debug_capture_id") or "")
-        try:
-            payload = _build_lookup_dp_only_payload(
-                q,
-                lang_code,
-                selected_sources,
-                lemma=request.args.get("lemma", ""),
-                upos=request.args.get("upos", ""),
-                xpos=request.args.get("xpos", ""),
-                exact_only=exact_only,
-                debug_trace=enable_debug_capture,
-            )
-            if enable_debug_capture and trace_capture_id:
-                trace_payload = finish_trace(payload)
-        finally:
-            if trace_token is not None:
-                stop_trace(trace_token)
-        payload["language"] = lang_code
-        payload = _attach_lookup_quota_after_success(payload)
-        if bool(payload.get("ok", True)):
-            try:
-                from analytics import record_lookup
-
-                record_lookup(lang_code, _lookup_token_count_from_payload(payload), dp_only=False)
-            except Exception:
-                pass
-        if enable_debug_capture and trace_capture_id:
-            payload["debug_capture_id"] = trace_capture_id
-            if isinstance(trace_payload, Mapping):
-                payload["sqlite_debug_trace"] = trace_payload
-                _update_backend_debug_snapshot(
-                    capture_id=trace_capture_id,
-                    lang_code=lang_code,
-                    query_text=q,
-                    merged_payload=payload,
-                    sqlite_debug_trace=trace_payload,
-                )
-        return _lookup_json_response(payload)
-
-    trace_token = None
-    trace_capture_id = ""
-    trace_payload = None
-    if enable_debug_capture:
-        trace_token, trace_state = start_trace(language=lang_code, query=q)
-        trace_capture_id = str(trace_state.get("debug_capture_id") or "")
-
     # NLP-only: JS client handles DP segmentation + hydration
     def _run_nlp(text, _dictionary, _hooks, trankit_lang):
-        if enable_debug_capture:
-            with trace_scope(
-                "run_trankit",
-                label="Run Trankit",
-                language=trankit_lang,
-                query_length=len(text or ""),
-                chunk_count=len(prepared_trankit_chunks),
-            ):
-                if prepared_trankit_chunks:
-                    trankit_doc = run_trankit_chunk_boundaries(
-                        text,
-                        prepared_trankit_chunks,
-                        trankit_lang,
-                        trankit_name_override=trankit_override,
-                        manual_sentence_segmentation=manual_sentence_segmentation,
-                        strip_punctuation_after_manual_sentence_segmentation=manual_sentence_segmentation_post_strip,
-                    )
-                else:
-                    trankit_doc = run_trankit(
-                        text,
-                        trankit_lang,
-                        trankit_name_override=trankit_override,
-                        manual_sentence_segmentation=manual_sentence_segmentation,
-                        strip_punctuation_after_manual_sentence_segmentation=manual_sentence_segmentation_post_strip,
-                    )
-                trankit_doc = _normalize_trankit_upos_doc(trankit_doc, trankit_lang)
-                if gemini_ner_requested:
-                    _clear_trankit_ner_tags(trankit_doc)
-            with trace_scope(
-                "process_lookup_nlp_only", label="Process NLP Only", language=trankit_lang
-            ):
-                payload = process_lookup_nlp_only(
-                    text,
-                    trankit_doc,
-                    trankit_lang=trankit_lang,
-                    enable_debug_capture=True,
-                    debug_capture_id=trace_capture_id,
-                )
-                if prepared_trankit_chunks and isinstance(payload, dict):
-                    payload["trankit_chunked_lookup"] = {
-                        "enabled": True,
-                        "mode": "boundary_tokenized",
-                        "chunk_count": len(prepared_trankit_chunks),
-                    }
-                return payload
         if prepared_trankit_chunks:
             trankit_doc = run_trankit_chunk_boundaries(
                 text,
@@ -3947,7 +1931,6 @@ def lookup():
             text,
             trankit_doc,
             trankit_lang=trankit_lang,
-            enable_debug_capture=False,
         )
         if prepared_trankit_chunks and isinstance(payload, dict):
             payload["trankit_chunked_lookup"] = {
@@ -3957,39 +1940,15 @@ def lookup():
             }
         return payload
 
-    try:
-        if enable_debug_capture:
-            with trace_scope(
-                "run_with_universal_normalization",
-                label="Universal Normalization",
-                language=lang_code,
-                strip_punctuation=effective_strip_punctuation,
-                manual_sentence_segmentation=manual_sentence_segmentation,
-                chunk_count=len(prepared_trankit_chunks),
-            ):
-                payload = run_with_universal_normalization(
-                    q,
-                    _run_nlp,
-                    None,
-                    None,
-                    lang_code,
-                    language=lang_code,
-                    strip_punctuation=effective_strip_punctuation,
-                )
-            trace_payload = finish_trace(payload)
-        else:
-            payload = run_with_universal_normalization(
-                q,
-                _run_nlp,
-                None,
-                None,
-                lang_code,
-                language=lang_code,
-                strip_punctuation=effective_strip_punctuation,
-            )
-    finally:
-        if trace_token is not None:
-            stop_trace(trace_token)
+    payload = run_with_universal_normalization(
+        q,
+        _run_nlp,
+        None,
+        None,
+        lang_code,
+        language=lang_code,
+        strip_punctuation=effective_strip_punctuation,
+    )
 
     if gemini_ner_requested and isinstance(payload, dict):
         _replace_lookup_ner_with_gemini(payload, lang_code)
@@ -4003,84 +1962,7 @@ def lookup():
             record_lookup(lang_code, _lookup_token_count_from_payload(payload), dp_only=False)
         except Exception:
             pass
-    if enable_debug_capture and trace_capture_id:
-        payload["debug_capture_id"] = trace_capture_id
-        prepared_trace = _prepare_debug_trace_payload(
-            trace_payload,
-            request_kind="lookup_nlp",
-            label="Lookup NLP Request",
-        )
-        if isinstance(prepared_trace, Mapping):
-            payload["sqlite_debug_trace"] = prepared_trace
-            _update_backend_debug_snapshot(
-                capture_id=trace_capture_id,
-                lang_code=lang_code,
-                query_text=q,
-                merged_payload=payload,
-                sqlite_debug_trace=prepared_trace,
-            )
     return _lookup_json_response(payload)
-
-
-@app.route("/lookup_dp_only")
-def lookup_dp_only():
-    """
-    Server-side single-token dictionary lookup.
-    Returns the same payload shape previously assembled in the browser.
-    """
-    quota_response = _precheck_lookup_quota_response()
-    if quota_response is not None:
-        return quota_response
-
-    q = (request.args.get("q") or "").strip()
-    raw_lang = (request.args.get("lang") or "").strip().lower()
-    lang_code = resolve_lang_code(raw_lang) or raw_lang
-    if not q or not lang_code:
-        return jsonify({"ok": False, "error": "missing q or lang"}), 400
-    payload = _build_lookup_dp_only_payload(
-        q,
-        lang_code,
-        _get_requested_sources(),
-        lemma=request.args.get("lemma", ""),
-        upos=request.args.get("upos", ""),
-        xpos=request.args.get("xpos", ""),
-        exact_only=str(request.args.get("exact") or "").strip().lower()
-        in {"1", "true", "yes", "exact"},
-        debug_trace=str(request.args.get("debug_trace") or "").strip().lower()
-        in {"1", "true", "yes", "on"},
-    )
-    payload["language"] = lang_code
-    if bool(payload.get("ok", True)):
-        try:
-            from analytics import record_lookup
-
-            record_lookup(lang_code, _lookup_token_count_from_payload(payload), dp_only=True)
-        except Exception:
-            pass
-    return _lookup_json_response(payload)
-
-
-@app.route("/subsegments")
-def subsegments():
-    """
-    Server-side subsegment decomposition using the SQLite segmenter.
-    """
-    token = (request.args.get("token") or "").strip()
-    raw_lang = (request.args.get("lang") or "").strip().lower()
-    lang_code = resolve_lang_code(raw_lang) or raw_lang
-    if not token or not lang_code:
-        return jsonify({"ok": False, "error": "missing token or lang"}), 400
-    decompose = str(request.args.get("decompose") or "").strip().lower() in {
-        "1",
-        "true",
-        "yes",
-        "on",
-    }
-    payload = _build_subsegments_payload(
-        token, lang_code, _get_requested_sources(), decompose=decompose
-    )
-    payload["language"] = lang_code
-    return jsonify(payload)
 
 
 @app.route("/annotation", methods=["GET", "POST"])
@@ -4156,7 +2038,6 @@ def js_custom_index(lang_code: str):
     Returns gzip-compressed JSON: {hw, fw, db_aliases} containing only customdb keys.
     Called by the client after loading the static index to inject user-created entries.
     """
-    import hashlib as _hashlib
     from dict_lookup_sqlite import build_compact_key_index, APP_DB_PATH
 
     resolved = resolve_lang_code(lang_code.strip().lower())
@@ -4371,7 +2252,6 @@ def user_dict_add():
         return jsonify({"ok": False, "error": "Failed to create entry."}), 500
 
     entry_payload = gemini_dict._entry_to_frontend(entry)
-    _invalidate_sqlite_segmenter_cache(language, _collect_lookup_texts_for_entry(entry_payload))
 
     return jsonify({"ok": True, "entry": entry_payload})
 
@@ -4433,9 +2313,6 @@ def user_dict_update():
     if not updated:
         return jsonify({"ok": False, "error": "Failed to update entry."}), 500
     updated_payload = _custom_entry_to_response(updated)
-    _invalidate_sqlite_segmenter_cache(
-        entry.language, _collect_lookup_texts_for_entry(updated_payload)
-    )
     return jsonify({"ok": True, "entry": updated_payload})
 
 
@@ -4461,9 +2338,6 @@ def user_dict_delete():
     removed = gemini_dict.remove_tsv_entry(entry.language, entry.headword, entry_id=entry.entry_id)
     if not removed:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
-    _invalidate_sqlite_segmenter_cache(
-        entry.language, _collect_lookup_texts_for_entry(_custom_entry_to_response(entry))
-    )
     return jsonify({"ok": True})
 
 
@@ -4477,73 +2351,6 @@ def custom_entries_list():
 def community_entries():
     """Legacy ownership endpoint. Custom entries are loaded through the shared index."""
     return jsonify({"ok": True, "entries": []})
-
-
-# ---------------------------------------------------------------------------
-# LLM per-token glosses (word-sense disambiguation aid)
-# ---------------------------------------------------------------------------
-
-
-@app.route("/api/llm_translate_sentences/cache_hit", methods=["POST"])
-def llm_translate_sentences_cache_hit():
-    """Debug endpoint: client reports that sentence translations were served
-    from its in-browser session cache (no Gemini call made)."""
-    data = request.get_json(silent=True) or {}
-    lang = (data.get("lang") or "").strip()
-    hits = data.get("hits") or []
-    try:
-        import gemini_log
-
-        gemini_log.log_translation_cache_hit(
-            caller="llm_translate_sentences",
-            lang=lang,
-            sentences=hits,
-        )
-    except Exception:
-        pass
-    return jsonify({"ok": True})
-
-
-@app.route("/api/llm_glosses/cache_hit", methods=["POST"])
-def llm_glosses_cache_hit():
-    """Debug endpoint: client reports that glosses were served from its
-    in-browser session cache (no Gemini call made)."""
-    data = request.get_json(silent=True) or {}
-    lang = (data.get("lang") or "").strip()
-    hits = data.get("hits") or []
-    try:
-        import gemini_log
-
-        for h in hits:
-            gemini_log.log_gloss_cache_hit(
-                caller="llm_glosses",
-                lang=lang,
-                tokens=h.get("tokens") or [],
-            )
-    except Exception:
-        pass
-    return jsonify({"ok": True})
-
-
-@app.route("/api/llm_decomps/cache_hit", methods=["POST"])
-def llm_decomps_cache_hit():
-    """Debug endpoint: client reports that token decompositions were served from its
-    in-browser session cache (no Gemini call made)."""
-    data = request.get_json(silent=True) or {}
-    lang = (data.get("lang") or "").strip()
-    hits = data.get("hits") or []
-    try:
-        import gemini_log
-
-        for h in hits:
-            gemini_log.log_decomp_cache_hit(
-                caller="llm_decomps",
-                lang=lang,
-                tokens=h.get("tokens") or [],
-            )
-    except Exception:
-        pass
-    return jsonify({"ok": True})
 
 
 @app.route("/api/llm_glosses", methods=["POST"])
@@ -4635,7 +2442,8 @@ def llm_glosses():
                                 out_glosses.append(g_chunk[j])
                         if out_indices:
                             line = json.dumps(
-                                {"indices": out_indices, "glosses": out_glosses}, ensure_ascii=False
+                                {"indices": out_indices, "glosses": out_glosses},
+                                ensure_ascii=False,
                             )
                             yield f"data: {line}\n\n"
                     if (
@@ -4814,7 +2622,8 @@ def orth_breakdowns():
                                 out_roms.append(o_chunk[j])
                         if out_indices:
                             line = json.dumps(
-                                {"indices": out_indices, "roms": out_roms}, ensure_ascii=False
+                                {"indices": out_indices, "roms": out_roms},
+                                ensure_ascii=False,
                             )
                             yield f"data: {line}\n\n"
                     if (
@@ -4903,7 +2712,10 @@ def gemini_entry_get():
     headword = (request.args.get("headword") or "").strip()
     language = (request.args.get("language") or "").strip()
     entry = _get_custom_dict_entry(
-        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+        entry_id=entry_id,
+        entry_row_id=entry_row_id,
+        language=language,
+        headword=headword,
     )
     if not entry:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
@@ -4923,7 +2735,10 @@ def gemini_entry_update():
     headword = (data.get("headword") or "").strip()
     language = (data.get("language") or "").strip()
     entry = _get_custom_dict_entry(
-        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+        entry_id=entry_id,
+        entry_row_id=entry_row_id,
+        language=language,
+        headword=headword,
     )
     if not entry:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
@@ -4962,9 +2777,6 @@ def gemini_entry_update():
     if not updated:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
     updated_payload = _custom_entry_to_response(updated)
-    _invalidate_sqlite_segmenter_cache(
-        entry.language, _collect_lookup_texts_for_entry(updated_payload)
-    )
     return jsonify({"ok": True, "entry": updated_payload})
 
 
@@ -4979,7 +2791,10 @@ def gemini_entry_vote_delete():
     headword = (data.get("headword") or "").strip()
     language = (data.get("language") or "").strip()
     entry = _get_custom_dict_entry(
-        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+        entry_id=entry_id,
+        entry_row_id=entry_row_id,
+        language=language,
+        headword=headword,
     )
     if not entry:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
@@ -5001,7 +2816,10 @@ def gemini_entry_delete():
     headword = (data.get("headword") or "").strip()
     language = (data.get("language") or "").strip()
     entry = _get_custom_dict_entry(
-        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+        entry_id=entry_id,
+        entry_row_id=entry_row_id,
+        language=language,
+        headword=headword,
     )
     if not entry:
         return jsonify({"ok": False, "error": "Entry not found."}), 404
@@ -5023,7 +2841,10 @@ def gemini_entry_deletion_votes():
     headword = (request.args.get("headword") or "").strip()
     language = (request.args.get("language") or "").strip()
     entry = _get_custom_dict_entry(
-        entry_id=entry_id, entry_row_id=entry_row_id, language=language, headword=headword
+        entry_id=entry_id,
+        entry_row_id=entry_row_id,
+        language=language,
+        headword=headword,
     )
     return jsonify(
         {
@@ -5517,7 +3338,10 @@ def _ensure_cached_gzip_tsv(lang_code: str, source: str = "") -> tuple[Path | No
 
         tmp_gz_path = gz_path.with_suffix(gz_path.suffix + ".tmp")
         tmp_meta_path = meta_path.with_suffix(meta_path.suffix + ".tmp")
-        with tsv_path.open("rb") as src_fh, _gzip.open(tmp_gz_path, "wb", compresslevel=9) as gz_fh:
+        with (
+            tsv_path.open("rb") as src_fh,
+            _gzip.open(tmp_gz_path, "wb", compresslevel=9) as gz_fh,
+        ):
             while True:
                 chunk = src_fh.read(1024 * 1024)
                 if not chunk:
@@ -5797,8 +3621,6 @@ def js_hydrate():
         return jsonify({"ok": False, "error": "missing lang"}), 400
     if lang_code not in LANGUAGE_REGISTRY:
         return jsonify({"ok": False, "error": f"Unsupported language: {raw_lang}"}), 400
-    debug_capture_id = str(data.get("debug_capture_id") or "").strip()
-    enable_debug_trace = bool(debug_capture_id)
 
     winner_refs = list(data.get("winner_refs") or [])
     allowed_sqlite_aliases = _registered_sqlite_aliases_for_language(lang_code)
@@ -5845,114 +3667,81 @@ def js_hydrate():
         resolved_paths = [p for p in resolved_paths if p.exists()]
         if resolved_paths:
             db_paths = resolved_paths
+    hydrated = _hydrate(
+        candidates,
+        lang_code,
+        db_paths=db_paths,
+    )
 
-    trace_token = None
-    trace_payload = None
-    payload_artifact = None
-    if enable_debug_trace:
-        trace_token, trace_state = start_trace(language=lang_code, capture_id=debug_capture_id)
-        debug_capture_id = str(trace_state.get("debug_capture_id") or debug_capture_id)
-    try:
-        with trace_scope("js_hydrate", label="JS Hydrate", winner_ref_count=len(winner_refs)):
-            hydrated = _hydrate(candidates, lang_code, db_paths=db_paths, trace=enable_debug_trace)
+    entry_store: dict[str, Any] = {}
+    # ref_to_key lets the JS client map its winner refs back to entry_store keys
+    ref_to_key: dict[str, str] = {}
+    # form_overlays: lightweight per-form display overrides keyed by form wire key
+    form_overlays: dict[str, dict[str, Any]] = {}
 
-        entry_store: dict[str, Any] = {}
-        # ref_to_key lets the JS client map its winner refs back to entry_store keys
-        ref_to_key: dict[str, str] = {}
-        # form_overlays: lightweight per-form display overrides keyed by form wire key
-        form_overlays: dict[str, dict[str, Any]] = {}
+    for (storage_kind, db_alias, entry_row_id), entry in hydrated.items():
+        # Ensure source is set to the db stem so the client can scope
+        # source-specific post-processing (e.g. pinyin conversion for cc-cedict).
+        if not entry.get("source") and db_alias and db_alias != "customdb":
+            entry["source"] = db_alias
+        base_wire = f"{storage_kind}|{db_alias}|{entry_row_id}"
+        match_key = str(match_keys_by_wire.get(base_wire) or "").strip()
 
-        for (storage_kind, db_alias, entry_row_id), entry in hydrated.items():
-            # Ensure source is set to the db stem so the client can scope
-            # source-specific post-processing (e.g. pinyin conversion for cc-cedict).
-            if not entry.get("source") and db_alias and db_alias != "customdb":
-                entry["source"] = db_alias
-            base_wire = f"{storage_kind}|{db_alias}|{entry_row_id}"
-            match_key = str(match_keys_by_wire.get(base_wire) or "").strip()
+        matched_forms = list(entry.get("_matched_forms") or [])
+        is_form_match = str(entry.get("_match_kind") or "").strip().lower() == "form"
 
-            matched_forms = list(entry.get("_matched_forms") or [])
-            is_form_match = str(entry.get("_match_kind") or "").strip().lower() == "form"
+        if is_form_match and matched_forms:
+            # Build ONE base payload for the entry (shared data: senses, forms, etymology).
+            # Per-form display differences go into form_overlays.
+            base_payload = _build_shared_base_payload(entry, match_key, lang_code)
+            if not base_payload:
+                continue
+            base_payload["ref_key"] = base_wire
+            base_payload["runtime_entry_id"] = base_wire
+            entry_store[base_wire] = base_payload
+            ref_to_key[base_wire] = base_wire
 
-            if is_form_match and matched_forms:
-                # Build ONE base payload for the entry (shared data: senses, forms, etymology).
-                # Per-form display differences go into form_overlays.
-                base_payload = _build_shared_base_payload(entry, match_key, lang_code)
-                if not base_payload:
+            for mf in matched_forms:
+                form_row_id = int(mf.get("_form_row_id") or 0)
+                if not form_row_id:
                     continue
-                base_payload["ref_key"] = base_wire
-                base_payload["runtime_entry_id"] = base_wire
-                entry_store[base_wire] = base_payload
-                ref_to_key[base_wire] = base_wire
+                form_wire = f"{base_wire}|{form_row_id}"
+                ref_to_key[form_wire] = base_wire
+                form_overlays[form_wire] = _extract_form_overlay(entry, mf)
+        else:
+            # Headword match — one payload per entry
+            if match_key:
+                entry["_match_key"] = match_key
+            _shape_korean_synthetic_stem_entry(entry, match_key, lang_code)
+            payload = _build_hydrated_display_payload(entry)
+            if not payload:
+                continue
+            payload_key = str(payload.get("ref_key") or base_wire).strip() or base_wire
+            entry_store[payload_key] = payload
+            ref_to_key[base_wire] = payload_key
 
-                for mf in matched_forms:
-                    form_row_id = int(mf.get("_form_row_id") or 0)
-                    if not form_row_id:
-                        continue
-                    form_wire = f"{base_wire}|{form_row_id}"
-                    ref_to_key[form_wire] = base_wire
-                    form_overlays[form_wire] = _extract_form_overlay(entry, mf)
-            else:
-                # Headword match — one payload per entry
-                if match_key:
-                    entry["_match_key"] = match_key
-                _shape_korean_synthetic_stem_entry(entry, match_key, lang_code)
-                payload = _build_hydrated_display_payload(entry)
-                if not payload:
-                    continue
-                payload_key = str(payload.get("ref_key") or base_wire).strip() or base_wire
-                entry_store[payload_key] = payload
-                ref_to_key[base_wire] = payload_key
+    # Map any remaining form-variant wire keys not yet covered
+    for ref in winner_refs:
+        sk = str(ref.get("storage_kind") or "sqlite")
+        alias = str(ref.get("db_alias") or "")
+        eid = int(ref.get("entry_row_id") or 0)
+        fid = int(ref.get("form_row_id") or 0)
+        wire = f"{sk}|{alias}|{eid}" + (f"|{fid}" if fid > 0 else "")
+        if wire not in ref_to_key:
+            # Fall back to the base entry or any form payload for this entry
+            base = f"{sk}|{alias}|{eid}"
+            pk = ref_to_key.get(base)
+            if pk:
+                ref_to_key[wire] = pk
 
-        # Map any remaining form-variant wire keys not yet covered
-        for ref in winner_refs:
-            sk = str(ref.get("storage_kind") or "sqlite")
-            alias = str(ref.get("db_alias") or "")
-            eid = int(ref.get("entry_row_id") or 0)
-            fid = int(ref.get("form_row_id") or 0)
-            wire = f"{sk}|{alias}|{eid}" + (f"|{fid}" if fid > 0 else "")
-            if wire not in ref_to_key:
-                # Fall back to the base entry or any form payload for this entry
-                base = f"{sk}|{alias}|{eid}"
-                pk = ref_to_key.get(base)
-                if pk:
-                    ref_to_key[wire] = pk
-
-        response_payload = {
-            "ok": True,
-            "entry_store": entry_store,
-            "ref_to_key": ref_to_key,
-            "form_overlays": form_overlays,
-        }
-        if enable_debug_trace:
-            payload_artifact = store_debug_json_artifact(
-                debug_capture_id,
-                "sqlite_payload",
-                response_payload,
-                filename=f"sqlite-payload-{lang_code or 'lookup'}-{debug_capture_id}.json",
-            )
-            trace_payload = _prepare_debug_trace_payload(
-                finish_trace(),
-                request_kind="js_hydrate",
-                label="JS Hydrate Request",
-                payload_artifact=payload_artifact,
-                drop_final_payload=True,
-            )
-    finally:
-        if trace_token is not None:
-            stop_trace(trace_token)
-
-    if enable_debug_trace and isinstance(trace_payload, Mapping):
-        _attach_sqlite_debug_trace_to_capture(
-            capture_id=debug_capture_id,
-            sqlite_debug_trace=trace_payload,
-        )
+    response_payload = {
+        "ok": True,
+        "entry_store": entry_store,
+        "ref_to_key": ref_to_key,
+        "form_overlays": form_overlays,
+    }
 
     extra_headers = None
-    if enable_debug_trace and isinstance(trace_payload, Mapping):
-        extra_headers = {
-            "X-Debug-Server-Ms": f"{float(trace_payload.get('total_ms') or 0.0):.3f}",
-            "X-Debug-Request-Kind": str(trace_payload.get("request_kind") or "js_hydrate"),
-        }
     return _lookup_json_response(response_payload, extra_headers=extra_headers)
 
 
@@ -5968,7 +3757,11 @@ def js_dict_index(lang_code: str):
     into the in-memory index via injectGeminiKey().
     """
     import hashlib as _hashlib
-    from dict_lookup_sqlite import build_compact_key_index, _resolve_db_path, _resolve_all_db_paths
+    from dict_lookup_sqlite import (
+        build_compact_key_index,
+        _resolve_db_path,
+        _resolve_all_db_paths,
+    )
 
     resolved = resolve_lang_code(lang_code.strip().lower())
     if not resolved:
@@ -5977,7 +3770,10 @@ def js_dict_index(lang_code: str):
     source = request.args.get("source", "").strip().lower()
     if source and source not in ("custom",) and not _is_registered_dict_source(resolved, source):
         return jsonify(
-            {"ok": False, "error": f"Unsupported dictionary source for {resolved}: {source}"}
+            {
+                "ok": False,
+                "error": f"Unsupported dictionary source for {resolved}: {source}",
+            }
         ), 404
 
     # Each index covers exactly one SQLite file — never bundle multiple dbs.
@@ -6096,7 +3892,11 @@ def _prebuild_js_index_cache() -> None:
     """
     import gzip as _gz
     import hashlib as _hashlib
-    from dict_lookup_sqlite import build_compact_key_index, _resolve_db_path, _resolve_all_db_paths
+    from dict_lookup_sqlite import (
+        build_compact_key_index,
+        _resolve_db_path,
+        _resolve_all_db_paths,
+    )
 
     _JS_INDEX_CACHE_DIR.mkdir(parents=True, exist_ok=True)
     _JS_INDEX_ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)

@@ -2,7 +2,7 @@
 
 ## Included
 
-Flask/JavaScript application, language configurations, neural inference and dictionary lookup infrastructure, runtime tests, and deployment templates.
+Flask/JavaScript application, language configurations, neural inference and dictionary lookup infrastructure, deployment templates.
 
 ## External resources
 
@@ -10,4 +10,4 @@ Dictionary databases, account and subscription records, customer documents, mode
 
 Live environment files, credentials, private keys, logs, installed dependencies, local environments, backup copies, and generated outputs are excluded. Configuration examples require your own settings. Third-party notices are preserved in [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
 
-The GitHub code is maintained separately from the deployed sites and original development workspaces. See [setup](SETUP.md) for inputs, build steps, and validation limits.
+The GitHub code is maintained separately from the deployed sites and original development workspaces. See [setup](SETUP.md) for required resources and launch instructions.

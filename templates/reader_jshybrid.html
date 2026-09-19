@@ -305,7 +305,6 @@
   <script>
     window.APP_DICT_VERSION = "{{ app_dict_version }}";
     window.APP_DICT_INDEX_URLS = {{ js_index_urls|tojson }};
-    window.LE_DEBUG_COLLECTION_ENABLED = {{ 'true' if is_debug_collection_enabled() else 'false' }};
   </script>
   <script src="{{ url_for('static', filename='TRANKIT_TAGS.js') }}?v={{ mtime('TRANKIT_TAGS.js') }}"></script>
   <script src="{{ url_for('static', filename='reader_wikt.js') }}?v={{ mtime('reader_wikt.js') }}"></script>
@@ -315,8 +314,7 @@
   <script src="{{ url_for('static', filename='grapheme_pronunciation_profiles.js') }}?v={{ mtime('grapheme_pronunciation_profiles.js') }}"></script>
   <script src="{{ url_for('static', filename='dictionary_engine_hybrid.js') }}?v={{ mtime('dictionary_engine_hybrid.js') }}"></script>
   <script src="{{ url_for('static', filename='dictionary_client_hybrid.js') }}?v={{ mtime('dictionary_client_hybrid.js') }}"></script>
-  <script src="{{ url_for('static', filename='user_contributions.js') }}?v={{ mtime('user_contributions.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendor/jszip/jszip.min.js') }}?v={{ mtime('vendor/jszip/jszip.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='unknown_entry_prompt.js') }}?v={{ mtime('unknown_entry_prompt.js') }}"></script>
   <script src="{{ url_for('static', filename='vendor/dompurify/purify.min.js') }}?v={{ mtime('vendor/dompurify/purify.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendor/mammoth/mammoth.browser.min.js') }}?v={{ mtime('vendor/mammoth/mammoth.browser.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendor/pdfjs/pdf.min.js') }}?v={{ mtime('vendor/pdfjs/pdf.min.js') }}"></script>
@@ -331,8 +329,6 @@
   <script src="{{ url_for('static', filename='docrender/canonical_builder.js') }}?v={{ mtime('docrender/canonical_builder.js') }}"></script>
   <script src="{{ url_for('static', filename='docrender/canonical_pdf_extractor.js') }}?v={{ mtime('docrender/canonical_pdf_extractor.js') }}"></script>
   <script src="{{ url_for('static', filename='docrender/web_snapshot_renderer.js') }}?v={{ mtime('docrender/web_snapshot_renderer.js') }}"></script>
-  <script src="{{ url_for('static', filename='docrender/canonical_web_extractor.js') }}?v={{ mtime('docrender/canonical_web_extractor.js') }}"></script>
-  <script src="{{ url_for('static', filename='docrender/canonical_lookup.js') }}?v={{ mtime('docrender/canonical_lookup.js') }}"></script>
   <script src="{{ url_for('static', filename='docrender/canonical_annotator.js') }}?v={{ mtime('docrender/canonical_annotator.js') }}"></script>
   <script src="{{ url_for('static', filename='docrender/canonical_renderer.js') }}?v={{ mtime('docrender/canonical_renderer.js') }}"></script>
   <script src="{{ url_for('static', filename='docrender/canonical_controller.js') }}?v={{ mtime('docrender/canonical_controller.js') }}"></script>
@@ -341,7 +337,6 @@
   <script src="{{ url_for('static', filename='lookup_gate.js') }}?v={{ mtime('lookup_gate.js') }}"></script>
   <script src="{{ url_for('static', filename='marked.min.js') }}?v={{ mtime('marked.min.js') }}"></script>
   <script src="{{ url_for('static', filename='llm_assistant.js') }}?v={{ mtime('llm_assistant.js') }}"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='trankit-chunk-debugger/trankit_chunk_debugger.css') }}?v={{ mtime('trankit-chunk-debugger/trankit_chunk_debugger.css') }}">
-  <script src="{{ url_for('static', filename='trankit-chunk-debugger/trankit_chunk_debugger.js') }}?v={{ mtime('trankit-chunk-debugger/trankit_chunk_debugger.js') }}"></script>
+  <script src="{{ url_for('static', filename='docrender/lookup_chunks.js') }}?v={{ mtime('docrender/lookup_chunks.js') }}"></script>
 </body>
 </html>

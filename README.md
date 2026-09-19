@@ -6,8 +6,6 @@ I built Language Engine to bring close reading and language research into one wo
 
 [Live application](https://language-engine.ai) · [Setup](docs/SETUP.md) · [Architecture](docs/ARCHITECTURE.md) · [Portfolio](https://github.com/conradcompagna)
 
-[![Checks](https://github.com/conradcompagna/language-engine/actions/workflows/checks.yml/badge.svg)](https://github.com/conradcompagna/language-engine/actions/workflows/checks.yml)
-
 ## Engineering highlights
 
 - **Hybrid search architecture:** browser-side dynamic programming over compact lexical indexes; batch SQLite hydration fetches full entries only after candidate selection. IndexedDB caches indexes between sessions.
@@ -17,7 +15,7 @@ I built Language Engine to bring close reading and language research into one wo
 
 ## Scope
 
-The code includes **34 language display configurations and 27 enabled NLP registry entries**, covering modern and historical languages. The deployment uses 42 SQLite dictionary files; dictionary contents and model weights remain external to this repository.
+The code includes **27 language display configurations and enabled NLP registry entries**, covering modern and historical languages. The deployment uses 42 SQLite dictionary files; dictionary contents and model weights remain external to this repository.
 
 ## Explore the code
 
@@ -27,13 +25,6 @@ The code includes **34 language display configurations and 27 enabled NLP regist
 | Browser segmentation and hydration | [dictionary_client_hybrid.js](static/dictionary_client_hybrid.js) |
 | Lexical indexes and SQLite access | [dict_lookup_sqlite.py](dict_lookup_sqlite.py) |
 | Neural inference and alignment | [language_registry.py](language_registry.py), [pipeline_common.py](pipeline_common.py), [trankit_compressed_runtime.py](trankit_compressed_runtime.py) |
-| Runtime regression checks | [tests/](tests/) |
 | Deployment | [wsgi.py](wsgi.py), [deploy/](deploy/) |
 
-## Run the lightweight checks
-
-```sh
-python -m tests.test_mwt_realign_dp
-```
-
-This regression runs without model weights or dictionaries. CI also checks Python formatting, undefined names, and JavaScript syntax. See [setup](docs/SETUP.md) for the resources required to run the application and [publication contents](docs/PUBLICATION.md) for the data boundary.
+Model weights, dictionaries, and account data are provisioned separately. See [setup](docs/SETUP.md) and [publication contents](docs/PUBLICATION.md).

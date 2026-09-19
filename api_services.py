@@ -14,7 +14,6 @@ import requests
 
 from db import db, ApiUsage, SyntheticEntry
 from config import (
-    GOOGLE_TRANSLATE_API_KEY,
     GEMINI_API_KEY,
     GEMINI_MAX_OUTPUT_TOKENS,
     GEMINI_MAX_USER_QUERY_CHARS,
@@ -115,7 +114,6 @@ def _call_gemini(
     max_output_tokens: int = GEMINI_MAX_OUTPUT_TOKENS,
     system_prompt: str | None = None,
 ) -> dict:
-    from gemini_log import log_gemini_call
 
     url = (
         f"https://generativelanguage.googleapis.com/v1beta/models/{model}"
@@ -145,7 +143,7 @@ def _call_gemini(
             resp.raise_for_status()
         data = resp.json()
 
-        usage_meta = log_gemini_call(caller, model, payload, data)
+        usage_meta = data.get("usageMetadata", {})
         candidates = data.get("candidates", [])
         if not candidates:
             return {"ok": False, "error": "No response from model."}
@@ -159,11 +157,9 @@ def _call_gemini(
         }
 
     except requests.exceptions.Timeout:
-        log_gemini_call(caller, model, payload, None, error="timeout")
         return {"ok": False, "error": "LLM request timed out."}
     except requests.exceptions.HTTPError as e:
         log.warning("Gemini API error: %s", e)
-        log_gemini_call(caller, model, payload, None, error=str(e))
         return {"ok": False, "error": "LLM service error."}
     except Exception as e:
         log.warning("Gemini unexpected error: %s", e)

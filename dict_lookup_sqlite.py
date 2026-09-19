@@ -1,15 +1,7 @@
-"""
-dict_lookup_sqlite.py — Thin query layer for SQLite-backed dictionary lookups.
+"""Build compact dictionary indexes and hydrate selected SQLite rows.
 
-Provides batch lookup for the /api/lookup_batch endpoint.
-Each language has its own .sqlite file in dict_sqlite/.
-Connections are per-thread via threading.local() to avoid concurrent access.
-
-Normalization rules ported from dictionary_normalization_layer.js,
-dictionary_engine.js (lookupKey/normalizeAffixMarkers), and
-dictionary_client.js (normalizeLookupKey) so that SQLite queries benefit
-from the same equiv-form folding that was previously only applied
-client-side after results were already fetched.
+The browser selects winner references; this module resolves full entries and
+forms with batched queries and maintains the custom-entry form index.
 """
 
 import json
@@ -17,12 +9,9 @@ import re
 import sqlite3
 import subprocess
 import threading
-import time
-from contextlib import nullcontext
 from pathlib import Path
 from typing import Any, Optional, Sequence
 from urllib.parse import unquote
-from debug_trace_runtime import record_retrieval, record_sqlite_query, trace_scope
 from sqlite_prune_policy import (
     entry_cut_reason,
     has_always_keep_tag,
@@ -154,7 +143,8 @@ def _attach_database(conn: sqlite3.Connection, db_path: Path, alias: str) -> Non
     sql = f"ATTACH DATABASE ? AS {quoted}"
     try:
         conn.execute(
-            sql, (_db_uri_for_readonly(db_path, immutable=_is_static_dictionary_db(db_path)),)
+            sql,
+            (_db_uri_for_readonly(db_path, immutable=_is_static_dictionary_db(db_path)),),
         )
     except Exception:
         conn.execute(sql, (str(Path(db_path)),))
@@ -330,7 +320,12 @@ def _fetch_split_page_form_rows_for_entries(
                 continue
             bucket = out.setdefault(entry_id, [])
             form_key = str(norm_cache.get((form_text, lang_code), "") or "").strip()
-            dedupe_key = (form_text, form_key, morph_tags, str(row["romanization"] or "").strip())
+            dedupe_key = (
+                form_text,
+                form_key,
+                morph_tags,
+                str(row["romanization"] or "").strip(),
+            )
             seen = {
                 (
                     str(item.get("form_text") or "").strip(),
@@ -406,7 +401,9 @@ def _build_pruned_survivor_context_for_alias(
     }
 
 
-def _sort_split_page_promoted_rows(rows: Sequence[dict[str, Any]] | None) -> list[dict[str, Any]]:
+def _sort_split_page_promoted_rows(
+    rows: Sequence[dict[str, Any]] | None,
+) -> list[dict[str, Any]]:
     return sorted(
         list(rows or []),
         key=lambda row: (
@@ -1014,7 +1011,6 @@ def hydrate_winner_refs(
     db_paths: Sequence[str | Path] | None = None,
     sources: list[str] | None = None,
     include_custom_entries: bool = True,
-    trace: bool = False,
 ) -> dict[tuple[str, str, int], dict]:
     def _run() -> dict[tuple[str, str, int], dict]:
         refs_payload: list[dict[str, Any]] = []
@@ -1023,80 +1019,60 @@ def hydrate_winner_refs(
         # Collect form_row_ids per entry for batch form lookup after entry fetch.
         # Key: (storage_kind, db_alias, entry_row_id) -> list of (form_row_id, match_key)
         form_refs_by_entry: dict[tuple[str, str, int], list[tuple[int, str]]] = {}
-        with (
-            trace_scope(
-                "prepare_hydrate_refs",
-                label="Prepare Hydrate Refs",
-                candidate_count=len(list(candidates or [])),
-            )
-            if trace
-            else nullcontext()
-        ):
-            for candidate in list(candidates or []):
-                storage_kind = str(candidate.get("_storage_kind") or "").strip().lower()
-                db_alias = str(candidate.get("_storage_db_alias") or "").strip()
-                entry_row_id = int(candidate.get("_storage_row_id") or 0)
-                match_kind = str(candidate.get("_match_kind") or "headword").strip().lower()
-                match_key = str(
-                    candidate.get("match_key") or candidate.get("_match_key") or ""
-                ).strip()
-                if not storage_kind or not db_alias or entry_row_id <= 0:
-                    continue
-                if storage_kind == "custom":
-                    need_custom = True
-                ekey = (storage_kind, db_alias, entry_row_id)
-                if ekey not in seen_entry_ids:
-                    seen_entry_ids.add(ekey)
-                    refs_payload.append(
-                        {
-                            "storage_kind": storage_kind,
-                            "db_alias": db_alias,
-                            "entry_row_id": entry_row_id,
-                            "match_kind": "headword",
-                            "match_key": match_key,
-                            "form_row_id": 0,
-                        }
-                    )
-                if match_kind == "form":
-                    matched_ids = [
-                        int(raw_id or 0)
-                        for raw_id in list(candidate.get("_matched_form_row_ids") or [])
-                        if int(raw_id or 0) > 0
-                    ]
-                    if not matched_ids:
-                        raw_id = int(candidate.get("_form_row_id") or 0)
-                        if raw_id > 0:
-                            matched_ids = [raw_id]
-                    if matched_ids:
-                        if ekey not in form_refs_by_entry:
-                            form_refs_by_entry[ekey] = []
-                        seen_fids = {fid for fid, _ in form_refs_by_entry[ekey]}
-                        for fid in matched_ids:
-                            if fid not in seen_fids:
-                                form_refs_by_entry[ekey].append((fid, match_key))
-                                seen_fids.add(fid)
+        for candidate in list(candidates or []):
+            storage_kind = str(candidate.get("_storage_kind") or "").strip().lower()
+            db_alias = str(candidate.get("_storage_db_alias") or "").strip()
+            entry_row_id = int(candidate.get("_storage_row_id") or 0)
+            match_kind = str(candidate.get("_match_kind") or "headword").strip().lower()
+            match_key = str(candidate.get("match_key") or candidate.get("_match_key") or "").strip()
+            if not storage_kind or not db_alias or entry_row_id <= 0:
+                continue
+            if storage_kind == "custom":
+                need_custom = True
+            ekey = (storage_kind, db_alias, entry_row_id)
+            if ekey not in seen_entry_ids:
+                seen_entry_ids.add(ekey)
+                refs_payload.append(
+                    {
+                        "storage_kind": storage_kind,
+                        "db_alias": db_alias,
+                        "entry_row_id": entry_row_id,
+                        "match_kind": "headword",
+                        "match_key": match_key,
+                        "form_row_id": 0,
+                    }
+                )
+            if match_kind == "form":
+                matched_ids = [
+                    int(raw_id or 0)
+                    for raw_id in list(candidate.get("_matched_form_row_ids") or [])
+                    if int(raw_id or 0) > 0
+                ]
+                if not matched_ids:
+                    raw_id = int(candidate.get("_form_row_id") or 0)
+                    if raw_id > 0:
+                        matched_ids = [raw_id]
+                if matched_ids:
+                    if ekey not in form_refs_by_entry:
+                        form_refs_by_entry[ekey] = []
+                    seen_fids = {fid for fid, _ in form_refs_by_entry[ekey]}
+                    for fid in matched_ids:
+                        if fid not in seen_fids:
+                            form_refs_by_entry[ekey].append((fid, match_key))
+                            seen_fids.add(fid)
         if not refs_payload:
             return {}
-        with (
-            trace_scope(
-                "resolve_hydrate_sources",
-                label="Resolve Hydrate Sources",
-                refs_payload_count=len(refs_payload),
+        include_custom = bool((include_custom_entries or need_custom) and APP_DB_PATH.exists())
+        if db_paths is not None:
+            paths = [Path(p) for p in db_paths]
+        else:
+            all_paths = _resolve_all_db_paths(lang_code)
+            paths = (
+                _filter_db_paths(all_paths, lang_code, list(sources or []))
+                if sources
+                else all_paths
             )
-            if trace
-            else nullcontext()
-        ):
-            include_custom = bool((include_custom_entries or need_custom) and APP_DB_PATH.exists())
-            if db_paths is not None:
-                paths = [Path(p) for p in db_paths]
-            else:
-                all_paths = _resolve_all_db_paths(lang_code)
-                paths = (
-                    _filter_db_paths(all_paths, lang_code, list(sources or []))
-                    if sources
-                    else all_paths
-                )
-            conn, alias_by_path = _get_aggregate_conn(paths, include_custom_entries=include_custom)
+        conn, alias_by_path = _get_aggregate_conn(paths, include_custom_entries=include_custom)
         db_aliases = [
             alias_by_path[str(Path(p).resolve())]
             for p in paths
@@ -1108,21 +1084,7 @@ def hydrate_winner_refs(
         params: list[Any] = [json.dumps(refs_payload, ensure_ascii=False)]
         if include_custom:
             params.extend([lang_code, lang_code, lang_code])
-        if trace:
-            t0 = time.perf_counter()
-            rows = conn.execute(sql, tuple(params)).fetchall()
-            record_sqlite_query(
-                sql=sql,
-                params=tuple(params),
-                duration_ms=(time.perf_counter() - t0) * 1000.0,
-                row_count=len(rows),
-                db_path="aggregate:"
-                + ",".join(db_aliases + ([_AGGREGATE_CUSTOM_ALIAS] if include_custom else [])),
-                query_kind="hydrate_winner_refs",
-                extra={"candidate_count": len(refs_payload), "lang": lang_code},
-            )
-        else:
-            rows = conn.execute(sql, tuple(params)).fetchall()
+        rows = conn.execute(sql, tuple(params)).fetchall()
 
         split_page_forms_by_ref: dict[tuple[str, str, int], list[dict[str, Any]]] = {}
         split_page_entry_ids_by_alias: dict[str, set[int]] = {}
@@ -1145,59 +1107,52 @@ def hydrate_winner_refs(
                 split_page_forms_by_ref[("sqlite", alias, entry_id)] = form_rows
 
         hydrated: dict[tuple[str, str, int], dict] = {}
-        with (
-            trace_scope(
-                "shape_hydrated_entries", label="Shape Hydrated Entries", row_count=len(rows)
+        for row in rows:
+            ref = (
+                str(row["storage_kind"] or "").strip().lower(),
+                str(row["db_alias"] or "").strip(),
+                int(row["entry_row_id"] or 0),
             )
-            if trace
-            else nullcontext()
-        ):
-            for row in rows:
-                ref = (
-                    str(row["storage_kind"] or "").strip().lower(),
-                    str(row["db_alias"] or "").strip(),
-                    int(row["entry_row_id"] or 0),
+            entry = hydrated.get(ref)
+            if entry is None:
+                split_page_form_rows = split_page_forms_by_ref.get(ref, [])
+                promoted_form = _choose_split_page_promoted_form(
+                    split_page_form_rows,
+                    match_key=str(row["match_key"] or "").strip(),
+                    form_row_id=int(row["form_row_id"] or 0),
                 )
-                entry = hydrated.get(ref)
-                if entry is None:
-                    split_page_form_rows = split_page_forms_by_ref.get(ref, [])
-                    promoted_form = _choose_split_page_promoted_form(
-                        split_page_form_rows,
-                        match_key=str(row["match_key"] or "").strip(),
-                        form_row_id=int(row["form_row_id"] or 0),
-                    )
-                    promoted_headword = str(
-                        promoted_form.get("form_text") or row["headword"] or ""
-                    ).strip()
-                    promoted_romanization = str(
-                        promoted_form.get("romanization") or row["romanization"] or ""
-                    ).strip()
-                    entry = {
-                        "headword": promoted_headword or row["headword"],
-                        "glosses": row["glosses"],
-                        "forms": [],
-                        "romanization": promoted_romanization,
-                        "pos": row["pos"] or "",
-                        "commentary": row["commentary"] or "",
-                        "lemma": row["lemma"] or "",
-                        "source": row["source"] or "",
-                        "entry_id": row["entry_id"] or "",
-                        "tags": row["tags"] or "",
-                        "format": row["format"] or "compact",
-                        "etymology": row["etymology"] or "",
-                        "etymology_number": row["etymology_number"] or 0,
-                        "_storage_kind": ref[0],
-                        "_storage_db_alias": ref[1],
-                        "_storage_row_id": ref[2],
-                        "_storage_form_row_id": 0,
-                        "_match_kind": "headword"
-                        if promoted_form
-                        else str(row["match_kind"] or "").strip().lower(),
-                        "_hydrated": True,
-                        "_matched_forms": [],
-                        "_split_page_promoted": bool(promoted_form),
-                    }
-                    hydrated[ref] = entry
+                promoted_headword = str(
+                    promoted_form.get("form_text") or row["headword"] or ""
+                ).strip()
+                promoted_romanization = str(
+                    promoted_form.get("romanization") or row["romanization"] or ""
+                ).strip()
+                entry = {
+                    "headword": promoted_headword or row["headword"],
+                    "glosses": row["glosses"],
+                    "forms": [],
+                    "romanization": promoted_romanization,
+                    "pos": row["pos"] or "",
+                    "commentary": row["commentary"] or "",
+                    "lemma": row["lemma"] or "",
+                    "source": row["source"] or "",
+                    "entry_id": row["entry_id"] or "",
+                    "tags": row["tags"] or "",
+                    "format": row["format"] or "compact",
+                    "etymology": row["etymology"] or "",
+                    "etymology_number": row["etymology_number"] or 0,
+                    "_storage_kind": ref[0],
+                    "_storage_db_alias": ref[1],
+                    "_storage_row_id": ref[2],
+                    "_storage_form_row_id": 0,
+                    "_match_kind": "headword"
+                    if promoted_form
+                    else str(row["match_kind"] or "").strip().lower(),
+                    "_hydrated": True,
+                    "_matched_forms": [],
+                    "_split_page_promoted": bool(promoted_form),
+                }
+                hydrated[ref] = entry
         # Batch-fetch matched form rows and attach to hydrated entries.
         # Each entry is fetched once; form metadata comes from a single cheap
         # PK-indexed query on the forms table.
@@ -1221,26 +1176,10 @@ def hydrate_winner_refs(
                         qa = '"' + alias.replace('"', '""') + '"'
                         placeholders = ",".join("?" * len(sqlite_fids))
                         form_sql = f"SELECT id, form_text, morph_tags, romanization FROM {qa}.forms WHERE id IN ({placeholders})"
-                        if trace:
-                            form_t0 = time.perf_counter()
-                            frows = conn.execute(
-                                form_sql,
-                                tuple(sqlite_fids),
-                            ).fetchall()
-                            record_sqlite_query(
-                                sql=form_sql,
-                                params=tuple(sqlite_fids),
-                                duration_ms=(time.perf_counter() - form_t0) * 1000.0,
-                                row_count=len(frows),
-                                db_path="aggregate:" + alias,
-                                query_kind="hydrate_form_rows",
-                                extra={"form_row_count": len(sqlite_fids), "lang": lang_code},
-                            )
-                        else:
-                            frows = conn.execute(
-                                form_sql,
-                                tuple(sqlite_fids),
-                            ).fetchall()
+                        frows = conn.execute(
+                            form_sql,
+                            tuple(sqlite_fids),
+                        ).fetchall()
                         for fr in frows:
                             form_row_map[int(fr["id"])] = {
                                 "form_text": str(fr["form_text"] or "").strip(),
@@ -1254,26 +1193,10 @@ def hydrate_winner_refs(
                         f"SELECT id, form_text, morph_tags, romanization FROM {_AGGREGATE_CUSTOM_ALIAS}.custom_dict_forms "
                         f"WHERE id IN ({placeholders})"
                     )
-                    if trace:
-                        form_t0 = time.perf_counter()
-                        frows = conn.execute(
-                            form_sql,
-                            tuple(custom_fids),
-                        ).fetchall()
-                        record_sqlite_query(
-                            sql=form_sql,
-                            params=tuple(custom_fids),
-                            duration_ms=(time.perf_counter() - form_t0) * 1000.0,
-                            row_count=len(frows),
-                            db_path="aggregate:" + _AGGREGATE_CUSTOM_ALIAS,
-                            query_kind="hydrate_custom_form_rows",
-                            extra={"form_row_count": len(custom_fids), "lang": lang_code},
-                        )
-                    else:
-                        frows = conn.execute(
-                            form_sql,
-                            tuple(custom_fids),
-                        ).fetchall()
+                    frows = conn.execute(
+                        form_sql,
+                        tuple(custom_fids),
+                    ).fetchall()
                     for fr in frows:
                         form_row_map[int(fr["id"])] = {
                             "form_text": str(fr["form_text"] or "").strip(),
@@ -1306,7 +1229,15 @@ def hydrate_winner_refs(
         # and same-headword morph variants.  These are the only forms needed
         # for the hydration response — the full inflection table is omitted
         # to keep the payload small and can be lazy-loaded on demand.
-        _SPECIAL_FORM_TAGS = ("hanja", "hangeul", "cjk", "sinitic", "hán-nôm", "han-nom", "hannom")
+        _SPECIAL_FORM_TAGS = (
+            "hanja",
+            "hangeul",
+            "cjk",
+            "sinitic",
+            "hán-nôm",
+            "han-nom",
+            "hannom",
+        )
         _special_tag_clause = " OR ".join(
             f"LOWER(f.morph_tags) LIKE '%{tag}%'" for tag in _SPECIAL_FORM_TAGS
         )
@@ -1328,20 +1259,7 @@ def hydrate_winner_refs(
                     f"   AND ({_special_tag_clause}"
                     f"        OR LOWER(f.form_text) = LOWER(e.headword))"
                 )
-                if trace:
-                    st0 = time.perf_counter()
-                    srows = conn.execute(special_sql, tuple(chunk)).fetchall()
-                    record_sqlite_query(
-                        sql=special_sql,
-                        params=tuple(chunk),
-                        duration_ms=(time.perf_counter() - st0) * 1000.0,
-                        row_count=len(srows),
-                        db_path="aggregate:" + alias,
-                        query_kind="hydrate_special_forms",
-                        extra={"entry_count": len(chunk), "lang": lang_code},
-                    )
-                else:
-                    srows = conn.execute(special_sql, tuple(chunk)).fetchall()
+                srows = conn.execute(special_sql, tuple(chunk)).fetchall()
                 for sr in srows:
                     eid = int(sr["entry_id"])
                     ekey = ("sqlite", alias, eid)
@@ -1378,8 +1296,6 @@ def hydrate_winner_refs(
                 if alias and row_id:
                     note_keys.add((alias, row_id))
             if note_keys:
-                from db import db as le_db
-
                 notes = EntryNote.query.filter(
                     EntryNote.language == lang_code,
                 ).all()
@@ -1403,14 +1319,6 @@ def hydrate_winner_refs(
 
         return hydrated
 
-    if trace:
-        with trace_scope(
-            "hydrate_winner_refs",
-            label="Hydrate Winner Refs",
-            lang=lang_code,
-            candidate_count=len(list(candidates or [])),
-        ):
-            return _run()
     return _run()
 
 

@@ -10,9 +10,6 @@ const isZip = async file => {
     return arr[0] === 0x50 && arr[1] === 0x4b && arr[2] === 0x03 && arr[3] === 0x04
 }
 
-const isCBZ = ({ name, type }) =>
-    type === 'application/vnd.comicbook+zip' || name.endsWith('.cbz')
-
 const isFB2 = ({ name, type }) =>
     type === 'application/x-fictionbook+xml' || name.endsWith('.fb2')
 
@@ -80,11 +77,7 @@ export const makeBook = async file => {
     else if (!file.size) throw new NotFoundError('File not found')
     else if (await isZip(file)) {
         const loader = await makeZipLoader(file)
-        if (isCBZ(file)) {
-            const { makeComicBook } = await import('./comic-book.js')
-            book = makeComicBook(loader, file)
-        }
-        else if (isFBZ(file)) {
+        if (isFBZ(file)) {
             const { makeFB2 } = await import('./fb2.js')
             const { entries } = loader
             const entry = entries.find(entry => entry.filename.endsWith('.fb2'))
@@ -565,13 +558,6 @@ export class View extends HTMLElement {
         for (const list of this.#searchResults.values())
             for (const item of list) this.deleteAnnotation(item)
         this.#searchResults.clear()
-    }
-    async initTTS(granularity = 'word') {
-        const doc = this.renderer.getContents()[0].doc
-        if (this.tts && this.tts.doc === doc) return
-        const { TTS } = await import('./tts.js')
-        this.tts = new TTS(doc, textWalker, range =>
-            this.renderer.scrollToAnchor(range, true), granularity)
     }
     startMediaOverlay() {
         const { index } = this.renderer.getContents()[0]

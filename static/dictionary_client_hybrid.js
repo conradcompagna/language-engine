@@ -9981,55 +9981,9 @@
     });
   }
 
-  function handleLookupDpOnlyRequest(parsedUrl) {
-    // Hybrid version: compact index DP + /js/hydrate. No Trankit needed.
-    var q = String(parsedUrl.searchParams.get("q") || "").trim();
-    var langCode = lookupLangFromUrl(parsedUrl);
-    var lemma = String(parsedUrl.searchParams.get("lemma") || "");
-    var upos = String(parsedUrl.searchParams.get("upos") || "");
-    var xpos = String(parsedUrl.searchParams.get("xpos") || "");
-    if (!q || !langCode) return Promise.resolve(jsonResponse({ ok: false, error: "empty" }, 400));
-    return hybridDpOnlyLookup(q, langCode, { lemma: lemma, upos: upos, xpos: xpos }).then(function(payload) {
-      payload.language = langCode;
-      return jsonResponse(payload, 200);
-    }).catch(function(err) {
-      console.error("[hybrid] lookup_dp_only error:", err);
-      return jsonResponse({ ok: false, error: "hybrid lookup_dp_only failed" }, 500);
-    });
-  }
 
-  function handleSubsegmentsRequest(parsedUrl) {
-    var token = String(parsedUrl.searchParams.get("token") || "").trim();
-    var langCode = lookupLangFromUrl(parsedUrl);
-    var decompose = isTruthyFlag(parsedUrl.searchParams.get("decompose") || "0");
-    if (!token) return Promise.resolve(jsonResponse({ ok: false, error: "empty" }, 400));
-    // Try worker path
-    var wkey = _getActiveWorkerKey(langCode);
-    if (wkey) {
-      return _queryWorker(wkey, {
-        type: "subsegments",
-        token: token,
-        langCode: langCode,
-        decompose: decompose
-      }).then(function(payload) {
-        payload.language = langCode;
-        return jsonResponse(payload, 200);
-      }).catch(function(err) {
-        console.error("Worker subsegments error:", err);
-        return jsonResponse({ ok: false, error: "worker subsegments failed" }, 500);
-      });
-    }
-    // Main-thread fallback
-    return ensureLanguageEngine(langCode, { source: getDictSource(), showProgress: false }).then(function(engine) {
-      if (!engine) return jsonResponse({ ok: false, error: "no dictionary loaded" }, 400);
-      var payload = buildSubsegmentsPayload(token, engine, decompose);
-      payload.language = langCode;
-      return jsonResponse(payload, 200);
-    }).catch(function(err) {
-      console.error("subsegments client error:", err);
-      return jsonResponse({ ok: false, error: "client subsegments failed" }, 500);
-    });
-  }
+
+
 
   function handleLookupRawRequest(parsedUrl) {
     var q = String(parsedUrl.searchParams.get("q") || "").trim();
@@ -10152,7 +10106,7 @@
     var captureId = String(options.debug_capture_id || "").trim();
     var timingNode = (options.debug_timing_node && typeof options.debug_timing_node === "object") ? options.debug_timing_node : null;
     var payload = { lang: langCode, winner_refs: winnerRefs };
-    if (captureId) payload.debug_capture_id = captureId;
+
     var requestStartedAt = timingNode ? perfNowMs() : 0;
     var networkNode = timingNode ? addTimingChild(timingNode, createTimingNode("hydrate_network", "/js/hydrate Network", {
       winner_ref_count: winnerRefs.length
@@ -10566,18 +10520,10 @@
           xpos: parsed.searchParams.get("xpos") || ""
         }).then(function(payload) {
           return jsonResponse(payload, 200);
-        }).catch(function(err) {
-          console.error("[hybrid] lookup_dp_only error:", err);
-          return origFetch(input, init);
         });
       }
 
-      // Intercept /subsegments — pass through to server (unchanged)
-      if (path === "/subsegments") {
-        return origFetch(input, init);
-      }
-
-      // Intercept /lookup — server now returns NLP-only, we do DP + hydrate
+// Intercept /lookup — server now returns NLP-only, we do DP + hydrate
       if (path === "/lookup") {
         var requestMethod = String(
           (init && init.method) ||
@@ -10602,10 +10548,7 @@
           requestParsed = sanskritRewrite.parsedUrl || parsed;
           requestInput = sanskritRewrite.url;
         }
-        var debugTimingRequested = !!(
-          window.LE_DEBUG_COLLECTION_ENABLED &&
-          isTruthyFlag(requestParsed.searchParams.get("debug_capture") || "0")
-        );
+        var debugTimingRequested = false;
         var lookupTimingRoot = debugTimingRequested ? createTimingNode("lookup_total", "Lookup Total", {
           language: jsLang,
           query_length: jsQ.length
