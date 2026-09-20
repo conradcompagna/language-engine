@@ -5,3 +5,11 @@
 *.md text eol=lf
 *.yml text eol=lf
 *.sh text eol=lf
+*.json text eol=lf
+*.tsv text eol=lf
+*.csv text eol=lf
+
+static/vendor/** linguist-vendored
+static/foliate-js/** linguist-vendored
+research/** linguist-documentation
+extras/** linguist-documentation

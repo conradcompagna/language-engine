@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Canonical Document Renderer Test App</title>
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Canonical Document Renderer</h1>
+        <p>Multi-format ingestion → canonical text/block model → paginated render → NLP-ready char ranges</p>
+      </div>
+      <div class="actions">
+        <div class="url-loader">
+          <input id="urlInput" type="url" placeholder="Paste article / text URL" spellcheck="false" />
+          <button id="loadUrl">Load URL</button>
+        </div>
+        <label class="file-button">Open file<input id="fileInput" type="file" accept=".txt,.text,.html,.htm,.xhtml,.md,.markdown,.epub,.docx,.pdf" /></label>
+        <button id="loadSample" class="primary">Load sample</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <aside class="panel">
+        <h2>Document</h2>
+        <div class="panel-content">
+          <div id="status" class="status">Ready.</div>
+          <div id="metadata" style="margin-top:14px"></div>
+          <div class="controls" style="margin-top:14px">
+            <label>Section
+              <select id="sectionSelect"></select>
+            </label>
+            <label>Page size
+              <select id="pageSize">
+                <option value="book">Book page</option>
+                <option value="tablet">Tablet page</option>
+                <option value="compact">Compact page</option>
+              </select>
+            </label>
+            <label>Font size
+              <input id="fontSize" type="range" min="14" max="26" step="1" value="18" />
+            </label>
+            <label>Line height
+              <input id="lineHeight" type="range" min="1.25" max="2.1" step="0.05" value="1.62" />
+            </label>
+          </div>
+        </div>
+      </aside>
+
+      <section class="reader-stage">
+        <div class="page-toolbar">
+          <button id="prevPage">Previous</button>
+          <span id="pageLabel" class="page-label">Page 1 / 1</span>
+          <button id="nextPage">Next</button>
+        </div>
+        <div id="pageHost" class="page-host"></div>
+      </section>
+
+      <aside class="right-rail">
+        <section class="panel">
+          <h2>Current page text slice</h2>
+          <pre id="pageText" class="inspect-box"></pre>
+        </section>
+        <section class="panel">
+          <h2>Demo NLP tokens on page</h2>
+          <div id="tokens" class="token-list"></div>
+        </section>
+        <section class="panel">
+          <h2>Character coordinate sample</h2>
+          <div class="panel-content"><button id="inspectChars">Inspect current page chars</button></div>
+          <pre id="charBoxes" class="inspect-box">Character boxes not inspected yet.</pre>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Browser dependencies. The app keeps adapters separated so these can be pinned/vendor-bundled later. -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.9.0/mammoth.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx-preview@0.3.6/dist/docx-preview.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

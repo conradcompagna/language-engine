@@ -1,0 +1,34 @@
+{
+  "source_dir": "C:\\Users\\conra\\Desktop\\universal\\files",
+  "chapter_info": "C:\\Users\\conra\\Desktop\\universal\\files\\chapter-info.xml",
+  "total_chapters": 15900,
+  "mwt_chapters": 14554,
+  "subset_fraction": 0.1,
+  "selected_chapters": 1455,
+  "train_chapters": 1309,
+  "dev_chapters": 146,
+  "train_text_chapters_written": 1309,
+  "dev_text_chapters_written": 146,
+  "split_rule": {
+    "type": "random_chapter_subset",
+    "random_seed": 1337,
+    "subset_fraction": 0.1,
+    "dev_fraction_within_subset": 0.1
+  },
+  "train_stats": {
+    "sentences": 70355,
+    "token_rows": 532329,
+    "mwt_rows": 100349,
+    "empty_nodes": 0,
+    "blank_head_rows_filled": 526078,
+    "blank_deprel_rows_filled": 526078
+  },
+  "dev_stats": {
+    "sentences": 9349,
+    "token_rows": 67004,
+    "mwt_rows": 13051,
+    "empty_nodes": 0,
+    "blank_head_rows_filled": 66654,
+    "blank_deprel_rows_filled": 66654
+  }
+}

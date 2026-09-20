@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Capture page</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="title">Language Engine Capture</div>
+  </header>
+
+  <section class="page-info">
+    <div id="page-title" class="page-title">(loading…)</div>
+    <div id="page-url" class="page-url"></div>
+  </section>
+
+  <div class="actions">
+    <button id="btn-download" class="primary" type="button">
+      <span class="label">Capture page</span>
+      <span class="hint">save .html</span>
+    </button>
+  </div>
+
+  <section id="status" class="status hidden">
+    <div class="spinner" id="spinner"></div>
+    <div id="status-text"></div>
+  </section>
+
+  <section id="result" class="result hidden">
+    <div id="result-text"></div>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>

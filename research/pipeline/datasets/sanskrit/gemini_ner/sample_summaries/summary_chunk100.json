@@ -1,0 +1,88 @@
+{
+  "chunk": 100,
+  "prefix": "chunk100",
+  "attempt_no": 1,
+  "is_retry": false,
+  "sentence_count": 10,
+  "input_token_rows": 505,
+  "sources": [
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 91
+    },
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 92
+    },
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 93
+    },
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 94
+    },
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 95
+    },
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 96
+    },
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 97
+    },
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 98
+    },
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 99
+    },
+    {
+      "source_file": "unannotatedchild_chunk_010_source_01_sent_0901_1000.bio",
+      "source_sentence": 100
+    }
+  ],
+  "status": "completed",
+  "output_token_rows": 505,
+  "divergence_count": 1,
+  "non_o_rows": 103,
+  "non_o_label_counts": {
+    "SUBSTANCE": 40,
+    "PLANT": 23,
+    "BODY": 14,
+    "FOOD": 9,
+    "DISEASE": 8,
+    "MEDICINE": 4,
+    "GROUP": 3,
+    "TOOL": 1,
+    "ANIMAL": 1
+  },
+  "usage": {
+    "model": "gemini-2.5-flash-lite",
+    "prompt_token_count": 3450,
+    "candidate_token_count": 2666,
+    "total_token_count": 6116,
+    "estimated_input_cost_usd": 0.000345,
+    "estimated_output_cost_usd": 0.0010664000000000001,
+    "estimated_total_cost_usd": 0.0014114000000000002,
+    "raw_usage": {
+      "promptTokenCount": 3450,
+      "candidatesTokenCount": 2666,
+      "totalTokenCount": 6116,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 3450
+        }
+      ],
+      "serviceTier": "standard"
+    }
+  },
+  "validation": "failed",
+  "validation_error": "line 490 token mismatch: expected 'tam', got 'taṃ'"
+}

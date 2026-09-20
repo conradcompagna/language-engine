@@ -1,0 +1,11 @@
+{
+  "category": "customized-ner",
+  "task": "ner",
+  "save_dir": "training\\t",
+  "train_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\lzh_cmag_200k\\train.bio",
+  "dev_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\lzh_cmag_200k\\dev.bio",
+  "embedding": "xlm-roberta-base",
+  "max_epoch": 100,
+  "batch_size": 4,
+  "gpu": true
+}

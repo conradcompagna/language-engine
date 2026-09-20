@@ -1,0 +1,70 @@
+{
+  "dataset": "ang_oedt-ud",
+  "base_dir": "training\\oldeng",
+  "raw_text_source": "reconstructed_from_token_rows_and_misc_spacing",
+  "source_splits": [
+    "train",
+    "dev",
+    "test"
+  ],
+  "output_splits": [
+    "train",
+    "dev"
+  ],
+  "split_strategy": {
+    "type": "document_hash_split",
+    "dev_ratio": 0.1,
+    "unit": "grouped_document"
+  },
+  "grouping_rule": "Use sent_id prefixes as paragraph/document groups. If there are at least four dot-separated parts and the last two are numeric, drop the final two parts; otherwise drop only the final part.",
+  "splits": {
+    "train": {
+      "grouped_conllu": "training\\oldeng\\ang_oedt-ud-train.grouped.conllu",
+      "raw_text": "training\\oldeng\\ang_oedt-ud-train.txt",
+      "lemmafill_conllu": "training\\oldeng\\ang_oedt-ud-train.lemmafill.conllu",
+      "paragraphs": 559,
+      "min_sentences_per_paragraph": 1,
+      "max_sentences_per_paragraph": 172,
+      "avg_sentences_per_paragraph": 4.08,
+      "lemma_backfilled_tokens": 58,
+      "annotation_stats": {
+        "sentences": 2278,
+        "tokens": 44025,
+        "mwt_rows": 0,
+        "empty_nodes": 0,
+        "lemmas": 43967,
+        "upos": 44025,
+        "xpos": 43955,
+        "feats": 44025,
+        "head": 44025,
+        "deprel": 44025,
+        "deps": 0,
+        "misc": 5945
+      }
+    },
+    "dev": {
+      "grouped_conllu": "training\\oldeng\\ang_oedt-ud-dev.grouped.conllu",
+      "raw_text": "training\\oldeng\\ang_oedt-ud-dev.txt",
+      "lemmafill_conllu": "training\\oldeng\\ang_oedt-ud-dev.lemmafill.conllu",
+      "paragraphs": 62,
+      "min_sentences_per_paragraph": 1,
+      "max_sentences_per_paragraph": 210,
+      "avg_sentences_per_paragraph": 8.69,
+      "lemma_backfilled_tokens": 3,
+      "annotation_stats": {
+        "sentences": 539,
+        "tokens": 10630,
+        "mwt_rows": 0,
+        "empty_nodes": 0,
+        "lemmas": 10627,
+        "upos": 10630,
+        "xpos": 10630,
+        "feats": 10630,
+        "head": 10630,
+        "deprel": 10630,
+        "deps": 0,
+        "misc": 1463
+      }
+    }
+  }
+}

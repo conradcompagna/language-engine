@@ -1,0 +1,99 @@
+{
+  "dataset": "wikiann_vi",
+  "created_utc": "2026-05-07T16:57:53Z",
+  "source": "training\\nerdump\\wikiann",
+  "source_members": {
+    "train_source": "training\\nerdump\\wikiann\\train-00000-of-00001 (4).parquet",
+    "dev_source": "training\\nerdump\\wikiann\\validation-00000-of-00001 (4).parquet",
+    "test_source": "training\\nerdump\\wikiann\\test-00000-of-00001 (3).parquet"
+  },
+  "format": "Trankit BIO, one token and one BIO tag per line, blank line between sentences.",
+  "tag_mapping": {
+    "0": "O",
+    "1": "B-PER",
+    "2": "I-PER",
+    "3": "B-ORG",
+    "4": "I-ORG",
+    "5": "B-LOC",
+    "6": "I-LOC"
+  },
+  "split_policy": "train.bio concatenates WikiANN train + test; dev.bio uses WikiANN validation. test.bio is also written separately for audit only.",
+  "splits": {
+    "train": {
+      "sentences": 30000,
+      "tokens": 194406,
+      "tag_counts": {
+        "B-LOC": 11305,
+        "B-ORG": 11068,
+        "B-PER": 11354,
+        "I-LOC": 24895,
+        "I-ORG": 41236,
+        "I-PER": 22770,
+        "O": 71778
+      },
+      "label_token_counts": {
+        "LOC": 36200,
+        "O": 71778,
+        "ORG": 52304,
+        "PER": 34124
+      }
+    },
+    "dev": {
+      "sentences": 10000,
+      "tokens": 64222,
+      "tag_counts": {
+        "B-LOC": 3832,
+        "B-ORG": 3621,
+        "B-PER": 3738,
+        "I-LOC": 8376,
+        "I-ORG": 13607,
+        "I-PER": 7650,
+        "O": 23398
+      },
+      "label_token_counts": {
+        "LOC": 12208,
+        "O": 23398,
+        "ORG": 17228,
+        "PER": 11388
+      }
+    },
+    "test": {
+      "sentences": 10000,
+      "tokens": 64967,
+      "tag_counts": {
+        "B-LOC": 3717,
+        "B-ORG": 3704,
+        "B-PER": 3884,
+        "I-LOC": 8018,
+        "I-ORG": 13562,
+        "I-PER": 7787,
+        "O": 24295
+      },
+      "label_token_counts": {
+        "LOC": 11735,
+        "O": 24295,
+        "ORG": 17266,
+        "PER": 11671
+      }
+    },
+    "all": {
+      "sentences": 40000,
+      "tokens": 258628,
+      "tag_counts": {
+        "B-LOC": 15137,
+        "B-ORG": 14689,
+        "B-PER": 15092,
+        "I-LOC": 33271,
+        "I-ORG": 54843,
+        "I-PER": 30420,
+        "O": 95176
+      },
+      "label_token_counts": {
+        "LOC": 48408,
+        "O": 95176,
+        "ORG": 69532,
+        "PER": 45512
+      }
+    }
+  }
+}

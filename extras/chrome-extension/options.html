@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Language Engine Capture — settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <h1>Capture settings</h1>
+
+  <form id="settings-form">
+    <label class="checkbox">
+      <input id="trigger-lazy" type="checkbox" checked>
+      <span>Scroll the page before capture (helps load lazy images)</span>
+    </label>
+
+    <div class="actions">
+      <button type="submit" class="primary">Save</button>
+      <span id="save-status" class="status"></span>
+    </div>
+  </form>
+
+  <script src="options.js"></script>
+</body>
+</html>

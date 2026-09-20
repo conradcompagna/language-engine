@@ -1,0 +1,119 @@
+{
+  "dataset": "lzh_cmag_1m",
+  "created_utc": "2026-05-03T20:55:36Z",
+  "source": "training\\nerdump\\anc\\AncientChineseProject-main.zip",
+  "source_project": "AncientChineseProject-main/CMAG",
+  "source_members": {
+    "train_pool": "AncientChineseProject-main/CMAG/data_cmag_train.pkl.tar",
+    "dev_test_pool": "AncientChineseProject-main/CMAG/data_cmag_dev.pkl",
+    "unused_original_test": "AncientChineseProject-main/CMAG/data_cmag_test.pkl"
+  },
+  "note": "Original CMAG test pickle was not used because it fails to unpickle locally at byte 1048580. Dev and test here are disjoint deterministic subsets of the original CMAG dev split.",
+  "seed": 20260503,
+  "target_tokens": {
+    "train": 800000,
+    "dev": 100000,
+    "test": 100000,
+    "all": 1000000
+  },
+  "skipped_blank_source_tokens": {
+    "train_pool": 1864,
+    "dev_pool": 592
+  },
+  "label_conversion": "CMAG BEIS tags are converted to BIO: LOC-S/PER-S/OFI-S -> B-*, LOC-E/PER-E/OFI-E -> I-*.",
+  "source_label2id": {
+    "LOC-B": 1,
+    "LOC-E": 2,
+    "LOC-I": 3,
+    "LOC-S": 4,
+    "O": 5,
+    "OFI-B": 6,
+    "OFI-E": 7,
+    "OFI-I": 8,
+    "OFI-S": 9,
+    "PER-B": 10,
+    "PER-E": 11,
+    "PER-I": 12,
+    "PER-S": 13,
+    "[PAD]": 0
+  },
+  "format": "Trankit BIO, one token and one BIO tag per line, blank line between sentences.",
+  "splits": {
+    "train": {
+      "sentences": 36192,
+      "tokens": 800018,
+      "tag_counts": {
+        "B-LOC": 43665,
+        "B-OFI": 9567,
+        "B-PER": 55589,
+        "I-LOC": 40037,
+        "I-OFI": 14769,
+        "I-PER": 53255,
+        "O": 583136
+      },
+      "label_token_counts": {
+        "LOC": 83702,
+        "O": 583136,
+        "OFI": 24336,
+        "PER": 108844
+      }
+    },
+    "dev": {
+      "sentences": 4510,
+      "tokens": 100004,
+      "tag_counts": {
+        "B-LOC": 5474,
+        "B-OFI": 1225,
+        "B-PER": 6752,
+        "I-LOC": 5098,
+        "I-OFI": 1885,
+        "I-PER": 6382,
+        "O": 73188
+      },
+      "label_token_counts": {
+        "LOC": 10572,
+        "O": 73188,
+        "OFI": 3110,
+        "PER": 13134
+      }
+    },
+    "test": {
+      "sentences": 4577,
+      "tokens": 100018,
+      "tag_counts": {
+        "B-LOC": 5647,
+        "B-OFI": 1199,
+        "B-PER": 6807,
+        "I-LOC": 5086,
+        "I-OFI": 1900,
+        "I-PER": 6532,
+        "O": 72847
+      },
+      "label_token_counts": {
+        "LOC": 10733,
+        "O": 72847,
+        "OFI": 3099,
+        "PER": 13339
+      }
+    },
+    "all": {
+      "sentences": 45279,
+      "tokens": 1000040,
+      "tag_counts": {
+        "B-LOC": 54786,
+        "B-OFI": 11991,
+        "B-PER": 69148,
+        "I-LOC": 50221,
+        "I-OFI": 18554,
+        "I-PER": 66169,
+        "O": 729171
+      },
+      "label_token_counts": {
+        "LOC": 105007,
+        "O": 729171,
+        "OFI": 30545,
+        "PER": 135317
+      }
+    }
+  }
+}

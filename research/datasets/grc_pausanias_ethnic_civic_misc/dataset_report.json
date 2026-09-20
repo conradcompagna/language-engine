@@ -1,0 +1,91 @@
+{
+  "dataset": "grc_pausanias_ethnic_civic_misc",
+  "source_variant": "pausanias_grc2_ner_all",
+  "remap_source": "training\\nerdump\\anc\\tlg0525_pausanias_ner_recreated\\pausanias_grc2_ner_all_misc_proposed_remap.tsv",
+  "rule": "Only MISC spans whose full surface_form has proposed_label ETHNIC_CIVIC_GROUP are relabeled; all other MISC stays MISC; existing PER/LOC/O unchanged.",
+  "ethnic_civic_surface_forms": 1210,
+  "splits": {
+    "train": {
+      "source": "training\\nerdump\\anc\\tlg0525_pausanias_ner_recreated\\pausanias_grc2_ner_all_train.conll",
+      "output": "training\\trankit_finerweb_prep\\datasets\\grc_pausanias_ethnic_civic_misc\\train.bio",
+      "sentences": 2483,
+      "tokens": 191653,
+      "tag_counts": {
+        "B-ETHNIC_CIVIC_GROUP": 4749,
+        "B-LOC": 5097,
+        "B-MISC": 1046,
+        "B-PER": 9635,
+        "I-PER": 4,
+        "O": 171122
+      },
+      "entity_token_counts": {
+        "B-ETHNIC_CIVIC_GROUP": 4749,
+        "B-LOC": 5097,
+        "B-MISC": 1046,
+        "B-PER": 9635,
+        "I-PER": 4
+      }
+    },
+    "dev": {
+      "source": "training\\nerdump\\anc\\tlg0525_pausanias_ner_recreated\\pausanias_grc2_ner_all_dev.conll",
+      "output": "training\\trankit_finerweb_prep\\datasets\\grc_pausanias_ethnic_civic_misc\\dev.bio",
+      "sentences": 323,
+      "tokens": 23340,
+      "tag_counts": {
+        "B-ETHNIC_CIVIC_GROUP": 506,
+        "B-LOC": 552,
+        "B-MISC": 99,
+        "B-PER": 1173,
+        "I-PER": 1,
+        "O": 21009
+      },
+      "entity_token_counts": {
+        "B-ETHNIC_CIVIC_GROUP": 506,
+        "B-LOC": 552,
+        "B-MISC": 99,
+        "B-PER": 1173,
+        "I-PER": 1
+      }
+    },
+    "test": {
+      "source": "training\\nerdump\\anc\\tlg0525_pausanias_ner_recreated\\pausanias_grc2_ner_all_test.conll",
+      "output": "training\\trankit_finerweb_prep\\datasets\\grc_pausanias_ethnic_civic_misc\\test.bio",
+      "sentences": 364,
+      "tokens": 28548,
+      "tag_counts": {
+        "B-ETHNIC_CIVIC_GROUP": 668,
+        "B-LOC": 745,
+        "B-MISC": 142,
+        "B-PER": 1228,
+        "O": 25765
+      },
+      "entity_token_counts": {
+        "B-ETHNIC_CIVIC_GROUP": 668,
+        "B-LOC": 745,
+        "B-MISC": 142,
+        "B-PER": 1228
+      }
+    },
+    "all": {
+      "source": "training\\nerdump\\anc\\tlg0525_pausanias_ner_recreated\\pausanias_grc2_ner_all.conll",
+      "output": "training\\trankit_finerweb_prep\\datasets\\grc_pausanias_ethnic_civic_misc\\all.bio",
+      "sentences": 3170,
+      "tokens": 243541,
+      "tag_counts": {
+        "B-ETHNIC_CIVIC_GROUP": 5923,
+        "B-LOC": 6394,
+        "B-MISC": 1287,
+        "B-PER": 12036,
+        "I-PER": 5,
+        "O": 217896
+      },
+      "entity_token_counts": {
+        "B-ETHNIC_CIVIC_GROUP": 5923,
+        "B-LOC": 6394,
+        "B-MISC": 1287,
+        "B-PER": 12036,
+        "I-PER": 5
+      }
+    }
+  }
+}
