@@ -2,7 +2,7 @@
 
 Context: your reader runs Trankit on every `/lookup`. When a user highlights text, Trankit tokenizes it, splits multi-word tokens (MWTs), tags each token with UPOS/XPOS/features, builds a dependency tree, and computes lemmas for dictionary lookup. Each of the knobs below changes one of those stages. When something goes wrong at a stage, the user sees it as a specific kind of visible glitch — wrong segmentation, broken dictionary lookup, a dep-tree that looks disjoint, etc.
 
-Every fix below is a **monkey-patch in your own backend** ([language_registry.py](language_registry.py) or [trankit_mwt_expansion.py](trankit_mwt_expansion.py)). Nothing edits the Trankit install directly, and everything reverts on next restart if you back it out.
+Every fix below is a **monkey-patch in your own backend** ([language_registry.py](../../language_registry.py) or [trankit_mwt_expansion.py](../../trankit_mwt_expansion.py)). Nothing edits the Trankit install directly, and everything reverts on next restart if you back it out.
 
 Items marked **Already done** are wired in your current code. Items marked **Pending** are suggested next steps with user-visible justification.
 
@@ -30,7 +30,7 @@ Cases where the locally-best next character leads nowhere good — greedy commit
 
 ### How to wire it
 
-Your [trankit_mwt_expansion.py:262-312](trankit_mwt_expansion.py#L262-L312) already defines `set_mwt_decoding_headroom(pipeline, max_dec_len=400, beam_size=None)`. You're already calling it from [language_registry.py:645](language_registry.py#L645) but without a beam value. Change:
+Your [trankit_mwt_expansion.py:262-312](../../trankit_mwt_expansion.py) already defines `set_mwt_decoding_headroom(pipeline, max_dec_len=400, beam_size=None)`. You're already calling it from [language_registry.py:645](../../language_registry.py) but without a beam value. Change:
 
 ```python
 applied = set_mwt_decoding_headroom(_trankit_pipeline, max_dec_len=400)
@@ -72,7 +72,7 @@ You already fixed both of these for the MWT side. The lemmatizer has the same pr
 
 ### How to wire it
 
-Add a sibling helper next to `set_mwt_decoding_headroom` in [trankit_mwt_expansion.py](trankit_mwt_expansion.py). Same shape, but walk every `LemmaWrapper` on the pipeline:
+Add a sibling helper next to `set_mwt_decoding_headroom` in [trankit_mwt_expansion.py](../../trankit_mwt_expansion.py). Same shape, but walk every `LemmaWrapper` on the pipeline:
 
 ```python
 def set_lemma_decoding_headroom(pipeline, max_dec_len=400, beam_size=3):
@@ -85,7 +85,7 @@ def set_lemma_decoding_headroom(pipeline, max_dec_len=400, beam_size=3):
     return applied
 ```
 
-Invoke it from [language_registry.py](language_registry.py) right after the MWT call at line 645.
+Invoke it from [language_registry.py](../../language_registry.py) right after the MWT call at line 645.
 
 **Status:** Pending. Same load-time gotcha as MWT: the checkpoint's saved args win on load, so you have to overwrite them *after* the model is loaded, not in `get_args()`.
 
@@ -145,7 +145,7 @@ Consistent preprocessing between training and runtime. Sentence boundaries becom
 
 ### How to wire it
 
-You already have the right patch point: [language_registry.py:582-597](language_registry.py#L582-L597) monkey-patches `wordpiece_tokenize_from_raw_text` for the char-level-tokenize case. Extend that same closure to also do per-language string replacements. Drive it from a new registry field:
+You already have the right patch point: [language_registry.py:582-597](../../language_registry.py) monkey-patches `wordpiece_tokenize_from_raw_text` for the char-level-tokenize case. Extend that same closure to also do per-language string replacements. Drive it from a new registry field:
 
 ```python
 # in LANGUAGE_REGISTRY rows:
@@ -196,7 +196,7 @@ For flagged languages, seq2seq output is always used. User-visible effect: dicti
 
 ### How to wire it
 
-Monkey-patch `LemmaWrapper.predict` (or the internal `edit_word` call) in [language_registry.py](language_registry.py). You already patch `LemmaWrapper.__init__` and `.predict` at lines 548-578 for identity-lemma languages; this is the inverse — languages where you want seq2seq forced ON. Pattern:
+Monkey-patch `LemmaWrapper.predict` (or the internal `edit_word` call) in [language_registry.py](../../language_registry.py). You already patch `LemmaWrapper.__init__` and `.predict` at lines 548-578 for identity-lemma languages; this is the inverse — languages where you want seq2seq forced ON. Pattern:
 
 ```python
 _force_seq2seq_treebanks = {
@@ -233,7 +233,7 @@ Fewer artificial chunks. Fewer split dependency trees. Long paragraphs get treat
 
 ### How to wire it
 
-Monkey-patch `trankit.utils.tbinfo.tbname2max_input_length` at module import time from [language_registry.py](language_registry.py). Pattern:
+Monkey-patch `trankit.utils.tbinfo.tbname2max_input_length` at module import time from [language_registry.py](../../language_registry.py). Pattern:
 
 ```python
 import trankit.utils.tbinfo as _tbinfo
@@ -269,7 +269,7 @@ Chunks get cut at the nearest punctuation/clause boundary instead of at "whateve
 
 ### How to wire it
 
-Monkey-patch the chunking loop in `trankit.iterators.tagger_iterators` from [language_registry.py](language_registry.py) (same patching style you already use for `tokenizer_utils`). Override the piece-level length check so it prefers to break at a punctuation-marked position within the last N pieces of the window.
+Monkey-patch the chunking loop in `trankit.iterators.tagger_iterators` from [language_registry.py](../../language_registry.py) (same patching style you already use for `tokenizer_utils`). Override the piece-level length check so it prefers to break at a punctuation-marked position within the last N pieces of the window.
 
 **Status:** Pending. Most involved fix on the list. Worth doing last, after the easy wins above, and specifically before the app is used heavily for long-paragraph academic texts.
 
@@ -281,9 +281,9 @@ These are wired in your current code, so you don't need to re-do them. Listed so
 
 | Fix | Where it's wired |
 |---|---|
-| MWT decoder length raised to 400 (Sanskrit compounds no longer get truncated) | [language_registry.py:644-645](language_registry.py#L644-L645), [trankit_mwt_expansion.py:262-312](trankit_mwt_expansion.py#L262-L312) |
-| Thai tokenized character-by-character instead of by whitespace | [language_registry.py:582-597](language_registry.py#L582-L597) |
-| Thai + Sanskrit use identity lemmatization (lemma = surface, no broken seq2seq firing) | [language_registry.py:540-578](language_registry.py#L540-L578) |
+| MWT decoder length raised to 400 (Sanskrit compounds no longer get truncated) | [language_registry.py:644-645](../../language_registry.py), [trankit_mwt_expansion.py:262-312](../../trankit_mwt_expansion.py) |
+| Thai tokenized character-by-character instead of by whitespace | [language_registry.py:582-597](../../language_registry.py) |
+| Thai + Sanskrit use identity lemmatization (lemma = surface, no broken seq2seq firing) | [language_registry.py:540-578](../../language_registry.py) |
 
 ---
 
