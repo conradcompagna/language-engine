@@ -1,22 +1,25 @@
-# Status of every training run
+# Historical training-run mapping
 
-Twenty-nine Trankit training runs exist in the development workspace. Ten produced a
-model the deployed service loads. Nineteen did not.
+The tables below preserve the author's development records for 29 Trankit runs,
+including ten reported contributors to the deployed model store. These are historical
+claims, not a fresh inspection of a server. The public repository omits the weights
+and their original run/deployment SHA-256 manifests, so this audit cannot verify
+that mapping. File-size matches alone do not establish identity or deployment.
 
-The labels below are not editorial. They come from
-[`tools/check_provenance.py`](tools/check_provenance.py), which compares every artefact
-a run produced against the deployed model store and reports which are identical. Sizes
-shared by more than two deployed files are discarded as uninformative — those are the
-XLM-R tokenizer checkpoints, which are byte-identical across every language.
+The current [provenance checker](tools/check_provenance.py) labels equal-size files
+as candidates and compares their contents only with `--hash`; unmatched runs are
+unmatched, not automatically abandoned. The status labels below retain the author's
+reported outcomes. See the [evidence index](EVIDENCE.md) for supported conclusions.
 
-Regenerate:
+Recheck against authorized local run and model stores:
+
 
 ```sh
 python research/tools/check_provenance.py \
     --runs <training dir> --deployed <model store>/xlm-roberta-base --hash
 ```
 
-## Shipped
+## Reported shipped
 
 | Run | Shipped as | What it contributed |
 |---|---|---|
@@ -36,7 +39,7 @@ The deployed `sanskrit-vedic` model came from the **DCS** run, not from
 `trankit_save_sa_vedic_v1`. The deployed Tagalog model is **not** `tgl_v2` superseding
 `tgl_v1`: it is v1's tagger and lemmatizer combined with v2's MWT expander.
 
-## Superseded
+## Reported superseded
 
 | Run | Superseded by | Evidence |
 |---|---|---|
@@ -45,7 +48,7 @@ The deployed `sanskrit-vedic` model came from the **DCS** run, not from
 
 Logs: [`experiments/sanskrit-vedic-v1/`](experiments/sanskrit-vedic-v1/).
 
-## Abandoned
+## Reported abandoned
 
 ### Arabic with CAMeL Tools — ten runs, nothing shipped
 

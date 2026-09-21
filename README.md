@@ -6,6 +6,10 @@ I built Language Engine to bring close reading and language research into one wo
 
 [Live application](https://language-engine.ai) · [Setup](docs/SETUP.md) · [Architecture](docs/ARCHITECTURE.md) · [Portfolio](https://github.com/conradcompagna)
 
+![Real reader template with a synthetic local lookup](docs/images/reader-fixture.png)
+
+The fixture uses synthetic responses; full dictionary and neural resources are provisioned separately.
+
 ---
 
 ## What runs in production
@@ -61,8 +65,15 @@ that was tried and dropped.
 
 Two examples of what is documented there: the Sanskrit sandhi splitter, trained as a
 multi-word-token expander over the Digital Corpus of Sanskrit with a deterministic,
-seeded dataset build; and the Sanskrit NER model, trained on a corpus that did not
-exist and was synthesised through 1,852 validated Gemini API jobs for USD 0.60.
+seeded dataset build; and the Sanskrit NER model, trained on a synthetic corpus whose published aggregate records 1,852 Gemini API jobs
+and USD 0.6023 of estimated usage; 1,680 validated BIO job artifacts are recorded.
+These are dataset-generation figures, not held-out NER accuracy.
 
 **[`extras/`](extras/)** — a Chrome extension and a standalone document-renderer test
 harness. Neither is runtime; both stand on their own.
+
+## Development and validation
+
+[Development commands](docs/DEVELOPMENT.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
+
+Start the [local fixture demo](docs/SETUP.md) without private models or account data; review the [research evidence index](research/EVIDENCE.md) for supported ML claims.

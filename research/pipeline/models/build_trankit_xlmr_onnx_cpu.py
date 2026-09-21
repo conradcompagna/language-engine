@@ -8,11 +8,11 @@ This script does not start Flask and does not serve requests. It only:
 2. Exports each active XLM-R + adapter task path to ONNX FP32.
 3. Runs ONNX Runtime transformer graph optimization.
 4. Dynamic-INT8 quantizes the optimized graph.
-5. Writes .trankit_onnx_cache/manifest_dynamic_int8.json.
+5. Writes manifest_dynamic_int8.json to the benchmark ONNX cache (configurable).
 
 Run when the machine is free:
 
-  python build_trankit_xlmr_onnx_cpu.py
+  python research/pipeline/models/build_trankit_xlmr_onnx_cpu.py
 """
 
 from __future__ import annotations
@@ -29,14 +29,14 @@ from typing import Any, Dict, Optional
 
 
 ROOT = Path(__file__).resolve().parent
-CPU_OPT_DEPS_DIR = ROOT / ".trankit_cpu_opt_deps"
-ONNX_DEPS_DIRS = [
-    Path(r"C:\tmp\trankit_onnx_deps_v2"),
-    Path(r"C:\tmp\trankit_onnx_deps"),
-    ROOT / ".trankit_onnx_deps",
-    CPU_OPT_DEPS_DIR,
-]
-ONNX_CACHE_DIR = ROOT / ".trankit_onnx_cache"
+REPO_ROOT = ROOT.parents[2]
+sys.path.insert(0, str(REPO_ROOT))
+# Exporter and benchmark must agree about dependency and output locations.
+from research.evaluation.benchmarks.trankit_benchmark import settings
+
+CPU_OPT_DEPS_DIR = Path(settings.CPU_OPT_DEPS_DIR)
+ONNX_DEPS_DIRS = [Path(path) for path in settings.ONNX_DEPS_DIRS]
+ONNX_CACHE_DIR = Path(settings.ONNX_CACHE_DIR)
 ONNX_MANIFEST_PATH = ONNX_CACHE_DIR / "manifest_dynamic_int8.json"
 ONNX_PROFILE_NAME = "onnxruntime_xlmr_dynamic_int8"
 ONNX_EXPORT_OPSET = 17

@@ -1,7 +1,9 @@
 # Build chains
 
-How each class of artefact the runtime loads was produced. Read a chain top to bottom;
-every step names the script that performs it.
+Historical build chains, recorded during development; labels such as SHIPPED below
+are author-reported outcomes, not SHA-256-verified deployment evidence. See the
+[evidence index](../EVIDENCE.md) and [reproduction guide](../REPRODUCIBILITY.md) for
+what can be checked from this publication.
 
 ---
 
@@ -56,7 +58,8 @@ See experiments/sanskrit-vedic-v1/.
 
 ### 1b. Sanskrit — named entities from a synthetic corpus
 
-There is no Sanskrit NER corpus. I built one with the Gemini API, then trained on it.
+I needed a Sanskrit NER corpus with this project's label inventory and annotation
+conventions, so I built a synthetic corpus with the Gemini API and trained on it.
 
 ```
 DCS MWT subset → train_10k_parent_tokens.conllu
