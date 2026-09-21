@@ -87,6 +87,10 @@ captures/
 /static/*.js.map
 /static/docrender/*.js.map
 /playwright-report/
+/static/reader.css
+/static/pdfjs_viewer.js
+/static/pdfjs_viewer.css
+/static/*.css.map
 uploads/
 /models/
 model-best/

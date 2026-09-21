@@ -4,5 +4,8 @@
   "static/dictionary_client_hybrid.js": "frontend/dictionary/client/index.mjs",
   "static/docrender/web_snapshot_renderer.js": "frontend/documents/snapshot/index.mjs",
   "static/grapheme_pronunciation_profiles.js": "frontend/linguistics/pronunciation/index.mjs",
-  "static/reader.js": "frontend/reader/index.mjs"
+  "static/reader.js": "frontend/reader/index.mjs",
+  "static/reader.css": "frontend/styles/reader.css",
+  "static/pdfjs_viewer.js": "frontend/documents/pdf/index.mjs",
+  "static/pdfjs_viewer.css": "frontend/documents/pdf/viewer.css"
 }

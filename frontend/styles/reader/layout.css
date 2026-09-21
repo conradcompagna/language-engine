@@ -1,0 +1,208 @@
+/* ===================== CONTENT WRAPPER (row for main + side panel) ===================== */
+#leContentWrap {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ===================== MAIN CONTAINER ===================== */
+#main-container {
+  flex: 1;
+  min-width: 0;
+  padding: 24px 64px;
+  overflow-y: visible;
+}
+#main-container.panel-open {
+  margin-right: 0;
+}
+@media (max-width: 1200px) {
+  .left-menu {
+    width: 260px;
+  }
+  .menu-toggle.menu-open {
+    left: 260px;
+  }
+}
+@media (max-width: 900px) {
+  .left-menu {
+    width: 240px;
+  }
+  .menu-toggle.menu-open {
+    left: 240px;
+  }
+}
+@media (max-width: 700px) {
+  .left-menu {
+    width: 280px;
+    max-width: 85vw;
+  }
+  .menu-toggle.menu-open {
+    left: min(280px, 85vw);
+  }
+  #main-container {
+    padding: 24px 44px;
+  }
+}
+
+/* ===================== HERO BANNER (removed) ===================== */
+.hero-banner {
+  display: none;
+}
+
+/* ===================== READER APP ===================== */
+#reader-app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 24px 24px 24px;
+  background: var(--le-white);
+  border-radius: var(--le-radius);
+  box-shadow: var(--le-shadow-lg);
+  border: 1px solid var(--le-slate-100);
+  overflow: visible;
+}
+.reader-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+  color: var(--le-slate-900);
+}
+.reader-subtitle {
+  font-size: 13px;
+  color: var(--le-slate-500);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#display-controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Flashcard button */
+#flashcardModeBtn {
+  background: var(--le-green-500);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--le-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background var(--le-transition);
+}
+#flashcardModeBtn:hover {
+  background: var(--le-green-700);
+}
+/* Legacy dropdown styles */
+.dropdown-section {
+  padding: 6px 0;
+}
+.dropdown-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--le-slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+.dropdown-divider {
+  height: 1px;
+  background: var(--le-slate-100);
+  margin: 6px 0;
+}
+.grammar-overlay-panel {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 8px);
+  left: auto;
+  width: 320px;
+  max-height: 360px;
+  background: var(--le-white);
+  border: 1px solid var(--le-slate-300);
+  border-radius: var(--le-radius-sm);
+  box-shadow: var(--le-shadow-md);
+  padding: 10px;
+  z-index: 1100;
+  overflow-y: auto;
+}
+.grammar-overlay-panel h4 {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--le-slate-900);
+}
+.toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px 0;
+}
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.toggle-label:hover {
+  background: var(--le-green-50);
+}
+.toggle-label input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--le-green-500);
+}
+.toggle-label input[type='number'] {
+  margin-left: auto;
+  width: 56px;
+  padding: 2px 6px;
+  font-size: 12px;
+  border: 1px solid var(--le-slate-300);
+  border-radius: 4px;
+  color: var(--le-slate-700);
+  background: var(--le-slate-100);
+  text-align: right;
+}
+.toggle-label span {
+  font-size: 13px;
+  color: var(--le-slate-700);
+}
+.toggle-label.threshold-setting {
+  flex-wrap: nowrap;
+}
+.toggle-label.threshold-setting input[type='number'] {
+  margin-left: auto;
+}
+.setting-explanation {
+  font-size: 11px;
+  color: var(--le-slate-500);
+  padding: 4px 8px 6px 8px;
+  line-height: 1.4;
+}
+.reset-btn {
+  margin-left: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  border: 1px solid var(--le-slate-300);
+  background: var(--le-slate-100);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--le-slate-500);
+  transition: all var(--le-transition);
+}
+.reset-btn:hover {
+  background: var(--le-green-50);
+  border-color: var(--le-green-300);
+  color: var(--le-green-700);
+}

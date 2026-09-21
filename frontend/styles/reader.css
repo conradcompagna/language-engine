@@ -1,0 +1,17 @@
+/* Cascade order is intentional: feature styles retain their original order. */
+@import './reader/theme.css';
+@import './reader/sidebar.css';
+@import './reader/layout.css';
+@import './reader/documents.css';
+@import './reader/controls.css';
+@import './reader/tokens.css';
+@import './reader/dictionary-panel.css';
+@import './reader/synthetic-entry.css';
+@import './reader/dictionary-entries.css';
+@import './reader/popups.css';
+@import './reader/flashcards.css';
+@import './reader/linguistic-controls.css';
+@import './reader/assistant.css';
+@import './reader/annotations.css';
+@import './reader/entry-actions.css';
+@import './reader/entry-editor.css';

@@ -125,3 +125,26 @@ test('dictionary bundles support classic worker imports and correlated queries',
   expect(result.payload.found).toBe(true);
   expect(result.error).toBeUndefined();
 });
+
+test('PDF viewer loads a synthetic document, publishes readiness and finds text', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    window.fixtureMessages = [];
+    window.addEventListener('message', (event) => {
+      if (event.data?.source === 'pdfjs-iframe') window.fixtureMessages.push(event.data);
+    });
+  });
+  await page.goto('/static/pdfjs_iframe_viewer.html?pdf_url=%2Ffixture.pdf&session_id=fixture');
+  await page.waitForFunction(() => window.fixtureMessages.some((message) => message.type === 'pdfjs-ready'));
+  await expect(page.locator('#pageCornerBadge')).toContainText('1 / 1');
+  await page.locator('#pdfSearchInput').fill('books');
+  await page.locator('#pdfSearchInput').press('Enter');
+  await expect(page.locator('#pdfSearchCount')).toContainText('1');
+  const messages = await page.evaluate(() => window.fixtureMessages);
+  expect(messages.find((message) => message.type === 'pdfjs-ready')).toMatchObject({
+    sessionId: 'fixture',
+    numPages: 1
+  });
+  expect(errors).toEqual([]);
+});

@@ -1,0 +1,401 @@
+/* ===================== OUTPUT AREA ===================== */
+.reader-output {
+  --reader-effect-overflow: 72px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--le-radius);
+  border: 1px solid var(--le-slate-100);
+  background: var(--le-white);
+  min-height: 140px;
+  font-size: 18px;
+  line-height: 2.2;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  font-family:
+    'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans Myanmar', 'Myanmar Text', system-ui,
+    sans-serif;
+  position: relative;
+  color: var(--le-slate-900);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top center;
+  overflow: visible;
+  overflow-clip-margin: var(--reader-effect-overflow);
+}
+.reader-output.orig-view-bg {
+  background-color: var(--le-slate-100);
+  min-height: auto;
+}
+/* Original view positioned layout */
+.orig-view-positioned {
+  padding: 0 !important;
+  background: transparent !important;
+}
+.positioned-segments-container {
+  font-family:
+    'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans Myanmar', 'Myanmar Text', system-ui,
+    sans-serif;
+}
+/* Structured flowing text layout */
+.orig-view-structured {
+  padding: 0 !important;
+  background: transparent !important;
+}
+.structured-text-container {
+  font-family:
+    'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans Myanmar', 'Myanmar Text', system-ui,
+    sans-serif;
+  font-size: 16px;
+  color: #1f2937;
+}
+.structured-text-container .text-block {
+  margin-bottom: 0.5em;
+}
+.structured-text-container .text-line {
+  margin: 0;
+  padding: 0;
+}
+.structured-text-container .pdf-raw-word {
+  display: inline;
+  cursor: default;
+  border-radius: 2px;
+  padding: 1px 0;
+}
+.structured-text-container .pdf-raw-word:hover {
+  background-color: transparent;
+}
+.structured-text-container .reader-token:hover {
+  background-color: rgba(64, 145, 108, 0.12);
+}
+.structured-text-container .pdf-raw-word.seg-known {
+}
+.structured-text-container .pdf-raw-word.seg-unknown {
+  background-color: transparent;
+  border-bottom: none;
+}
+.pdfjs-textlayer-container {
+  position: relative;
+  overflow: auto;
+  background: var(--le-white);
+  border: 1px solid var(--le-slate-100);
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 100%;
+}
+.pdfjs-textlayer-host {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+}
+.pdfjs-textlayer-host .textLayer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 1;
+  line-height: 1;
+}
+.pdfjs-textlayer-host .pdfjs-textlayer-clone > span {
+  position: absolute;
+  white-space: pre;
+  transform-origin: 0 0;
+  line-height: 1;
+}
+.pdfjs-textlayer-host .pdfjs-textlayer-clone > span .reader-token {
+  position: static;
+  transform: none;
+}
+.pdfjs-textlayer-host .pdfjs-textlayer-clone span {
+  color: #111827 !important;
+}
+.positioned-token {
+  font-family: inherit;
+  position: absolute !important;
+  z-index: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+.positioned-token:hover {
+  z-index: 1 !important;
+  transform: none !important;
+}
+.dep-tree-view {
+  margin-top: 16px;
+}
+.reader-output-placeholder {
+  color: var(--le-slate-500);
+  font-size: 13px;
+}
+
+/* ===================== TOKENS ===================== */
+.reader-token {
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+.reader-token:hover {
+  z-index: 20;
+}
+.reader-token.reader-punct {
+  cursor: default;
+}
+.reader-token.reader-punct:hover {
+  background: transparent !important;
+}
+.reader-token.grammar-token {
+  font-weight: inherit;
+}
+.reader-token.unknown-token {
+  color: inherit;
+}
+.docx-preview-host .reader-token.unknown-token {
+  color: inherit !important;
+}
+#renderedText .reader-token.unknown-token {
+  color: inherit !important;
+}
+#renderedText .reader-token.unknown-token * {
+  color: inherit !important;
+}
+.reader-token.pos-tagged {
+  border-radius: 2px;
+}
+
+/* ===================== UD DEPENDENCY VISUALIZATION ===================== */
+#ud-svg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 30;
+  overflow: visible !important;
+}
+.ud-dep-line {
+  stroke: #6366f1;
+  stroke-width: 1.4;
+  fill: none;
+  opacity: 0.8;
+}
+.ud-dep-line.root-line {
+  stroke: #dc2626;
+  stroke-width: 1.75;
+}
+.ud-dep-line.child-line {
+  stroke: #e67e22;
+  stroke-width: 1.4;
+  opacity: 0.8;
+}
+.ud-dep-arrow {
+  fill: #6366f1;
+}
+.ud-dep-arrow.root-arrow {
+  fill: #dc2626;
+}
+.ud-dep-arrow.child-arrow {
+  fill: #e67e22;
+}
+#phrase-boundary-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.phrase-boundary {
+  position: absolute;
+  border: none;
+  border-bottom: 5px solid transparent;
+  box-sizing: border-box;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+.hover-reticle {
+  position: absolute;
+  border: 1px solid #000000;
+  border-radius: 2px;
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 40;
+}
+.hover-reticle-token {
+  outline: 1px solid #000000 !important;
+  outline-offset: 0 !important;
+  border-radius: 2px;
+}
+.reader-token-fill-hit.hover-reticle-token {
+  outline: 1px solid #000000 !important;
+  outline-offset: 0 !important;
+  border-radius: 2px;
+}
+.docx-preview-host .hover-reticle-token {
+  outline: 1px solid #000000 !important;
+  outline-offset: 0 !important;
+  box-shadow: 0 0 0 1px #000000 !important;
+  border-radius: 2px !important;
+}
+.phrase-boundary-batch {
+  position: absolute;
+  border: none;
+  border-bottom: 5px solid;
+  box-sizing: border-box;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+.reader-token.ud-highlight {
+  outline: 2px solid #6366f1;
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+.reader-token.ud-highlight-parent {
+  outline: 2px solid #e67e22;
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+.reader-token.ud-highlight-child {
+  outline: 2px solid #6366f1;
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+.reader-token.ud-root-highlight {
+  outline: 2px solid #dc2626;
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+.reader-token.ud-tagged {
+  border-bottom: 2px dotted #6366f1;
+}
+/* Chunk highlighting */
+.reader-token.chunk-member {
+  position: relative;
+}
+.reader-token.chunk-head::before {
+  content: attr(data-chunk-pos);
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+.reader-token.chunk-active {
+}
+.chunk-pos-tag {
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  text-transform: lowercase;
+}
+/* UD info badge in popup */
+.ud-info-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  margin: 2px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  background: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+.ud-info-badge.upos {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+.ud-info-badge.dep {
+  background: #dbeafe;
+  color: #1e40af;
+  border-color: #93c5fd;
+}
+.ud-info-badge.root {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+.popup-ud-section {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--le-slate-100);
+}
+.popup-ud-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--le-slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+/* ===================== NER OVERLAY ===================== */
+#ner-hover-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 6;
+  overflow: visible;
+}
+.ner-label {
+  position: absolute;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: #3b82f6;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+  --ner-tail-x: 50%;
+  --ner-tail-h: 5px;
+}
+.ner-label::after {
+  content: '';
+  position: absolute;
+  left: var(--ner-tail-x, 50%);
+  bottom: calc(-1 * var(--ner-tail-h, 5px));
+  width: 2px;
+  height: var(--ner-tail-h, 5px);
+  background: inherit;
+  border-radius: 1px;
+  transform: translateX(-50%);
+}
+.ner-caliper {
+  position: absolute;
+  pointer-events: none;
+  border-style: solid;
+  border-width: 2px 2px 0 2px;
+  border-color: #3b82f6;
+  border-radius: 2px 2px 0 0;
+  opacity: 0.9;
+}
