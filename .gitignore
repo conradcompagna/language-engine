@@ -74,6 +74,8 @@ postprocessed/
 outputs/
 exports/
 captures/
+!language_engine/captures/
+!language_engine/captures/*.py
 uploads/
 /models/
 model-best/
