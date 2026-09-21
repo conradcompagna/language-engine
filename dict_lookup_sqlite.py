@@ -1354,9 +1354,6 @@ def _normalize_keys_via_js(pairs: list[tuple[str, str]]) -> dict[tuple[str, str]
     return out
 
 
-def _is_korean_language_code(lang_code: str) -> bool:
-    lang = (lang_code or "").strip().lower()
-    return lang == "ko" or lang == "korean" or lang.startswith("ko-")
 
 
 def _iter_custom_forms(
