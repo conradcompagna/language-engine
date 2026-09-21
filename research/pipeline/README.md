@@ -92,13 +92,12 @@ DCS MWT subset → train_10k_parent_tokens.conllu
 Run cost and volume: 1,852 jobs against `gemini-2.5-flash-lite`, 3,107,852 prompt
 tokens, 728,721 output tokens, 3,836,573 total, USD 0.60. Recorded in
 [`datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json`](datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json);
-per-wave progress with pass/fail counts and running cost is in
-[`logs/batch_progress.tsv`](datasets/sanskrit/gemini_ner/logs/batch_progress.tsv).
+per-wave progress logs are not redistributed in this repository.
 
 The label set was derived from the corpus rather than imported: 19 tags including
 DEITY, RITUAL, SUBSTANCE, PLANT, DISEASE, BODY, MEASURE, ASTRO and PROCEDURE, which is
-what Sanskrit śāstra literature actually contains. Counts are in
-[`final/tag_counts.tsv`](datasets/sanskrit/gemini_ner/final/tag_counts.tsv).
+what Sanskrit śāstra literature actually contains. The per-tag count TSV is not
+redistributed; published aggregate usage is linked above.
 
 ### 1c. Other trained languages
 

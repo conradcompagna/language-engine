@@ -13,3 +13,5 @@ static/vendor/** linguist-vendored
 static/foliate-js/** linguist-vendored
 research/** linguist-documentation
 extras/** linguist-documentation
+
+*.training text eol=lf

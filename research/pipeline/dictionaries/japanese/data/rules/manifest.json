@@ -1,0 +1,207 @@
+{
+  "schema": 1,
+  "kind": "json-families",
+  "original": "jp_tokenized_pipeline_morphology_ruleset_v2_bundle.json",
+  "original_sha256": "ffea498e6054b8d847c976cc7227a28d8a0169acf09bdf40bbfc0f29278235d1",
+  "original_bytes": 209960,
+  "entries": [
+    {
+      "key": "metadata",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "metadata.json",
+          "sha256": "30bc4ab6535f7005c886e7ab85db09d93b31d36bcddd7c460a4745b178afc2ce",
+          "bytes": 3192
+        }
+      ]
+    },
+    {
+      "key": "orthography_rules",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "orthography_rules.json",
+          "sha256": "8799988270ddaa63cea029cb4c51fb47c7c6deed8d31d6c5793d81697c530b5d",
+          "bytes": 10781
+        }
+      ]
+    },
+    {
+      "key": "godan_row_map",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "godan_row_map.json",
+          "sha256": "8220bde647f72ad193a07c301a0bcfe718bc3b2b00340e3bd5380dd199b94df6",
+          "bytes": 2472
+        }
+      ]
+    },
+    {
+      "key": "base_generation_rules",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "base_generation_rules.json",
+          "sha256": "505aae3bc941325a86107e11e6e247cfaa646dcbae1f2d62a82e2511ba7077d2",
+          "bytes": 49899
+        }
+      ]
+    },
+    {
+      "key": "token_morph_rules",
+      "combine": "list",
+      "parts": [
+        {
+          "path": "token_morph/01-verb.json",
+          "sha256": "4459217346b31386ea71fd17e3b391a6d8b12b94be3e54d4931db258398f68b9",
+          "bytes": 36441
+        },
+        {
+          "path": "token_morph/02-adj.json",
+          "sha256": "69afa2b83a6a165643b376f92748ef9a167e866548e475bc9ba09584b6bbfa4f",
+          "bytes": 4394
+        },
+        {
+          "path": "token_morph/03-cop.json",
+          "sha256": "3fe271cb9983ac31da69190c5a1c8e932544059b6c6f188ce987f3a3ddf95faf",
+          "bytes": 3712
+        },
+        {
+          "path": "token_morph/04-adj.json",
+          "sha256": "dc99c68b6a607a95062aaf4750d720f96e2d9435513ac93f6b64ce5d713b9dd0",
+          "bytes": 1070
+        },
+        {
+          "path": "token_morph/05-aux.json",
+          "sha256": "7c03d4cfd5b9e2e98e74e88b9d7e878add980c338af5ca7e51be4f35e1c73fe0",
+          "bytes": 6039
+        },
+        {
+          "path": "token_morph/06-cop.json",
+          "sha256": "d955cc654c70bb8dbe02a43a7410780028893e0fa02ff9add8cc4ff353e6987a",
+          "bytes": 1071
+        },
+        {
+          "path": "token_morph/07-aux.json",
+          "sha256": "4c88d55d330fa44e3a0ca84effc8a04c27bed18cde5296a7bbc8c75bc40c825f",
+          "bytes": 3205
+        },
+        {
+          "path": "token_morph/08-part.json",
+          "sha256": "832a40d2c0392a27e625391ddb04349b50a43a5bf475ce71cd2226306ca3772f",
+          "bytes": 1073
+        },
+        {
+          "path": "token_morph/09-aux.json",
+          "sha256": "d8af7039b24be987e6e0f0300551b95a9f03cab4bea66ff3fb99bc2183b02b07",
+          "bytes": 6541
+        },
+        {
+          "path": "token_morph/10-part.json",
+          "sha256": "b67dd577e2900a6e69b37fcae2b949da2aa74fde28518c25fc611d72426cb1f2",
+          "bytes": 522
+        },
+        {
+          "path": "token_morph/11-aux.json",
+          "sha256": "8661d90bd202bb51d2d246c8f28deac9f92af317efded83cbea22089b2cbbabe",
+          "bytes": 3021
+        },
+        {
+          "path": "token_morph/12-part.json",
+          "sha256": "60792df6b40635df43edf963162dcb26fd5a83f2bfe26e45da09995f326e01db",
+          "bytes": 2024
+        }
+      ]
+    },
+    {
+      "key": "morpheme_allomorph_map",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "morpheme_allomorph_map.json",
+          "sha256": "91a65c44f0fe7884508ffa2a3ce5bd1453805d34ab8d0471b8e1f41066014974",
+          "bytes": 33157
+        }
+      ]
+    },
+    {
+      "key": "ambiguity_resolution",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "ambiguity_resolution.json",
+          "sha256": "de71796e57c965c0a1d8e622d812803ccc9518b80eda3d72ed8c4c6ddc130a38",
+          "bytes": 5018
+        }
+      ]
+    },
+    {
+      "key": "lexical_exceptions",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "lexical_exceptions.json",
+          "sha256": "5399a3995fd806d972cae3447ffed07c5ddc8e0db840ed89e6b26d229df37990",
+          "bytes": 4477
+        }
+      ]
+    },
+    {
+      "key": "normalization_aliases",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "normalization_aliases.json",
+          "sha256": "f59e419c32cbc3089175f2f5b4cd044c4b4e82f04ac1146e950af874687c11d8",
+          "bytes": 2964
+        }
+      ]
+    },
+    {
+      "key": "attachment_states",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "attachment_states.json",
+          "sha256": "6204c69cd21aad8181d4f758c0e682127da8c7ae692d1a2471bb04204e2f8215",
+          "bytes": 3572
+        }
+      ]
+    },
+    {
+      "key": "attachment_edges",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "attachment_edges.json",
+          "sha256": "7c6b27242eec39703c58b9f8f4b3254d0bd8d4d3c5a39287bc2826b42c7f1764",
+          "bytes": 7060
+        }
+      ]
+    },
+    {
+      "key": "contraction_rules",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "contraction_rules.json",
+          "sha256": "badb502caab33106271bfe8e68ffb3f4abb4a458110601e0498258ab9bf65f74",
+          "bytes": 1976
+        }
+      ]
+    },
+    {
+      "key": "validation_examples",
+      "combine": "single",
+      "parts": [
+        {
+          "path": "validation_examples.json",
+          "sha256": "f58fdb73a46ab8641f80eb809b6f114686419b1a4c28b3cf174998573ff45793",
+          "bytes": 3329
+        }
+      ]
+    }
+  ]
+}

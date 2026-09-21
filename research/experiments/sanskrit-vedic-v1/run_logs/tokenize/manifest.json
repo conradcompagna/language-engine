@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "text-concat",
+  "original": "tokenize.training",
+  "original_sha256": "a1bc7c29adcf62428f24b2bf103aca89bb7e7eef87f472803710460246e4ecfc",
+  "original_bytes": 163256,
+  "entries": [
+    {
+      "path": "epoch-00.training",
+      "sha256": "5c795fa9b8384c411470a6499fcfd66a0e6c2975cb807bec6db5be0da3bd02a7",
+      "bytes": 23033,
+      "epoch": 0,
+      "first_line": 1,
+      "last_line": 451
+    },
+    {
+      "path": "epoch-01.training",
+      "sha256": "2445af2034990d69a4c2f8ab6514b644dd6d86d2b94404976f987e43c03e897c",
+      "bytes": 23255,
+      "epoch": 1,
+      "first_line": 452,
+      "last_line": 902
+    },
+    {
+      "path": "epoch-02.training",
+      "sha256": "7d9da6851dfaa11fdd97d8432b67865257e426de0ff43695e0fbee258bdf2ca4",
+      "bytes": 23240,
+      "epoch": 2,
+      "first_line": 903,
+      "last_line": 1353
+    },
+    {
+      "path": "epoch-03.training",
+      "sha256": "1a280f512bbb3a4e4d8911da0bd947c2d8f01fff28c4031063ea5f81a9709c9d",
+      "bytes": 23301,
+      "epoch": 3,
+      "first_line": 1354,
+      "last_line": 1804
+    },
+    {
+      "path": "epoch-04.training",
+      "sha256": "858b5dc3dd0215302efc52725b8768595241538fedfb02b3329dc0c850cd5aad",
+      "bytes": 23336,
+      "epoch": 4,
+      "first_line": 1805,
+      "last_line": 2255
+    },
+    {
+      "path": "epoch-05.training",
+      "sha256": "5fab6dc439925671caca76c4e6f8795c17fa78e932b3a0a263fe01f01aa63c0c",
+      "bytes": 23352,
+      "epoch": 5,
+      "first_line": 2256,
+      "last_line": 2706
+    },
+    {
+      "path": "epoch-06.training",
+      "sha256": "caa831d53af30ed308dd8d4b466da8d5c64413eb8c571cea55ae1a888f3a0073",
+      "bytes": 23408,
+      "epoch": 6,
+      "first_line": 2707,
+      "last_line": 3157
+    },
+    {
+      "path": "epoch-07.training",
+      "sha256": "00749da9ed31655b9d93da2973106699efdd312e383c358119042958e37e3918",
+      "bytes": 331,
+      "epoch": 7,
+      "first_line": 3158,
+      "last_line": 3164
+    }
+  ]
+}

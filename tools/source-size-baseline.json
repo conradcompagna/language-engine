@@ -1,9 +1,6 @@
 {
   "gemini_dict.py": 3297,
   "research/evaluation/benchmarks/trankit_dual_device_benchmark_app.py": 6092,
-  "research/evaluation/reports/grc_lsj_vs_wiktionary_samples.md": 3430,
-  "research/experiments/sanskrit-vedic-v1/run_logs/tokenize.training": 3164,
-  "research/pipeline/dictionaries/japanese/data/jp_tokenized_pipeline_morphology_ruleset_v2_bundle.json": 6347,
   "router.py": 3856,
   "static/TRANKIT_TAGS.js": 3279,
   "static/dictionary_client_hybrid.js": 11174,
