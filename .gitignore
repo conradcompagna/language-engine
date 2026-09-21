@@ -76,6 +76,17 @@ exports/
 captures/
 !language_engine/captures/
 !language_engine/captures/*.py
+
+# Reproducible browser bundles; maintained modules are in frontend/.
+/static/reader.js
+/static/dictionary_client_hybrid.js
+/static/dictionary_engine_hybrid.js
+/static/TRANKIT_TAGS.js
+/static/grapheme_pronunciation_profiles.js
+/static/docrender/web_snapshot_renderer.js
+/static/*.js.map
+/static/docrender/*.js.map
+/playwright-report/
 uploads/
 /models/
 model-best/

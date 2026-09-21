@@ -1,12 +1,6 @@
 {
   "research/evaluation/benchmarks/trankit_dual_device_benchmark_app.py": 6092,
   "router.py": 3856,
-  "static/TRANKIT_TAGS.js": 3279,
-  "static/dictionary_client_hybrid.js": 11174,
-  "static/dictionary_engine_hybrid.js": 3057,
-  "static/docrender/web_snapshot_renderer.js": 2572,
-  "static/grapheme_pronunciation_profiles.js": 2529,
   "static/pdfjs_iframe_viewer.html": 2029,
-  "static/reader.css": 4784,
-  "static/reader.js": 31440
+  "static/reader.css": 4784
 }
