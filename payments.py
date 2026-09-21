@@ -93,8 +93,8 @@ def create_checkout():
         mode="subscription",
         metadata={"user_id": str(current_user.id), "billing": billing},
         subscription_data={"metadata": {"user_id": str(current_user.id), "billing": billing}},
-        success_url=_public_url("account_page") + "?payment=success",
-        cancel_url=_public_url("account_page") + "?payment=canceled",
+        success_url=_public_url("pages.account_page") + "?payment=success",
+        cancel_url=_public_url("pages.account_page") + "?payment=canceled",
     )
 
     return jsonify({"ok": True, "url": checkout_session.url})
@@ -201,11 +201,11 @@ def portal():
     stripe = _get_stripe()
 
     if not current_user.stripe_customer_id:
-        return redirect(url_for("account_page"))
+        return redirect(url_for("pages.account_page"))
 
     portal_session = stripe.billing_portal.Session.create(
         customer=current_user.stripe_customer_id,
-        return_url=_public_url("account_page"),
+        return_url=_public_url("pages.account_page"),
     )
     return redirect(portal_session.url)
 

@@ -19,12 +19,34 @@ flowchart LR
 
 ## Application boundaries
 
+`language_engine.application.create_app()` composes the Flask application; importing
+the factory does not initialize a database or load a model. `router.py` and
+`wsgi.py` retain the server entrypoints and use production initialization defaults.
+`language_engine/database.py` contains the existing compatibility migrations.
+
+`language_engine/http/` separates lookup, dictionary indexes/downloads, hydration
+serializers, custom entries, notes/decomposition, quotas, pages and startup.
+HTTP URLs and response shapes remain compatible; Flask endpoint names now include
+their blueprint (for example, `pages.account_page`). The paid-feature gate checks
+the endpoint's function name after removing that prefix.
+
+Tests pass `prepare_database=False` and `load_resources=False`, create an isolated
+SQLite database, and inject `nlp_runner` when exercising lookup. A `resource_loader`
+callback can replace production initialization. The production language registry
+and immutable dictionary index version maps remain process-wide shared caches;
+factories are not a way to run incompatible model registries in one process.
+
 `auth.py`, `payments.py`, and `db.py` implement identity, subscription state, and persistence. `api_services.py` and `gemini_dict.py` enforce usage budgets around contextual assistance and generated dictionary entries.
 
 Dictionary-only lookups run in the browser through the shared hybrid engine; the server hydrates the selected entries.
 
 ## Repository layout
 
-The root contains the application modules. `static/` and `templates/` contain the browser interface; `deploy/` contains hosting templates. `tools/normalize_keys.js` supplies runtime key normalization. Models and dictionary data are provisioned separately.
+The root retains server compatibility entrypoints and existing focused services.
+`language_engine/` owns HTTP composition, capture security and Gemini task services.
+`frontend/` contains maintained browser modules and ordered stylesheets; `npm run
+build` produces the existing public URLs in `static/`. `templates/` contains the
+HTML interface; `deploy/` contains hosting templates. `tools/normalize_keys.js`
+supplies runtime key normalization. Models and dictionary data are provisioned separately.
 
 `static/foliate-js/` contains the ebook renderer and its browser dependencies. `static/docrender/lookup_chunks.js` groups page geometry into paragraph boundaries during PDF and web-snapshot extraction.
