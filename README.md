@@ -60,7 +60,7 @@ that was tried and dropped.
 | [`research/pipeline/`](research/pipeline/) | Model training, dataset construction, dictionary building, NER taxonomy derivation. |
 | [`research/evaluation/`](research/evaluation/) | Regression test, benchmarks, latency measurements, dictionary and corpus audits. |
 | [`research/experiments/`](research/experiments/) | Six lines of work that did not ship, each with an `OUTCOME.md` explaining why. |
-| [`research/notes/`](research/notes/) | Sixteen design and architecture documents written during development. |
+| [`research/notes/`](research/notes/) | Design and architecture documents written during development. |
 | [`research/datasets/`](research/datasets/), [`research/models/`](research/models/) | Dataset cards and training configurations for 29 model runs. No corpora, no weights. |
 
 Two examples of what is documented there: the Sanskrit sandhi splitter, trained as a

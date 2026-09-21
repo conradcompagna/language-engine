@@ -18,6 +18,26 @@ swapped. It passes against the current runtime.
 | `benchmarks/run_crusades_comparison.py`, `analyze_comparison.py`, `realign_comparison.py` | end-to-end pipeline comparison on a fixed historical text |
 | `benchmarks/tag_overlap_analysis.py` | agreement between tagsets across models |
 
+### ONNX session tuning
+
+After building the shared INT8 encoder, the
+[session tuner](../pipeline/models/tune_trankit_onnx_ort_session.py) compared thread
+counts, execution mode, and memory settings on the same Japanese request. The
+selected configuration used sequential execution, eight intra-op threads, one
+inter-op thread, and disabled memory patterns.
+
+| Configuration | Timed requests (seconds) | Mean (seconds) |
+|---|---|---:|
+| ORT defaults | 1.914, 1.896 | 1.905 |
+| Selected session settings | 0.906, 0.906 | 0.906 |
+
+The [recorded measurements](results/ort_session_tuning_excerpt.json) preserve the
+exact timings, profiles, matching annotation fingerprints, CPU/runtime versions,
+and original report hash. The input contained 620 characters and produced 351
+tokens on a 16-logical-CPU Windows machine. Each profile had one warmup and two
+timed requests: this is a small tuning experiment within the same INT8 runtime,
+not a general throughput or tail-latency benchmark.
+
 ## Reports
 
 `reports/` holds the audits that gated dictionary and pipeline changes. The substantial
