@@ -22,6 +22,11 @@ import csv
 import json
 import re
 
+if __package__:
+    from .rules import load_bundle
+else:
+    from rules import load_bundle
+
 
 def _s(v: Any) -> str:
     return str(v or "").strip()
@@ -179,9 +184,10 @@ class JpInflectionAnalyzer:
 
     def _load_rules(self) -> None:
         bundle_path = self.data_dir / "jp_tokenized_pipeline_morphology_ruleset_v2_bundle.json"
-        if bundle_path.exists():
+        rules_dir = self.data_dir / "rules"
+        if (rules_dir / "manifest.json").exists() or bundle_path.exists():
             try:
-                bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+                bundle = load_bundle(rules_dir) if (rules_dir / "manifest.json").exists() else json.loads(bundle_path.read_text(encoding="utf-8"))
             except Exception:
                 bundle = {}
             meta = bundle.get("metadata", {}) if isinstance(bundle, dict) else {}

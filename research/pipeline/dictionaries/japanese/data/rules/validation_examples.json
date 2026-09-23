@@ -1,0 +1,102 @@
+[
+  {
+    "token_surface": "大切",
+    "lemma": "大切",
+    "pos_major": "ADJ",
+    "why_written_differently": "Base adjectival noun stem; no inflection on this token.",
+    "matched_rule_id": "TOK_NAADJ_PRED",
+    "context_example": "大切にされていた",
+    "expected_prev_state": "START",
+    "expected_next_state": "A_NA_STEM"
+  },
+  {
+    "token_surface": "に",
+    "lemma": "だ",
+    "pos_major": "COP",
+    "why_written_differently": "Adverbial allomorph of the copula (だ→に) used after na-adjective stem before verb/aux chain.",
+    "matched_rule_id": "ALLO_COP_NI",
+    "context_example": "大切にされていた",
+    "expected_prev_state": "A_NA_STEM",
+    "expected_next_state": "VERB_OR_AUX"
+  },
+  {
+    "token_surface": "さ",
+    "lemma": "する",
+    "pos_major": "VERB",
+    "why_written_differently": "Irrealis stem of する before passive/causative/negative auxiliaries.",
+    "matched_rule_id": "ALLO_SURU_SA",
+    "context_example": "されていた",
+    "expected_prev_state": "START",
+    "expected_next_state": "れる|られる|せる|させる|ない"
+  },
+  {
+    "token_surface": "れ",
+    "lemma": "れる",
+    "pos_major": "AUX",
+    "why_written_differently": "Renyou (continuative) stem of れる before next auxiliary/connective.",
+    "matched_rule_id": "ALLO_RERU_RE",
+    "context_example": "されていた",
+    "expected_prev_state": "V_MIZEN",
+    "expected_next_state": "AUX_OR_CONNECTIVE"
+  },
+  {
+    "token_surface": "て",
+    "lemma": "て",
+    "pos_major": "PART",
+    "why_written_differently": "Fixed connective linker in te-form chain.",
+    "matched_rule_id": "ALLO_TE_TE",
+    "context_example": "されていた",
+    "expected_prev_state": "AUX_VERB_RENYO",
+    "expected_next_state": "TE_CHAIN"
+  },
+  {
+    "token_surface": "い",
+    "lemma": "いる",
+    "pos_major": "AUX",
+    "why_written_differently": "Renyou stem of いる before past marker.",
+    "matched_rule_id": "ALLO_IRU_I",
+    "context_example": "ていた",
+    "expected_prev_state": "TE_CHAIN",
+    "expected_next_state": "た"
+  },
+  {
+    "token_surface": "た",
+    "lemma": "た",
+    "pos_major": "AUX",
+    "why_written_differently": "Past auxiliary base form; no stem change.",
+    "matched_rule_id": "ALLO_TA_BASE",
+    "context_example": "ていた",
+    "expected_prev_state": "AUX_VERB_RENYO",
+    "expected_next_state": "END"
+  },
+  {
+    "token_surface": "なかっ",
+    "lemma": "ない",
+    "pos_major": "AUX",
+    "why_written_differently": "Renyou stem of ない before た (past).",
+    "matched_rule_id": "ALLO_NAI_NAKA",
+    "context_example": "なかった",
+    "expected_prev_state": "NEG_SLOT",
+    "expected_next_state": "た"
+  },
+  {
+    "token_surface": "でし",
+    "lemma": "です",
+    "pos_major": "COP",
+    "why_written_differently": "Renyou stem of です before た.",
+    "matched_rule_id": "ALLO_DESU_DESHI",
+    "context_example": "でした",
+    "expected_prev_state": "COPULA_SLOT",
+    "expected_next_state": "た"
+  },
+  {
+    "token_surface": "まし",
+    "lemma": "ます",
+    "pos_major": "AUX",
+    "why_written_differently": "Renyou stem of ます before た.",
+    "matched_rule_id": "ALLO_MASU_MASHI",
+    "context_example": "ました",
+    "expected_prev_state": "POLITE_SLOT",
+    "expected_next_state": "た"
+  }
+]

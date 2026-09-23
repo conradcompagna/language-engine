@@ -9,7 +9,6 @@ trace individual implementation decisions.
 |---|---|
 | `NLP_HUB_CONSTRUCTION_REPORT.md` | how the multilingual NLP layer was assembled |
 | `TRANKIT_INTERNALS_PRODUCTION_INFERENCE_REPORT.md` | Trankit's internals as they bear on production inference |
-| `TRANKIT_OPTIMIZATION_SANDBOX_PLAN.md` | the plan behind the ONNX/INT8 work |
 | `MWT_SYSTEM.md` | multi-word-token handling end to end |
 | `RENDERING_ARCHITECTURE.md` | reader rendering architecture |
 | `ENTRY_RENDERING_SYSTEM_OVERVIEW.md` | dictionary entry rendering |
@@ -21,5 +20,4 @@ trace individual implementation decisions.
 | `DEPLOYMENT_AUTH_BILLING.md` | deployment, authentication and billing |
 | `PRODUCTION_READINESS_REPORT_PART1.md` | pre-launch readiness review |
 | `THIRD_PARTY_CONTENT_AND_LICENSING_REPORT.md` | third-party content and licensing |
-| `DOCUMENT_CAPTURE_FIDELITY_SUGGESTIONS.md` | document capture fidelity |
 | `trankit_internals_notes.md` | working notes on Trankit internals |

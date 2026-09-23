@@ -13,5 +13,7 @@ Files: `train.bio`, `dev.bio`, `test.bio`, `all.bio`, `label_token_counts.tsv`, 
 Use with:
 
 ```powershell
-python training\trankit_finerweb_prep\trankit_training_run\train_ner.py --dataset-dir training\trankit_finerweb_prep\datasets\wikiann_vi --run-id wikiann_vi
+python research/pipeline/models/train_ner.py --dataset-dir /path/to/wikiann_vi --run-id wikiann_vi
 ```
+
+The retained test split overlaps training by design and must not be used as a held-out test score; supply authorized local files for the command above.

@@ -1,0 +1,366 @@
+/* ===================== CONTROL ROWS ===================== */
+.reader-control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.reader-control-top {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.reader-control-bottom {
+  justify-content: space-between;
+}
+.reader-control-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.reader-control-left #leLookupAnchor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reader-control-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.reader-control-row .file-button,
+.file-button {
+  background: var(--le-white);
+  border: 1.5px solid var(--le-slate-300);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--le-slate-700);
+  cursor: pointer;
+  transition: all var(--le-transition);
+}
+.reader-control-row .file-button:hover,
+.file-button:hover {
+  border-color: var(--le-green-500);
+  color: var(--le-green-700);
+  background: var(--le-green-50);
+}
+.reader-control-row .language-select,
+.language-select {
+  background: var(--le-white);
+  border: 1.5px solid var(--le-slate-300);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--le-slate-700);
+  cursor: pointer;
+  appearance: auto;
+  transition: all var(--le-transition);
+}
+.reader-control-row .language-select:hover,
+.language-select:hover {
+  border-color: var(--le-green-500);
+}
+.reader-control-row .language-select.lookup-required-missing,
+.reader-control-row .language-select.lookup-required-missing:hover,
+.reader-control-row .language-select.lookup-required-missing:focus,
+.reader-control-row .language-select.lookup-required-missing:focus-visible,
+.language-select.lookup-required-missing,
+.language-select.lookup-required-missing:hover,
+.language-select.lookup-required-missing:focus,
+.language-select.lookup-required-missing:focus-visible {
+  border-color: #dc2626 !important;
+  outline: 2px solid #dc2626 !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.16) !important;
+}
+/* Dict progress bar (inline in top row) */
+.dict-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dict-progress-track {
+  width: 120px;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.dict-progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--le-green-500);
+  transition: width 0.2s;
+  border-radius: 3px;
+}
+.dict-progress-text {
+  font-size: 11px;
+  color: var(--le-slate-500);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.file-name-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  padding: 3px 10px;
+  border: 1px solid var(--le-green-100);
+  border-radius: 999px;
+  background: var(--le-green-50);
+  font-size: 11px;
+  color: var(--le-green-900);
+  max-width: 320px;
+}
+.file-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 280px;
+}
+.file-clear-btn {
+  border: none;
+  background: transparent;
+  color: var(--le-slate-500);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color var(--le-transition);
+}
+.file-clear-btn:hover {
+  color: var(--le-slate-900);
+}
+
+/* Original/Text view toggle switch */
+.orig-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--le-slate-100);
+  border: 1px solid var(--le-slate-300);
+  font-size: 11px;
+  color: var(--le-slate-700);
+  transition: all var(--le-transition);
+}
+.orig-view-toggle:hover {
+  background: var(--le-green-50);
+  border-color: var(--le-green-300);
+}
+.orig-view-toggle input[type='checkbox'] {
+  display: none;
+}
+.orig-view-toggle .toggle-slider {
+  width: 28px;
+  height: 16px;
+  background: var(--le-slate-300);
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.2s;
+}
+.orig-view-toggle .toggle-slider::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--le-white);
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.orig-view-toggle input:checked + .toggle-slider {
+  background: var(--le-green-500);
+}
+.orig-view-toggle input:checked + .toggle-slider::after {
+  transform: translateX(12px);
+}
+.orig-view-toggle .toggle-text {
+  font-weight: 500;
+}
+
+/* ===================== LOOKUP BUTTON (inline) ===================== */
+.le-lookup-btn {
+  background: var(--le-green-700);
+  color: var(--le-white);
+  border: none;
+  border-radius: var(--le-radius-sm);
+  padding: 6px 20px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--le-transition);
+  white-space: nowrap;
+}
+.le-lookup-btn:hover {
+  background: var(--le-green-900);
+  transform: translateY(-1px);
+  box-shadow: var(--le-shadow-sm);
+}
+.le-lookup-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.le-lookup-btn.le-lookup-upgrade {
+  background: #ef4444;
+}
+.le-lookup-btn.le-lookup-upgrade:hover {
+  background: #dc2626;
+}
+
+/* ===================== QUOTA TOAST (dismissible popup after lookup) ===================== */
+.le-quota-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background: var(--le-white);
+  border: 1px solid var(--le-slate-100);
+  border-radius: 14px;
+  padding: 14px 44px 15px;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--le-slate-700);
+  text-align: center;
+  width: min(520px, calc(100vw - 48px));
+  max-width: 520px;
+  animation: leToastIn 0.25s ease;
+}
+@keyframes leToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+.le-quota-toast-msg {
+  display: block;
+  width: 100%;
+  line-height: 1.5;
+  text-align: center;
+}
+.le-quota-toast-msg strong {
+  color: var(--le-slate-900);
+  font-weight: 700;
+}
+.le-quota-toast-close {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--le-slate-300);
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color var(--le-transition);
+}
+.le-quota-toast-close:hover {
+  color: var(--le-slate-700);
+}
+.le-quota-toast-link {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--le-green-700);
+  font-weight: 600;
+  text-decoration: none;
+}
+.le-quota-toast-link:hover {
+  text-decoration: underline;
+}
+.le-quota-toast-exhausted {
+  border-color: #fecaca;
+  background: #fef8f8;
+}
+.le-quota-toast-exhausted .le-quota-toast-msg {
+  color: #b91c1c;
+}
+.le-quota-toast-exhausted .le-quota-toast-msg strong {
+  color: #991b1b;
+}
+
+/* ---- Upgrade prompt (floating dismissible box) ---- */
+.le-upgrade-prompt {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fef8f8;
+  border: 1px solid #fecaca;
+  border-radius: var(--le-radius);
+  padding: 14px 18px;
+  box-shadow: var(--le-shadow-lg);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  color: #b91c1c;
+  max-width: 440px;
+  animation: leToastIn 0.25s ease;
+}
+.le-upgrade-prompt a {
+  color: var(--le-green-700);
+  font-weight: 600;
+  text-decoration: none;
+}
+.le-upgrade-prompt a:hover {
+  text-decoration: underline;
+}
+.le-upgrade-prompt-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #e5a0a0;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color var(--le-transition);
+}
+.le-upgrade-prompt-close:hover {
+  color: #b91c1c;
+}
+
+/* ===================== STATUS ===================== */
+.reader-status {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--le-slate-500);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.reader-status span {
+  white-space: nowrap;
+}
+.status-inline {
+  font-size: 11px;
+  color: var(--le-slate-500);
+  white-space: nowrap;
+}

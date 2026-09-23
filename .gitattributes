@@ -1,6 +1,8 @@
 * text=auto
 *.py text eol=lf
 *.js text eol=lf
+*.mjs text eol=lf
+*.css text eol=lf
 *.ts text eol=lf
 *.md text eol=lf
 *.yml text eol=lf
@@ -13,3 +15,5 @@ static/vendor/** linguist-vendored
 static/foliate-js/** linguist-vendored
 research/** linguist-documentation
 extras/** linguist-documentation
+
+*.training text eol=lf

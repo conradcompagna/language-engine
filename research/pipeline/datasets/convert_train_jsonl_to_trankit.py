@@ -386,6 +386,9 @@ def build_datasets(
     dev_remainder: int,
     limit: int | None,
 ) -> dict:
+    if paragraph_size < 1 or dev_mod < 2 or not 0 <= dev_remainder < dev_mod:
+        raise ValueError("Require positive paragraph size, dev-mod >= 2, and a remainder inside the modulus")
+    out_dir.mkdir(parents=True, exist_ok=True)
     train_examples: list[SentenceExample] = []
     dev_examples: list[SentenceExample] = []
     skipped_ids: list[str] = []

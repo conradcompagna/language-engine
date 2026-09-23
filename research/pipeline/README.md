@@ -1,7 +1,9 @@
 # Build chains
 
-How each class of artefact the runtime loads was produced. Read a chain top to bottom;
-every step names the script that performs it.
+Historical build chains, recorded during development; labels such as SHIPPED below
+are author-reported outcomes, not SHA-256-verified deployment evidence. See the
+[evidence index](../EVIDENCE.md) and [reproduction guide](../REPRODUCIBILITY.md) for
+what can be checked from this publication.
 
 ---
 

@@ -40,3 +40,7 @@ adapted to a new environment. Model weights and full corpora are provisioned sep
 with resource details in [publication contents](../docs/PUBLICATION.md).
 Aggregate records, such as the [Sanskrit annotation run](pipeline/datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json),
 make the scale, validation, and cost of the work inspectable.
+
+The [evidence index](EVIDENCE.md) connects each research path to its data, training
+configuration, and evaluation record. The [reproduction guide](REPRODUCIBILITY.md)
+provides public checks and commands for preparing new runs.

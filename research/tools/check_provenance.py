@@ -10,7 +10,9 @@ Method
 Every Trankit run writes its outputs as `.mdl` (tokenizer/tagger/NER) and `.pt`
 (lemmatizer/MWT expander) files. A run produced a deployed model if one of its outputs
 is byte-identical to a file in the deployed model store. Size is used as a cheap first
-pass; --hash confirms survivors with SHA-256.
+pass; --hash confirms survivors with SHA-256. Size matches are only candidates.
+Byte identity establishes an artifact match, not that the run trained rather than
+copied the artifact; training provenance also requires the run's logs/configuration.
 
 Sizes shared by more than `--ambiguous-threshold` deployed files are discarded. In
 practice these are the XLM-R tokenizer checkpoints, which are identical across
@@ -90,16 +92,18 @@ def main() -> int:
 
     verified = "sha256" if args.hash else "size"
     print(f"# Provenance ({verified} comparison)\n")
-    print("| Run | Status | Shipped as |")
+    print("| Run | Status | Matched deployment directory |")
     print("|---|---|---|")
     for name in sorted(shipped):
-        print(f"| {name} | Shipped | {', '.join(sorted(shipped[name]))} |")
+        status = "Verified SHA-256 match" if args.hash else "Candidate (size only)"
+        print(f"| {name} | {status} | {', '.join(sorted(shipped[name]))} |")
     for name in sorted(no_match):
-        print(f"| {name} | Abandoned | produced weights, none deployed |")
+        print(f"| {name} | No match found | weights present; no unambiguous match in supplied store |")
     for name in sorted(produced_nothing):
-        print(f"| {name} | Abandoned | no weights produced |")
-    print(f"\n{len(shipped)} shipped, {len(no_match)} unused, "
-          f"{len(produced_nothing)} produced nothing, {len(run_dirs)} runs total.")
+        print(f"| {name} | No model outputs found | no .mdl/.pt files in supplied run directory |")
+    label = "verified matches" if args.hash else "size candidates (unverified)"
+    print(f"\n{len(shipped)} {label}, {len(no_match)} unmatched, "
+          f"{len(produced_nothing)} without model outputs, {len(run_dirs)} runs total.")
     return 0
 
 

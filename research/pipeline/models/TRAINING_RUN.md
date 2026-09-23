@@ -1,59 +1,32 @@
-# Trankit NER Training Run
+# Trankit NER training
 
-This folder is the reusable training work area.
+Run these commands from the repository root with your own authorized BIO corpus.
+Public dataset directories contain cards and counts, not full training files.
 
-Use `training\t` as Trankit's `save_dir`. The path is intentionally short because Trankit's old transformer cache uses very long hash filenames on Windows. The training script keeps the active Trankit category fixed as `customized-ner` by default, so repeated NER runs reuse the same downloaded XLM-R / Trankit work cache instead of creating a fresh category cache for every dataset.
-
-Finished model artifacts are copied after each run into:
-
-```text
-finished_models/<run-id>/
+```sh
+python research/pipeline/models/train_ner.py --dataset-dir /path/to/corpus --validate-only
+python research/pipeline/models/train_ner.py --dataset-dir /path/to/corpus --run-id experiment --work-cache /short/cache --finished-models /path/to/results --seed-cache /path/to/seed-cache --max-epoch 1
 ```
 
-Default first run:
+Preflight needs only Python 3.12: it checks UTF-8 two-column BIO/BIOES rows, nonempty
+splits and exact token-sequence overlap, and prints file hashes/counts without model
+imports or filesystem changes. It does not prove annotation quality or detect
+near-duplicate leakage. Full training expects a CUDA-capable PyTorch/Trankit
+environment; the application's CPU requirements are not a CUDA training recipe.
+Historical package versions are not fully recorded, so the old results cannot be
+reproduced from this clone alone. Future runs record installed package versions and
+the actual TPipeline source hash in `run_evidence.json`.
 
-```powershell
-python training\trankit_finerweb_prep\trankit_training_run\train_ner.py
-```
+Defaults are repository-relative `.cache/training/{active,finished,seed}`. On Windows,
+use `--work-cache` with a short path to avoid legacy transformer-cache path limits.
+All corpus/cache/output paths are CLI parameters. The shared active category is
+overwritten by subsequent training: run only one trainer per work cache. Finished
+run IDs are reserved separately to avoid overwriting an existing run.
 
-Short smoke run:
-
-```powershell
-python training\trankit_finerweb_prep\trankit_training_run\train_ner.py --max-epoch 1
-```
-
-Low-memory run:
-
-```powershell
-python training\trankit_finerweb_prep\trankit_training_run\train_ner.py --batch-size 4
-```
-
-If you manually stop a run with `Ctrl+C`, the wrapper snapshots the latest saved active model into `finished_models/<run-id>` before exiting.
-
-For a run that was started before this behavior was added, snapshot the active cache manually:
-
-```powershell
-python training\trankit_finerweb_prep\trankit_training_run\train_ner.py --run-id <dataset-name> --snapshot-only
-```
-
-For another dataset, put `train.bio` and `dev.bio` in a dataset folder under `training\trankit_finerweb_prep\datasets`, then run:
-
-```powershell
-python training\trankit_finerweb_prep\trankit_training_run\train_ner.py --dataset-dir training\trankit_finerweb_prep\datasets\<dataset-name> --run-id <dataset-name>
-```
-
-The active model during training lives at:
-
-```text
-training/t/xlm-roberta-base/customized-ner/
-```
-
-That directory is reused and overwritten by each training job. The preserved outputs are the copied subfolders under `finished_models`.
-
-This local Trankit NER training path expects CUDA.
-
-By default the script seeds the local XLM-R cache from:
-
-```text
-training/trankit_save_ja_ner_v2/
-```
+`--snapshot-only --run-id recovered` copies the active cache without training; a
+snapshot is not proof of the data or seed that produced it. Normal training copies
+new artifacts and hashes them when it finishes or is interrupted. The installed
+Trankit controls random seeds: the published [patch](upstream_patches/trankit/tpipeline.py)
+sets 1234, but the wrapper does not silently assume that your installation uses it.
+Evaluation logs contain entity-level micro scores and per-label precision/recall/F1.
+Keep train, dev and a genuinely unseen evaluation corpus separate.

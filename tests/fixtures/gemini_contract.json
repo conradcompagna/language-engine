@@ -1,0 +1,549 @@
+[
+  {
+    "function": "_build_response_schema",
+    "args": [
+      false,
+      false
+    ],
+    "expected": {
+      "type": "object",
+      "propertyOrdering": [
+        "pos",
+        "glosses"
+      ],
+      "properties": {
+        "pos": {
+          "type": "string",
+          "enum": [
+            "noun",
+            "verb",
+            "adj",
+            "adv",
+            "pron",
+            "det",
+            "num",
+            "conj",
+            "prep",
+            "postp",
+            "particle",
+            "intj",
+            "suffix",
+            "prefix",
+            "name",
+            "phrase"
+          ],
+          "description": "Choose the best matching part of speech."
+        },
+        "glosses": {
+          "type": "string",
+          "description": "1-5 short English glosses explaining the meaning of the target word separated by semicolons."
+        }
+      },
+      "required": [
+        "pos",
+        "glosses"
+      ]
+    }
+  },
+  {
+    "function": "_build_response_schema",
+    "args": [
+      false,
+      true
+    ],
+    "expected": {
+      "type": "object",
+      "propertyOrdering": [
+        "pos",
+        "glosses",
+        "lemma",
+        "morphological properties"
+      ],
+      "properties": {
+        "pos": {
+          "type": "string",
+          "enum": [
+            "noun",
+            "verb",
+            "adj",
+            "adv",
+            "pron",
+            "det",
+            "num",
+            "conj",
+            "prep",
+            "postp",
+            "particle",
+            "intj",
+            "suffix",
+            "prefix",
+            "name",
+            "phrase"
+          ],
+          "description": "Choose the best matching part of speech."
+        },
+        "glosses": {
+          "type": "string",
+          "description": "1-5 short English glosses explaining the meaning of the target word separated by semicolons."
+        },
+        "lemma": {
+          "type": "string",
+          "description": "MANDATORY: lemmatize the word, reducing it to its uninflected base form."
+        },
+        "morphological properties": {
+          "type": "string",
+          "description": "MANDATORY: brief labels tagging the surface form's morphological properties using full unabbreviated Universal Dependencies category names (e.g. case, number, gender, animacy, noun class, person, tense, aspect, mood, voice, verb form, definiteness, degree, pronoun type, polarity, politeness, clusivity, evidentiality)."
+        }
+      },
+      "required": [
+        "pos",
+        "glosses",
+        "lemma",
+        "morphological properties"
+      ]
+    }
+  },
+  {
+    "function": "_build_response_schema",
+    "args": [
+      true,
+      false
+    ],
+    "expected": {
+      "type": "object",
+      "propertyOrdering": [
+        "romanization",
+        "pos",
+        "glosses"
+      ],
+      "properties": {
+        "romanization": {
+          "type": "string",
+          "description": "MANDATORY romanization of the target word (non-Latin script language)."
+        },
+        "pos": {
+          "type": "string",
+          "enum": [
+            "noun",
+            "verb",
+            "adj",
+            "adv",
+            "pron",
+            "det",
+            "num",
+            "conj",
+            "prep",
+            "postp",
+            "particle",
+            "intj",
+            "suffix",
+            "prefix",
+            "name",
+            "phrase"
+          ],
+          "description": "Choose the best matching part of speech."
+        },
+        "glosses": {
+          "type": "string",
+          "description": "1-5 short English glosses explaining the meaning of the target word separated by semicolons."
+        }
+      },
+      "required": [
+        "romanization",
+        "pos",
+        "glosses"
+      ]
+    }
+  },
+  {
+    "function": "_build_response_schema",
+    "args": [
+      true,
+      true
+    ],
+    "expected": {
+      "type": "object",
+      "propertyOrdering": [
+        "romanization",
+        "pos",
+        "glosses",
+        "lemma",
+        "morphological properties"
+      ],
+      "properties": {
+        "romanization": {
+          "type": "string",
+          "description": "MANDATORY romanization of the target word (non-Latin script language)."
+        },
+        "pos": {
+          "type": "string",
+          "enum": [
+            "noun",
+            "verb",
+            "adj",
+            "adv",
+            "pron",
+            "det",
+            "num",
+            "conj",
+            "prep",
+            "postp",
+            "particle",
+            "intj",
+            "suffix",
+            "prefix",
+            "name",
+            "phrase"
+          ],
+          "description": "Choose the best matching part of speech."
+        },
+        "glosses": {
+          "type": "string",
+          "description": "1-5 short English glosses explaining the meaning of the target word separated by semicolons."
+        },
+        "lemma": {
+          "type": "string",
+          "description": "MANDATORY: lemmatize the word, reducing it to its uninflected base form."
+        },
+        "morphological properties": {
+          "type": "string",
+          "description": "MANDATORY: brief labels tagging the surface form's morphological properties using full unabbreviated Universal Dependencies category names (e.g. case, number, gender, animacy, noun class, person, tense, aspect, mood, voice, verb form, definiteness, degree, pronoun type, polarity, politeness, clusivity, evidentiality)."
+        }
+      },
+      "required": [
+        "romanization",
+        "pos",
+        "glosses",
+        "lemma",
+        "morphological properties"
+      ]
+    }
+  },
+  {
+    "function": "_trankit_requires_morph",
+    "args": [
+      "word",
+      "lemma",
+      "Case=Compound",
+      "sa"
+    ],
+    "expected": false
+  },
+  {
+    "function": "_trankit_requires_morph",
+    "args": [
+      "word",
+      "lemma",
+      "Case=Compound|Number=Plur",
+      "sa"
+    ],
+    "expected": true
+  },
+  {
+    "function": "_trankit_requires_morph",
+    "args": [
+      "word",
+      "lemma",
+      "Number[psor]=Sing",
+      "fi"
+    ],
+    "expected": true
+  },
+  {
+    "function": "_trankit_requires_morph",
+    "args": [
+      "word",
+      "lemma",
+      "_",
+      "ja"
+    ],
+    "expected": false
+  },
+  {
+    "function": "_trankit_requires_morph",
+    "args": [
+      "word",
+      "lemma",
+      "PronType=Prs",
+      "en"
+    ],
+    "expected": false
+  },
+  {
+    "function": "_entry_to_frontend",
+    "args": [
+      {
+        "headword": "語",
+        "id": 42,
+        "glosses": "word; word; language",
+        "forms": [
+          {
+            "form": "語る"
+          }
+        ],
+        "source": "user"
+      }
+    ],
+    "expected": {
+      "entry_id": "",
+      "headword": "語",
+      "pos": "",
+      "romanization": "",
+      "glosses": [
+        "word",
+        "language"
+      ],
+      "forms": [],
+      "commentary": "",
+      "lemma": "",
+      "source": "user",
+      "entry_row_id": 42,
+      "db_alias": "customdb"
+    }
+  },
+  {
+    "function": "_entry_to_frontend",
+    "args": [
+      {
+        "headword": "empty",
+        "glosses": null,
+        "forms": null
+      }
+    ],
+    "expected": {
+      "entry_id": "",
+      "headword": "empty",
+      "pos": "",
+      "romanization": "",
+      "glosses": [],
+      "forms": [],
+      "commentary": "",
+      "lemma": "",
+      "source": "gemini"
+    }
+  },
+  {
+    "function": "_build_decomp_schema",
+    "args": [
+      [
+        {
+          "sentence_index": 2,
+          "text": "ပြန်ဖတ်"
+        },
+        {
+          "sentence_index": 4,
+          "text": "read-again"
+        }
+      ]
+    ],
+    "expected": [
+      {
+        "type": "object",
+        "properties": {
+          "2_ပြန်ဖတ်": {
+            "type": "string"
+          },
+          "4_read-again": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "2_ပြန်ဖတ်",
+          "4_read-again"
+        ],
+        "propertyOrdering": [
+          "2_ပြန်ဖတ်",
+          "4_read-again"
+        ]
+      },
+      [
+        "2_ပြန်ဖတ်",
+        "4_read-again"
+      ]
+    ]
+  },
+  {
+    "function": "_build_gloss_schema",
+    "args": [
+      [
+        {
+          "text": "학교에서",
+          "lemmas": [
+            "학교",
+            "에서"
+          ]
+        },
+        {
+          "text": "読む"
+        },
+        {
+          "text": "again"
+        }
+      ],
+      [
+        [
+          0,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ]
+    ],
+    "expected": [
+      {
+        "type": "object",
+        "properties": {
+          "s1_0_학교": {
+            "type": "string"
+          },
+          "s1_1_에서": {
+            "type": "string"
+          },
+          "s1_2_読む": {
+            "type": "string"
+          },
+          "s2_0_again": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "s1_0_학교",
+          "s1_1_에서",
+          "s1_2_読む",
+          "s2_0_again"
+        ],
+        "propertyOrdering": [
+          "s1_0_학교",
+          "s1_1_에서",
+          "s1_2_読む",
+          "s2_0_again"
+        ]
+      },
+      [
+        [
+          "s1_0_학교",
+          "s1_1_에서"
+        ],
+        [
+          "s1_2_読む"
+        ],
+        [
+          "s2_0_again"
+        ]
+      ]
+    ]
+  },
+  {
+    "function": "_gemini_ner_sentence_inputs",
+    "args": [
+      [
+        "New",
+        "York",
+        "။",
+        "ရန်ကုန်"
+      ],
+      {
+        "sentences": [
+          [
+            0,
+            2
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            -3,
+            0
+          ]
+        ]
+      },
+      "my"
+    ],
+    "expected": [
+      [
+        {
+          "id": 0,
+          "start": 0,
+          "end": 2,
+          "tokens": [
+            "New",
+            "York"
+          ]
+        },
+        {
+          "id": 1,
+          "start": 2,
+          "end": 4,
+          "tokens": [
+            "။",
+            "ရန်ကုန်"
+          ]
+        }
+      ],
+      {
+        "token_count": 4,
+        "sentence_count": 2,
+        "truncated": false
+      }
+    ]
+  },
+  {
+    "function": "_gemini_ner_sentence_inputs",
+    "args": [
+      [],
+      null,
+      "my"
+    ],
+    "expected": [
+      [],
+      {
+        "token_count": 0,
+        "sentence_count": 0,
+        "truncated": false
+      }
+    ]
+  },
+  {
+    "function": "_normalize_forms",
+    "args": [
+      [
+        "word",
+        {
+          "form": "word",
+          "tags": [
+            "plural"
+          ]
+        },
+        {
+          "form": "other"
+        },
+        {}
+      ]
+    ],
+    "expected": []
+  },
+  {
+    "function": "_normalize_glosses",
+    "args": [
+      [
+        {
+          "glosses": [
+            "one",
+            "two"
+          ]
+        },
+        "two",
+        " one ",
+        ""
+      ]
+    ],
+    "expected": [
+      "{'glosses': ['one', 'two']}",
+      "two",
+      "one"
+    ]
+  }
+]

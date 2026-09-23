@@ -1,0 +1,383 @@
+[
+  {
+    "rule": "/api/lang_config",
+    "methods": [
+      "GET"
+    ],
+    "function": "lang_config_endpoint"
+  },
+  {
+    "rule": "/api/user_dict/add",
+    "methods": [
+      "POST"
+    ],
+    "function": "user_dict_add"
+  },
+  {
+    "rule": "/api/user_dict/update",
+    "methods": [
+      "POST"
+    ],
+    "function": "user_dict_update"
+  },
+  {
+    "rule": "/api/user_dict/delete",
+    "methods": [
+      "POST"
+    ],
+    "function": "user_dict_delete"
+  },
+  {
+    "rule": "/api/custom_entries/list",
+    "methods": [
+      "GET"
+    ],
+    "function": "custom_entries_list"
+  },
+  {
+    "rule": "/api/community_entries",
+    "methods": [
+      "GET"
+    ],
+    "function": "community_entries"
+  },
+  {
+    "rule": "/api/gemini_entry/get",
+    "methods": [
+      "GET"
+    ],
+    "function": "gemini_entry_get"
+  },
+  {
+    "rule": "/api/gemini_entry/update",
+    "methods": [
+      "POST"
+    ],
+    "function": "gemini_entry_update"
+  },
+  {
+    "rule": "/api/gemini_entry/vote_delete",
+    "methods": [
+      "POST"
+    ],
+    "function": "gemini_entry_vote_delete"
+  },
+  {
+    "rule": "/api/gemini_entry/delete",
+    "methods": [
+      "POST"
+    ],
+    "function": "gemini_entry_delete"
+  },
+  {
+    "rule": "/api/gemini_entry/deletion_votes",
+    "methods": [
+      "GET"
+    ],
+    "function": "gemini_entry_deletion_votes"
+  },
+  {
+    "rule": "/robots.txt",
+    "methods": [
+      "GET"
+    ],
+    "function": "robots_txt"
+  },
+  {
+    "rule": "/sitemap.xml",
+    "methods": [
+      "GET"
+    ],
+    "function": "sitemap_xml"
+  },
+  {
+    "rule": "/",
+    "methods": [
+      "GET"
+    ],
+    "function": "index"
+  },
+  {
+    "rule": "/chrome-extension",
+    "methods": [
+      "GET"
+    ],
+    "function": "chrome_extension_page"
+  },
+  {
+    "rule": "/reader",
+    "methods": [
+      "GET"
+    ],
+    "function": "reader_page"
+  },
+  {
+    "rule": "/account",
+    "methods": [
+      "GET"
+    ],
+    "function": "account_page"
+  },
+  {
+    "rule": "/about",
+    "methods": [
+      "GET"
+    ],
+    "function": "about_page"
+  },
+  {
+    "rule": "/contact",
+    "methods": [
+      "GET"
+    ],
+    "function": "contact_page"
+  },
+  {
+    "rule": "/admin/analytics",
+    "methods": [
+      "GET"
+    ],
+    "function": "admin_analytics_page"
+  },
+  {
+    "rule": "/admin/analytics.json",
+    "methods": [
+      "GET"
+    ],
+    "function": "admin_analytics_json"
+  },
+  {
+    "rule": "/lookup/gate",
+    "methods": [
+      "POST"
+    ],
+    "function": "lookup_gate"
+  },
+  {
+    "rule": "/api/contact",
+    "methods": [
+      "POST"
+    ],
+    "function": "contact_message"
+  },
+  {
+    "rule": "/lookup",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "function": "lookup"
+  },
+  {
+    "rule": "/annotation",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "function": "annotation_endpoint"
+  },
+  {
+    "rule": "/api/mt_gloss",
+    "methods": [
+      "POST"
+    ],
+    "function": "mt_gloss"
+  },
+  {
+    "rule": "/api/llm_query",
+    "methods": [
+      "POST"
+    ],
+    "function": "llm_query"
+  },
+  {
+    "rule": "/api/llm_translate_sentences",
+    "methods": [
+      "POST"
+    ],
+    "function": "llm_translate_sentences"
+  },
+  {
+    "rule": "/api/llm_usage",
+    "methods": [
+      "GET"
+    ],
+    "function": "llm_usage"
+  },
+  {
+    "rule": "/api/llm_glosses",
+    "methods": [
+      "POST"
+    ],
+    "function": "llm_glosses"
+  },
+  {
+    "rule": "/api/llm_decomps",
+    "methods": [
+      "POST"
+    ],
+    "function": "llm_decomps"
+  },
+  {
+    "rule": "/api/orth_breakdowns",
+    "methods": [
+      "POST"
+    ],
+    "function": "orth_breakdowns"
+  },
+  {
+    "rule": "/js/dict/<lang_code>/custom_index",
+    "methods": [
+      "GET"
+    ],
+    "function": "js_custom_index"
+  },
+  {
+    "rule": "/api/dict/<lang_code>/gemini",
+    "methods": [
+      "GET"
+    ],
+    "function": "get_gemini_dict"
+  },
+  {
+    "rule": "/api/log_unknown_phon_mark",
+    "methods": [
+      "POST"
+    ],
+    "function": "log_unknown_phon_mark"
+  },
+  {
+    "rule": "/api/entry_note/get",
+    "methods": [
+      "GET"
+    ],
+    "function": "entry_note_get"
+  },
+  {
+    "rule": "/api/entry_note/save",
+    "methods": [
+      "POST"
+    ],
+    "function": "entry_note_save"
+  },
+  {
+    "rule": "/api/entry_note/delete",
+    "methods": [
+      "POST"
+    ],
+    "function": "entry_note_delete"
+  },
+  {
+    "rule": "/api/entry_note/generate",
+    "methods": [
+      "POST"
+    ],
+    "function": "entry_note_generate"
+  },
+  {
+    "rule": "/api/entry_decomp/batch",
+    "methods": [
+      "POST"
+    ],
+    "function": "entry_decomp_batch"
+  },
+  {
+    "rule": "/api/entry_decomp/get",
+    "methods": [
+      "GET"
+    ],
+    "function": "entry_decomp_get"
+  },
+  {
+    "rule": "/api/entry_decomp/save",
+    "methods": [
+      "POST"
+    ],
+    "function": "entry_decomp_save"
+  },
+  {
+    "rule": "/api/entry_decomp/delete",
+    "methods": [
+      "POST"
+    ],
+    "function": "entry_decomp_delete"
+  },
+  {
+    "rule": "/api/entry_decomp/generate",
+    "methods": [
+      "POST"
+    ],
+    "function": "entry_decomp_generate"
+  },
+  {
+    "rule": "/api/user/preferences",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "function": "user_preferences"
+  },
+  {
+    "rule": "/api/dict/<lang_code>",
+    "methods": [
+      "GET"
+    ],
+    "function": "serve_dict"
+  },
+  {
+    "rule": "/api/dict_sources/<lang_code>",
+    "methods": [
+      "GET"
+    ],
+    "function": "dict_sources"
+  },
+  {
+    "rule": "/api/languages",
+    "methods": [
+      "GET"
+    ],
+    "function": "list_languages"
+  },
+  {
+    "rule": "/js/hydrate",
+    "methods": [
+      "POST"
+    ],
+    "function": "js_hydrate"
+  },
+  {
+    "rule": "/js/dict/<lang_code>/index",
+    "methods": [
+      "GET"
+    ],
+    "function": "js_dict_index"
+  },
+  {
+    "rule": "/dict-index/<path:filename>",
+    "methods": [
+      "GET"
+    ],
+    "function": "serve_js_index_artifact"
+  },
+  {
+    "rule": "/ping",
+    "methods": [
+      "GET"
+    ],
+    "function": "ping"
+  },
+  {
+    "rule": "/js/dict/versions",
+    "methods": [
+      "GET"
+    ],
+    "function": "js_dict_versions"
+  },
+  {
+    "rule": "/js/dict/<lang>/version",
+    "methods": [
+      "GET"
+    ],
+    "function": "js_dict_lang_version"
+  }
+]

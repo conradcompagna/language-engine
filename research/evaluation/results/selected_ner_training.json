@@ -1,0 +1,91 @@
+{
+  "record_type": "historical log excerpts; no retraining or new evaluation",
+  "selection": "Four illustrative runs linked to dataset construction in this repository; not a cross-dataset leaderboard.",
+  "interpretation": "Epochs were selected on development data; scores are not independent test results or verification of currently deployed weights.",
+  "runs": [
+    {
+      "run_id": "ang_oedt",
+      "metric": "best development NER F1 reported in saved log",
+      "scale": "0-100",
+      "f1": 88.2,
+      "epoch": 13,
+      "published_config": null,
+      "source": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/ang_oedt/logs/ner.training",
+        "sha256": "efd923a3646b3bb6708741b6f728a409fc2a3a941c6234a7858593845ba59456"
+      },
+      "source_line_count": 8814,
+      "first_best_score_line": {
+        "line": 8134,
+        "text": "Best dev F1 score: epoch 13, F1: 88.20"
+      },
+      "last_score_line": {
+        "line": 8715,
+        "text": "Best dev F1 score: epoch 13, F1: 88.20"
+      }
+    },
+    {
+      "run_id": "grc_pausanias_ethnic_civic_misc",
+      "metric": "best development NER F1 reported in saved log",
+      "scale": "0-100",
+      "f1": 78.81,
+      "epoch": 13,
+      "published_config": "research/models/grc_pausanias_ethnic_civic_misc/training_config.json",
+      "source": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/grc_pausanias_ethnic_civic_misc/logs/ner.training",
+        "sha256": "82ffe962103588b4ac06f306bd8a7b3e7fbd4d0d2e36164699b48afb6032d89f"
+      },
+      "source_line_count": 8774,
+      "first_best_score_line": {
+        "line": 8750,
+        "text": "Best dev F1 score: epoch 13, F1: 78.81"
+      },
+      "last_score_line": {
+        "line": 8750,
+        "text": "Best dev F1 score: epoch 13, F1: 78.81"
+      }
+    },
+    {
+      "run_id": "san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5",
+      "metric": "best development NER F1 reported in saved log",
+      "scale": "0-100",
+      "f1": 54.28,
+      "epoch": 29,
+      "published_config": "research/models/san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/training_config.json",
+      "source": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/logs/ner.training",
+        "sha256": "8bc0232f85681ac823f849573bc960015b5cd596e9200d90d15101e2e1a0b79d"
+      },
+      "source_line_count": 54057,
+      "first_best_score_line": {
+        "line": 36240,
+        "text": "Best dev F1 score: epoch 29, F1: 54.28"
+      },
+      "last_score_line": {
+        "line": 53152,
+        "text": "Best dev F1 score: epoch 29, F1: 54.28"
+      }
+    },
+    {
+      "run_id": "wikiann_vi",
+      "metric": "best development NER F1 reported in saved log",
+      "scale": "0-100",
+      "f1": 91.72,
+      "epoch": 18,
+      "published_config": "research/models/wikiann_vi/training_config.json",
+      "source": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/wikiann_vi/logs/ner.training",
+        "sha256": "84185014f66edde74f41a0745f7fa8e6267f6bc78051975804c776c7e98655f5"
+      },
+      "source_line_count": 91237,
+      "first_best_score_line": {
+        "line": 71326,
+        "text": "Best dev F1 score: epoch 18, F1: 91.72"
+      },
+      "last_score_line": {
+        "line": 90096,
+        "text": "Best dev F1 score: epoch 18, F1: 91.72"
+      }
+    }
+  ]
+}

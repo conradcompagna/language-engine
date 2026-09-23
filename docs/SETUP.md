@@ -4,14 +4,21 @@ This source release contains the application and its model/dictionary build infr
 
 ## Runtime
 
-Use Python 3.12 and Node.js. From the repository root:
+Use Python 3.12 and Node.js 22 or newer. From the repository root:
 
 ```sh
 python -m venv .venv
 python -m pip install -r requirements.txt
+npm ci --ignore-scripts
+npm run build
 ```
 
 Activate `.venv` before installing or running commands. Copy `.env.example` to `.env` and supply your own configuration. Generate a session secret with `python -c "import secrets; print(secrets.token_hex(32))"`.
+
+The browser sources are in [`frontend/`](../frontend/README.md); the build creates
+the existing static script URLs. Run it again after browser changes. For a local
+demo without models, dictionaries, credentials or production services, run
+`node tests/browser/fixture-server.mjs` and open `http://127.0.0.1:8791`.
 
 Required resources:
 

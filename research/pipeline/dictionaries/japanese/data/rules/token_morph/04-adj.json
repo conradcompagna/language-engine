@@ -1,0 +1,38 @@
+[
+  {
+    "rule_id": "TOK_NAADJ_ATTR",
+    "lemma": "<na-adj>",
+    "pos_major": "ADJ",
+    "pos_detail": "NA_ADJ",
+    "lemma_class": "A_NA",
+    "surface": "<lemma+な>",
+    "morph_slot": "ADNOMINAL",
+    "reason_code": "NA_ADJECTIVE_REQUIRES_COPULA_ATTRIBUTIVE_NA",
+    "orthography_rule_id": "GR_COPULA_ATTR_NA",
+    "requires_prev_state": "NONE",
+    "emits_state": "ADNOMINAL",
+    "morph_features": "AdjType=Na|ConjType=Adnominal",
+    "register": "neutral",
+    "productivity": "productive",
+    "ambiguity_group": "",
+    "notes": ""
+  },
+  {
+    "rule_id": "TOK_NAADJ_PRED",
+    "lemma": "<na-adj>",
+    "pos_major": "ADJ",
+    "pos_detail": "NA_ADJ",
+    "lemma_class": "A_NA",
+    "surface": "<lemma>",
+    "morph_slot": "STEM",
+    "reason_code": "NA_ADJ_STEM_REQUIRES_COPULA_FOR_PREDICATION",
+    "orthography_rule_id": "",
+    "requires_prev_state": "NONE",
+    "emits_state": "COPULA_SLOT",
+    "morph_features": "AdjType=Na|NeedsCopula=Yes",
+    "register": "neutral",
+    "productivity": "productive",
+    "ambiguity_group": "",
+    "notes": ""
+  }
+]

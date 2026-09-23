@@ -6,6 +6,10 @@ I built Language Engine to bring close reading and language research into one wo
 
 [Live application](https://language-engine.ai) · [Setup](docs/SETUP.md) · [Architecture](docs/ARCHITECTURE.md) · [Portfolio](https://github.com/conradcompagna)
 
+![Real reader template with a synthetic local lookup](docs/images/reader-fixture.png)
+
+The fixture uses synthetic responses; full dictionary and neural resources are provisioned separately.
+
 ---
 
 ## What runs in production
@@ -29,7 +33,9 @@ The code includes **27 language display configurations and enabled NLP registry 
 | Area | Starting point |
 |---|---|
 | HTTP application and accounts | [router.py](router.py), [auth.py](auth.py), [payments.py](payments.py) |
-| Browser segmentation and hydration | [dictionary_client_hybrid.js](static/dictionary_client_hybrid.js) |
+| Browser segmentation and hydration | [dictionary client modules](frontend/dictionary/client/), [browser build and fixture demo](frontend/README.md) |
+| Reader UI and document views | [reader modules](frontend/reader/), [snapshot renderer](frontend/documents/snapshot/) |
+| Contextual language services | [Gemini task services](language_engine/gemini/README.md) |
 | Lexical indexes and SQLite access | [dict_lookup_sqlite.py](dict_lookup_sqlite.py) |
 | Neural inference and alignment | [language_registry.py](language_registry.py), [pipeline_common.py](pipeline_common.py), [trankit_compressed_runtime.py](trankit_compressed_runtime.py) |
 | Deployment | [wsgi.py](wsgi.py), [deploy/](deploy/) |
@@ -53,7 +59,7 @@ building the tools that turn research outputs into deployable assets.
 | [`research/pipeline/`](research/pipeline/) | Model training, dataset construction, dictionary building, NER taxonomy derivation. |
 | [`research/evaluation/`](research/evaluation/) | Regression test, benchmarks, latency measurements, dictionary and corpus audits. |
 | [`research/experiments/`](research/experiments/) | Six development paths documenting model comparisons, architecture prototypes, and design decisions. |
-| [`research/notes/`](research/notes/) | Sixteen design and architecture documents written during development. |
+| [`research/notes/`](research/notes/) | Design and architecture records from development. |
 | [`research/datasets/`](research/datasets/), [`research/models/`](research/models/) | Dataset provenance, label vocabularies, and configurations for 29 completed NER runs. |
 
 Two examples show the connection between linguistic analysis and engineering: a
@@ -64,3 +70,11 @@ created through a resumable, validated Gemini annotation workflow. The latter re
 
 **[`extras/`](extras/)** — a Chrome extension and a standalone document-renderer test
 harness, showing the development of document capture and reading workflows.
+
+## Development and validation
+
+[Development commands](docs/DEVELOPMENT.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
+
+Try the [local fixture demo](docs/SETUP.md), then follow the
+[research evidence index](research/EVIDENCE.md) from build decisions to recorded
+results and the [reproduction guide](research/REPRODUCIBILITY.md) for checks and new runs.

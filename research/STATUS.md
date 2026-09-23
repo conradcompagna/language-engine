@@ -10,14 +10,14 @@ a supplied model store; common sizes are excluded to reduce ambiguous matches, a
 `--hash` verifies candidate matches with SHA-256. Training configurations and logs
 supply the associated build context.
 
-Regenerate:
+To verify local artifact matches:
 
 ```sh
 python research/tools/check_provenance.py \
     --runs <training dir> --deployed <model store>/xlm-roberta-base --hash
 ```
 
-## Shipped
+## Reported shipped
 
 | Run | Shipped as | What it contributed |
 |---|---|---|
@@ -37,7 +37,7 @@ The mapping captures component-level model selection: `sanskrit-vedic` uses the
 expander. Keeping those choices explicit makes the application assets traceable
 across separately named training runs.
 
-## Superseded
+## Superseded model variants
 
 | Run | Superseded by | Evidence |
 |---|---|---|

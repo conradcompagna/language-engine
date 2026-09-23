@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "kind": "text-concat",
+  "original": "grc_lsj_vs_wiktionary_samples.md",
+  "original_sha256": "d21ffe490ecd1a404104b355de2cfb01e607d103ae6af403c1a88e86e203cd81",
+  "original_bytes": 52337,
+  "entries": [
+    {
+      "path": "introduction.md",
+      "sha256": "e25ed6d94327654219c89b349b46ea3af3109ec5a82e94dfea41cf10ca79f172",
+      "bytes": 686,
+      "first_line": 1,
+      "last_line": 17
+    },
+    {
+      "path": "lsj-samples.md",
+      "sha256": "7ffddd6224641f46a63607aaab5dc2fb58f932844f19d9aac11b611dd8b5b576",
+      "bytes": 22329,
+      "first_line": 18,
+      "last_line": 1535
+    },
+    {
+      "path": "wiktionary-samples.md",
+      "sha256": "dc08be00c61f2acee5c171162a4e851e3cf5164b36e29bbc2c9684a701402bc8",
+      "bytes": 29322,
+      "first_line": 1536,
+      "last_line": 3430
+    }
+  ]
+}

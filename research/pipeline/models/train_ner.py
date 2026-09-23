@@ -8,13 +8,18 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
+if __package__:
+    from .training_evidence import environment_evidence, file_evidence, inspect_split
+else:
+    from training_evidence import environment_evidence, file_evidence, inspect_split
+
 
 RUN_DIR = Path(__file__).resolve().parent
-PREP_DIR = Path("training") / "trankit_finerweb_prep"
-DEFAULT_DATASET = PREP_DIR / "datasets" / "grc_pausanias_ethnic_civic_misc"
-DEFAULT_WORK_CACHE = Path("training") / "t"
-DEFAULT_FINISHED_MODELS = PREP_DIR / "trankit_training_run" / "finished_models"
-DEFAULT_SEED_CACHE = Path("training") / "trankit_save_ja_ner_v2"
+REPO_ROOT = RUN_DIR.parents[2]
+DEFAULT_DATASET = REPO_ROOT / "research" / "datasets" / "grc_pausanias_ethnic_civic_misc"
+DEFAULT_WORK_CACHE = REPO_ROOT / ".cache" / "training" / "active"
+DEFAULT_FINISHED_MODELS = REPO_ROOT / ".cache" / "training" / "finished"
+DEFAULT_SEED_CACHE = REPO_ROOT / ".cache" / "training" / "seed"
 _OPEN = builtins.open
 
 
@@ -38,6 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-epoch", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--snapshot-only", action="store_true")
+    parser.add_argument("--validate-only", action="store_true", help="Validate disjoint BIO splits without loading models or creating a run")
     return parser.parse_args()
 
 
@@ -271,6 +277,18 @@ def patch_trankit_ner_eval_logging() -> None:
 
 def main() -> None:
     args = parse_args()
+    if args.snapshot_only and args.validate_only:
+        raise ValueError("Choose --snapshot-only or --validate-only")
+    if Path(args.run_id).name != args.run_id or args.run_id in {".", ".."}:
+        raise ValueError("--run-id must be a single directory name")
+    if args.batch_size < 1 or args.max_epoch < 0:
+        raise ValueError("--batch-size must be positive and --max-epoch nonnegative")
+    train_bio = args.dataset_dir / args.train_file
+    dev_bio = args.dataset_dir / args.dev_file
+    split_evidence = None if args.snapshot_only else inspect_split(train_bio, dev_bio)
+    if args.validate_only:
+        print(json.dumps(split_evidence, ensure_ascii=False, indent=2))
+        return
     args.finished_models.mkdir(parents=True, exist_ok=True)
     reserve_run_id(args)
     args.work_cache.mkdir(parents=True, exist_ok=True)
@@ -279,13 +297,6 @@ def main() -> None:
         out_dir = copy_active_artifacts(args)
         print(f"Active model snapshot copied to: {out_dir}")
         return
-
-    train_bio = args.dataset_dir / args.train_file
-    dev_bio = args.dataset_dir / args.dev_file
-    if not train_bio.exists():
-        raise FileNotFoundError(train_bio)
-    if not dev_bio.exists():
-        raise FileNotFoundError(dev_bio)
 
     seed_xlmr_cache(args)
 
@@ -308,6 +319,17 @@ def main() -> None:
 
     import trankit
     patch_trankit_ner_eval_logging()
+    from trankit import tpipeline
+    evidence = {
+        "schema_version": 1, "inputs": split_evidence,
+        "environment": environment_evidence(), "trainer": file_evidence(Path(__file__)),
+        "installed_tpipeline": file_evidence(Path(tpipeline.__file__)),
+        "seed": {"value": None, "policy": "controlled by installed Trankit; bundled patch uses 1234; inspect recorded source hash"},
+        "artifacts": [],
+    }
+    evidence_path = args.finished_models / args.run_id / "run_evidence.json"
+    evidence_path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_run_config(args, config)
 
     if args.max_epoch <= 0:
         trainer = trankit.TPipeline(training_config=config)
@@ -340,6 +362,10 @@ def main() -> None:
         current_signature = artifact_signature(model_path)
         if current_signature is not None and current_signature != initial_signature:
             out_dir = copy_active_artifacts(args, config=config)
+            evidence["artifacts"] = [file_evidence(path) for path in sorted(out_dir.iterdir())
+                                     if path.is_file() and path.suffix in {".mdl", ".json"}
+                                     and path.name != "run_evidence.json"]
+            evidence_path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             print(f"Latest saved model copied to: {out_dir}")
         else:
             print("No new active NER model was saved during this run.")
