@@ -1,13 +1,14 @@
-# Status of every training run
+# Training runs and application artifacts
 
-Twenty-nine Trankit training runs exist in the development workspace. Ten produced a
-model the deployed service loads. Nineteen did not.
+The development record contains 29 Trankit parser-training configurations, including
+ten runs reported as contributing application models. The tables connect those runs
+to their selected artifacts and preserve the alternatives explored during development.
 
-The labels below are not editorial. They come from
-[`tools/check_provenance.py`](tools/check_provenance.py), which compares every artefact
-a run produced against the deployed model store and reports which are identical. Sizes
-shared by more than two deployed files are discarded as uninformative — those are the
-XLM-R tokenizer checkpoints, which are byte-identical across every language.
+The mapping below is a historical build record.
+[`tools/check_provenance.py`](tools/check_provenance.py) screens artifact sizes against
+a supplied model store; common sizes are excluded to reduce ambiguous matches, and
+`--hash` verifies candidate matches with SHA-256. Training configurations and logs
+supply the associated build context.
 
 Regenerate:
 
@@ -31,10 +32,10 @@ python research/tools/check_provenance.py \
 | `trankit_save_th_customized_ner` | thai-ner | tagger, NER |
 | `trankit_save_oldeng_oedt_tokenize_v3` | customized | Old English tagger |
 
-Two results here contradict their own directory names, which is why the check exists.
-The deployed `sanskrit-vedic` model came from the **DCS** run, not from
-`trankit_save_sa_vedic_v1`. The deployed Tagalog model is **not** `tgl_v2` superseding
-`tgl_v1`: it is v1's tagger and lemmatizer combined with v2's MWT expander.
+The mapping captures component-level model selection: `sanskrit-vedic` uses the
+**DCS** build, and Tagalog combines v1's tagger and lemmatizer with v2's MWT
+expander. Keeping those choices explicit makes the application assets traceable
+across separately named training runs.
 
 ## Superseded
 
@@ -45,9 +46,9 @@ The deployed `sanskrit-vedic` model came from the **DCS** run, not from
 
 Logs: [`experiments/sanskrit-vedic-v1/`](experiments/sanskrit-vedic-v1/).
 
-## Abandoned
+## Additional development runs
 
-### Arabic with CAMeL Tools — ten runs, nothing shipped
+### Arabic morphology and tokenizer experiments
 
 | Run | Evidence |
 |---|---|
@@ -62,15 +63,15 @@ Logs: [`experiments/sanskrit-vedic-v1/`](experiments/sanskrit-vedic-v1/).
 | `trankit_save_ar_ziplemma_20260405a` | weights produced, none deployed |
 | `trankit_save_ar_zip_surface_lemma_20260405a` | weights produced, none deployed |
 
-Confirmed independently: `camel_tools` appears in neither `requirements.txt` nor any
-runtime module. The deployed Arabic model came from `commercial_v1`.
+The selected Arabic model came from `commercial_v1`; the runtime keeps CAMeL Tools
+as an external comparison dependency. The experiment record documents the alternatives.
 See [`experiments/arabic-cameltools/OUTCOME.md`](experiments/arabic-cameltools/OUTCOME.md).
 
-### Per-language rare-language splits — six runs, nothing shipped
+### Comparing pooled and per-language training
 
 `trankit_save_rarelangs_v1as`, `v1bn`, `v1mr`, `v1ojp`, `v1pa`, `v1pkt` (Assamese,
-Bengali, Marathi, Old Japanese, Punjabi, Prakrit). None produced weights; the pooled
-`trankit_save_rarelangs_v1` run is what shipped.
+Bengali, Marathi, Old Japanese, Punjabi, Prakrit). The retained records contain no weights for these six configurations; the pooled
+`trankit_save_rarelangs_v1` run supplied the application models.
 See [`experiments/rarelangs-per-language/OUTCOME.md`](experiments/rarelangs-per-language/OUTCOME.md).
 
 ### Other
@@ -88,5 +89,5 @@ Portuguese, Sanskrit, Swahili, Thai, Turkish and Vietnamese. Several languages h
 multiple runs against different label schemes; the Vietnamese and Sanskrit families are
 scheme comparisons, not retries.
 
-The NER models load from the same store as the parsers, so the same comparison applies
-to them. Weights are not published, so the table above covers the parser runs only.
+The parser mapping above is complemented by the NER configurations and vocabularies
+in [models/](models/), and by the source/split records in [datasets/](datasets/).

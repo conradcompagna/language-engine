@@ -1,6 +1,6 @@
 # Setup and external resources
 
-This is a source publication of a deployed application. A fresh clone does not include the trained NLP models or dictionary contents needed for lookup.
+This source release contains the application and its model/dictionary build infrastructure. To run your own instance, provision the NLP models and dictionaries below, then configure the application environment.
 
 ## Runtime
 

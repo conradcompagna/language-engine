@@ -1,8 +1,9 @@
 # Design and architecture notes
 
-Working documents written during development. They are not maintained documentation;
-they record what was decided and why at the time. `docs/ARCHITECTURE.md` at the
-repository root is the maintained summary.
+Development records capture the design of the multilingual inference, lexical
+search, and document-rendering systems. Start with the maintained
+[architecture guide](../../docs/ARCHITECTURE.md), then use these dated notes to
+trace individual implementation decisions.
 
 | Document | Subject |
 |---|---|

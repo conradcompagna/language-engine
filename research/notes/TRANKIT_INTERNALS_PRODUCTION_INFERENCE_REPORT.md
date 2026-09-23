@@ -2,7 +2,10 @@
 
 ## Scope
 
-This report reflects the current benchmark app and the installed Trankit internals as of this revision.
+This development report records the shared ONNX graph, runtime adapter packs, and
+remaining optimization opportunities at the time of inspection. It documents the
+reasoning behind the inference work; see the maintained [architecture guide](../../docs/ARCHITECTURE.md)
+for the published application.
 
 Files inspected:
 

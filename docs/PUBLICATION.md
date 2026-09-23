@@ -7,11 +7,11 @@ inference and dictionary lookup infrastructure, and deployment templates. This i
 everything at the repository root.
 
 **Build infrastructure.** Under [`research/`](../research/): the code that produced the
-models, datasets and dictionaries the runtime loads; the evaluation and audits that
-gated them; the experiments that did not ship; and design notes. Under
+models, datasets and dictionaries the runtime loads; evaluation and audit tools; alternative
+model and inference designs; and implementation notes. Under
 [`extras/`](../extras/): two standalone applications.
 
-## Not included, and why
+## Separately provisioned resources
 
 | Excluded | Reason |
 |---|---|
@@ -23,9 +23,9 @@ gated them; the experiments that did not ship; and design notes. Under
 | Account and subscription records, customer documents, analytics | Personal data. |
 | Live environment files, credentials, keys, logs, caches, backups | Operational. |
 
-The intent is that the process is fully legible and the products are not redistributed.
-Every script names its inputs; the datasets and dictionaries are obtainable from their
-original sources.
+The source release documents the build process through code, configurations, dataset
+cards, and selected run evidence. Scripts name their inputs; obtain third-party
+resources from their original sources and build derived application assets locally.
 
 Configuration examples require your own settings. Third-party notices are preserved in
 [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).

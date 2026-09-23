@@ -1,7 +1,7 @@
 # Model runs
 
 One directory per finished NER training run, holding the training configuration and the
-label vocabulary. **No weights.** The configuration records the base encoder, the
+label vocabulary. The configuration records the base encoder, the
 dataset, and the hyperparameters; the vocabulary records the label set the run was
 trained against.
 
@@ -9,8 +9,8 @@ Twenty-nine runs across Old English, Ancient Greek, Armenian, Classical Chinese,
 Filipino, Hebrew, Hindi, Indonesian, Italian, Latin, Persian, Portuguese, Sanskrit,
 Swahili, Thai, Turkish and Vietnamese.
 
-Several languages appear more than once. Those are comparisons between label schemes,
-not retries:
+Several languages have complementary runs comparing label schemes, corpus sizes,
+and supervision settings:
 
 - `vie_plo75`, `vie_manual12_direct_raw`, `vie_collapse13_all_tags_raw`, `wikiann_vi` —
   four different coarse label sets for Vietnamese

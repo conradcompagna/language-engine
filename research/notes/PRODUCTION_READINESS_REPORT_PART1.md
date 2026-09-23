@@ -4,17 +4,21 @@ Date: 2026-05-14
 App: Language Engine  
 Scope: marketing site, account/auth/billing/email, the reader product, Trankit backend, dictionary runtime, Gemini integration, document handling, and initial Hetzner deployment readiness.
 
-## Executive Verdict
+## Development context
 
-Language Engine is not yet fully ready to go live as a paid indie SaaS, but it is past the prototype stage. The core product architecture exists, the payment and account flows are real, the reader stack is wired to the current hybrid lookup system, and the app has enough functional surface to become launchable without a rewrite. The blocker is not that the app is missing its product. The blocker is that the production envelope is not finished: the repo is not deployment-clean, production process files are missing, some runtime dependencies are not pinned, secrets and security defaults need tightening, debug surfaces are still enabled, several browser dependencies still load from CDNs, and multiple-worker deployment on Hetzner has practical memory and cache-state consequences that need to be handled deliberately.
+This May 14, 2026 review records the transition from an integrated application to a
+deployable service. The core work already connected multilingual NLP, hybrid
+dictionary lookup, document reading, account management, OAuth, subscription
+billing, and usage-budgeted language assistance. The review translated that system
+into concrete deployment tasks: runtime packaging, secret and session configuration,
+worker memory budgeting, cache ownership, and service integration checks.
 
-The short answer is: do not point paid public traffic at the app today. It should be treated as a nearly-launchable app that still needs a production hardening pass. A soft launch becomes reasonable after the P0 items in this report are completed and verified on a fresh Hetzner server or a close local replica.
+The findings below describe that development snapshot. Use the maintained
+[architecture guide](../../docs/ARCHITECTURE.md), [setup instructions](../../docs/SETUP.md),
+and current source for the published application; this historical checklist is a
+record of the launch work, not a current deployment audit.
 
-The biggest positives are substantial. The app has an actual marketing landing page, a working account page, Stripe Checkout and Customer Portal integration, Google OAuth support, SMTP email support through Resend, a real hybrid dictionary architecture, SQLite dictionary hydration, Trankit NLP processing, Gemini-backed features, and locally stored dictionary/model assets. This is not just a landing page with a fake checkout. There is a real product behind it.
-
-The biggest concerns are also concrete. The current workspace is not tarball-ready. There is no active root `requirements.txt`, no root `wsgi.py`, no production service file, no deployment manifest for the runtime footprint, and no clean packaging boundary that separates needed runtime files from backup/copy/tmp/dev artifacts. The app also currently has debug collection and the debug panel enabled, broad CORS, an unset production Flask secret key in `.env`, a hardcoded Gemini fallback in source, and active CDN dependencies in the reader and marketing pages. Those are fixable, but they are go-live blockers.
-
-## Readiness Snapshot
+## Readiness snapshot at the time of review
 
 | Area | Current Readiness | Verdict |
 | --- | --- | --- |
@@ -196,6 +200,6 @@ If low latency is the goal, prebuilding dictionary compact indexes and shipping 
 
 ## Conclusion
 
-Language Engine is not production-ready today, but it is close enough that the next step should be deployment hardening rather than product rebuilding. The marketing page, account system, Stripe integration, email integration, Google OAuth path, reader UI, Trankit backend, dictionary hydration, and Gemini feature stack all exist. The product is real.
+The review established deployment hardening as the next phase of development: the marketing page, account system, Stripe integration, email integration, Google OAuth path, reader UI, Trankit backend, dictionary hydration, and Gemini feature stack were already integrated. The checklist below records the remaining work identified on May 14, 2026.
 
 The go-live blockers are mainly production discipline: clean packaging, pinned requirements, local assets, secure secrets, disabled debug surfaces, verified third-party dashboards, documented runtime data, and a measured Hetzner worker plan. Once those are handled, the app should be suitable for a controlled indie SaaS launch. The most practical next phase is to create the deployment files and manifest, localize browser dependencies, clean the tarball boundary, and run the app on a fresh server-like environment before deploying it publicly.

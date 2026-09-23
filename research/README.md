@@ -1,44 +1,42 @@
 # Research and build infrastructure
 
-Everything in this directory is **offline work**. None of it runs in production. It is
-the record of how the models, dictionaries and datasets that Language Engine loads at
-runtime were actually built, evaluated, and in many cases abandoned.
+This is the development record behind Language Engine: multilingual model training,
+task-specific corpus construction, dictionary engineering, and inference optimization.
+The guides connect implementation choices to the scripts, configurations, and recorded
+outputs that produced them.
 
-The deployed application is at the repository root. If you only want to see what the
-service does, stop at the root [README](../README.md) and do not read further.
+## Three paths through the work
 
-## Layout
+1. **Build models for historical and low-resource languages.** Follow the
+   [build chains](pipeline/README.md) from Sanskrit sandhi supervision and synthetic
+   NER annotation to model training and application integration.
+2. **Make multilingual inference practical to serve.** Follow the
+   [runtime-artifact pipeline](pipeline/README.md#2-runtime-model-artefacts) through
+   ONNX export, INT8 quantization, and session tuning, with
+   [evaluation tools and measurements](evaluation/README.md).
+3. **Turn heterogeneous dictionaries into one reading interface.** Follow the
+   [dictionary pipeline](pipeline/README.md#3-dictionaries) through source conversion,
+   language-specific normalization, lexical indexing, and batch hydration.
 
-| Directory | Contents |
+## Supporting records
+
+| Directory | What to explore |
 |---|---|
-| [`pipeline/`](pipeline/) | Code that produced something the runtime loads. See [pipeline/README.md](pipeline/README.md) for the end-to-end build chains. |
-| [`evaluation/`](evaluation/) | Regression tests, benchmarks, latency measurements, and the dictionary/corpus audit reports. |
-| [`experiments/`](experiments/) | Work that did not ship. Each subdirectory has an `OUTCOME.md` stating what was tried and why it was dropped. |
-| [`notes/`](notes/) | Architecture and design documents written during development. |
-| [`datasets/`](datasets/) | Dataset cards: label inventories, token counts, provenance. No corpora. |
-| [`models/`](models/) | Training configuration and label vocabulary for every finished model run. No weights. |
+| [pipeline/](pipeline/) | Dataset builders, trainers, model conversion, and dictionary tooling |
+| [models/](models/) | Configurations and label vocabularies for 29 completed NER runs |
+| [datasets/](datasets/) | Corpus provenance, label inventories, and token counts |
+| [evaluation/](evaluation/) | Regression harnesses, profiling tools, and recorded measurements |
+| [experiments/](experiments/) | Design alternatives and the decisions that shaped the application |
+| [notes/](notes/) | Development records for inference, lookup, rendering, and deployment |
 
-## Which runs shipped
+[STATUS.md](STATUS.md) records the historical mapping between training runs and
+application artifacts. The [application overview](../README.md) and
+[architecture](../docs/ARCHITECTURE.md) describe the reading platform itself.
 
-[`STATUS.md`](STATUS.md) labels every training run **Shipped**, **Superseded** or
-**Abandoned**, and gives the evidence for each label. The labels are not a judgement
-call: [`tools/check_provenance.py`](tools/check_provenance.py) compares the byte size
-of every artefact each run produced against the models the deployed service loads, and
-regenerates the table. Run it yourself against a model store to reproduce the result.
+## Working with the build tools
 
-This matters because the directory names are unreliable. The deployed `sanskrit-vedic`
-model was not produced by `trankit_save_sa_vedic_v1`; it came from the DCS run. The
-deployed Tagalog model is `tgl_v1`'s tagger and lemmatiser combined with `tgl_v2`'s
-multi-word-token expander. Ten Arabic runs produced nothing that ships.
-
-## What is deliberately not here
-
-Model weights, dictionary databases, training corpora, and the per-job outputs of
-large annotation runs. The scripts that build them are here; the products are not.
-Where a run produced tens of thousands of intermediate files, an aggregate record of
-that volume is published instead of the files — see
-[`pipeline/datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json`](pipeline/datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json).
-
-Most scripts here expect input paths that existed on the development machine. They are
-published as a record of method, not as a turnkey pipeline. Each one names its inputs
-and outputs at the top.
+Scripts identify their inputs and outputs; historical scripts may need local paths
+adapted to a new environment. Model weights and full corpora are provisioned separately,
+with resource details in [publication contents](../docs/PUBLICATION.md).
+Aggregate records, such as the [Sanskrit annotation run](pipeline/datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json),
+make the scale, validation, and cost of the work inspectable.

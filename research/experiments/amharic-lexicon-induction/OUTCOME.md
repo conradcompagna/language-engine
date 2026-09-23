@@ -1,4 +1,4 @@
-# Amharic bilingual lexicon induction — research, not product
+# Amharic bilingual lexicon induction
 
 ## What was tried
 
@@ -17,7 +17,7 @@ text exists.
 
 ## Outcome
 
-It produced a usable statistical dictionary, but Amharic was never added to Language
-Engine and this is not connected to the product. It is here because it is the same
-research question the rest of the project circles — how to get usable lexical coverage
-for a language that has none — approached from the opposite direction.
+The experiment produced a statistical dictionary and a reusable sequence of corpus,
+morphology, alignment, and lexicon-assembly tools. It is a separate low-resource NLP
+study alongside Language Engine, addressing lexical coverage through monolingual
+embedding alignment. Amharic is outside the deployed reader's language set.
