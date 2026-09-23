@@ -2,9 +2,11 @@
 
 ## Included
 
-**Runtime.** The Flask/JavaScript application, language configurations, neural
-inference and dictionary lookup infrastructure, and deployment templates. This is
-everything at the repository root.
+**Runtime.** Flask composition, HTTP services, capture handling, and contextual
+language services in `language_engine/`; browser modules and stylesheets in
+`frontend/`; focused neural and lexical services at the repository root; HTML
+templates and deployment configuration. The [architecture guide](ARCHITECTURE.md)
+maps these responsibilities. Browser bundles are generated during the build.
 
 **Build infrastructure.** Under [`research/`](../research/): the code that produced the
 models, datasets and dictionaries the runtime loads; evaluation and audit tools; alternative

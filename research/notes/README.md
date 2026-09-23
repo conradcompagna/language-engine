@@ -1,23 +1,22 @@
-# Design and architecture notes
+# Design and implementation guides
 
-Development records capture the design of the multilingual inference, lexical
-search, and document-rendering systems. Start with the maintained
-[architecture guide](../../docs/ARCHITECTURE.md), then use these dated notes to
-trace individual implementation decisions.
+Start with the [application architecture](../../docs/ARCHITECTURE.md). These
+guides explain the engineering decisions behind inference, lexical search,
+document interaction, and classical-language support, with links to their
+implementation and research evidence.
 
-| Document | Subject |
+| Guide | What it explains |
 |---|---|
-| `NLP_HUB_CONSTRUCTION_REPORT.md` | how the multilingual NLP layer was assembled |
-| `TRANKIT_INTERNALS_PRODUCTION_INFERENCE_REPORT.md` | Trankit's internals as they bear on production inference |
-| `MWT_SYSTEM.md` | multi-word-token handling end to end |
-| `RENDERING_ARCHITECTURE.md` | reader rendering architecture |
-| `ENTRY_RENDERING_SYSTEM_OVERVIEW.md` | dictionary entry rendering |
-| `HYDRATION_FIRST_RENDERING_REFERENCE.md` | the hydration-first lookup model |
-| `LOOKUP_RENDERING_PIPELINE_MAP.md` | lookup from selection to rendered entry |
-| `DICTIONARY_POSTPROCESSOR_INVENTORY.md` | every dictionary post-processing step |
-| `LATIN_GREEK_PIPELINE.md` | the classical-language pipeline |
-| `AUDIT_text_pipeline.md` | text pipeline audit |
-| `DEPLOYMENT_AUTH_BILLING.md` | deployment, authentication and billing |
-| `PRODUCTION_READINESS_REPORT_PART1.md` | pre-launch readiness review |
-| `THIRD_PARTY_CONTENT_AND_LICENSING_REPORT.md` | third-party content and licensing |
-| `trankit_internals_notes.md` | working notes on Trankit internals |
+| [Multilingual inference and lexical search](NLP_HUB_CONSTRUCTION_REPORT.md) | Model integration, compact indexes, and batched hydration |
+| [Dictionary hydration contract](HYDRATION_FIRST_RENDERING_REFERENCE.md) | Exact identity, matched forms, morphology, and provenance |
+| [Dictionary rendering](RENDERING_ARCHITECTURE.md) | Popup, side-panel, and annotation responsibilities |
+| [Document loading and lookup](LOOKUP_RENDERING_PIPELINE_MAP.md) | Source formats, geometry, selection, and shared lookup flow |
+| [Multi-word tokens](MWT_SYSTEM.md) | Surface spans, expanded words, and dictionary alignment |
+| [Latin and Ancient Greek](LATIN_GREEK_PIPELINE.md) | Lexical construction, inflectional resources, normalization, and NER |
+| [Trankit inference internals](TRANKIT_INTERNALS_PRODUCTION_INFERENCE_REPORT.md) | Tokenization, tagging, lemmatization, and model execution |
+| [Trankit implementation notes](trankit_internals_notes.md) | Pipeline components and linguistic feature design |
+| [Deployment, authentication, and billing](DEPLOYMENT_AUTH_BILLING.md) | Application services and deployment configuration |
+| [Third-party content and licensing](THIRD_PARTY_CONTENT_AND_LICENSING_REPORT.md) | Source attribution and content provenance |
+
+[Research results](../EVIDENCE.md) connect these design choices to corpus
+construction, model training, and recorded measurements.

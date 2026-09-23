@@ -1,25 +1,50 @@
-# NLP Hub Construction Report
+# Multilingual inference and lexical search
 
-This report traces the active code paths in the current Language Engine workspace and ignores the many backup and legacy files unless they explain how the present architecture evolved. The app appears to have been built as a Flask-backed reading environment that gradually moved expensive dictionary work out of the server and into a compact browser-side runtime, while keeping transformer NLP, persistence, billing, and document ingestion on the Python side.
+The platform combines a shared multilingual NLP service with browser-side
+dictionary matching and exact SQLite hydration. This design keeps large lexical
+records on the server while making repeated matching and navigation interactive.
 
-The first layer is the Flask application shell in `router.py`. It creates the app, enables CORS, sets JSON to preserve Unicode, exposes cache-busting helpers for static assets, and initializes SQLAlchemy through `db.py`. Authentication is separated into `auth.py` as a Flask-Login blueprint with password login and optional Google OAuth. Stripe billing lives in `payments.py`, and account state feeds feature gates and quota checks. `config.py` reads environment variables and local `.env` settings for database, Stripe, OAuth, Gemini, free-tier limits, and model/runtime switches. On startup, `router.py` creates missing database tables, performs a few small migrations, registers the debug panel and document routes, then calls `preload_startup_resources()`.
+## Language and model integration
 
-The language layer is centralized in `language_registry.py`. Each language entry maps an internal code such as `ja`, `ko`, `grc`, or `sa` to a Trankit runtime name, optional treebank name, language config JSON, dictionary source metadata, and special runtime flags. Startup builds one shared Trankit `Pipeline`, registers custom language names that Trankit does not know by default, adds every configured language, and protects inference with a threading lock. This file also patches several Trankit internals: identity lemmatization for languages without a trained lemmatizer, multi-word-token behavior, custom NER routing, language-specific tokenization for Classical Chinese and Arabic, and optional ONNX runtime installation when `NEWPIPELINE=1`. This is the core NLP backend: a single multilingual transformer service wrapped in project-specific normalization and treebank routing.
+[language_registry.py](../../language_registry.py) connects language codes,
+Trankit runtime names, display configuration, and dictionary sources. It manages
+the shared inference pipeline, language-specific tokenization hooks, custom NER
+routing, and compressed-runtime integration. [pipeline_common.py](../../pipeline_common.py)
+turns model output into token spans, dependency edges, grammatical features,
+and entity overlays for the reader.
 
-A lookup begins in the browser. The reader page is `templates/reader_jshybrid.html`, which loads `reader_wikt.js`, `panel_segment_renderer.js`, `dictionary_normalization_layer.js`, `dictionary_engine_hybrid.js`, `dictionary_client_hybrid.js`, `user_contributions.js`, and finally the large `reader.js` application. `reader.js` owns the reader UI: file loading, text selection, page rendering, POS shading, dependency overlays, NER display, side panel behavior, and calls to `/lookup`. Before those calls reach the network unchanged, `dictionary_client_hybrid.js` monkey-patches `window.fetch`.
+The [normalization layer](../../universal_normalization.py) maps model-space
+text and offsets to the reading surface. The [MWT guide](MWT_SYSTEM.md) explains
+how expanded linguistic words retain their relationship to visible tokens.
+[Training records](../STATUS.md) connect model configurations and corpus builds
+to application assets; [model results](../models/README.md) show selected runs.
 
-For the main lookup chain, the patched fetch still sends `/lookup` to Flask, but the server now returns NLP only. `router.py` resolves the language, applies `run_with_universal_normalization()` from `universal_normalization.py`, calls `run_trankit()` or `run_trankit_chunk_boundaries()`, normalizes a few language-specific UPOS cases, and passes the Trankit document to `process_lookup_nlp_only()` in `pipeline_common.py`. That function flattens multi-word token structures, collects token surfaces and offsets, and builds a `ud_overlay` containing dependency edges, roots, sentence spans, token features, lemmas, POS tags, and NER spans. The response intentionally leaves `results_by_seg` empty. The server has done linguistic analysis, not dictionary resolution.
+## Compact lexical indexes
 
-The dictionary system is built in two phases. Offline, `convert_tsv_to_sqlite.py` reads Wiktionary-derived TSV files and alternate sources such as JMDict, KRDict, CC-CEDICT, LSJ, and others into per-language SQLite databases under `dict_sqlite/`. The schema separates `entries` from inflected or alternate `forms`, preserving headword, romanization, part of speech, JSON glosses, commentary, lemma, etymology, source, tags, and format. This design keeps dictionary content queryable without loading multi-gigabyte dictionaries into memory.
+The [dictionary pipeline](../pipeline/README.md#3-dictionaries) produces
+SQLite entries and form tables. [dict_lookup_sqlite.py](../../dict_lookup_sqlite.py)
+builds compact headword and form indexes that carry row references rather than
+full glosses. Shared normalization and [pruning policy](../../sqlite_prune_policy.py)
+keep index construction aligned with browser queries.
 
-At server startup, `router.py` prebuilds compact JavaScript key indexes by calling `build_compact_key_index()` in `dict_lookup_sqlite.py`. That function reads each SQLite dictionary, prunes duplicate or unhelpful rows, normalizes headwords and forms through the same JavaScript normalization layer used in the browser, and emits only compact maps: `hw` for normalized headword keys and `fw` for normalized form keys. Values are small winner references: database alias, entry row id, and sometimes form row id. Full glosses and forms are not sent in the index. The resulting gzip artifacts are cached under runtime cache directories and exposed through immutable `/dict-index/...` URLs plus `/js/dict/versions`.
+[Index-cache services](../../language_engine/http/index_cache.py) and
+[startup services](../../language_engine/http/startup.py) prepare versioned gzip
+artifacts. The [browser cache](../../frontend/dictionary/client/index-cache.mjs)
+retains indexes between sessions; the [dictionary engine](../../frontend/dictionary/engine/)
+uses them for candidate selection, segmentation, and fuzzy matching.
 
-In the browser, `dictionary_client_hybrid.js` loads the correct gzip index for the selected language/source, decompresses it, and creates a compact-mode `DictionaryEngine`. In this mode, `dictionary_engine_hybrid.js` does not return full entries from `lookup_all()`. It returns winner-ref stubs. The DP segmentation function `buildSinglePassSurfaceLookup()` then tries whole-surface matches, lemma-aware matches using Trankit lemmas, form matches, MWT child mappings, and greedy segmentation over known dictionary keys. Its output is a compact decision: which pieces of the selected text correspond to which row references.
+## Request flow
 
-The second server round trip is hydration. `dictionary_client_hybrid.js` deduplicates winner refs and posts them to `/js/hydrate`. The Flask route validates dictionary aliases and calls `hydrate_winner_refs()` in `dict_lookup_sqlite.py`. Hydration uses attached SQLite databases and a JSON payload of refs to fetch exactly the needed rows in batches. It also fetches matched form metadata, special display forms such as hanja/hangeul/CJK rows, same-headword morphology variants, and community notes. `router.py` reshapes this into `entry_store`, `ref_to_key`, and `form_overlays`, so the browser can merge entries back into each token without downloading unused dictionary data.
+1. The [HTTP lookup service](../../language_engine/http/lookup.py) runs linguistic analysis.
+2. [Browser lookup orchestration](../../frontend/dictionary/client/lookup-service.mjs) combines its output with dictionary candidates and surface spans.
+3. The [hydration endpoint](../../language_engine/http/dictionary_index.py) validates dictionary sources and retrieves selected rows in batches.
+4. [Display serializers](../../language_engine/http/serializers.py) attach explicit identity, morphology, and provenance fields.
+5. [Reader modules](../../frontend/reader/) display the aligned results in document overlays and dictionary panels.
 
-Finally, `hybridSegmentAndHydrate()` merges the NLP payload and hydrated dictionary payload into the old reader-compatible shape: `segments`, `segment_offsets`, `ud_overlay`, `grammar_overlay`, `results_by_seg`, and `entry_store`. `reader_wikt.js` renders entries, glosses, forms, morphology, notes, and etymology through one shared Wiktionary-style template. `panel_segment_renderer.js` makes side-panel entry text hoverable by using the same `/lookup_dp_only` interception path, which performs compact-index DP plus hydration without calling Trankit.
+Side-panel lookups reuse compact matching and hydration without an additional
+neural parse. [Custom-entry services](../../language_engine/gemini/README.md)
+add user-authored and generated entries with persistence and usage accounting.
 
-The app also has a custom-entry layer. `gemini_dict.py` can generate dictionary rows with Gemini, enforce the same monthly API budget as the chat assistant, store results in `custom_dict_entries`, and sync a custom forms index. The browser loads `/js/dict/<lang>/custom_index` separately with no disk caching and injects those custom keys into the live compact engine. General LLM chat and translation features are handled in `api_services.py` and related routes with tier-based budget accounting in `ApiUsage`.
-
-The overall construction shows a strong split of responsibilities: Flask manages authenticated infrastructure, model inference, document ingestion, billing, and exact SQLite hydration; JavaScript manages interactive reading, segmentation decisions, rendering, caching, and popup ergonomics. The technically distinctive part is the hybrid lookup design: Trankit supplies syntactic and morphological context, compact browser indexes supply fast lexical search, and SQLite hydration supplies full scholarly dictionary content only after the client has selected the winning rows.
+The [application architecture](../../docs/ARCHITECTURE.md) maps service ownership;
+the [evaluation guide](../evaluation/README.md) links measurements and regressions
+behind the lookup and inference design.

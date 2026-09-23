@@ -12,7 +12,7 @@ The fixture uses synthetic responses; full dictionary and neural resources are p
 
 ---
 
-## What runs in production
+## Application architecture
 
 The application combines a browser reading workspace with Flask services, multilingual
 neural inference, and a shared dictionary infrastructure.
@@ -32,13 +32,18 @@ The code includes **27 language display configurations and enabled NLP registry 
 
 | Area | Starting point |
 |---|---|
-| HTTP application and accounts | [router.py](router.py), [auth.py](auth.py), [payments.py](payments.py) |
+| Application composition and HTTP services | [application factory](language_engine/application.py), [HTTP modules](language_engine/http/), [authentication](auth.py), [billing](payments.py) |
 | Browser segmentation and hydration | [dictionary client modules](frontend/dictionary/client/), [browser build and fixture demo](frontend/README.md) |
 | Reader UI and document views | [reader modules](frontend/reader/), [snapshot renderer](frontend/documents/snapshot/) |
 | Contextual language services | [Gemini task services](language_engine/gemini/README.md) |
 | Lexical indexes and SQLite access | [dict_lookup_sqlite.py](dict_lookup_sqlite.py) |
 | Neural inference and alignment | [language_registry.py](language_registry.py), [pipeline_common.py](pipeline_common.py), [trankit_compressed_runtime.py](trankit_compressed_runtime.py) |
 | Deployment | [wsgi.py](wsgi.py), [deploy/](deploy/) |
+
+The server is organized into Flask blueprints and task services; the browser uses
+ES modules with explicit imports and feature-owned state. CI enforces a 2,000-line
+limit for maintained files and runs backend, browser, and fixture checks. Follow
+the [architecture guide](docs/ARCHITECTURE.md) for the request and data flow.
 
 Model weights, dictionaries, and account data are provisioned separately. See [setup](docs/SETUP.md) and [publication contents](docs/PUBLICATION.md).
 

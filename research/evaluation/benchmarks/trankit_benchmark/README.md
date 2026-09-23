@@ -45,12 +45,11 @@ the same paths. Cache defaults remain adjacent to the compatibility entrypoint.
 | `TRANKIT_ONNX_CACHE_DIR` | `.trankit_compressed_runtime` |
 | `TRANKIT_ONNX_DEPS_DIRS` | Optional directories separated by the OS path separator |
 
-No private `C:\\tmp` dependency paths are assumed. This repository does not ship
-model weights or claim a fresh clone reproduces a hardware benchmark result.
+Hardware benchmarks use separately provisioned model weights and runtime dependencies.
 Record model hashes, dependencies, hardware, input, repetitions and warmup state
 alongside any measurements you publish.
 
-`python -m pytest tests/test_benchmark.py` checks pre-extraction comparison fixtures,
+`python -m pytest tests/test_benchmark.py` checks comparison fixtures,
 the asset-serving interface, spawn imports and picklable worker targets without
 loading models. Hardware timing, CUDA and ONNX inference require a separate run
 with the authorized assets and are not covered by these fixture checks.

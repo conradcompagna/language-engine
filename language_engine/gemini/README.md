@@ -1,7 +1,8 @@
 # Gemini services
 
-`gemini_dict.py` preserves the existing function import paths for the router.
-Implementations live here with explicit imports and no model loading on import.
+Contextual language tasks are organized into focused services with explicit
+imports. The root `gemini_dict.py` facade exposes their public functions;
+importing the services does not load a model.
 
 | Module | Responsibility |
 | --- | --- |
@@ -14,11 +15,9 @@ Implementations live here with explicit imports and no model loading on import.
 | `gloss.py`, `decomposition.py`, `orthography.py` | Contextual batch tasks |
 | `ner.py`, `translation.py` | Entity spans and sentence translation |
 
-The eight shadowed function definitions and an overwritten decomposition prompt
-were consolidated to their effective final versions. All 57 effective function
-bodies were preserved during extraction; regression fixtures retain pre-extraction
-schema, language-policy and payload results. Mocked transport tests make no API
-calls and require no private dictionary or trained model.
+Regression fixtures cover schemas, language policies, and request/response
+payloads. Mocked transport tests exercise service behavior without API calls,
+private dictionaries, or trained models.
 
 Set provider settings in `settings.py`; credentials remain in environment-backed
 `config.py`. The facade exposes values for compatibility, but configuration should

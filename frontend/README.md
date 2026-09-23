@@ -16,12 +16,10 @@ ES modules instead. Vendored PDF.js, Mammoth, DOMPurify and Foliate remain separ
 | `linguistics/pronunciation/` | Grapheme analysis, script-specific algorithms, profiles and tables                             |
 
 Each entrypoint imports feature modules explicitly. Feature state lives in the
-adjacent `*.state.mjs` module; initialization runs once in the original script
-order through `index.mjs`. This retains synchronous browser and worker APIs
-without a framework or dynamically concatenated source files. Modules import
-cross-feature functions directly; state modules have no DOM or network effects
-on import. Four shadowed reader functions retain only their effective final
-definitions.
+adjacent `*.state.mjs` module; `index.mjs` initializes each entrypoint in dependency
+order. Browser and worker APIs are synchronous where their callers require it.
+Modules import cross-feature functions directly; state modules have no DOM or
+network effects on import.
 
 ## Checks and fixture demo
 
@@ -37,11 +35,10 @@ The last command serves the real reader template at `http://127.0.0.1:8791`
 with synthetic authentication/configuration responses, without importing the
 production server, loading a model, or calling an external service.
 
-Regression fixtures record pre-extraction dictionary/form lookup, compact row
+Regression fixtures cover dictionary/form lookup, compact row
 identity, fuzzy tiers, custom-key updates, lemma alignment, every published tag
 label, and pronunciation results for all profile table keys and spans. Browser
 tests exercise rendering, snapshot selection/isolation, classic worker imports,
-and PDF loading/search using a synthetic local PDF. The CSS extraction retained
-the original cascade; a local Chromium comparison found identical computed styles
-for all 272 fixture elements and an identical page screenshot.
-These fixtures do not replace full inference tests with authorized model assets.
+and PDF loading/search using a synthetic local PDF. Stylesheets use explicit
+imports to define cascade order. Model-backed evaluation is documented separately
+in the [research evidence index](../research/EVIDENCE.md).

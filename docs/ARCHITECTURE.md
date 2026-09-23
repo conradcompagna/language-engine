@@ -1,52 +1,75 @@
-# Architecture
+# Application architecture
 
-## Reading and lookup
+Language Engine separates neural inference, lexical storage, browser matching,
+and interactive reading. The browser selects dictionary candidates from compact
+indexes; the server returns full records for the selected candidates in batches.
 
 ```mermaid
 flowchart LR
-    Text[Selected document text] --> NLP[Flask / Trankit]
-    NLP --> DP[Browser DP segmentation]
+    Text[Selected document text] --> NLP[Flask lookup service / Trankit]
+    NLP --> DP[Browser dictionary segmentation]
     Index[Compact key index / IndexedDB] --> DP
     DP --> Hydrate[Batch SQLite hydration]
     Hydrate --> Reader[Dictionary and grammar overlays]
 ```
 
-`templates/reader_jshybrid.html` loads the reader. `static/dictionary_client_hybrid.js` intercepts the main `/lookup` request, combines the server's NLP output with client-side segmentation, and requests selected entries from `/js/hydrate`. Side-panel lookup uses the same lexical engine without a new neural parse.
+## Server composition
 
-`dict_lookup_sqlite.py` builds compact indexes and retrieves dictionary rows. `tools/normalize_keys.js` supplies the JavaScript normalization used during indexing and is a runtime dependency. `sqlite_prune_policy.py` supplies the shared entry-pruning policy.
+| Responsibility | Implementation |
+|---|---|
+| Application factory and resource initialization | [application.py](../language_engine/application.py), [startup.py](../language_engine/http/startup.py) |
+| HTTP lookup and language selection | [lookup.py](../language_engine/http/lookup.py), [language_registry.py](../language_registry.py) |
+| Dictionary indexes and hydration | [dictionary_index.py](../language_engine/http/dictionary_index.py), [serializers.py](../language_engine/http/serializers.py), [dict_lookup_sqlite.py](../dict_lookup_sqlite.py) |
+| Accounts, subscriptions, and persistence | [auth.py](../auth.py), [payments.py](../payments.py), [db.py](../db.py) |
+| Contextual language tasks | [Gemini service modules](../language_engine/gemini/README.md), [api_services.py](../api_services.py) |
+| Capture policy and isolation | [capture guide](CAPTURES.md), [capture package](../language_engine/captures/) |
+| Deployment entrypoints | [wsgi.py](../wsgi.py), [router.py](../router.py), [deployment templates](../deploy/) |
 
-`pipeline_common.py` handles NLP results, including the alignment of expanded multi-word tokens back to the selected surface text. `language_registry.py` selects models and loads language display configurations from `wiktionary_general/`. Arabic uses Trankit's native tokenizer. Compressed encoder execution is implemented in `trankit_compressed_runtime.py` and `trankit_onnx_live_switch.py`.
+`create_app()` composes Flask blueprints and accepts explicit resource-loading
+and NLP adapters. Importing the factory does not open a database or load a model.
+The server entrypoints select production initialization. Database preparation
+lives in [database.py](../language_engine/database.py).
 
-## Application boundaries
+Model registries and immutable dictionary index-version maps are shared within
+a process. Tests construct isolated databases with `prepare_database=False` and
+`load_resources=False`, then inject the NLP and resource adapters they exercise.
+HTTP policy checks account tiers and quotas at the blueprint boundary.
 
-`language_engine.application.create_app()` composes the Flask application; importing
-the factory does not initialize a database or load a model. `router.py` and
-`wsgi.py` retain the server entrypoints and use production initialization defaults.
-`language_engine/database.py` contains the existing compatibility migrations.
+## Lookup and dictionary identity
 
-`language_engine/http/` separates lookup, dictionary indexes/downloads, hydration
-serializers, custom entries, notes/decomposition, quotas, pages and startup.
-HTTP URLs and response shapes remain compatible; Flask endpoint names now include
-their blueprint (for example, `pages.account_page`). The paid-feature gate checks
-the endpoint's function name after removing that prefix.
+The [request adapter](../frontend/dictionary/client/public-api.mjs) handles
+reader lookup calls. [lookup-service.mjs](../frontend/dictionary/client/lookup-service.mjs)
+combines server NLP with [surface matching](../frontend/dictionary/client/surface-lookup.mjs)
+and the [dictionary engine](../frontend/dictionary/engine/). Side-panel dictionary
+lookup uses the same lexical engine without requesting a new neural parse.
 
-Tests pass `prepare_database=False` and `load_resources=False`, create an isolated
-SQLite database, and inject `nlp_runner` when exercising lookup. A `resource_loader`
-callback can replace production initialization. The production language registry
-and immutable dictionary index version maps remain process-wide shared caches;
-factories are not a way to run incompatible model registries in one process.
+Compact indexes carry database and row identifiers. `/js/hydrate` validates the
+requested sources, loads selected SQLite records, and builds explicit display
+fields. The [hydration contract](../research/notes/HYDRATION_FIRST_RENDERING_REFERENCE.md)
+explains how matched forms, headwords, provenance, and display identity travel
+together through the interface.
 
-`auth.py`, `payments.py`, and `db.py` implement identity, subscription state, and persistence. `api_services.py` and `gemini_dict.py` enforce usage budgets around contextual assistance and generated dictionary entries.
+[pipeline_common.py](../pipeline_common.py) prepares NLP overlays and surface
+spans; [language_registry.py](../language_registry.py) selects models and display
+configurations. [trankit_compressed_runtime.py](../trankit_compressed_runtime.py)
+and [trankit_onnx_live_switch.py](../trankit_onnx_live_switch.py) implement shared
+compressed-encoder execution. Index construction uses the same JavaScript key
+normalization as browser queries through [normalize_keys.js](../tools/normalize_keys.js).
 
-Dictionary-only lookups run in the browser through the shared hybrid engine; the server hydrates the selected entries.
+## Browser and document boundaries
 
-## Repository layout
+[frontend/reader/](../frontend/reader/) owns document interaction, popups, grammar
+overlays, and settings. [frontend/dictionary/](../frontend/dictionary/) owns
+matching and hydration. [frontend/documents/snapshot/](../frontend/documents/snapshot/)
+owns captured-document layout and selection. Feature modules import their
+dependencies explicitly and keep mutable state in adjacent state modules.
 
-The root retains server compatibility entrypoints and existing focused services.
-`language_engine/` owns HTTP composition, capture security and Gemini task services.
-`frontend/` contains maintained browser modules and ordered stylesheets; `npm run
-build` produces the existing public URLs in `static/`. `templates/` contains the
-HTML interface; `deploy/` contains hosting templates. `tools/normalize_keys.js`
-supplies runtime key normalization. Models and dictionary data are provisioned separately.
+`npm run build` compiles the entrypoints in [frontend/entries.json](../frontend/entries.json)
+into the public assets loaded by [reader_jshybrid.html](../templates/reader_jshybrid.html).
+Generated bundles and source maps are build products; maintained browser source
+lives under `frontend/`. PDF.js and Foliate provide document rendering services.
 
-`static/foliate-js/` contains the ebook renderer and its browser dependencies. `static/docrender/lookup_chunks.js` groups page geometry into paragraph boundaries during PDF and web-snapshot extraction.
+Continue with the [browser module map](../frontend/README.md),
+[document flow](../research/notes/LOOKUP_RENDERING_PIPELINE_MAP.md), and
+[development checks](DEVELOPMENT.md). Model weights and dictionary data are
+provisioned as described in [setup](SETUP.md).

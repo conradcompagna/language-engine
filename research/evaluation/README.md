@@ -40,11 +40,11 @@ not a general throughput or tail-latency benchmark.
 
 ## Reports
 
-`reports/` holds the audits that gated dictionary and pipeline changes. The substantial
-ones:
+`reports/` holds dictionary quality studies and recorded performance measurements.
+Start with:
 
-- `dictionary_sqlite_port_function_audit_2026-03-27.md` — function-by-function audit of
-  the port from the TSV-era lookup to the SQLite lookup, with the gap report alongside it
+- [Lookup normalization responsibilities](reports/lookup_normalization_audit.md)
+  — shared key rules from index construction to browser matching
 - `wiktionary_form_tags_audit_2026-04-11.md`, `wiktionary_forms_surface_audit_2026-04-11.md`
   — what Wiktionary's form tags actually contain, across languages
 - `headword_non_script_marks_master.md` — headwords carrying marks outside their own
@@ -55,8 +55,8 @@ ones:
   — the measurements behind the hybrid lookup design
 - `transparency_attribution_inventory.md` — source and licence inventory for every
   dictionary
-- `mwt_child_authority_audit_report.md` — which of a multi-word token's children may
-  override the parent's analysis
+- [Multi-word-token alignment](../notes/MWT_SYSTEM.md) — surface and child
+  representations, maintained modules, and the realignment regression
 
 ## Browser probes
 

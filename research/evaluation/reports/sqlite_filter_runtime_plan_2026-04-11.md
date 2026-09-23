@@ -4,7 +4,7 @@
 
 - Goal: avoid destructive DB edits and instead suppress junk at compact-index build time
 - Active hook point: `dict_lookup_sqlite.py::build_compact_key_index()`
-- Related cache freshness logic: `router.py::_js_index_cache_is_fresh()`
+- Related cache freshness logic: `language_engine/http/index_cache.py::_js_index_cache_is_fresh()`
 - Supporting audit data:
   - `tmp_wiktionary_db_audit_2026-04-11.json`
   - `tmp_sqlite_filter_plan_audit_2026-04-11.json`
@@ -321,7 +321,7 @@ Suggested objects:
 2. `dict_lookup_sqlite.py::hydrate_winner_refs()`
    - remap duplicate refs to canonical ids
    - apply merged overlay for the survivor entry
-3. `router.py::_js_index_cache_is_fresh()`
+3. `language_engine/http/index_cache.py::_js_index_cache_is_fresh()`
    - invalidate on filter config / filter code version too, not just DB mtime
 
 ## Comprehensive Implementation Plan
