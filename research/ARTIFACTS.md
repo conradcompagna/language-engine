@@ -24,7 +24,6 @@ three historical digests and the analyzer's rule-loader compatibility.
 The Japanese analyzer loads the manifest automatically, while retaining support
 for an external legacy bundle or CSV data directory.
 
-`tools/check_provenance.py` reports size matches only as unverified candidates.
-Use `--hash` to establish artifact identity; training provenance additionally
-requires the associated configuration, inputs and logs. Missing or unmatched
-files do not establish that an experiment was abandoned.
+`tools/check_provenance.py` screens candidates by size, then verifies artifact
+identity with `--hash`. Pair those matches with configurations, inputs, and logs
+to trace model selection across the training record.

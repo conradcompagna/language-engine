@@ -14,9 +14,8 @@ The fixture uses synthetic responses; full dictionary and neural resources are p
 
 ## What runs in production
 
-This section describes the application architecture. Repository changes require
-an independent build and deployment; the published branch is not a statement of
-the current server's exact version.
+The application combines a browser reading workspace with Flask services, multilingual
+neural inference, and a shared dictionary infrastructure.
 
 ### Engineering highlights
 
@@ -47,33 +46,35 @@ Model weights, dictionaries, and account data are provisioned separately. See [s
 
 ## How it was built
 
-None of this runs in production. It is the offline infrastructure that produced the
-models and dictionaries the service loads, the evaluation that gated them, and the work
-that was tried and dropped.
+I developed the models and lexical resources alongside the application: constructing
+training corpora, adapting linguistic supervision, comparing model variants, and
+building the tools that turn research outputs into deployable assets.
 
 **[`research/`](research/)** — start at [research/README.md](research/README.md).
 
 | | |
 |---|---|
-| [**Build chains**](research/pipeline/README.md) | How each model, dataset and dictionary was actually produced, step by step. Start here. |
-| [**Run history**](research/STATUS.md) | Recorded deployment/experiment history; [`check_provenance.py`](research/tools/check_provenance.py) distinguishes size candidates from SHA-256 artifact matches. |
+| [**Build chains**](research/pipeline/README.md) | Trace corpus construction, model training, and dictionary production from inputs to application assets. |
+| [**Training-to-application record**](research/STATUS.md) | Recorded model choices, run identifiers, and artifact-matching tools. |
 | [`research/pipeline/`](research/pipeline/) | Model training, dataset construction, dictionary building, NER taxonomy derivation. |
 | [`research/evaluation/`](research/evaluation/) | Regression test, benchmarks, latency measurements, dictionary and corpus audits. |
-| [`research/experiments/`](research/experiments/) | Six lines of work that did not ship, each with an `OUTCOME.md` explaining why. |
-| [`research/notes/`](research/notes/) | Design and architecture documents written during development. |
-| [`research/datasets/`](research/datasets/), [`research/models/`](research/models/) | Dataset cards and training configurations for 29 model runs. No corpora, no weights. |
+| [`research/experiments/`](research/experiments/) | Six development paths documenting model comparisons, architecture prototypes, and design decisions. |
+| [`research/notes/`](research/notes/) | Design and architecture records from development. |
+| [`research/datasets/`](research/datasets/), [`research/models/`](research/models/) | Dataset provenance, label vocabularies, and configurations for 29 completed NER runs. |
 
-Two examples of what is documented there: the Sanskrit sandhi splitter, trained as a
-multi-word-token expander over the Digital Corpus of Sanskrit with a deterministic,
-seeded dataset build; and the Sanskrit NER model, trained on a synthetic corpus whose published aggregate records 1,852 Gemini API jobs
-and USD 0.6023 of estimated usage; 1,680 validated BIO job artifacts are recorded.
-These are dataset-generation figures, not held-out NER accuracy.
+Two examples show the connection between linguistic analysis and engineering: a
+Sanskrit sandhi splitter trained as a multi-word-token expander over a deterministic
+Digital Corpus of Sanskrit dataset build, and a task-specific Sanskrit NER corpus
+created through a resumable, validated Gemini annotation workflow. The latter records
+1,852 API jobs and an estimated annotation cost of USD 0.60.
 
 **[`extras/`](extras/)** — a Chrome extension and a standalone document-renderer test
-harness. Neither is runtime; both stand on their own.
+harness, showing the development of document capture and reading workflows.
 
 ## Development and validation
 
 [Development commands](docs/DEVELOPMENT.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
 
-Start the [local fixture demo](docs/SETUP.md) without private models or account data; review the [research evidence index](research/EVIDENCE.md) for supported ML claims.
+Try the [local fixture demo](docs/SETUP.md), then follow the
+[research evidence index](research/EVIDENCE.md) from build decisions to recorded
+results and the [reproduction guide](research/REPRODUCIBILITY.md) for checks and new runs.

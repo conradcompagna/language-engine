@@ -1,9 +1,9 @@
 # Dataset cards
 
 One directory per training corpus, holding a README, a machine-readable dataset report,
-and label/token counts. **No corpora.** These record what each dataset contains, how
-big it is, and where it came from, so the training configurations in `../models/` can
-be interpreted without the data.
+and label/token counts. Together they document source provenance, corpus size, and
+supervision choices for the [model runs](../models/). Full corpora are provisioned
+separately under their source terms.
 
 | Card | Language | Source |
 |---|---|---|

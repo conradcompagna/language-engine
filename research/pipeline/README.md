@@ -58,8 +58,8 @@ See experiments/sanskrit-vedic-v1/.
 
 ### 1b. Sanskrit — named entities from a synthetic corpus
 
-I needed a Sanskrit NER corpus with this project's label inventory and annotation
-conventions, so I built a synthetic corpus with the Gemini API and trained on it.
+I built a task-specific Sanskrit NER corpus with the Gemini API, then trained
+models against its domain-specific label inventory.
 
 ```
 DCS MWT subset → train_10k_parent_tokens.conllu
@@ -95,12 +95,13 @@ DCS MWT subset → train_10k_parent_tokens.conllu
 Run cost and volume: 1,852 jobs against `gemini-2.5-flash-lite`, 3,107,852 prompt
 tokens, 728,721 output tokens, 3,836,573 total, USD 0.60. Recorded in
 [`datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json`](datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json);
-per-wave progress logs are not redistributed in this repository.
+selected per-job records are in
+[`sample_summaries/`](datasets/sanskrit/gemini_ner/sample_summaries/).
 
 The label set was derived from the corpus rather than imported: 19 tags including
 DEITY, RITUAL, SUBSTANCE, PLANT, DISEASE, BODY, MEASURE, ASTRO and PROCEDURE, which is
-what Sanskrit śāstra literature actually contains. The per-tag count TSV is not
-redistributed; published aggregate usage is linked above.
+what Sanskrit śāstra literature actually contains. The [dataset summary](datasets/sanskrit/gemini_ner/final/dataset_summary.json)
+records chunk coverage, token rows, and annotation corrections.
 
 ### 1c. Other trained languages
 
@@ -149,18 +150,18 @@ models/build_trankit_compressed_runtime_artifacts.py
                                               the service actually loads
 ```
 
-Measurements behind these choices: `../evaluation/benchmarks/memory_probe.py`,
-`trankit_dual_device_benchmark_app.py`. The adapter-bank prototype that would have
-shared one encoder across languages with per-language adapter inputs is in
-[`../experiments/arabic-onnx-adapter-bank/`](../experiments/arabic-onnx-adapter-bank/);
-it did not ship.
+Memory and device profiling tools are in [evaluation/](../evaluation/). The
+[adapter-bank prototypes](../experiments/arabic-onnx-adapter-bank/OUTCOME.md) document
+the exploration of shared encoder and dynamic adapter inputs; the application
+implementation is in the root compressed-runtime and live-switch modules.
 
 ---
 
 ## 3. Dictionaries
 
-The deployment uses 42 SQLite dictionary files. None are published. This is how they
-are built.
+The deployment uses 42 SQLite dictionary files. This build chain turns their
+heterogeneous sources into a common lexical index and entry store; database files
+are provisioned separately.
 
 ```
 source (Wiktionary JSONL, JMdict, KRDict XML, CC-CEDICT, LSJ, Monier-Williams, …)

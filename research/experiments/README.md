@@ -1,18 +1,17 @@
-# Experiments
+# Development experiments
 
-Work that did not reach production. It is here because the record of what was tried and
-rejected is part of how the shipped system was arrived at, and because a reader should
-be able to tell at a glance which directories are load-bearing and which are not.
+These records show how model, data, and architecture choices developed into the
+reading platform. Each `OUTCOME.md` connects a specific problem to the approach
+tested, the retained result, and its relationship to the application.
 
-Every subdirectory has an `OUTCOME.md` stating what was attempted, what happened, and
-why it stopped. Nothing in this directory is imported by the runtime or by
-`research/pipeline/`.
-
-| Directory | Outcome |
+| Development path | What it demonstrates |
 |---|---|
-| [`arabic-cameltools/`](arabic-cameltools/) | Ten runs integrating CAMeL Tools morphology and tokenization for Arabic. Abandoned; the shipped Arabic model came from a plain UD run. |
-| [`arabic-onnx-adapter-bank/`](arabic-onnx-adapter-bank/) | One shared INT8 encoder with per-language adapter inputs. Prototyped, not shipped. |
-| [`sanskrit-vedic-v1/`](sanskrit-vedic-v1/) | Sanskrit trained on the Vedic UD treebank. Superseded by the DCS run. |
-| [`rarelangs-per-language/`](rarelangs-per-language/) | Six per-language splits of the rare-language batch. None completed; the pooled run shipped. |
-| [`finerweb-taxonomy-sweeps/`](finerweb-taxonomy-sweeps/) | ~80 parameter variants behind the chosen NER label taxonomy. |
-| [`amharic-lexicon-induction/`](amharic-lexicon-induction/) | Unsupervised bilingual lexicon induction for Amharic. Unrelated to the product. |
+| [Arabic morphology](arabic-cameltools/OUTCOME.md) | Comparing morphology-derived segmentation with the selected UD training path |
+| [Shared ONNX encoder](arabic-onnx-adapter-bank/OUTCOME.md) | Prototyping adapter inputs and INT8 inference for a multilingual runtime |
+| [Sanskrit supervision](sanskrit-vedic-v1/OUTCOME.md) | Moving from a Vedic UD experiment to DCS multi-word-token supervision |
+| [Pooled language training](rarelangs-per-language/OUTCOME.md) | Recording the selected pooled run alongside per-language configurations |
+| [FiNERweb taxonomy](finerweb-taxonomy-sweeps/OUTCOME.md) | Comparing clustering, weighting, and acceptance criteria for multilingual labels |
+| [Amharic lexicon induction](amharic-lexicon-induction/OUTCOME.md) | A separate low-resource NLP study using embedding alignment and morphology |
+
+Application build tools are maintained in [pipeline/](../pipeline/); these directories
+preserve the development experiments and their original artifacts.

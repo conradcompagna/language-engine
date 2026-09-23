@@ -31,17 +31,16 @@ writers that produced the threshold ladders used to compare them.
 
 ## Outcome
 
-The method that survived is in `research/pipeline/taxonomy/`: fastText label
+The selected method is in `research/pipeline/taxonomy/`: fastText label
 embeddings, Louvain community detection over label co-occurrence, centroid clustering
 with a frequency-weighted internal-coherence gate at 90. The dataset builders for the
 chosen schemes are in `research/pipeline/taxonomy/dataset_builders/`, and the resulting
 models are recorded in `research/models/` — the `vie_*` and `san_*` families are
-comparisons between surviving schemes, not retries of a failed one.
+comparisons between selected label schemes.
 
 ## A note on method
 
-This is a parameter search of a size that was not practical to write by hand. Each
-variant is a few hundred lines, and there are eighty of them. That is the working
-method for most of this project: generate many variants cheaply, run them all, keep
-what survives the acceptance criterion, and record the rest. The value is in the
-criterion and the record, not in any individual script.
+The experiment varies clustering, weighting, seeding, and acceptance thresholds
+explicitly, with audit scripts and reports retained alongside the variants. This
+makes the selected taxonomy traceable to its design criteria and provides a basis
+for comparing downstream NER models trained with different label schemes.

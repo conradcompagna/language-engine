@@ -90,7 +90,7 @@ canonical document model
 
 ## What this is not yet
 
-It is not a production-perfect GroupDocs/Aspose replacement. Full fidelity DOCX and PDF rendering requires deep layout engines. This prototype preserves practical reader structure and exposes the right data model so you can test whether this architecture is worth hardening.
+The prototype focuses on reader structure, pagination, and the mapping between rendered text and canonical offsets. It provides a testbed for those decisions; exact DOCX/PDF layout fidelity is a separate rendering requirement.
 
 ## Next hardening steps
 

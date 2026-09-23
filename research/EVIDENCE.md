@@ -1,25 +1,40 @@
 # Research evidence index
 
-Counts below are published historical records, not newly reproduced training results.
-No private model store or deployed server was consulted for this cleanup.
+The record connects four kinds of work: linguistic dataset construction, model
+training, inference optimization, and application validation. Start with the selected
+[NER training results](models/README.md#selected-training-results) and
+[ONNX session measurements](evaluation/README.md#onnx-session-tuning), then follow
+the inputs and implementation below.
 
-| Work | Trainer/configuration | Data, split and seed | Evaluation/artifacts and limits |
+| Work | Implementation | Data and configuration | Recorded evidence |
 |---|---|---|---|
-| Sanskrit sandhi/MWT | [reported run history](STATUS.md) and [subset builder](pipeline/datasets/build_dcs_trankit_mwt_subset.py); exact DCS trainer configuration is not published | [DCS aggregate](pipeline/datasets/sanskrit/stats.json): seed 1337, chapter sample and split, 1,309 train / 146 dev chapters | 70,355 train / 9,349 dev sentences are data counts; [MWT evaluation builder](pipeline/datasets/build_trankit_mwt_eval_input.py); published weights, hashes and held-out score are absent |
-| Sanskrit synthetic NER | [trainer](pipeline/models/train_ner.py), [dataset builder](pipeline/datasets/sanskrit/build_final_sanskrit_gemini_ner_dataset.py) | [final dataset summary](pipeline/datasets/sanskrit/gemini_ner/final/dataset_summary.json) and builder define the split; installed Trankit controls training seed | [run aggregate](pipeline/datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json): 1,852 jobs, 1,680 validated BIO artifacts, estimated USD 0.6023; these do not measure NER generalization |
-| Multilingual NER datasets | [dataset cards](datasets/README.md), [trainer and commands](pipeline/models/TRAINING_RUN.md) | Read each card's source and split; bundled TPipeline patch sets seed 1234, while historical configs do not record the installed trainer hash | 29 [run configuration/vocabulary directories](models/README.md); no new accuracy or training-reproduction claim |
-| CPU/GPU inference comparison | [benchmark modules and commands](evaluation/benchmarks/trankit_benchmark/README.md), [ONNX exporter](pipeline/models/build_trankit_xlmr_onnx_cpu.py) | Same input text across worker profiles; hardware and local model artifacts required | Public tests check comparison math, routes and process lifecycle; they are not throughput measurements |
+| Sanskrit sandhi/MWT | [Run history](STATUS.md) and [subset builder](pipeline/datasets/build_dcs_trankit_mwt_subset.py) | [DCS aggregate](pipeline/datasets/sanskrit/stats.json): seed 1337; 1,309 train / 146 dev chapters | 70,355 training and 9,349 development sentences; [MWT evaluation builder](pipeline/datasets/build_trankit_mwt_eval_input.py) |
+| Sanskrit synthetic NER | [Trainer](pipeline/models/train_ner.py) and [dataset builder](pipeline/datasets/sanskrit/build_final_sanskrit_gemini_ner_dataset.py) | [Dataset summary](pipeline/datasets/sanskrit/gemini_ner/final/dataset_summary.json), split construction, and domain-specific labels | [Annotation aggregate](pipeline/datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json): 1,852 jobs, 1,680 validated BIO artifacts, estimated USD 0.6023; selected dev scores in the [model guide](models/README.md) |
+| Multilingual NER | [Dataset cards](datasets/README.md), [trainer and commands](pipeline/models/TRAINING_RUN.md) | Source and split recorded per card; bundled TPipeline patch sets seed 1234 | 29 [configuration/vocabulary directories](models/README.md) and selected training-log excerpts |
+| Inference optimization | [Benchmark modules](evaluation/benchmarks/trankit_benchmark/README.md) and [ONNX exporter](pipeline/models/build_trankit_xlmr_onnx_cpu.py) | Matched input text across worker profiles, with explicit hardware and local model resources | Session-tuning measurements plus public checks for comparison math, routes, and worker lifecycle |
 
-The [Vietnamese WikiANN card](datasets/wikiann_vi/README.md) combines the upstream
-train and test sets for training and uses validation as dev: its retained `test.bio`
-is an audit copy, **not a held-out test set**. Do not report a test score on it as
-unseen-data performance.
+## Reading the measurements
 
-Future NER runs write `run_evidence.json` with input hashes/counts, Python/package
-versions, wrapper and installed TPipeline source hashes, and hashes of copied output
-artifacts. This cannot retroactively authenticate earlier runs. Historical configs
-and logs retain their original paths and contents as evidence; do not publish newly
-generated private paths, corpora or weights without reviewing them.
+Dataset counts and annotation costs describe construction; development F1 describes
+epoch selection on each run's own labels and split. Historical configurations and
+logs retain their original context, while the run-history guide records artifact
+selection. The DCS trainer configuration and original model hashes are outside the
+published snapshot. Historical configs also do not identify the installed trainer
+hash or every seed setting; the installed Trankit version controls those defaults.
 
-Losslessly split rules, reports and logs carry ordered SHA-256 manifests; run
-`python -m pytest tests/test_research_artifacts.py` to validate the published reconstruction.
+The [Vietnamese WikiANN card](datasets/wikiann_vi/README.md) records its use of
+upstream train + test for training and validation for development. Its retained
+`test.bio` is an audit copy, so the published comparison uses development scores,
+not an independent held-out test claim. Benchmark fixture tests establish software
+behavior; the separate timing record identifies the machine, inputs, and samples.
+
+## Recording new runs
+
+NER runs write `run_evidence.json` with input hashes/counts, Python/package versions,
+wrapper and installed TPipeline source hashes, and copied-output hashes. This
+provides a reproducible record for new experiments alongside the historical logs.
+Review generated manifests before publication to keep local paths and private
+resources separate from the selected evidence package.
+
+Losslessly split rules, reports, and logs carry ordered SHA-256 manifests;
+`python -m pytest tests/test_research_artifacts.py` verifies reconstruction.
