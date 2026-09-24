@@ -8,7 +8,7 @@ Construction:
 - Included every sentence with complete HEAD+DEPREL annotation.
 - Deduplicated overlapping human files.
 - Human-annotated material kept separate from silver auto-annotation for dev.
-- Dev is gold-ish human only.
+- Dev contains only human-annotated sentences.
 - Train = remaining human complete sentences + all unique complete auto-annotated sentences.
 
 Counts:

@@ -94,14 +94,10 @@ work, pooled versus per-language low-resource runs, and shared-encoder prototype
 The [NER collection](models/README.md) also records label-scheme and corpus-size
 comparisons. Those records explain selection decisions alongside the active map.
 
-## Verify supplied assets
+## Artifact identities
 
-The JSON inventory records relative paths, byte sizes and SHA-256 hashes without
-weights. With separately supplied artifacts, compare them to that inventory; the
-existing helper also compares a retained training directory to a model store:
-
-```sh
-python research/tools/check_provenance.py --runs <training-dir> --deployed <model-store>/xlm-roberta-base --hash
-```
-
-Input/output contracts and public checks are in [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
+The JSON inventory records relative paths, byte sizes and SHA-256 hashes.
+The [provenance tool](tools/check_provenance.py) compares retained training
+directories with a model store, connecting run outputs to selected components.
+The [training record](REPRODUCIBILITY.md) describes the corpus, configuration and
+artifact records behind those matches.

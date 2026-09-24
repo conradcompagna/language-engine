@@ -1,10 +1,10 @@
-# fiNERweb Trankit NER prep
+# FiNERweb label-taxonomy preparation
 
 Created: 2026-05-03T01:01:08
 
 Source folder: `training\nerdump\fiNERweb_app_languages`
 
-This is the review stage only. No labels were dropped. Every original fiNERweb label seen across all local fiNERweb parquet files is mapped to exactly one proposed bucket in `finerweb_label_bucket_map.tsv` and `finerweb_label_bucket_map.json`.
+I built this review inventory to organize the fine-grained FiNERweb labels into candidate training categories. It preserves every original label across the source parquet files and assigns each to one proposed bucket, with counts, language distributions and mention examples supporting review.
 
 Files:
 
@@ -14,4 +14,4 @@ Files:
 - `finerweb_label_bucket_map.json`: machine-readable mapping to edit/review.
 - `finerweb_bucket_summary.tsv`: aggregate span counts per proposed bucket.
 
-Next step after review: convert each parquet to Trankit-style BIO/CoNLL using the reviewed bucket map.
+The [dataset builders](dataset_builders/) encode the candidate label schemes for Trankit training; the [taxonomy experiments](../../experiments/finerweb-taxonomy-sweeps/OUTCOME.md) record the clustering and acceptance criteria.

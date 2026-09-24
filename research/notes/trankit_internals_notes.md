@@ -26,5 +26,5 @@ the supervision behind Sanskrit and other language integrations.
 The [inference report](TRANKIT_INTERNALS_PRODUCTION_INFERENCE_REPORT.md) records
 the shared ONNX encoder, adapter packs, dictionary-first execution, and stage
 costs examined during optimization. [Recorded session measurements](../evaluation/README.md#onnx-session-tuning)
-compare runtime settings on a fixed input; the benchmark tools separate model
-execution from application fixture checks.
+compare runtime settings on a fixed input, with annotation fingerprints
+connecting timing measurements to the resulting analyses.

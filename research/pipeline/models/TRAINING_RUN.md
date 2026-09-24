@@ -1,32 +1,38 @@
-# Trankit NER training
+# Trankit NER training workflow
 
-Run these commands from the repository root with your own authorized BIO corpus.
-Public dataset directories contain cards and counts, not full training files.
+The [training wrapper](train_ner.py) connects prepared BIO corpora, Trankit's
+training pipeline, epoch evaluation and named output directories. The
+[model-run index](../../models/README.md) records 29 completed NER runs with their
+label vocabularies and retained configurations.
 
-```sh
-python research/pipeline/models/train_ner.py --dataset-dir /path/to/corpus --validate-only
-python research/pipeline/models/train_ner.py --dataset-dir /path/to/corpus --run-id experiment --work-cache /short/cache --finished-models /path/to/results --seed-cache /path/to/seed-cache --max-epoch 1
-```
+## From corpus to model artifact
 
-Preflight needs only Python 3.12: it checks UTF-8 two-column BIO/BIOES rows, nonempty
-splits and exact token-sequence overlap, and prints file hashes/counts without model
-imports or filesystem changes. It does not prove annotation quality or detect
-near-duplicate leakage. Full training expects a CUDA-capable PyTorch/Trankit
-environment; the application's CPU requirements are not a CUDA training recipe.
-Historical package versions are not fully recorded, so the old results cannot be
-reproduced from this clone alone. Future runs record installed package versions and
-the actual TPipeline source hash in `run_evidence.json`.
+| Stage | Implementation and record |
+|---|---|
+| Corpus preparation | Dataset directories supply training and development BIO files; [dataset cards](../../datasets/README.md) record source, labels and split construction. |
+| Input validation | The wrapper checks UTF-8 token/tag rows, nonempty splits and exact token-sequence overlap, with hashes and counts for the input files. |
+| Training configuration | The run selects the base encoder, corpus, epoch limit, working cache and named output directory. |
+| Epoch evaluation | Logs record entity-level micro scores and per-label precision, recall and F1. |
+| Artifact capture | Completed or interrupted runs copy newly saved model artifacts into the reserved run directory and record their hashes. |
 
-Defaults are repository-relative `.cache/training/{active,finished,seed}`. On Windows,
-use `--work-cache` with a short path to avoid legacy transformer-cache path limits.
-All corpus/cache/output paths are CLI parameters. The shared active category is
-overwritten by subsequent training: run only one trainer per work cache. Finished
-run IDs are reserved separately to avoid overwriting an existing run.
+The trainer separates the active Trankit cache from finished runs. Run identifiers
+are reserved before training to protect previous outputs, and cache paths are
+configurable to accommodate Windows path-length constraints. A separate snapshot
+operation preserves an existing active cache.
 
-`--snapshot-only --run-id recovered` copies the active cache without training; a
-snapshot is not proof of the data or seed that produced it. Normal training copies
-new artifacts and hashes them when it finishes or is interrupted. The installed
-Trankit controls random seeds: the published [patch](upstream_patches/trankit/tpipeline.py)
-sets 1234, but the wrapper does not silently assume that your installation uses it.
-Evaluation logs contain entity-level micro scores and per-label precision/recall/F1.
-Keep train, dev and a genuinely unseen evaluation corpus separate.
+## Reading the training evidence
+
+Historical configurations and log excerpts record the original runs. The current
+wrapper also writes `run_evidence.json` with corpus identities, installed package
+versions and the actual `TPipeline` source hash. These are distinct records: a
+snapshot identifies model files, while a training record connects files to the
+inputs and execution that produced them.
+
+The bundled [Trankit pipeline patch](upstream_patches/trankit/tpipeline.py) sets
+seed 1234. The wrapper records the installed pipeline implementation so the seed
+policy remains attributable to the code used for that run.
+
+The [selected results](../../models/README.md#selected-training-results) report
+best-development scores with their dataset and epoch-selection context. The
+[application selection map](../../STATUS.md) connects completed training runs to
+the components loaded by Language Engine.

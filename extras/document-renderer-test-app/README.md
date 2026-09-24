@@ -1,120 +1,63 @@
-# Canonical Document Renderer Test App
+# Document rendering and annotation geometry
 
-Prototype for an NLP-powered translation workbench renderer.
+I built this development application to work through a central reading-interface
+problem: keeping annotations attached to source text as documents change format,
+page size and layout. It separates format parsing, canonical text, browser geometry
+and annotation placement.
 
-It demonstrates this pipeline:
-
-```txt
-PDF / EPUB / DOCX / TXT / HTML / Markdown / URL-imported web pages
-→ format adapter
-→ CanonicalDocument
-→ canonical text + block/range map
-→ paginated browser render
-→ page text slice + token ranges + optional character boxes
+```text
+PDF / EPUB / DOCX / HTML / Markdown / plain text / captured URL
+  → format adapter
+  → canonical sections, blocks and source offsets
+  → reflowable columns or fixed-layout pages
+  → visible text ranges and character boxes
 ```
 
-## Run
+## One text model across formats
 
-```bash
-cd document-renderer-test-app
-npm test
-npm run start
-```
+Each adapter produces a `CanonicalDocument` with sections, blocks, `canonicalText`
+and a `sourceMap`. Blocks carry `canonicalStart` and `canonicalEnd` offsets, so
+annotation identity can be expressed independently of page breaks and DOM nodes.
 
-Then open:
-
-```txt
-http://localhost:4173
-```
-
-The URL importer uses the local Node dev server as a same-origin proxy at `/api/fetch-url?url=...`, so normal browser CORS rules do not block testing. Production should replace this with a hardened fetch service.
-
-The browser app uses CDN builds of permissive/free libraries for parsing/rendering:
-
-- JSZip for EPUB/DOCX container reading
-- DOMPurify for HTML sanitation
-- marked for Markdown
-- mammoth and docx-preview for DOCX
-- pdf.js for PDF text extraction
-
-For a production app, vendor/pin these dependencies locally rather than relying on CDNs.
-
-## Supported inputs in this prototype
-
-| Format | Adapter behavior |
+| Input | Conversion |
 |---|---|
-| TXT/raw text | Built-in parser preserves blank lines, indentation, headings, verse-like blocks |
-| HTML/XHTML | Sanitized DOM to canonical blocks while keeping inner HTML |
-| URL import | Local dev proxy fetches remote HTML, resolves relative links/images, strips scripts/viewer sludge, then uses the same HTML adapter |
-| Markdown | Markdown to HTML, then HTML adapter |
-| EPUB | Reads OPF spine with JSZip, converts XHTML spine items through HTML adapter |
-| DOCX | Uses docx-preview for visual HTML when available; falls back to mammoth |
-| PDF | Uses pdf.js textContent extraction into fixed-layout page objects |
+| Plain text | Preserves blank lines, indentation, headings and verse-like blocks |
+| HTML and captured URLs | Sanitizes markup and converts document structure into canonical blocks |
+| Markdown | Converts Markdown to HTML before using the HTML adapter |
+| EPUB | Reads the OPF spine through JSZip and converts its XHTML sections in reading order |
+| DOCX | Uses docx-preview for visual HTML, with a Mammoth conversion fallback |
+| PDF | Uses PDF.js text extraction to build fixed-layout pages with positioned text items |
 
-## Canonical model
+The [format adapters](src/adapters/) feed the common
+[canonical model](src/canonical.js). Format-specific parsing ends at that boundary;
+pagination and annotation operate on the shared representation.
 
-The core model is in `src/canonical.js`.
+## Pagination and source alignment
 
-Important fields:
+The reflowable renderer uses CSS columns for browser text shaping, bidirectional
+layout and line breaking. Its measuring flow and visible pages share an explicit
+`contentWidth + columnGap` step, keeping navigation aligned with the measured columns.
+PDF pages instead retain fixed positions and their own canonical text slices.
 
-```ts
-type CanonicalDocument = {
-  title: string;
-  sourceType: string;
-  metadata: object;
-  sections: CanonicalSection[];
-  canonicalText: string;
-  sourceMap: SourceMapEntry[];
-  fixedLayoutPages?: FixedLayoutPage[];
-};
-```
+Text-run spans carry source offsets. DOM ranges provide word and character boxes
+for connecting visible text to those offsets, and the annotation layer selects
+tokens by intersection with each page's canonical range. The separate alignment
+utility compares normalized text when locating a page slice.
 
-Each block gets stable `canonicalStart` / `canonicalEnd` offsets. NLP tokens should attach to these offsets, not to the rendered DOM.
+## Imported-page handling
 
-## Renderer model
+Before pagination, the renderer removes scripts, frames and embedded objects,
+converts navigation links into inert spans, and replaces form controls with text
+placeholders. That gives imported content the same document interactions as the
+other formats.
 
-The reflowable renderer uses CSS columns so the browser handles line breaking, fonts, bidi text, shaping, CJK wrapping, and pagination. It then uses DOM `Range.getClientRects()` to collect word and character boxes.
+| Source | Responsibility |
+|---|---|
+| [canonical.js](src/canonical.js) | Sections, blocks, canonical offsets and source maps |
+| [renderer.js](src/renderer.js) | Page geometry, inert content, text-run mapping and character boxes |
+| [align.js](src/align.js) | Normalized text alignment and development token fixtures |
+| [annotator.js](src/annotator.js) | Range selection and token markup |
 
-PDF uses a fixed-layout adapter in this prototype: each PDF page becomes a fixed HTML page with positioned text items and a canonical text slice.
-
-## What this is
-
-A serious test harness for the architecture:
-
-```txt
-canonical document model
-+ browser pagination
-+ text/range mapping
-+ page-level NLP annotation plumbing
-```
-
-## What this is not yet
-
-The prototype focuses on reader structure, pagination, and the mapping between rendered text and canonical offsets. It provides a testbed for those decisions; exact DOCX/PDF layout fidelity is a separate rendering requirement.
-
-## Next hardening steps
-
-1. Vendor dependencies locally.
-2. Add worker-based parsing for large books.
-3. Add IndexedDB cache keyed by file hash + render options.
-4. Split EPUB/DOCX chapters into lazy sections.
-5. Add annotation overlay mode that does not mutate the text DOM.
-6. Add robust PDF canvas background rendering beneath the text layer.
-7. Add a deterministic alignment layer for page text ↔ canonical text.
-
-
-## Geometry note
-
-The reflowable renderer now paginates inside a content-column viewport rather than a padded whole-page strip. The hidden measuring flow and the visible page clone use the same explicit `contentWidth + columnGap` step, so next/previous navigation cannot drift between columns because of padding, margins, scrollbar width, or device-pixel rounding.
-
-## URL reader sandbox patch
-
-URL imports are converted into inert reader content before pagination. The renderer now:
-
-- removes scripts/iframes/embedded objects;
-- converts live `<a href>` links into inert `<span class="reader-inert-link" data-href="...">` nodes;
-- removes form controls and replaces them with inert text placeholders;
-- wraps rendered text runs in `<span class="reader-text-run" data-canonical-start="..." data-canonical-end="...">` so page text can be mapped back to canonical character offsets;
-- automatically samples current-page character boxes in the right rail.
-
-This is closer to the intended production architecture: imported URLs are not a browser surface, they are sandboxed reader documents with canonical offset metadata.
+This study records the document and layout mechanisms. The integrated reader's
+neural analysis and lexical lookup are described in the
+[application construction guide](../../docs/BUILD_PROCESS.md).

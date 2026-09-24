@@ -10,8 +10,8 @@ the inputs and implementation below.
 |---|---|---|---|
 | Sanskrit sandhi/MWT | [Run history](STATUS.md) and [subset builder](pipeline/datasets/build_dcs_trankit_mwt_subset.py) | [DCS aggregate](pipeline/datasets/sanskrit/stats.json): seed 1337; 1,309 train / 146 dev chapters | 70,355 training and 9,349 development sentences; [MWT evaluation builder](pipeline/datasets/build_trankit_mwt_eval_input.py) |
 | Sanskrit synthetic NER | [Trainer](pipeline/models/train_ner.py) and [dataset builder](pipeline/datasets/sanskrit/build_final_sanskrit_gemini_ner_dataset.py) | [Dataset summary](pipeline/datasets/sanskrit/gemini_ner/final/dataset_summary.json), split construction, and domain-specific labels | [Annotation aggregate](pipeline/datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json): 1,852 jobs, 1,680 validated BIO artifacts, estimated USD 0.6023; selected dev scores in the [model guide](models/README.md) |
-| Multilingual NER | [Dataset cards](datasets/README.md), [trainer and commands](pipeline/models/TRAINING_RUN.md) | Source and split recorded per card; bundled TPipeline patch sets seed 1234 | 29 [configuration/vocabulary directories](models/README.md) and selected training-log excerpts |
-| Inference optimization | [Benchmark modules](evaluation/benchmarks/trankit_benchmark/README.md) and [ONNX exporter](pipeline/models/build_trankit_xlmr_onnx_cpu.py) | Matched input text across worker profiles, with explicit hardware and local model resources | Session-tuning measurements plus public checks for comparison math, routes, and worker lifecycle |
+| Multilingual NER | [Dataset cards](datasets/README.md), [training workflow](pipeline/models/TRAINING_RUN.md) | Source and split recorded per card; bundled TPipeline patch sets seed 1234 | 29 [configuration/vocabulary directories](models/README.md) and selected training-log excerpts |
+| Inference optimization | [Benchmark modules](evaluation/benchmarks/trankit_benchmark/README.md) and [ONNX exporter](pipeline/models/build_trankit_xlmr_onnx_cpu.py) | Matched input text across worker profiles, with explicit hardware and local model resources | [Session-tuning measurements](evaluation/results/ort_session_tuning_excerpt.json) with profile settings, annotation fingerprints and runtime context |
 
 ## Reading the measurements
 
@@ -25,17 +25,16 @@ hash or every seed setting; the installed Trankit version controls those default
 
 The [Vietnamese WikiANN card](datasets/wikiann_vi/README.md) records its use of
 upstream train + test for training and validation for development. Its retained
-`test.bio` is an audit copy, so the published comparison uses development scores,
-not an independent held-out test claim. Benchmark fixture tests establish software
-behavior; the separate timing record identifies the machine, inputs, and samples.
+`test.bio` is an audit copy, so the published comparison uses development scores
+on that validation split. The timing record separately identifies the machine,
+inputs and samples behind the inference measurements.
 
-## Recording new runs
+## Run and artifact records
 
 NER runs write `run_evidence.json` with input hashes/counts, Python/package versions,
 wrapper and installed TPipeline source hashes, and copied-output hashes. This
-provides a reproducible record for new experiments alongside the historical logs.
-Review generated manifests before publication to keep local paths and private
-resources separate from the selected evidence package.
+connects corpus inputs and training execution to the resulting artifacts,
+alongside the historical logs.
 
-Losslessly split rules, reports, and logs carry ordered SHA-256 manifests;
-`python -m pytest tests/test_research_artifacts.py` verifies reconstruction.
+Losslessly split rules, reports and logs carry ordered SHA-256 manifests, preserving
+the identity and ordering of the original records.

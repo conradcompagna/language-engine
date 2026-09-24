@@ -25,10 +25,6 @@ bounded before parsing; reads enforce expiry and do not extend it. The in-memory
 store is per process, matching the current single-worker deployment template;
 multi-worker hosting would require shared storage and a shared rate limiter.
 
-Run `python -m pytest tests/test_captures.py` after installing `requirements-dev.txt`.
-Tests use an isolated Flask application and synthetic HTML without loading models,
-contacting external services or touching an account database.
-
 These are source changes for a future release; they do not alter an existing live
 deployment. Direct public snapshot links and anonymous server uploads are
 intentionally unsupported by the secured API.

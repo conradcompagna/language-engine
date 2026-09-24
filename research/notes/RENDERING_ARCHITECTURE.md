@@ -31,15 +31,13 @@ normalization. Segment and fill objects carry dictionary provenance alongside
 their lexical content, allowing presentation to distinguish dictionary sources,
 generated entries, and user-authored entries.
 
-## State and validation
+## State and document geometry
 
 Feature modules import shared functions explicitly and store mutable state in
 adjacent `*.state.mjs` modules. [reader/index.mjs](../../frontend/reader/index.mjs)
 initializes the interface. The build produces the script URL used by the Flask
 template; source maps connect browser behavior to the maintained modules.
 
-[Browser fixtures](../../tests/browser/) exercise
-rendering and document interaction with synthetic local responses. Dictionary
-regressions check form selection, compact identity, and hydration independently
-of neural model loading. The [document guide](LOOKUP_RENDERING_PIPELINE_MAP.md)
-covers how source pages provide the text and geometry used by these overlays.
+The [document guide](LOOKUP_RENDERING_PIPELINE_MAP.md) explains how source pages
+provide the text and geometry used by these overlays, linking document selection
+to lookup results and their visual placement.

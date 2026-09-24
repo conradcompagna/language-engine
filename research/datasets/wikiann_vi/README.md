@@ -1,4 +1,4 @@
-# wikiann_vi
+# Vietnamese WikiANN: Trankit preparation
 
 Vietnamese WikiANN converted into Trankit BIO format.
 
@@ -8,12 +8,12 @@ Split policy: `train.bio` is WikiANN train + test joined together; `dev.bio` is 
 
 WikiANN label mapping from parquet metadata: `0=O`, `1=B-PER`, `2=I-PER`, `3=B-ORG`, `4=I-ORG`, `5=B-LOC`, `6=I-LOC`.
 
-Files: `train.bio`, `dev.bio`, `test.bio`, `all.bio`, `label_token_counts.tsv`, `dataset_report.json`.
+Corpus-build outputs: `train.bio`, `dev.bio`, `test.bio`, `all.bio`, `label_token_counts.tsv`, `dataset_report.json`.
 
-Use with:
+The [dataset report](dataset_report.json) records corpus sizes and label counts.
+The [model-run record](../../models/wikiann_vi/) connects
+it to the NER training work.
 
-```powershell
-python research/pipeline/models/train_ner.py --dataset-dir /path/to/wikiann_vi --run-id wikiann_vi
-```
-
-The retained test split overlaps training by design and must not be used as a held-out test score; supply authorized local files for the command above.
+The separately retained test copy overlaps training; I report this run's
+results as [development F1](../../models/README.md#selected-training-results)
+on the validation split.

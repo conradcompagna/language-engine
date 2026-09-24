@@ -3,8 +3,9 @@
 These build chains document corpus, model and dictionary construction. The
 [verified selection map](../STATUS.md) identifies current components and separates
 retained alternatives; the [construction story](../../docs/BUILD_PROCESS.md) connects
-the chains to the product. Use the [evidence index](../EVIDENCE.md) and
-[reproduction guide](../REPRODUCIBILITY.md) for measurements and runnable checks.
+the chains to the product. The [evidence index](../EVIDENCE.md) and
+[training record](../REPRODUCIBILITY.md) connect measurements to corpus preparation,
+training configuration and artifact tracking.
 
 ---
 
@@ -173,8 +174,7 @@ See the [DCS and runtime-pruning explanation](../../docs/BUILD_PROCESS.md#4-engi
 The Monier-Williams converter below records a separate development path.
 
 The deployment uses 42 SQLite dictionary files. This build chain turns their
-heterogeneous sources into a common lexical index and entry store; database files
-are provisioned separately.
+heterogeneous sources into a common lexical index and entry store.
 
 ```
 source (Wiktionary JSONL, JMdict, KRDict XML, CC-CEDICT, LSJ, Monier-Williams, …)

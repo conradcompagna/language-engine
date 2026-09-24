@@ -1,55 +1,42 @@
-# Trankit device benchmark
+# Inference comparison and profiling
 
-This opt-in harness compares annotations, timing and memory for CPU/GPU/ONNX
-execution; it is separate from the reader server and is not a CI performance claim.
-The preserved default startup loads the ONNX CPU worker and the GPU worker.
-Historical UI options for other worker combinations require provisioning those
-workers; an unavailable pair returns 503.
+I built this benchmark interface while adapting multilingual Trankit inference
+for CPU deployment. It brings annotation comparison, stage timing and memory
+measurements together so runtime changes can be examined at the component level.
 
-Run from an environment with the root application's Trankit/PyTorch dependencies,
-authorized model caches, the ONNX runtime and a supported CUDA installation:
+## Comparison design
 
-```sh
-python research/evaluation/benchmarks/trankit_dual_device_benchmark_app.py
-```
+CPU and GPU workers run in separate processes, with request queues and a
+parent-owned lifecycle. The retained startup selects the ONNX CPU worker and the
+application's GPU Trankit path. Both use the application's language registry and
+integration policies.
 
-The compatibility entrypoint works from any current directory. Importing it starts
-no worker. Startup explicitly starts and waits for spawned processes; shutdown
-joins/terminates them. Open the local URL printed by Flask after workers are ready.
-This development harness should remain bound to localhost.
+The comparison layer fingerprints complete annotations and aligns sentence and
+token sequences before reporting differences. This connects performance work to
+its effect on tokenization, expanded words, grammatical tags and named entities.
 
-## Ownership
+Instrumentation separates task time, ONNX session time, tensor handoff and other
+PyTorch work. Batch records distinguish real sequence lengths from padded work;
+load and memory probes separate initialization from request processing.
 
-- `worker.py`, `worker_handle.py`, `lifecycle.py`, `state.py`: isolated device
-  processes, request queues, parent lifecycle and parent-owned mutable status.
-- `cpu_backend.py`, `cpu_profile.py`, `cpu_tuning.py`, `cpu_candidates.py`: CPU
-  execution profiles and measured candidate selection.
-- `gpu_profile.py`, `onnx_runtime.py`, `onnx_batching.py`: device-specific adapters.
-- `quantization.py`, `model_cache.py`, `cpu_selection_cache.py`: module transforms
-  and cached optimization decisions.
-- `memory.py`, `instrumentation.py`, `load_probe.py`, `cold_start.py`: measurements.
-- `comparison.py`: annotation alignment and discrepancy metrics.
-- `routes.py`, `templates/`, `static/`: the local benchmark interface.
+## Engineering components
 
-## Configuration
-
-Set environment variables **before** starting the parent so spawned workers see
-the same paths. Cache defaults remain adjacent to the compatibility entrypoint.
-
-| Variable | Default |
+| Responsibility | Source |
 |---|---|
-| `TRANKIT_BENCHMARK_HOST` | `127.0.0.1` |
-| `TRANKIT_BENCHMARK_PORT` | `5055` |
-| `TRANKIT_CPU_OPT_DEPS_DIR` | `.trankit_cpu_opt_deps` |
-| `TRANKIT_CPU_OPT_CACHE_DIR` | `.trankit_cpu_opt_cache` |
-| `TRANKIT_ONNX_CACHE_DIR` | `.trankit_compressed_runtime` |
-| `TRANKIT_ONNX_DEPS_DIRS` | Optional directories separated by the OS path separator |
+| Process ownership and lifecycle | [worker.py](worker.py), [worker_handle.py](worker_handle.py), [lifecycle.py](lifecycle.py), [state.py](state.py) |
+| CPU profiles and candidate selection | [cpu_backend.py](cpu_backend.py), [cpu_profile.py](cpu_profile.py), [cpu_tuning.py](cpu_tuning.py), [cpu_candidates.py](cpu_candidates.py) |
+| Device execution and batching | [gpu_profile.py](gpu_profile.py), [onnx_runtime.py](onnx_runtime.py), [onnx_batching.py](onnx_batching.py) |
+| Model transforms and cached decisions | [quantization.py](quantization.py), [model_cache.py](model_cache.py), [cpu_selection_cache.py](cpu_selection_cache.py) |
+| Timing, memory and initialization | [instrumentation.py](instrumentation.py), [memory.py](memory.py), [load_probe.py](load_probe.py), [cold_start.py](cold_start.py) |
+| Annotation alignment and discrepancy metrics | [comparison.py](comparison.py) |
 
-Hardware benchmarks use separately provisioned model weights and runtime dependencies.
-Record model hashes, dependencies, hardware, input, repetitions and warmup state
-alongside any measurements you publish.
+## Recorded optimization result
 
-`python -m pytest tests/test_benchmark.py` checks comparison fixtures,
-the asset-serving interface, spawn imports and picklable worker targets without
-loading models. Hardware timing, CUDA and ONNX inference require a separate run
-with the authorized assets and are not covered by these fixture checks.
+The separate [ONNX session-tuning record](../../README.md#onnx-session-tuning)
+compares session settings on one fixed Japanese request: mean time fell from
+1.905 seconds to 0.906 seconds across two timed requests per profile, following
+one warmup, with matching annotation fingerprints. The record includes the input
+size, hardware context and runtime versions.
+
+The [CPU construction record](../../../../docs/BUILD_PROCESS.md#3-package-inference-for-cpu-deployment)
+connects these optimization tools to the selected shared encoder and adapter packs.

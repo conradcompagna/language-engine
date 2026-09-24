@@ -50,7 +50,5 @@ precedence for the same entry; matching form text can contribute morphology,
 while distinct displayed forms retain separate rows. Alternate buckets use
 the explicit `is_alternate_match` field from hydration.
 
-A useful inspection path is the selected reference, its SQLite record, the
-serialized payload, and then the rendered row. The
-[fixture checks](../../tests/browser/) exercise
-compact identity, form lookup, custom entries, and presentation contracts.
+The selected reference, SQLite record, serialized payload and rendered row
+form a continuous identity chain from lexical match to presentation.

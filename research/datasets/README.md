@@ -2,8 +2,7 @@
 
 One directory per training corpus, holding a README, a machine-readable dataset report,
 and label/token counts. Together they document source provenance, corpus size, and
-supervision choices for the [model runs](../models/). Full corpora are provisioned
-separately under their source terms.
+supervision choices for the [model runs](../models/).
 
 | Card | Language | Source |
 |---|---|---|

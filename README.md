@@ -95,8 +95,9 @@ Digital Corpus of Sanskrit dataset build, and a task-specific Sanskrit NER corpu
 created through a resumable, validated Gemini annotation workflow. The latter records
 1,852 API jobs and an estimated annotation cost of USD 0.60.
 
-**[`extras/`](extras/)** — a Chrome extension and a standalone document-renderer test
-harness, showing the development of document capture and reading workflows.
+**[Document capture and rendering](extras/)** — the Chrome capture extension and
+document-model study, covering static page capture, format conversion, pagination
+and annotation geometry.
 
 
 The [research evidence index](research/EVIDENCE.md) connects selected training

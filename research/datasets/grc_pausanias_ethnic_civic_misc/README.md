@@ -1,4 +1,7 @@
-# grc_pausanias_ethnic_civic_misc
+# Ancient Greek: ethnic and civic entity labels
+
+I separated ethnic and civic groups from the general MISC category while
+retaining person and location labels.
 
 Source: `training\nerdump\anc\tlg0525_pausanias_ner_recreated\pausanias_grc2_ner_all*.conll`
 
@@ -10,7 +13,7 @@ all other MISC -> MISC
 PER / LOC / O unchanged
 ```
 
-Files:
+Corpus-build outputs:
 
 ```text
 train.bio
@@ -31,8 +34,6 @@ PER                12,041
 O                 217,896
 ```
 
-Use with:
-
-```powershell
-python training\trankit_finerweb_prep\trankit_training_run\train_ner.py
-```
+The [dataset report](dataset_report.json) records corpus sizes and label counts.
+The [model-run record](../../models/grc_pausanias_ethnic_civic_misc/) connects
+it to the NER training work.

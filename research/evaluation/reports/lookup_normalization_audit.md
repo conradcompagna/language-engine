@@ -19,5 +19,5 @@ exercised through both index construction and browser matching; presentation
 changes are checked against the [hydration contract](../../notes/HYDRATION_FIRST_RENDERING_REFERENCE.md).
 
 The [evaluation index](../README.md) links dictionary data audits and lookup
-measurements. The [browser guide](../../../frontend/README.md) describes public
-fixtures for dictionary identity, form matching, and lemma alignment.
+measurements. The [browser guide](../../../frontend/README.md) maps the source
+modules for dictionary identity, form matching, segmentation and hydration.

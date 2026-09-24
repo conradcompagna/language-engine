@@ -15,10 +15,6 @@ importing the services does not load a model.
 | `gloss.py`, `decomposition.py`, `orthography.py` | Contextual batch tasks |
 | `ner.py`, `translation.py` | Entity spans and sentence translation |
 
-Regression fixtures cover schemas, language policies, and request/response
-payloads. Mocked transport tests exercise service behavior without API calls,
-private dictionaries, or trained models.
-
-Set provider settings in `settings.py`; credentials remain in environment-backed
-`config.py`. The facade exposes values for compatibility, but configuration should
-be changed at its owning module rather than by assigning facade attributes.
+Provider settings belong to `settings.py`, with credentials supplied through
+environment-backed `config.py`. Each task service owns its prompt and response
+handling; the facade preserves the application's public call interface.
