@@ -51,6 +51,19 @@ Sanskrit dictionary engineering and CPU export, or the
 
 The code includes **27 language display configurations and enabled NLP registry entries**, covering modern and historical languages. The dictionary infrastructure brings 42 SQLite resources into a common lookup and display system.
 
+### Released research models
+
+I have published three model packages from the platform, with native weights,
+model cards, training evidence and measured development results:
+
+- [Arabic clitic segmentation](research/releases/arabic-clitic-tokenizer/README.md): a tokenizer and MWT expander trained on corrected CAMeL teacher annotations over authentic news text.
+- [Sanskrit sandhi splitting](research/releases/sanskrit-sandhi-tokenizer/README.md): tokenizer and expansion models trained on DCS fused forms and their underlying words.
+- [Sanskrit interpretive NER](research/releases/sanskrit-interpretive-ner/README.md): 18 semantic categories learned from Gemini-assisted annotations of authentic Sanskrit documents.
+
+The [full score collection](research/models/TRAINING_RESULTS.md) covers all 61
+custom component selections; the [component map](research/STATUS.md) distinguishes
+them from the upstream models used elsewhere in the application.
+
 ### Explore the runtime
 
 | Area | Starting point |
@@ -83,6 +96,7 @@ building the tools that turn research outputs into deployable assets.
 | [**From resources to the deployed product**](docs/BUILD_PROCESS.md) | The construction path, selected artifacts, measurements and evidence by stage. |
 | [**Build chains**](research/pipeline/README.md) | Trace corpus construction, model training, and dictionary production from inputs to application assets. |
 | [**Training-to-application record**](research/STATUS.md) | Recorded model choices, run identifiers, and artifact-matching tools. |
+| [**Selected model scores**](research/models/TRAINING_RESULTS.md) | All 61 custom component selections: tokenizer, MWT, POS/parser, lemma and NER scores, linked to selected checkpoints and original records. |
 | [`research/pipeline/`](research/pipeline/) | Model training, dataset construction, dictionary building, NER taxonomy derivation. |
 | [`research/evaluation/`](research/evaluation/) | Regression test, benchmarks, latency measurements, dictionary and corpus audits. |
 | [`research/experiments/`](research/experiments/) | Six development paths documenting model comparisons, architecture prototypes, and design decisions. |
@@ -92,7 +106,7 @@ building the tools that turn research outputs into deployable assets.
 Two examples show the connection between linguistic analysis and engineering: a
 Sanskrit sandhi splitter trained as a multi-word-token expander over a deterministic
 Digital Corpus of Sanskrit dataset build, and a task-specific Sanskrit NER corpus
-created through a resumable, validated Gemini annotation workflow. The latter records
+annotated from authentic Sanskrit texts through a resumable, validated Gemini workflow. The latter records
 1,852 API jobs and an estimated annotation cost of USD 0.60.
 
 **[Document capture and rendering](extras/)** — the Chrome capture extension and

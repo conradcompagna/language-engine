@@ -1,0 +1,113 @@
+{
+  "evaluated_on": "2026-09-24",
+  "record_type": "New component-stage evaluation of selected checkpoint on retained development corpus",
+  "language": "Sanskrit",
+  "component": "tagger_parser",
+  "runtime_alias": "sanskrit-vedic",
+  "checkpoint_epoch": 74,
+  "checkpoint_artifacts": [
+    {
+      "path": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.tagger.mdl",
+      "bytes": 21926681,
+      "sha256": "93532d76a28c787467898d5cbf43d1a555f492cbd865084160b3acb9e8795b78"
+    },
+    {
+      "path": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.vocabs.json",
+      "bytes": 24546,
+      "sha256": "4902589a4e4b2cd2f592b1cf5e9275d3c044a49fa0783d5b23eb73d595c547de"
+    }
+  ],
+  "dataset_files": [
+    {
+      "path": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/train_10000.conllu",
+      "bytes": 9125358,
+      "sha256": "4ab05355465b0a5c6753cadf4a7e5b7b39841fd3cbb43bd5ed0817d0180b7be1"
+    },
+    {
+      "path": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/dev.conllu",
+      "bytes": 1372714,
+      "sha256": "cacf6991faf32b50f5de541a2f58c3b1030e6976c5b161e9ca1427043b8eb398"
+    },
+    {
+      "path": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/train_posdep.py",
+      "bytes": 632,
+      "sha256": "a55e3f7181b444eca6510cdf43f0733e4b2f50b35db9d2cd384c4eee72ff1db3"
+    },
+    {
+      "path": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/build_dataset.js",
+      "bytes": 11981,
+      "sha256": "e29eeac653815e2aa0dc79c0c35bb63d8f2ae5401bba352a5d1d6052696cc5c5"
+    }
+  ],
+  "dataset_identity": "All seven label-to-index vocabularies regenerated from train_10000.conllu match the selected runtime vocabulary exactly; dev.conllu is named by train_posdep.py in the same retained directory.",
+  "input_stage": "Gold sentence boundaries and gold expanded word segmentation from retained dev.conllu; predicted UPOS, XPOS, morphology, dependency heads and labels. Tokenizer/MWT and lemmatizer not invoked.",
+  "sentences": 1525,
+  "evaluated_sentences": 1525,
+  "words": 9787,
+  "max_wordpieces": 512,
+  "batch_size": 16,
+  "cpu_threads": 4,
+  "metrics_scale": "fractions 0-1",
+  "metrics": {
+    "UPOS": {
+      "precision": 0.900991110656994,
+      "recall": 0.900991110656994,
+      "f1": 0.900991110656994,
+      "aligned_accuracy": 0.900991110656994
+    },
+    "XPOS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "aligned_accuracy": 1.0
+    },
+    "UFeats": {
+      "precision": 0.8107693879636252,
+      "recall": 0.8107693879636252,
+      "f1": 0.8107693879636252,
+      "aligned_accuracy": 0.8107693879636252
+    },
+    "AllTags": {
+      "precision": 0.7656074384387452,
+      "recall": 0.7656074384387452,
+      "f1": 0.7656074384387452,
+      "aligned_accuracy": 0.7656074384387452
+    },
+    "UAS": {
+      "precision": 0.7273934811484623,
+      "recall": 0.7273934811484623,
+      "f1": 0.7273934811484623,
+      "aligned_accuracy": 0.7273934811484623
+    },
+    "LAS": {
+      "precision": 0.6225605394911617,
+      "recall": 0.6225605394911617,
+      "f1": 0.6225605394911617,
+      "aligned_accuracy": 0.6225605394911617
+    },
+    "CLAS": {
+      "precision": 0.6030776193708984,
+      "recall": 0.6050630037461687,
+      "f1": 0.6040686802289341,
+      "aligned_accuracy": 0.6050630037461687
+    },
+    "MLAS": {
+      "precision": 0.47918081013804026,
+      "recall": 0.48075831535929164,
+      "f1": 0.47996826656088853,
+      "aligned_accuracy": 0.48075831535929164
+    }
+  },
+  "method": "Pristine Trankit 1.1.1 TaggerDataset and TPipeline._eval_posdep with selected native classifier/adapter weights, upstream XLM-R base, and bundled CoNLL 2018 UD scorer.",
+  "prediction_sha256": "40e79761acc74d9ee9184cfad46f84beebdb138c8002a1813156bcb87470c540",
+  "python": "3.10.20",
+  "dependencies": {
+    "trankit": "1.1.1",
+    "torch": "2.6.0+cpu",
+    "numpy": "1.26.4",
+    "sentencepiece": "0.2.2",
+    "tokenizers": "0.23.2"
+  },
+  "elapsed_seconds": 95.79700000002049,
+  "note": "This re-evaluation supplies new measurements where the historical log is absent; it is not recovered historical training-console output or an independent test-set result."
+}

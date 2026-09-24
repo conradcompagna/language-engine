@@ -20,10 +20,13 @@ Three runs produced saved weights. Seven ended during training or evaluation wit
 saved weights; the retained logs document the token-alignment constraints involved
 in reconciling CAMeL output with Trankit's CoNLL-U evaluation.
 
-The application selected the Arabic UD/PADT model from
-`trankit_save_commercial_v1`. The comparison harness remained useful for checking
-that tokenizer against CAMeL output as an external reference, while keeping the
-application's runtime dependencies focused on the selected pipeline.
+The final application combines the corrected CAMeL-teacher tokenizer and MWT
+expander from `t_ar10k2` with the tagger/parser and lemmatizer from
+`trankit_save_commercial_v1/ar`. The [teacher-data builder and correction rules](../../pipeline/datasets/arabic/README.md)
+record the path from authentic news text to the selected segmentation models.
+The comparison harness records individual differences against CAMeL output;
+the [training results](../../models/TRAINING_RESULTS.md) give the selected
+components' development scores.
 
 ## Inspect the work
 

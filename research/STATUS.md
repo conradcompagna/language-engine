@@ -9,50 +9,44 @@ training, dictionary and CPU-export stages that produced these resources.
 
 ## Active model map
 
-| Language | Runtime alias | Matched syntax / lexical components | NER record |
-|---|---|---|---|
-| Chinese (`zh`) | `chinese` | Matches retained Chinese cache components | Retained Chinese cache |
-| Japanese (`ja`) | `customized-ner` | Syntax matches retained Japanese cache components | Retained NER work cache |
-| Korean (`ko`) | `korean-ner` | Korean-Kaist treebank mapping; KLUE NER work area | KLUE conversion/training record |
-| Vietnamese (`vi`) | `vietnamese` | Provisioned components fingerprinted | [wikiann_vi](models/wikiann_vi/) |
-| Classical Chinese (`lzh`) | `classical-chinese` | Syntax matches retained Classical Chinese cache components | [lzh_cmag_200k](models/lzh_cmag_200k/) |
-| Turkish (`tr`) | `turkish` | commercial_v1/tr: tokenizer, tagger, lemma, MWT | [tur_turkish_wiki_ner](models/tur_turkish_wiki_ner/) |
-| Persian (`fa`) | `persian` | Separate persianlemmatizer selection | [fa_multiconer_v2_coarse6](models/fa_multiconer_v2_coarse6/) |
-| Indonesian (`id`) | `indonesian` | Provisioned components fingerprinted | [ind_indonlu_nerp](models/ind_indonlu_nerp/) |
-| Hindi (`hi`) | `hindi` | commercial_v1/hi: tokenizer, tagger, lemma | [hi_multiconer_v2_coarse6](models/hi_multiconer_v2_coarse6/) |
-| Arabic (`ar`) | `arabic` | t_ar10k2: tokenizer/MWT; commercial_v1/ar: tagger/lemma | Retained Arabic cache |
-| Thai (`th`) | `thai-ner` | th_customized_ner: tokenizer/tagger; identity lemma | [tha_thai_nner_full_coarse_bio](models/tha_thai_nner_full_coarse_bio/) |
-| Sanskrit (`sa`) | `sanskrit-vedic` | sa_dcs_v1: tokenizer/lemma/MWT | [san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5](models/san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/) |
-| Old English (`ang`) | `customized` | OEDT tokenize v3: tokenizer/tagger; oldeng_lemmatizer | [ang_oedt](models/ang_oedt/) |
-| French (`fr`) | `french` | Provisioned components fingerprinted | Fingerprint recorded |
-| Italian (`it`) | `italian-twittiro` | Provisioned components fingerprinted | [it_multiconer_v2_coarse6](models/it_multiconer_v2_coarse6/) |
-| Russian (`ru`) | `russian-gsd` | Provisioned components fingerprinted | Fingerprint recorded |
-| Spanish (`es`) | `spanish-gsd` | Provisioned components fingerprinted | Fingerprint recorded |
-| German (`de`) | `german` | Provisioned components fingerprinted | Fingerprint recorded |
-| Dutch (`nl`) | `dutch` | Provisioned components fingerprinted | Fingerprint recorded |
-| Portuguese (`pt`) | `portuguese` | Provisioned components fingerprinted | [pt_multiconer_v2_coarse6](models/pt_multiconer_v2_coarse6/) |
-| Latin (`la`) | `latin` | commercial_v1/la: tokenizer/tagger/lemma | [lat_herodotos_latin_ner](models/lat_herodotos_latin_ner/) |
-| Greek (`el`) | `greek` | commercial_v1/el: tokenizer/tagger/lemma | [ell_greek_ner_nel](models/ell_greek_ner_nel/) |
-| Armenian (`hy`) | `armenian` | Provisioned components fingerprinted | [hye_wikiann](models/hye_wikiann/) |
-| Ancient Greek (`grc`) | `ancient-greek` | t_grc_naturalpara_tok: tokenizer; t_grc10k_tok1: tagger/lemma | [grc_pausanias_ethnic_civic_misc](models/grc_pausanias_ethnic_civic_misc/) |
-| Hebrew (`he`) | `hebrew` | commercial_v1/he: tokenizer/tagger/lemma/MWT | [heb_nemo_token_single](models/heb_nemo_token_single/) |
-| Tagalog (`tl`) | `tagalog-custom` | tgl_v2: tokenizer/MWT; tgl_v1: tagger/lemma | [fil_tlunified_ner](models/fil_tlunified_ner/) |
-| Swahili (`sw`) | `swahili-custom` | swh_v1: tokenizer/tagger/lemma | [swh_finerweb_top100_lpo_20260507_201707](models/swh_finerweb_top100_lpo_20260507_201707/) |
+I combine my own trained components with upstream Trankit models. This table records the selection for each task rather than treating an entire language pipeline as either custom or stock.
 
-The inventory contains 159 provisioned checkpoints, 96 adapter packs, the INT8
-encoder and its manifest. Stored resources include historical and shared assets;
-the registry, rather than the directory count, determines enabled languages.
-All 257 listed artifact/manifest fingerprints match the retained local deployment
-store. In the earlier 119-file registry-folder comparison, 71 files also matched
-retained training outputs or cache copies. Eighteen NER files match named finished
-runs linked above. These counts describe file identity, not numbers of custom models.
+| Language | Tokenizer | MWT expansion | POS/morphology/parser | Lemmatizer | NER |
+|---|---|---|---|---|---|
+| Chinese (Simplified) | Stock | — | Stock | Stock | Stock |
+| Japanese | Stock | — | Stock | Stock | Custom |
+| Korean | Stock | — | Stock | Stock | Custom |
+| Vietnamese | Stock | — | Stock | Identity | Custom |
+| Classical Chinese | Stock | — | Stock | Stock | Custom |
+| Turkish | Custom | Custom | Custom | Custom | Custom |
+| Persian | Stock | Stock | Stock | Custom | Custom |
+| Indonesian | Stock | — | Stock | Stock | Custom |
+| Hindi | Custom | — | Custom | Custom | Custom |
+| Arabic | Custom | Custom | Custom | Custom | Stock |
+| Thai | Custom | — | Custom | Identity | Custom |
+| Sanskrit | Custom | Custom | Custom | Custom | Custom |
+| Old English | Custom | — | Custom | Custom | Custom |
+| French | Stock | Stock | Stock | Stock | Stock |
+| Italian | Stock | Stock | Stock | Stock | Custom |
+| Russian | Stock | — | Stock | Stock | Stock |
+| Spanish | Stock | Stock | Stock | Stock | Stock |
+| German | Stock | Stock | Stock | Stock | Stock |
+| Dutch | Stock | — | Stock | Stock | Stock |
+| Portuguese | Stock | Stock | Stock | Stock | Custom |
+| Latin | Custom | — | Custom | Custom | Custom |
+| Greek | Custom | Stock | Custom | Custom | Custom |
+| Armenian | Stock | Stock | Stock | Stock | Custom |
+| Ancient Greek | Custom | — | Custom | Custom | Custom |
+| Hebrew | Custom | Custom | Custom | Custom | Custom |
+| Tagalog | Custom | Custom | Custom | Custom | Custom |
+| Swahili | Custom | — | Custom | Custom | Custom |
+| Chinese (Traditional) | Stock | — | Stock | Stock | Stock |
 
-"Fingerprint recorded" identifies the deployed artifact without assigning an
-unverified historical training run. Cached-file identity establishes a retained
-copy; dataset and authorship claims come from the associated training record.
-Korean shares resources through its treebank mapping, and Traditional Chinese
-uses the extra `traditional-chinese` alias; neither should be inferred solely
-from the presence of alias-named component files.
+Across these 28 pipelines, 61 task slots use custom checkpoints, 62 use stock checkpoints, 2 use identity lemmatization, and 15 do not use an MWT component.
+
+Korean syntax uses the Korean-Kaist components; Korean NER is separately trained on KLUE. Persian combines stock tokenization, syntax and MWT expansion with my lemmatizer and NER; Greek combines my tokenizer, syntax and lemmatizer with the stock MWT expander.
+
+The [component identities](models/component-origins.json) record checkpoint hashes and immutable upstream sources. The training results distinguish original selected-checkpoint development scores from fresh evaluations of the retained MWT, Japanese NER and Sanskrit parser checkpoints.
 
 ## Component selection decisions
 
@@ -61,8 +55,9 @@ from the presence of alias-named component files.
 - **Ancient Greek:** natural-paragraph tokenizer training is combined with the
   `t_grc10k_tok1` tagger/lemmatizer and the Pausanias NER run.
 - **Sanskrit:** DCS v1 supplies tokenizer, lemma and sandhi/MWT expansion; NER
-  matches the corrected supervised 95/5 run. The tagger has a deployment fingerprint
-  without a matched historical training output in this comparison.
+  matches the corrected supervised 95/5 run. The tagger uses the separate
+  10,000-sentence DCS dependency-data track: all seven training vocabulary maps
+  match the selected model, and its retained development evaluation is recorded.
 - **Tagalog:** v2 supplies tokenizer/MWT and v1 supplies tagger/lemma.
 - **Old English:** OEDT tokenize v3 supplies tokenizer/tagger, alongside the
   separate lemmatizer and `ang_oedt` NER.
@@ -70,8 +65,8 @@ from the presence of alias-named component files.
 - **Thai:** syntax matches `trankit_save_th_customized_ner`; NER matches the
   separately finished `tha_thai_nner_full_coarse_bio` run.
 
-The [model guide](models/README.md#selected-training-results) gives saved development
-scores and source-log identities for four selected examples. The
+The [complete training results](models/TRAINING_RESULTS.md) give selected-checkpoint
+development scores, last logged results and source-log identities across tasks. The
 [dataset cards](datasets/README.md) and [build chains](pipeline/README.md) document
 their input preparation and label schemes.
 

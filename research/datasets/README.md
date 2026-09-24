@@ -10,5 +10,5 @@ supervision choices for the [model runs](../models/).
 | `grc_pausanias_ethnic_civic_misc/` | Ancient Greek | Pausanias, ethnic/civic/misc entity scheme |
 | `lzh_cmag_200k/`, `lzh_cmag_1m/` | Classical Chinese | CMAG, two corpus sizes |
 | `wikiann_vi/` | Vietnamese | WikiANN |
-| `sanskrit_annotated_20_chunks_bio/` | Sanskrit | the Gemini-annotated set, see [the build chain](../pipeline/README.md#1b-sanskrit--named-entities-from-a-synthetic-corpus) |
+| `sanskrit_annotated_20_chunks_bio/` | Sanskrit | the Gemini-annotated set, see [the build chain](../pipeline/README.md#1b-sanskrit--semantic-annotations-over-authentic-texts) |
 | `thai_nner_full_coarse_bio/` | Thai | Thai-NNER, coarse BIO conversion |

@@ -1,0 +1,65 @@
+{
+  "model": "arabic-clitic-tokenizer",
+  "metric_scale": "percent 0-100",
+  "tokenizer_historical_training_record": {
+    "code": "ar",
+    "language": "Arabic",
+    "component": "tokenizer",
+    "split": "development",
+    "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic.tokenizer.mdl",
+    "checkpoint_sha256": "fd2a9195aabc1a39f98e339969732c61d37cf994c648f6d8867db0554591bc7f",
+    "checkpoint_epoch": 11,
+    "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/t_ar10k2/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl",
+    "log": "_deprecated_nonruntime_20260514_184819/training/t_ar10k2/xlm-roberta-base/customized-mwt/logs/tokenize.training",
+    "log_sha256": "64b853045f27875f2c2ae4560deb97cc613e87054c8ef9a16424d3c4fed5aa2a",
+    "selected_table_line": 9513,
+    "selected_metrics_f1_percent": {
+      "Tokens": 99.86,
+      "Sentences": 97.49
+    },
+    "last_logged_metrics_f1_percent": {
+      "Tokens": 99.86,
+      "Sentences": 97.49
+    },
+    "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+  },
+  "mwt_development_reevaluation": {
+    "language_code": "ar",
+    "language": "Arabic",
+    "checkpoint": {
+      "path": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic_mwt_expander.pt",
+      "sha256": "c9e2cd69fa05a44e6b16d56112b1fcec74654bba7e6998e0d9c2877c2273c044",
+      "bytes": 1384901
+    },
+    "evaluation_date": "2026-09-24",
+    "device": "CPU",
+    "checkpoint_format": "native PyTorch, unquantized",
+    "split": "retained development material",
+    "input": {
+      "path": "_deprecated_nonruntime_20260514_184819/training/t_ar10k2/xlm-roberta-base/customized-mwt/preds/tokenizer.dev.conllu",
+      "sha256": "83be526273aeb88f058564bfc02569e011c24ff53bf22b022a64c80fa452628c",
+      "bytes": 428935
+    },
+    "input_kind": "retained_tokenizer_development_predictions",
+    "reference": {
+      "path": "_deprecated_nonruntime_20260514_184819/training/arabiccomponents/lessbad/ara_news_2022_10K_plain_trankit_tok_dev_fixed.conllu",
+      "sha256": "7f142595a3f116ab557c07230a0e447cb7b31799358676e366796e2db186d12c",
+      "bytes": 806800
+    },
+    "sentence_count": 497,
+    "mwt_candidate_count": 1962,
+    "dictionary_ensemble": {
+      "precision": 98.108346,
+      "recall": 98.071366,
+      "f1": 98.089852
+    },
+    "seq2seq_only": {
+      "precision": 97.806687,
+      "recall": 97.76982,
+      "f1": 97.78825
+    },
+    "prediction_sha256": "77eb44b3c8e233c532ab0c520d124c0f502424188b7d3c6247198a92668e9386",
+    "torch_version": "2.12.0.dev20260217+cu128",
+    "scope_note": "Retained selected-tokenizer development predictions feed the expander. The input token/sentence metrics match the selected tokenizer training log."
+  }
+}

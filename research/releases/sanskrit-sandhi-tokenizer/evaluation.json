@@ -1,0 +1,80 @@
+{
+  "model": "sanskrit-sandhi-tokenizer",
+  "metric_scale": "percent 0-100",
+  "tokenizer_historical_training_record": {
+    "code": "sa",
+    "language": "Sanskrit",
+    "component": "tokenizer",
+    "split": "development",
+    "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.tokenizer.mdl",
+    "checkpoint_sha256": "9bce77c36db05a7a84bc435558d2e3f7f49c5f9359dd72f6cc4c16d925213a14",
+    "checkpoint_epoch": 20,
+    "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl",
+    "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/logs/tokenize.training",
+    "log_sha256": "131eeb9c50afcd9bfc9d0f53b0046f81afce8e87893b0a402a7cc79a052236ab",
+    "selected_table_line": 7818,
+    "selected_metrics_f1_percent": {
+      "Tokens": 97.09,
+      "Sentences": 79.39
+    },
+    "last_logged_metrics_f1_percent": {
+      "Tokens": 97.09,
+      "Sentences": 79.39
+    },
+    "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+  },
+  "mwt_development_reevaluation": {
+    "language_code": "sa",
+    "language": "Sanskrit",
+    "checkpoint": {
+      "path": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic_mwt_expander.pt",
+      "sha256": "5d444e53a231c5fcfcd9bd141529b03575cb33dbd250cb50c7c35a00bb5d5c32",
+      "bytes": 35706757
+    },
+    "evaluation_date": "2026-09-24",
+    "device": "CPU",
+    "checkpoint_format": "native PyTorch, unquantized",
+    "split": "retained development material",
+    "input": {
+      "path": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/preds/tokenizer.dev.conllu",
+      "sha256": "74467869be4fb1e2151f55cf7144677646bec724be3836243b090b922be8eaa7",
+      "bytes": 43939121
+    },
+    "input_kind": "retained_reference_surface_boundaries_and_mwt_flags",
+    "reference": {
+      "path": "work/model-publication-audit/mwt-reevaluation/sa-recovered-reference.conllu",
+      "sha256": "21459f1e618f77c58c38c04353be66ff84a966165842455832d74d455dfc81f1",
+      "bytes": 82345709
+    },
+    "sentence_count": 73807,
+    "mwt_candidate_count": 97960,
+    "dictionary_ensemble": {
+      "precision": 94.103215,
+      "recall": 93.720553,
+      "f1": 93.911494
+    },
+    "seq2seq_only": {
+      "precision": 92.995371,
+      "recall": 92.629111,
+      "f1": 92.811879
+    },
+    "prediction_sha256": "823f5dbe3718a5ec447ed54ea0df1ffdac857ab609637d1d45c822c1d886299f",
+    "torch_version": "2.12.0.dev20260217+cu128",
+    "reference_recovery": {
+      "chapter_count": 1590,
+      "stats": {
+        "sentences": 73819,
+        "token_rows": 547166,
+        "mwt_rows": 97960,
+        "empty_nodes": 0,
+        "blank_head_rows_filled": 525008,
+        "blank_deprel_rows_filled": 525008
+      },
+      "method": "Recover chapter IDs in order from retained MWT input comments, map through original chapter-info.xml, and invoke original CoNLL-U export builder on retained corpus chapters.",
+      "builder_sha256": "1f5c31afa20a48b7efa8c651d8585386947b43d016c7046d96fb525e0d0422f0",
+      "chapter_metadata_sha256": "59144c194160408340095c3f91ab7dc19f08102703427c77b7dc25d6cd4e4663",
+      "reference_sha256": "21459f1e618f77c58c38c04353be66ff84a966165842455832d74d455dfc81f1"
+    },
+    "scope_note": "Gold surface boundaries and MWT flags from the retained full DCS development input. The original reference was rebuilt from 1,590 identified corpus chapters using the original exporter. This evaluates expansion, not tokenizer boundary detection."
+  }
+}

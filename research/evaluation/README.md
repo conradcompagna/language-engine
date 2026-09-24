@@ -1,5 +1,12 @@
 # Evaluation
 
+## Selected models
+
+The [complete training results](../models/TRAINING_RESULTS.md) cover all 61
+custom component selections: 54 historical selected-checkpoint score records
+and seven fresh evaluations of retained checkpoints. The records include model
+and dataset hashes, metric definitions, source-log excerpts and input-stage details.
+
 ## Regression
 
 `test_mwt_realign_dp.py` — the multi-word-token realignment regression. This covers the

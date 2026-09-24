@@ -1,5 +1,10 @@
 # Model runs
 
+The [complete selected-training results](TRAINING_RESULTS.md) cover tokenization,
+POS/dependency parsing, lemmatization and NER, with checkpoint identities and
+exact score records; the [component map](../STATUS.md) distinguishes my trained
+components from upstream Trankit resources.
+
 One directory per finished NER training run, holding the training configuration and the
 label vocabulary. The configuration records the base encoder, the
 dataset, and the hyperparameters; the vocabulary records the label set the run was
@@ -26,14 +31,14 @@ Dataset cards for the corpora are in [`../datasets/`](../datasets/).
 ## Selected training results
 
 These runs connect the dataset work to measured NER outcomes: converting an existing
-Old English corpus, separating an Ancient Greek entity category, preparing synthetic
-Sanskrit supervision, and adapting Vietnamese WikiANN to Trankit's BIO format.
+Old English corpus, separating an Ancient Greek entity category, preparing Gemini-assisted
+annotations over authentic Sanskrit text, and adapting Vietnamese WikiANN to Trankit's BIO format.
 
 | Run | Dataset / build record | Best dev F1 (%) | Selected epoch | Run assets |
 |---|---|---:|---:|---|
 | Old English OEDT | [BIO conversion](../datasets/ang_oedt/README.md) | 88.20 | 13 | [label vocabulary](ang_oedt/customized-ner.ner-vocab.json) |
 | Ancient Greek Pausanias | [ethnic/civic label remap](../datasets/grc_pausanias_ethnic_civic_misc/README.md) | 78.81 | 13 | [configuration](grc_pausanias_ethnic_civic_misc/training_config.json) |
-| Sanskrit synthetic NER | [corpus construction](../pipeline/README.md#1b-sanskrit--named-entities-from-a-synthetic-corpus) | 54.28 | 29 | [supervised 95/5 configuration](san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/training_config.json) |
+| Sanskrit interpretive NER | [corpus construction](../pipeline/README.md#1b-sanskrit--semantic-annotations-over-authentic-texts) | 54.28 | 29 | [supervised 95/5 configuration](san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/training_config.json) |
 | Vietnamese WikiANN | [source and split policy](../datasets/wikiann_vi/README.md) | 91.72 | 18 | [configuration](wikiann_vi/training_config.json) |
 
 The [saved-log excerpts](../evaluation/results/selected_ner_training.json) include

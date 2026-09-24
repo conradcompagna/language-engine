@@ -1,0 +1,25 @@
+Conrad Compagna Model Evaluation License 1.0
+
+Copyright (c) 2026 Conrad Compagna.
+
+This license applies only to the original model weights, model-specific code,
+and documentation in this package in which Conrad Compagna holds rights.
+
+You may download, copy, run, and modify those materials for noncommercial
+research, education, personal experimentation, and evaluation. Evaluation for
+recruitment or hiring is also permitted. Retain this notice and attribution to
+Conrad Compagna in copies and in publications describing use of these models.
+You may publish evaluation results and research findings.
+
+Commercial deployment, inclusion in a commercially offered product or service,
+and redistribution of the original or modified model weights require separate
+permission from Conrad Compagna: conradcompagna@gmail.com.
+
+Third-party materials are excluded from this grant and retain their own terms,
+as identified in THIRD_PARTY_NOTICES.md. This license does not limit permissions
+already granted by third-party licensors. In particular, bundled fastText vectors
+and their converted vocabulary remain under CC BY-SA 3.0.
+
+The materials are provided as is, without warranties. To the extent permitted
+by applicable law, the author is not liable for claims or damages arising from
+their use. All rights not expressly granted above are reserved.

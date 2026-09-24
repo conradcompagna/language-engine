@@ -1,0 +1,1082 @@
+{
+  "record_type": "Exact checkpoint identity against official upstream release archives",
+  "repository": "uonlp/trankit",
+  "revision": "1add34e3909949dbb98523ed6cfcb4e9393e2c8e",
+  "version": "v1.0.0",
+  "embedding": "xlm-roberta-base",
+  "official_download_code": {
+    "url": "https://raw.githubusercontent.com/nlp-uoregon/trankit/54e863327391262cf72f6adc1b0ff104e972a1dc/trankit/utils/base_utils.py",
+    "git_revision": "54e863327391262cf72f6adc1b0ff104e972a1dc",
+    "file_sha256": "c172cd01e36ab8b982b28ece6f384d92fe913117889c5578b55138685f2792b1",
+    "line": 99,
+    "text": "url = \"https://huggingface.co/uonlp/trankit/resolve/main/models/{}/{}/{}.zip\".format(saved_model_version, embedding_name,"
+  },
+  "verification": "Archive SHA-256 equals the official Hugging Face LFS object ID; each listed archive member SHA-256 equals the retained runtime checkpoint hash.",
+  "archives": [
+    {
+      "language": "ancient-greek",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/ancient-greek.zip",
+      "archive_sha256": "41b68755011385f28103ee5ab8b091d3c98aa62850d43390cd89c72b5c9d8878"
+    },
+    {
+      "language": "arabic",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/arabic.zip",
+      "archive_sha256": "48e232024de92f5092bd315991403eb0cbed977925b6aea314419b8765106f52"
+    },
+    {
+      "language": "armenian",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/armenian.zip",
+      "archive_sha256": "5abb6fcf3740f61d3813ddbea0d303e23c678e2289c9f6a0940dbdba4204b1bd"
+    },
+    {
+      "language": "chinese",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+      "archive_sha256": "7142c6303f7fc280ea5a063e7251b7e455c511d9818b9afc583cc5f99bb44f1c"
+    },
+    {
+      "language": "classical-chinese",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/classical-chinese.zip",
+      "archive_sha256": "e3d0a16bca9616b4172bc95584ad50b4ed4898a418230971c36f19862377fa5f"
+    },
+    {
+      "language": "dutch",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+      "archive_sha256": "cf1465a1ee658991e4dc297fcfa80c88b390d607c67825f404b69c9d6d27c13e"
+    },
+    {
+      "language": "french",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+      "archive_sha256": "f54053b0cd7b985d128b35b58732d0ce84bb277c922161c444cb37abf2da6573"
+    },
+    {
+      "language": "german",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+      "archive_sha256": "4c06d66d4189f9d7b10ffe5ce7e2f3bfc92416e9bf7a3e75a2daa168c4dba230"
+    },
+    {
+      "language": "greek",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/greek.zip",
+      "archive_sha256": "446a1381609f0cb1bfc6afb0e489f72abaaeb461251027e0674136f6fb0a60bd"
+    },
+    {
+      "language": "hebrew",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/hebrew.zip",
+      "archive_sha256": "cd4f0c65a6a701f6801ab000425010039d6bc5705f52e8927fcfa9b2266b28a5"
+    },
+    {
+      "language": "hindi",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/hindi.zip",
+      "archive_sha256": "1a95a6ac2e92cd62f0caeaeea94ac99b6685cc337569c4d3001375c796151a2d"
+    },
+    {
+      "language": "indonesian",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/indonesian.zip",
+      "archive_sha256": "a96309f3ee2b51f2961b0f146cc875f6cb97b55570687486ba32fc81486e28f9"
+    },
+    {
+      "language": "italian-twittiro",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/italian-twittiro.zip",
+      "archive_sha256": "02af7b93114bb917f14ad9faaf09be8cdc778e289e8cbeee55aded6301047ffc"
+    },
+    {
+      "language": "japanese",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+      "archive_sha256": "2f3bbe6e983883b254bceb0d1d5102ef3bf4dd6945609f2a786b86abff7b0769"
+    },
+    {
+      "language": "korean",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean.zip",
+      "archive_sha256": "0a6e9297e91a93f38d5601f73b90b4ed90de84bf8fad7c618f415c24d51659e9"
+    },
+    {
+      "language": "korean-kaist",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean-kaist.zip",
+      "archive_sha256": "61ad040e3ed0ff8caf858a66bd5b2aa76aabf42f94258c8a3435a79d22a78a7d"
+    },
+    {
+      "language": "latin",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/latin.zip",
+      "archive_sha256": "af539cf40ff51d64023420c0f1d5f45c23533a51d85ccd3e18d3cb83d08c4c10"
+    },
+    {
+      "language": "persian",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/persian.zip",
+      "archive_sha256": "44e9acd774c53920ff4f9019028e2a957e14bd483126c2a27e0ec63d76b6c63c"
+    },
+    {
+      "language": "portuguese",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/portuguese.zip",
+      "archive_sha256": "94c4f33bd97f1d287cf7adbb69aeaaa224b839ab144f2c4cc6015cf081f57868"
+    },
+    {
+      "language": "russian-gsd",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/russian-gsd.zip",
+      "archive_sha256": "4c3ff855c53874aa52311bfccebb79dcd339c1834b9f20aa96a912c29ac98b35"
+    },
+    {
+      "language": "spanish-gsd",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+      "archive_sha256": "6c294e016545a3c9ce8c1fd50a6b68ba075177723afaf705960107039e76a838"
+    },
+    {
+      "language": "traditional-chinese",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/traditional-chinese.zip",
+      "archive_sha256": "f420b34cd85482e7df88f37fb0ae7116a9b6a35e1c2e3d5cea437a7eccb077ca"
+    },
+    {
+      "language": "turkish",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/turkish.zip",
+      "archive_sha256": "e953fdcbbf03e62f6caaae3888a750965b4be8327dd0dd6d3191bb5595c29e6e"
+    },
+    {
+      "language": "vietnamese",
+      "url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/vietnamese.zip",
+      "archive_sha256": "c8fcbde3b9c4637d6e497c89f2e8cd05c22cdc8e0d9539f0100338c445cefcf5"
+    }
+  ],
+  "stock_files": [
+    {
+      "code": "zh",
+      "target": "chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/chinese/chinese.ner.mdl",
+      "sha256": "5299a84f5ee3fb17b34c9068fbbeaa4ec99a1bacea2dc98e5ffc87eb909a456c",
+      "upstream_identical_files": [
+        {
+          "archive_language": "chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "member": "chinese.ner.mdl"
+        },
+        {
+          "archive_language": "classical-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/classical-chinese.zip",
+          "member": "classical-chinese.ner.mdl"
+        },
+        {
+          "archive_language": "traditional-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/traditional-chinese.zip",
+          "member": "traditional-chinese.ner.mdl"
+        }
+      ]
+    },
+    {
+      "code": "zh",
+      "target": "chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/chinese/chinese.tagger.mdl",
+      "sha256": "6daae8a6d6f19a437fdd5ca2084a0147bd68d7296de9f84cfe6bd80a1be9ea71",
+      "upstream_identical_files": [
+        {
+          "archive_language": "chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "member": "chinese.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "zh",
+      "target": "chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/chinese/chinese.tokenizer.mdl",
+      "sha256": "f3c7224b4f6d667092c8eeefeae4667c80c7511c9278b8772e5aa95f2981dc56",
+      "upstream_identical_files": [
+        {
+          "archive_language": "chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "member": "chinese.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "zh",
+      "target": "chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/chinese/chinese_lemmatizer.pt",
+      "sha256": "059c7c63fe5426ce1348c36fd2773159d4b7aad5198b2e8f3adfbd12271ba7b9",
+      "upstream_identical_files": [
+        {
+          "archive_language": "chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "member": "chinese_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "ja",
+      "target": "customized-ner",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized-ner/customized-ner.tagger.mdl",
+      "sha256": "1906d7f11d1037829b97de5daef57c96653829b5a3550b43355955048e5c7e73",
+      "upstream_identical_files": [
+        {
+          "archive_language": "japanese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+          "member": "japanese.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "ja",
+      "target": "customized-ner",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized-ner/customized-ner.tokenizer.mdl",
+      "sha256": "1d7ab28c0c1c1fe21f750c15a36d46274f6e4772f9814f03120af20d402fc12d",
+      "upstream_identical_files": [
+        {
+          "archive_language": "japanese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+          "member": "japanese.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "ja",
+      "target": "customized-ner",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized-ner/customized-ner_lemmatizer.pt",
+      "sha256": "cf27852a6191c3bb42e76f4c2445db2352df1a6ab8be940085827e73da4ff76e",
+      "upstream_identical_files": [
+        {
+          "archive_language": "japanese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+          "member": "japanese_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "vi",
+      "target": "vietnamese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/vietnamese/vietnamese.tagger.mdl",
+      "sha256": "9df705af13dce2a21cd5212e16a205942aabea76d6d3f2953a6c4a2ee5a91f7a",
+      "upstream_identical_files": [
+        {
+          "archive_language": "vietnamese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/vietnamese.zip",
+          "member": "vietnamese.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "vi",
+      "target": "vietnamese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/vietnamese/vietnamese.tokenizer.mdl",
+      "sha256": "3bcef30d6fa0f832a64f5c3ef750805ba855863b291aaa5879f77bab6f16af0b",
+      "upstream_identical_files": [
+        {
+          "archive_language": "vietnamese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/vietnamese.zip",
+          "member": "vietnamese.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "lzh",
+      "target": "classical-chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/classical-chinese/classical-chinese.tagger.mdl",
+      "sha256": "1699f10cfcc3e0ee44a09321564fd5aff3dd8c4c4218c3ee8c4b778faf388363",
+      "upstream_identical_files": [
+        {
+          "archive_language": "classical-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/classical-chinese.zip",
+          "member": "classical-chinese.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "lzh",
+      "target": "classical-chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/classical-chinese/classical-chinese.tokenizer.mdl",
+      "sha256": "24014f6677bd115e0106173c1678072c2bb8e08c48f09ceb57846cb3c6cded31",
+      "upstream_identical_files": [
+        {
+          "archive_language": "classical-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/classical-chinese.zip",
+          "member": "classical-chinese.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "lzh",
+      "target": "classical-chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/classical-chinese/classical-chinese_lemmatizer.pt",
+      "sha256": "3ffebf31e921c495003f3fa41026668534969193c977f1369ca04a8e9d4be4e2",
+      "upstream_identical_files": [
+        {
+          "archive_language": "classical-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/classical-chinese.zip",
+          "member": "classical-chinese_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "fa",
+      "target": "persian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian.tagger.mdl",
+      "sha256": "998f7cee6942d93c7e1a8e7299a0cacba0256b9420b8d412dbc44c61446c4909",
+      "upstream_identical_files": [
+        {
+          "archive_language": "persian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/persian.zip",
+          "member": "persian.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "fa",
+      "target": "persian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian.tokenizer.mdl",
+      "sha256": "c9d0c2bf4a05645d8c70c4b1d64e4712b65cfb2c15458f525ee55abb2fbe1977",
+      "upstream_identical_files": [
+        {
+          "archive_language": "persian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/persian.zip",
+          "member": "persian.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "fa",
+      "target": "persian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian_mwt_expander.pt",
+      "sha256": "86507d230f3560736b200e4cd58dfd75727e6f1888dc7420ea8119ba4553e216",
+      "upstream_identical_files": [
+        {
+          "archive_language": "persian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/persian.zip",
+          "member": "persian_mwt_expander.pt"
+        }
+      ]
+    },
+    {
+      "code": "id",
+      "target": "indonesian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/indonesian/indonesian.tagger.mdl",
+      "sha256": "e024ee898e66df008560ae5702d583b89602f79eeb78f2bac71083a69812fe47",
+      "upstream_identical_files": [
+        {
+          "archive_language": "indonesian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/indonesian.zip",
+          "member": "indonesian.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "id",
+      "target": "indonesian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/indonesian/indonesian.tokenizer.mdl",
+      "sha256": "176ab446c7eaec6849c08ab34b0479b96abebc8fbf25695c6c3111e5f7897160",
+      "upstream_identical_files": [
+        {
+          "archive_language": "indonesian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/indonesian.zip",
+          "member": "indonesian.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "id",
+      "target": "indonesian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/indonesian/indonesian_lemmatizer.pt",
+      "sha256": "1f7918907f2134a34be04f1560fe019d5fc77a3881eb5b4820367b244551ff06",
+      "upstream_identical_files": [
+        {
+          "archive_language": "indonesian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/indonesian.zip",
+          "member": "indonesian_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "ar",
+      "target": "arabic",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic.ner.mdl",
+      "sha256": "0924461350ae081929f957af038c629504c357f67bacba72d5943a99962dea52",
+      "upstream_identical_files": [
+        {
+          "archive_language": "arabic",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/arabic.zip",
+          "member": "arabic.ner.mdl"
+        }
+      ]
+    },
+    {
+      "code": "fr",
+      "target": "french",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french.ner.mdl",
+      "sha256": "5025f3df00dd447a85fed89dd3354a1417e07cebdab3104e8a459d91d5e0d240",
+      "upstream_identical_files": [
+        {
+          "archive_language": "french",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "member": "french.ner.mdl"
+        }
+      ]
+    },
+    {
+      "code": "fr",
+      "target": "french",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french.tagger.mdl",
+      "sha256": "0e29b5973bdf4030ff9d5fbad10589ad77eae5911a552fe12f54bc46a51841ee",
+      "upstream_identical_files": [
+        {
+          "archive_language": "french",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "member": "french.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "fr",
+      "target": "french",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french.tokenizer.mdl",
+      "sha256": "8d86215fe315427b23e1f112d6ecaf5c986df5bf9a8eeb3c22ba97099bec6323",
+      "upstream_identical_files": [
+        {
+          "archive_language": "french",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "member": "french.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "fr",
+      "target": "french",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french_lemmatizer.pt",
+      "sha256": "9571f1b2ee60ad3a45958a9f39f969407c570e48897b1766d85ede2e8c0fccfd",
+      "upstream_identical_files": [
+        {
+          "archive_language": "french",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "member": "french_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "fr",
+      "target": "french",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french_mwt_expander.pt",
+      "sha256": "d9c5f4625f6679725b6e97c11fa3183d1a94588ab17caa99034b2e25994e21f0",
+      "upstream_identical_files": [
+        {
+          "archive_language": "french",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "member": "french_mwt_expander.pt"
+        }
+      ]
+    },
+    {
+      "code": "it",
+      "target": "italian-twittiro",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro.tagger.mdl",
+      "sha256": "af1a3b18f796b8d12a93e2d819dc83f0356ac082e0cffaa912849358f76578a6",
+      "upstream_identical_files": [
+        {
+          "archive_language": "italian-twittiro",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/italian-twittiro.zip",
+          "member": "italian-twittiro.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "it",
+      "target": "italian-twittiro",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro.tokenizer.mdl",
+      "sha256": "37ea18239a3353874ceded46befbb3dd2a4c75146c20c87932a6ddad71b4b27b",
+      "upstream_identical_files": [
+        {
+          "archive_language": "italian-twittiro",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/italian-twittiro.zip",
+          "member": "italian-twittiro.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "it",
+      "target": "italian-twittiro",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro_lemmatizer.pt",
+      "sha256": "dff483392c26126b99a12946c6c66ad26e7481403f6c19170aab3f53adc7a183",
+      "upstream_identical_files": [
+        {
+          "archive_language": "italian-twittiro",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/italian-twittiro.zip",
+          "member": "italian-twittiro_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "it",
+      "target": "italian-twittiro",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro_mwt_expander.pt",
+      "sha256": "e452eafd00b39f4db1575196dcc5b16679e2ef994d599cd87e3cc3946246db1e",
+      "upstream_identical_files": [
+        {
+          "archive_language": "italian-twittiro",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/italian-twittiro.zip",
+          "member": "italian-twittiro_mwt_expander.pt"
+        }
+      ]
+    },
+    {
+      "code": "ru",
+      "target": "russian-gsd",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/russian-gsd/russian-gsd.ner.mdl",
+      "sha256": "6a905d5ea6a0f844d9c64a7333dfdeb03ba76d2d68c7b586bb3c884482106fd8",
+      "upstream_identical_files": [
+        {
+          "archive_language": "russian-gsd",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/russian-gsd.zip",
+          "member": "russian-gsd.ner.mdl"
+        }
+      ]
+    },
+    {
+      "code": "ru",
+      "target": "russian-gsd",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/russian-gsd/russian-gsd.tagger.mdl",
+      "sha256": "6eb914b13f38827b68fcf264c819744395868924d1fe5ab5e1ca5cb19b75c844",
+      "upstream_identical_files": [
+        {
+          "archive_language": "russian-gsd",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/russian-gsd.zip",
+          "member": "russian-gsd.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "ru",
+      "target": "russian-gsd",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/russian-gsd/russian-gsd.tokenizer.mdl",
+      "sha256": "ef867f493b21b75c2e54f4eaa1180b18d8548e933784a858486d8b6b62acee50",
+      "upstream_identical_files": [
+        {
+          "archive_language": "russian-gsd",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/russian-gsd.zip",
+          "member": "russian-gsd.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "ru",
+      "target": "russian-gsd",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/russian-gsd/russian-gsd_lemmatizer.pt",
+      "sha256": "1ad88550c698e88ba99ff0229d29cc99da4de9d9c001c638ad8e5707b2a8d4c9",
+      "upstream_identical_files": [
+        {
+          "archive_language": "russian-gsd",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/russian-gsd.zip",
+          "member": "russian-gsd_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "es",
+      "target": "spanish-gsd",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd.ner.mdl",
+      "sha256": "cdfa9d04bbfbb74d4a2abb832735d047820f1ddf042ecf4c0d27135b2ea12f3a",
+      "upstream_identical_files": [
+        {
+          "archive_language": "spanish-gsd",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "member": "spanish-gsd.ner.mdl"
+        }
+      ]
+    },
+    {
+      "code": "es",
+      "target": "spanish-gsd",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd.tagger.mdl",
+      "sha256": "feeb0cdc2840490620ec030918922aa311d219b92d2a959fe5bb19f9d53b2d07",
+      "upstream_identical_files": [
+        {
+          "archive_language": "spanish-gsd",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "member": "spanish-gsd.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "es",
+      "target": "spanish-gsd",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd.tokenizer.mdl",
+      "sha256": "6200b55bb6225fd543749fa4fb505353ea1baa0d5e6b55b3c0afe399f4d2be5e",
+      "upstream_identical_files": [
+        {
+          "archive_language": "spanish-gsd",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "member": "spanish-gsd.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "es",
+      "target": "spanish-gsd",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd_lemmatizer.pt",
+      "sha256": "7a99ebe93a595faeb37d64b2155828cdd6a108b2e4105212dee30e9655404f34",
+      "upstream_identical_files": [
+        {
+          "archive_language": "spanish-gsd",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "member": "spanish-gsd_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "es",
+      "target": "spanish-gsd",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd_mwt_expander.pt",
+      "sha256": "d9870fe453ed308ad14b6e6e19f2b6b75e219fa3d2ac3b563a2109dc7c16c567",
+      "upstream_identical_files": [
+        {
+          "archive_language": "spanish-gsd",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "member": "spanish-gsd_mwt_expander.pt"
+        }
+      ]
+    },
+    {
+      "code": "de",
+      "target": "german",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german.ner.germeval14.mdl",
+      "sha256": "5008d9d4c7b7e8d14f34d62ba71fd9fe134394ff53f351126de91301651857a5",
+      "upstream_identical_files": [
+        {
+          "archive_language": "german",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "member": "german.ner.germeval14.mdl"
+        }
+      ]
+    },
+    {
+      "code": "de",
+      "target": "german",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german.ner.mdl",
+      "sha256": "4c010d3c8145db86a16e00d29123c85f4e36099b0062be37a1b0e7720d87c4fd",
+      "upstream_identical_files": [
+        {
+          "archive_language": "german",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "member": "german.ner.mdl"
+        }
+      ]
+    },
+    {
+      "code": "de",
+      "target": "german",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german.tagger.mdl",
+      "sha256": "a703117d373e737e6822e34b9dfce3def79e00f4b0308ba6f496b0c639b492a6",
+      "upstream_identical_files": [
+        {
+          "archive_language": "german",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "member": "german.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "de",
+      "target": "german",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german.tokenizer.mdl",
+      "sha256": "06843405ac4ee5c6672738b455882760fd4f0aaed0b6410f3d9885c79f131cb4",
+      "upstream_identical_files": [
+        {
+          "archive_language": "german",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "member": "german.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "de",
+      "target": "german",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german_lemmatizer.pt",
+      "sha256": "c09bd2ca2250968a84ee2ff478a59576dd0e5b3fb607b5416bcb86f161c0e511",
+      "upstream_identical_files": [
+        {
+          "archive_language": "german",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "member": "german_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "de",
+      "target": "german",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german_mwt_expander.pt",
+      "sha256": "f6b65fd4ba782cd297c50a2a6677ddda9dd3e098b412737fe7a25f88dcfbbf05",
+      "upstream_identical_files": [
+        {
+          "archive_language": "german",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "member": "german_mwt_expander.pt"
+        }
+      ]
+    },
+    {
+      "code": "nl",
+      "target": "dutch",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch.ner-vocab.wikiner.mdl",
+      "sha256": "b34957f0e9c3f7fc968afb2d5c9c33a593f62006435f3b0f34404ff019cd4ea2",
+      "upstream_identical_files": [
+        {
+          "archive_language": "dutch",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "member": "dutch.ner-vocab.wikiner.mdl"
+        }
+      ]
+    },
+    {
+      "code": "nl",
+      "target": "dutch",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch.ner.mdl",
+      "sha256": "aac3de839cceed390df05144061f7aec28562d5c9e9142f0635f90046f94dc0c",
+      "upstream_identical_files": [
+        {
+          "archive_language": "dutch",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "member": "dutch.ner.mdl"
+        }
+      ]
+    },
+    {
+      "code": "nl",
+      "target": "dutch",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch.ner.wikiner.mdl",
+      "sha256": "fa06518125b26cf2f78a555475fabff36a0cc3d115e3369fb04532300e3acb69",
+      "upstream_identical_files": [
+        {
+          "archive_language": "dutch",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "member": "dutch.ner.wikiner.mdl"
+        }
+      ]
+    },
+    {
+      "code": "nl",
+      "target": "dutch",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch.tagger.mdl",
+      "sha256": "d6c8950879661248eba0bcb8b4995d09021be8d26b4aa3dd6544408a06f9e421",
+      "upstream_identical_files": [
+        {
+          "archive_language": "dutch",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "member": "dutch.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "nl",
+      "target": "dutch",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch.tokenizer.mdl",
+      "sha256": "62ce9b2a4179fa772f06990af03e349ac55ab93cca16fccd09e63ac875177e24",
+      "upstream_identical_files": [
+        {
+          "archive_language": "dutch",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "member": "dutch.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "nl",
+      "target": "dutch",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch_lemmatizer.pt",
+      "sha256": "705057c047da6e5dadfc6837804c53f4a36f4323a9532898a95cd78429937cba",
+      "upstream_identical_files": [
+        {
+          "archive_language": "dutch",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "member": "dutch_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "pt",
+      "target": "portuguese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese.tagger.mdl",
+      "sha256": "8ada34be2864fdbdbf0a7eb4407a28307ae5210c95a1bd0d80af9f3d7fdfa7d5",
+      "upstream_identical_files": [
+        {
+          "archive_language": "portuguese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/portuguese.zip",
+          "member": "portuguese.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "pt",
+      "target": "portuguese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese.tokenizer.mdl",
+      "sha256": "8421a029d1895e2469459c4e1c543a3509fd287c6c29a02bbb07768e2d83bf2b",
+      "upstream_identical_files": [
+        {
+          "archive_language": "portuguese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/portuguese.zip",
+          "member": "portuguese.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "pt",
+      "target": "portuguese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese_lemmatizer.pt",
+      "sha256": "f7a32f0a4cb71cafa0fa36f35b140b40a4eedf5b470f784156d009c521593946",
+      "upstream_identical_files": [
+        {
+          "archive_language": "portuguese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/portuguese.zip",
+          "member": "portuguese_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "pt",
+      "target": "portuguese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese_mwt_expander.pt",
+      "sha256": "1c6383786a09ecf9af0ecab569547d30c8c8deca3c65655eca4f12a9e526d490",
+      "upstream_identical_files": [
+        {
+          "archive_language": "portuguese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/portuguese.zip",
+          "member": "portuguese_mwt_expander.pt"
+        }
+      ]
+    },
+    {
+      "code": "el",
+      "target": "greek",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek_mwt_expander.pt",
+      "sha256": "38cfda50e48d8355d6d056e8995b47588aab869352c0bbf24dba1787b65fd820",
+      "upstream_identical_files": [
+        {
+          "archive_language": "greek",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/greek.zip",
+          "member": "greek_mwt_expander.pt"
+        }
+      ]
+    },
+    {
+      "code": "hy",
+      "target": "armenian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian.tagger.mdl",
+      "sha256": "2c4069ad37b29a7151226391493cb908ecd2a1d56436ac28338adfbe16d6c891",
+      "upstream_identical_files": [
+        {
+          "archive_language": "armenian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/armenian.zip",
+          "member": "armenian.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": "hy",
+      "target": "armenian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian.tokenizer.mdl",
+      "sha256": "fb864dea321e89b104f6e954804e8c15d26baa14174a6c73f29b9ad45bc4a2e5",
+      "upstream_identical_files": [
+        {
+          "archive_language": "armenian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/armenian.zip",
+          "member": "armenian.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": "hy",
+      "target": "armenian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian_lemmatizer.pt",
+      "sha256": "d11e0fbb0b051da7a2249589fa70a062db9b555c4ddb98382be93fa33ab04b47",
+      "upstream_identical_files": [
+        {
+          "archive_language": "armenian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/armenian.zip",
+          "member": "armenian_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": "hy",
+      "target": "armenian",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian_mwt_expander.pt",
+      "sha256": "972c951d5a265087a31859dde547b591d30b6a83efb6fd49505b93632db889f2",
+      "upstream_identical_files": [
+        {
+          "archive_language": "armenian",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/armenian.zip",
+          "member": "armenian_mwt_expander.pt"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "japanese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/japanese/japanese.tagger.mdl",
+      "sha256": "1906d7f11d1037829b97de5daef57c96653829b5a3550b43355955048e5c7e73",
+      "upstream_identical_files": [
+        {
+          "archive_language": "japanese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+          "member": "japanese.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "japanese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/japanese/japanese.tokenizer.mdl",
+      "sha256": "1d7ab28c0c1c1fe21f750c15a36d46274f6e4772f9814f03120af20d402fc12d",
+      "upstream_identical_files": [
+        {
+          "archive_language": "japanese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+          "member": "japanese.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "japanese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/japanese/japanese_lemmatizer.pt",
+      "sha256": "cf27852a6191c3bb42e76f4c2445db2352df1a6ab8be940085827e73da4ff76e",
+      "upstream_identical_files": [
+        {
+          "archive_language": "japanese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+          "member": "japanese_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "korean",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean/korean.tagger.mdl",
+      "sha256": "0b03fe6c221cb3a9ae17f020c4664ab32b32fd700c2835d9657a5819593b2ee9",
+      "upstream_identical_files": [
+        {
+          "archive_language": "korean",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean.zip",
+          "member": "korean.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "korean",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean/korean.tokenizer.mdl",
+      "sha256": "d8c6b1ebd6e2403db8efe361c21b1f980d5d5beafed8e52768be7396e8ac4fba",
+      "upstream_identical_files": [
+        {
+          "archive_language": "korean",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean.zip",
+          "member": "korean.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "korean",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean/korean_lemmatizer.pt",
+      "sha256": "96a72ec6e7716de67c64f12829db18b1749fc8a3d0368b33273e93284c80e35b",
+      "upstream_identical_files": [
+        {
+          "archive_language": "korean",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean.zip",
+          "member": "korean_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "korean-kaist",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean-kaist/korean-kaist.tagger.mdl",
+      "sha256": "32779195714c1b84dc5ad1e7fe6ea3a8b1dd26d6451f17c5f852e13312dc2fa0",
+      "upstream_identical_files": [
+        {
+          "archive_language": "korean-kaist",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean-kaist.zip",
+          "member": "korean-kaist.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "korean-kaist",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean-kaist/korean-kaist.tokenizer.mdl",
+      "sha256": "b4fcd5bd0095c0fd162bd8edfce1f8b85b0420be343729b240fcd98c608782cf",
+      "upstream_identical_files": [
+        {
+          "archive_language": "korean-kaist",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean-kaist.zip",
+          "member": "korean-kaist.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "korean-kaist",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean-kaist/korean-kaist_lemmatizer.pt",
+      "sha256": "3e4382271ddcce969dcafd5dd50cac2c5d453db20726c04af92b04ed370df26a",
+      "upstream_identical_files": [
+        {
+          "archive_language": "korean-kaist",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean-kaist.zip",
+          "member": "korean-kaist_lemmatizer.pt"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "traditional-chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/traditional-chinese/traditional-chinese.ner.mdl",
+      "sha256": "5299a84f5ee3fb17b34c9068fbbeaa4ec99a1bacea2dc98e5ffc87eb909a456c",
+      "upstream_identical_files": [
+        {
+          "archive_language": "chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "member": "chinese.ner.mdl"
+        },
+        {
+          "archive_language": "classical-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/classical-chinese.zip",
+          "member": "classical-chinese.ner.mdl"
+        },
+        {
+          "archive_language": "traditional-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/traditional-chinese.zip",
+          "member": "traditional-chinese.ner.mdl"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "traditional-chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/traditional-chinese/traditional-chinese.tagger.mdl",
+      "sha256": "a6306c3b0a219b4f997a782058f9514eea3eb703e1fe39e930a2e779ca5fa6ad",
+      "upstream_identical_files": [
+        {
+          "archive_language": "traditional-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/traditional-chinese.zip",
+          "member": "traditional-chinese.tagger.mdl"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "traditional-chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/traditional-chinese/traditional-chinese.tokenizer.mdl",
+      "sha256": "0435b0b7bc333897e4bbfe2e6f95b16e8a11696c65c3077a1390e05023fe48f6",
+      "upstream_identical_files": [
+        {
+          "archive_language": "traditional-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/traditional-chinese.zip",
+          "member": "traditional-chinese.tokenizer.mdl"
+        }
+      ]
+    },
+    {
+      "code": null,
+      "target": "traditional-chinese",
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/traditional-chinese/traditional-chinese_lemmatizer.pt",
+      "sha256": "a0ffdfe914f6230966bb153c5aabe4f2097dbc338ab0d5120acee0c9668e33f5",
+      "upstream_identical_files": [
+        {
+          "archive_language": "traditional-chinese",
+          "archive_url": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/traditional-chinese.zip",
+          "member": "traditional-chinese_lemmatizer.pt"
+        }
+      ]
+    }
+  ]
+}

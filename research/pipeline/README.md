@@ -39,8 +39,9 @@ Digital Corpus of Sanskrit (15,900 CoNLL-U chapters + chapter-info.xml)
   │     Random 10% sample, seed 1337 → 1,455 chapters.
   │     Result (stats.json): 70,355 train sentences, 532,329 token rows,
   │     100,349 MWT rows; 9,349 dev sentences, 67,004 token rows.
-  │     The full corpus is ~5.3M tokens; the expander was trained on the
-  │     MWT-bearing subset to concentrate the signal.
+  │     This records the focused-subset preparation track. The selected run's
+  │     retained development artifacts cover the full 1,590-chapter split;
+  │     its evaluation record identifies that material separately.
   │
   ├─ datasets/convert_vedic_iast_to_slp1.py
   │     Separate Vedic UD track. Transliteration between IAST and SLP1, plus
@@ -53,16 +54,19 @@ Digital Corpus of Sanskrit (15,900 CoNLL-U chapters + chapter-info.xml)
         → sanskrit-vedic.tokenizer.mdl     SHIPPED
         → sanskrit-vedic_mwt_expander.pt   (35.7 MB)  SHIPPED
         → sanskrit-vedic_lemmatizer.pt     (28.2 MB)  SHIPPED
-        Training logs for tokenize / mwt / lemmatize are in that run directory.
+        Retained tokenizer / lemmatizer logs identify the selected scores.
+        The selected MWT checkpoint has a recorded development re-evaluation.
 
 trankit_save_sa_vedic_v1 trained on the Vedic UD track instead. It did not ship.
 See experiments/sanskrit-vedic-v1/.
 ```
 
-### 1b. Sanskrit — named entities from a synthetic corpus
+### 1b. Sanskrit — semantic annotations over authentic texts
 
-I built a task-specific Sanskrit NER corpus with the Gemini API, then trained
-models against its domain-specific label inventory.
+I used the Gemini API to annotate authentic Digital Corpus of Sanskrit texts,
+then trained NER models against a domain-specific semantic inventory. The
+annotations are model-assisted; the underlying Sanskrit documents are real
+corpus texts.
 
 ```
 DCS MWT subset → train_10k_parent_tokens.conllu
@@ -101,7 +105,7 @@ tokens, 728,721 output tokens, 3,836,573 total, USD 0.60. Recorded in
 selected per-job records are in
 [`sample_summaries/`](datasets/sanskrit/gemini_ner/sample_summaries/).
 
-The label set was derived from the corpus rather than imported: 19 tags including
+The label set was derived from the corpus rather than imported: 18 semantic categories including
 DEITY, RITUAL, SUBSTANCE, PLANT, DISEASE, BODY, MEASURE, ASTRO and PROCEDURE, which is
 what Sanskrit śāstra literature actually contains. The [dataset summary](datasets/sanskrit/gemini_ner/final/dataset_summary.json)
 records chunk coverage, token rows, and annotation corrections.
@@ -118,7 +122,7 @@ records chunk coverage, token rows, and annotation corrections.
 | Ancient Greek | `datasets/ancient_greek/convert_perseus_greek_to_conllu.py`, `build_sampled_subset.py`, `_build_naturalpara_10k.py`, `_verify_naturalpara.py` | `t_grc_naturalpara_tok`, `t_grc10k_tok1` | Natural-paragraph tokenizer; 10k tagger/lemmatizer; separate Pausanias NER |
 | Thai | `datasets/` Thai UD + NNER conversion | `th_customized_ner` | `thai-ner` tokenizer/tagger; NER from the separately finished NNER run |
 | Korean | `datasets/korean/convert_to_bio.py` → `train_ner.py` | KLUE-NER | `korean-ner` |
-| Arabic | Arabic training and tokenizer comparisons | `t_ar10k2`, `commercial_v1/ar` | 10k tokenizer/MWT; commercial-v1 tagger/lemmatizer |
+| Arabic | [CAMeL teacher-data builder and correction rules](datasets/arabic/README.md) | `t_ar10k2`, `commercial_v1/ar` | Corrected teacher-supervised tokenizer/MWT; commercial-v1 tagger/lemmatizer |
 | Greek, Hebrew, Hindi, Latin, Turkish | Component matches in [STATUS.md](../STATUS.md) | `commercial_v1` | Selected syntax/lemma components; NER selected separately |
 
 `datasets/convert_train_jsonl_to_trankit.py` is the shared converter from annotated

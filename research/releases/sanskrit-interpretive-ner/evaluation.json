@@ -1,0 +1,52 @@
+{
+  "model": "sanskrit-interpretive-ner",
+  "record_type": "Historical selected-checkpoint development evaluation",
+  "reference": "Gemini-assisted semantic annotations over authentic DCS text",
+  "metric": "Exact-span entity F1, percent 0-100",
+  "selected_record": {
+    "language_code": "sa",
+    "runtime_target": "sanskrit-vedic",
+    "task": "ner",
+    "run_id": "san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5",
+    "metric": "best development entity F1",
+    "scale": "0-100",
+    "f1": 54.28,
+    "selected_epoch": 29,
+    "checkpoint": {
+      "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.ner.mdl",
+      "sha256": "a987748ad57752fca968f30e26d75fcd39795bffb0ff9c2ce23acf36624d08b0",
+      "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/customized-ner.ner.mdl",
+      "same_bytes": true,
+      "stored_epoch_matches_log": true
+    },
+    "source_log": {
+      "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/logs/ner.training",
+      "sha256": "8bc0232f85681ac823f849573bc960015b5cd596e9200d90d15101e2e1a0b79d",
+      "line_count": 54057,
+      "first_selected_best": {
+        "line": 36240,
+        "epoch": 29,
+        "f1": 54.28,
+        "text": "Best dev F1 score: epoch 29, F1: 54.28"
+      },
+      "last_summary": {
+        "line": 53152,
+        "epoch": 29,
+        "f1": 54.28,
+        "text": "Best dev F1 score: epoch 29, F1: 54.28"
+      },
+      "last_started_epoch": 44
+    },
+    "training_config": {
+      "category": "customized-ner",
+      "task": "ner",
+      "save_dir": "training\\t",
+      "train_bio_fpath": "training\\nerdump\\training_data\\san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5\\train.bio",
+      "dev_bio_fpath": "training\\nerdump\\training_data\\san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5\\dev.bio",
+      "embedding": "xlm-roberta-base",
+      "max_epoch": 100,
+      "batch_size": 12,
+      "gpu": true
+    }
+  }
+}

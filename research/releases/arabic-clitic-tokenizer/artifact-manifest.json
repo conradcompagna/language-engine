@@ -1,0 +1,24 @@
+{
+  "author": "Conrad Compagna",
+  "model_id": "arabic-clitic-tokenizer",
+  "format": "Trankit 1.1.1 native checkpoint",
+  "base_model": "FacebookAI/xlm-roberta-base",
+  "runtime_alias": "arabic",
+  "deployment_identity_checked": "2026-09-23",
+  "files": [
+    {
+      "path": "weights/xlm-roberta-base/arabic/arabic.tokenizer.mdl",
+      "bytes": 9515589,
+      "sha256": "fd2a9195aabc1a39f98e339969732c61d37cf994c648f6d8867db0554591bc7f",
+      "source": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic.tokenizer.mdl"
+    },
+    {
+      "path": "weights/xlm-roberta-base/arabic/arabic_mwt_expander.pt",
+      "bytes": 1384901,
+      "sha256": "c9e2cd69fa05a44e6b16d56112b1fcec74654bba7e6998e0d9c2877c2273c044",
+      "source": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic_mwt_expander.pt"
+    }
+  ],
+  "task": "tokenize",
+  "treebank": "UD_Arabic-PADT"
+}

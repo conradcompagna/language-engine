@@ -6,7 +6,7 @@ inside a document reader. I developed the model preparation, dictionary conversi
 CPU inference and browser interaction as parts of the same system.
 
 For a short route through the evidence, read the [selected model map](../research/STATUS.md),
-the [training results](../research/models/README.md#selected-training-results), and
+the [training results](../research/models/TRAINING_RESULTS.md), and
 the [request architecture](BUILD_PROCESS.md#runtime-architecture). The
 [artifact record](../research/models/deployed_artifacts.json) identifies the model
 files checked against production on 23 September 2026.
@@ -20,14 +20,17 @@ trained NER adapter. The shared model-store directory name is not a language lis
 
 | Construction problem | Transformation and evidence |
 |---|---|
+| Arabic clitic segmentation | The [CAMeL teacher builder and correction pass](../research/pipeline/datasets/arabic/) convert authentic news text into corrected surface/expansion pairs for the selected tokenizer and MWT model. |
 | Sanskrit sandhi | [DCS full-corpus builder](../research/pipeline/datasets/build_dcs_trankit_full_dataset.py) preserves fused surface tokens and underlying MWT children; the [subset builder](../research/pipeline/datasets/build_dcs_trankit_mwt_subset.py) concentrates training on MWT-bearing chapters. |
 | Sanskrit entity supervision | The [validated annotation runner](../research/pipeline/datasets/sanskrit/gemini_sanskrit_ner_batch_runner.py) checks returned tokens, saves usage and resumes completed jobs; the [final builder](../research/pipeline/datasets/sanskrit/build_final_sanskrit_gemini_ner_dataset.py) combines validated BIO output and recorded corrections. |
 | Historical-language NER | [Old English OEDT](../research/datasets/ang_oedt/README.md) and [Ancient Greek Pausanias](../research/datasets/grc_pausanias_ethnic_civic_misc/README.md) document corpus conversion and task-specific label decisions. |
 | Multilingual label inventories | [Taxonomy construction](../research/pipeline/taxonomy/) and [dataset builders](../research/pipeline/taxonomy/dataset_builders/) connect label embeddings, co-occurrence clustering and candidate schemes to training data. |
 | Source-specific splits | [Dataset cards](../research/datasets/README.md), per-run configurations and the [evidence index](../research/EVIDENCE.md) record the source, label scheme and split used by each published example. |
 
-The DCS subset records seed 1337, 1,309 training chapters and 146 development
-chapters, producing 70,355 training sentences and 9,349 development sentences.
+The selected Sanskrit MWT development input spans 1,590 DCS chapters and 97,960
+expansion candidates. A separate focused-subset preparation track records seed
+1337, 1,309 training chapters and 146 development chapters, producing 70,355
+training sentences and 9,349 development sentences.
 The Sanskrit NER annotation record contains 1,852 API jobs; its final corpus
 summary records 1,765 usable chunks, 131,507 token rows and 237 recorded fixes.
 These are construction measurements; model evaluation is recorded separately.
@@ -43,17 +46,20 @@ retains configurations and label vocabularies for 29 finished NER runs.
 The [selection table](../research/STATUS.md) connects the active language aliases
 to the retained work. Examples include Arabic's separate tokenizer/MWT and
 tagger/lemma choices, Tagalog's v1/v2 combination, and Sanskrit's DCS components
-plus its corrected supervised NER run. Four selected NER examples have published
-best-development scores: Old English 88.20 F1, Ancient Greek 78.81, Sanskrit 54.28
+plus its corrected supervised NER run. The [component results](../research/models/TRAINING_RESULTS.md)
+cover all 61 custom selections across tokenization, MWT expansion, parsing,
+lemmatization and NER. Representative NER
+best-development scores include Old English 88.20 F1, Ancient Greek 78.81, Sanskrit 54.28
 and Vietnamese 91.72, each on its own labels and split; the
-[saved score excerpts](../research/evaluation/results/selected_ner_training.json)
+[saved score excerpts](../research/evaluation/results/ner-training.json)
 preserve their source-log hashes and selected epochs.
 
 The artifact inventory distinguishes three facts: a file is provisioned, it is
 selected by the registry, and it matches a retained training output. Those facts
 are recorded separately so a cached upstream model is not counted as custom training.
-Historical source-run identification remains recorded only where supported by the
-retained files; every listed deployment asset nevertheless has a SHA-256 identity.
+The score collection contains 54 historical selected-checkpoint records and seven
+fresh development evaluations of retained checkpoints; their input stages and
+dataset identities are recorded alongside the scores.
 
 ## 3. Package inference for CPU deployment
 
