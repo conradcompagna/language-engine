@@ -9,8 +9,8 @@ inference on CPU, dictionary conversion and pruning, browser-side lexical search
 and document rendering. I connected those components through a Flask backend and
 an interactive reader, with contextual Gemini services, accounts and subscriptions.
 
-This development record connects the application source to retained corpus builders,
-training configurations, dictionary transformations and saved run results.
+The corpus builders, training configurations, dictionary transformations and run
+results below document how I developed the platform.
 
 ## Application architecture
 
