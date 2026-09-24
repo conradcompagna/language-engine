@@ -26,7 +26,7 @@ Required resources:
 |---|---|
 | SQLite dictionaries | `dict_sqlite/*.sqlite` |
 | Compressed shared encoder and adapter packs | `.trankit_compressed_runtime/`, including `manifest.json` |
-| Japanese NER training output | `training/trankit_save_ja_ner_v2/` |
+| Shared multilingual Trankit model store | `training/trankit_save_ja_ner_v2/`; the historical directory name covers all selected languages |
 | Other model resources | Paths selected by `language_registry.py` and the compressed-runtime manifest |
 | Account database | `LE_DATABASE_URL`; use a new database for your installation |
 

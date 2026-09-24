@@ -17,6 +17,30 @@ The fixture uses synthetic responses; full dictionary and neural resources are p
 The application combines a browser reading workspace with Flask services, multilingual
 neural inference, and a shared dictionary infrastructure.
 
+```mermaid
+flowchart TB
+    Reader["Document reader"] --> Normalize["Normalize text"]
+    Normalize --> NLP["CPU Trankit analysis"]
+    CPU["Train components<br/>Export shared INT8"]
+    SQLite["Convert dictionaries<br/>to SQLite"]
+    NLP --> DP["Browser: dictionary DP"]
+    Index["Pruned indexes<br/>cached in browser"] --> DP
+    DP --> Hydrate["Hydrate selected<br/>SQLite records"]
+    Hydrate --> Results["Aligned definitions,<br/>grammar and entities"]
+    Reader --> Gemini["Gemini services"]
+    Gemini --> Results
+    CPU --> NLP
+    SQLite --> Index
+    SQLite --> Hydrate
+```
+
+Accounts, subscriptions and quotas govern the server request paths; document
+rendering keeps results attached to the selected passage. Follow the
+[construction story](docs/BUILD_PROCESS.md) for source preparation, model selection,
+Sanskrit dictionary engineering and CPU export, or the
+[runtime guide](docs/ARCHITECTURE.md) for the code behind each request.
+
+
 ### Engineering highlights
 
 - **Hybrid search architecture:** browser-side dynamic programming over compact lexical indexes; batch SQLite hydration fetches full entries only after candidate selection. IndexedDB caches indexes between sessions.
@@ -59,6 +83,7 @@ building the tools that turn research outputs into deployable assets.
 
 | | |
 |---|---|
+| [**From resources to the deployed product**](docs/BUILD_PROCESS.md) | The complete construction path, selected artifacts, measurements and reconstruction checklist. |
 | [**Build chains**](research/pipeline/README.md) | Trace corpus construction, model training, and dictionary production from inputs to application assets. |
 | [**Training-to-application record**](research/STATUS.md) | Recorded model choices, run identifiers, and artifact-matching tools. |
 | [`research/pipeline/`](research/pipeline/) | Model training, dataset construction, dictionary building, NER taxonomy derivation. |

@@ -1,5 +1,8 @@
 # Repository contents
 
+Start with the [construction story and reconstruction checklist](BUILD_PROCESS.md)
+for the selected artifacts and the process connecting them to the application.
+
 ## Included
 
 **Runtime.** Flask composition, HTTP services, capture handling, and contextual

@@ -1,5 +1,8 @@
 # Research and build infrastructure
 
+Start with the [construction story and reconstruction checklist](../docs/BUILD_PROCESS.md)
+for the selected artifacts and the process connecting them to the application.
+
 This is the development record behind Language Engine: multilingual model training,
 task-specific corpus construction, dictionary engineering, and inference optimization.
 The guides connect implementation choices to the scripts, configurations, and recorded

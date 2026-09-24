@@ -1,9 +1,10 @@
 # Build chains
 
-Historical build chains, recorded during development; labels such as SHIPPED below
-are author-reported outcomes, not SHA-256-verified deployment evidence. See the
-[evidence index](../EVIDENCE.md) and [reproduction guide](../REPRODUCIBILITY.md) for
-what can be checked from this publication.
+These build chains document corpus, model and dictionary construction. The
+[verified selection map](../STATUS.md) identifies current components and separates
+retained alternatives; the [construction story](../../docs/BUILD_PROCESS.md) connects
+the chains to the product. Use the [evidence index](../EVIDENCE.md) and
+[reproduction guide](../REPRODUCIBILITY.md) for measurements and runnable checks.
 
 ---
 
@@ -48,6 +49,7 @@ Digital Corpus of Sanskrit (15,900 CoNLL-U chapters + chapter-info.xml)
   │     Builds the evaluation input for the expander.
   │
   └─ run: trankit_save_sa_dcs_v1
+        → sanskrit-vedic.tokenizer.mdl     SHIPPED
         → sanskrit-vedic_mwt_expander.pt   (35.7 MB)  SHIPPED
         → sanskrit-vedic_lemmatizer.pt     (28.2 MB)  SHIPPED
         Training logs for tokenize / mwt / lemmatize are in that run directory.
@@ -88,7 +90,7 @@ DCS MWT subset → train_10k_parent_tokens.conllu
   │     Cross-checks annotated surface forms against the Monier-Williams
   │     dictionary build, grouped for manual review.
   │
-  └─ models/train_ner.py → san_gemini_ner_chunks_0001_1800_corrected (+3 variants)
+  └─ models/train_ner.py → san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5 (selected; other variants retained)
         → sanskrit-vedic.ner.mdl   SHIPPED
 ```
 
@@ -105,17 +107,18 @@ records chunk coverage, token rows, and annotation corrections.
 
 ### 1c. Other trained languages
 
-| Language | Dataset build | Run | Shipped as |
+| Language | Dataset build | Run | Selected components / development status |
 |---|---|---|---|
-| Ancient Hebrew | `datasets/build_ancient_hebrew_dataset.py`, `train_ancient_hebrew.py` | `hbo_ptnk_v1` | `ancient-hebrew-mwt` tagger, lemmatizer, MWT expander |
-| Old English | `datasets/old_english/build_oldeng_trankit_dataset.py` → `train_oldeng_trankit.py` | `oldeng_oedt_tokenize_v3` | `customized` tagger |
-| Tagalog | `datasets/tagalog/parquet_to_conllu.py` → `train_tokenizer.py`, `train_mwt.py` | `tgl_v1`, `tgl_v2` | `tagalog-custom` (v1 tagger + lemmatizer, v2 MWT expander) |
-| Swahili | augmented UD set, see `datasets/swahili/DATASET_README.txt` | `swh_v1` | `swahili-custom` tagger, lemmatizer |
-| Bengali, Punjabi | `datasets/process_rarelangs.py` over UD treebanks | `ben_v1`, `rarelangs_v1` | `bengali-custom`, `punjabi-custom` |
-| Ancient Greek | `datasets/ancient_greek/convert_perseus_greek_to_conllu.py`, `build_sampled_subset.py`, `_build_naturalpara_10k.py`, `_verify_naturalpara.py` | `t_grc10k_*` probes | tokenizer variants |
-| Thai | `datasets/` Thai UD + NNER conversion | `th_customized_ner` | `thai-ner` tagger, NER |
+| Ancient Hebrew | `datasets/build_ancient_hebrew_dataset.py`, `train_ancient_hebrew.py` | `hbo_ptnk_v1` | Retained `ancient-hebrew-mwt` resources; outside the current language registry |
+| Old English | `datasets/old_english/build_oldeng_trankit_dataset.py` → `train_oldeng_trankit.py` | `oldeng_oedt_tokenize_v3` | `customized` tokenizer and tagger; separate lemmatizer and OEDT NER |
+| Tagalog | `datasets/tagalog/parquet_to_conllu.py` → `train_tokenizer.py`, `train_mwt.py` | `tgl_v1`, `tgl_v2` | `tagalog-custom`: v1 tagger/lemmatizer, v2 tokenizer/MWT |
+| Swahili | augmented UD set, see `datasets/swahili/DATASET_README.txt` | `swh_v1` | `swahili-custom` tokenizer, tagger and lemmatizer |
+| Bengali, Punjabi | `datasets/process_rarelangs.py` over UD treebanks | `ben_v1`, `rarelangs_v1` | Retained development resources; outside the current language registry |
+| Ancient Greek | `datasets/ancient_greek/convert_perseus_greek_to_conllu.py`, `build_sampled_subset.py`, `_build_naturalpara_10k.py`, `_verify_naturalpara.py` | `t_grc_naturalpara_tok`, `t_grc10k_tok1` | Natural-paragraph tokenizer; 10k tagger/lemmatizer; separate Pausanias NER |
+| Thai | `datasets/` Thai UD + NNER conversion | `th_customized_ner` | `thai-ner` tokenizer/tagger; NER from the separately finished NNER run |
 | Korean | `datasets/korean/convert_to_bio.py` → `train_ner.py` | KLUE-NER | `korean-ner` |
-| Arabic, Greek, Hebrew, Hindi, Latin, Turkish | see `commercial_v1` in STATUS.md | `commercial_v1` | six deployed models |
+| Arabic | Arabic training and tokenizer comparisons | `t_ar10k2`, `commercial_v1/ar` | 10k tokenizer/MWT; commercial-v1 tagger/lemmatizer |
+| Greek, Hebrew, Hindi, Latin, Turkish | Component matches in [STATUS.md](../STATUS.md) | `commercial_v1` | Selected syntax/lemma components; NER selected separately |
 
 `datasets/convert_train_jsonl_to_trankit.py` is the shared converter from annotated
 JSONL into Trankit's expected CoNLL-U and plain-text pair.
@@ -124,8 +127,9 @@ training pipeline; several of the runs above require it.
 
 ### 1d. NER label taxonomy
 
-The multilingual NER models use a coarse label set derived from FiNERweb's fine-grained
-tags rather than imposed on them. `taxonomy/` holds the derivation: fastText embeddings
+The FiNERweb taxonomy work derives coarse label sets from its fine-grained tags.
+Other selected NER models retain their source/task-specific inventories, recorded
+in the model and dataset cards. `taxonomy/` holds the derivation: fastText embeddings
 of label strings, Louvain community detection over label co-occurrence, and centroid
 clustering under purity and internal-coherence gates.
 `taxonomy/dataset_builders/` builds a training set for each candidate scheme.
@@ -136,7 +140,10 @@ The ~80 parameter variants behind the chosen thresholds are in
 
 ## 2. Runtime model artefacts
 
-The service does not load Trankit's default PyTorch checkpoints directly.
+The service initializes selected Trankit checkpoints, installs the shared
+INT8 ONNX encoder/adapter runtime, and dynamically quantizes supported PyTorch
+task modules. The [CPU build record](../../docs/BUILD_PROCESS.md#3-package-inference-for-cpu-deployment)
+connects those stages to the verified deployed bundle.
 
 ```
 models/prep_trankit.py                        fetch and lay out base models
@@ -159,6 +166,12 @@ implementation is in the root compressed-runtime and live-switch modules.
 
 ## 3. Dictionaries
 
+The selected Sanskrit SQLite resource is the **DCS-derived build**: its
+[builder](datasets/sanskrit/build_sa_sqlite.py) joins lemma IDs to attested corpus
+forms, yielding 180,000 entries and 479,041 forms in the verified local build.
+See the [DCS and runtime-pruning explanation](../../docs/BUILD_PROCESS.md#4-engineer-the-dictionaries).
+The Monier-Williams converter below records a separate development path.
+
 The deployment uses 42 SQLite dictionary files. This build chain turns their
 heterogeneous sources into a common lexical index and entry store; database files
 are provisioned separately.
@@ -176,8 +189,8 @@ source (Wiktionary JSONL, JMdict, KRDict XML, CC-CEDICT, LSJ, Monier-Williams, �
   │     dictionaries/convert_lsj_to_sqlite.py, convert_lsj_zip_to_sqlite.py
   │
   ├─ dictionaries/convert_tsv_to_sqlite.py
-  │     the importer: builds the compact lexical index the browser downloads
-  │     and the full entry store the server hydrates from
+  │     the importer builds the SQLite entry/form store; runtime pruning and
+  │     index construction derive the compact records the browser downloads
   │
   ├─ repair and enrichment passes
   │     fix_ja_redirects.py, fix_ko_redirects.py, fill_ja_form_romanization.py,
@@ -218,5 +231,5 @@ clearest picture of method, in order:
    a recorded seed and a stats file.
 2. `datasets/sanskrit/gemini_sanskrit_ner_batch_runner.py` — a validated, resumable,
    cost-tracked LLM annotation run.
-3. `dictionaries/convert_tsv_to_sqlite.py` — the importer that produces the lexical
-   index the browser reads.
+3. `dictionaries/convert_tsv_to_sqlite.py` — the importer that builds the SQLite
+   entry/form store from which runtime policies derive the browser index.

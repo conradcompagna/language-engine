@@ -1,11 +1,12 @@
 # Application architecture
 
 Language Engine separates neural inference, lexical storage, browser matching,
-and interactive reading. The browser selects dictionary candidates from compact
+and interactive reading. The [construction guide](BUILD_PROCESS.md) connects
+training and dictionary preparation to these runtime resources. The browser selects dictionary candidates from compact
 indexes; the server returns full records for the selected candidates in batches.
 
 ```mermaid
-flowchart LR
+flowchart TB
     Text[Selected document text] --> NLP[Flask lookup service / Trankit]
     NLP --> DP[Browser dictionary segmentation]
     Index[Compact key index / IndexedDB] --> DP

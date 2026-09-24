@@ -18,8 +18,9 @@ the inputs and implementation below.
 Dataset counts and annotation costs describe construction; development F1 describes
 epoch selection on each run's own labels and split. Historical configurations and
 logs retain their original context, while the run-history guide records artifact
-selection. The DCS trainer configuration and original model hashes are outside the
-published snapshot. Historical configs also do not identify the installed trainer
+selection. The [deployed artifact inventory](models/deployed_artifacts.json) now records
+model hashes and component matches; the historical DCS trainer configuration
+remains a separately retained resource. Historical configs also do not identify the installed trainer
 hash or every seed setting; the installed Trankit version controls those defaults.
 
 The [Vietnamese WikiANN card](datasets/wikiann_vi/README.md) records its use of
