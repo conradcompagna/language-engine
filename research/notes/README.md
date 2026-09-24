@@ -1,6 +1,6 @@
 # Design and implementation guides
 
-Start with the [application architecture](../../docs/ARCHITECTURE.md). These
+Start with the [application architecture](../../docs/BUILD_PROCESS.md#runtime-architecture). These
 guides explain the engineering decisions behind inference, lexical search,
 document interaction, and classical-language support, with links to their
 implementation and research evidence.

@@ -4,7 +4,7 @@
 
 This development report records the shared ONNX graph, runtime adapter packs, and
 remaining optimization opportunities at the time of inspection. It documents the
-reasoning behind the inference work; see the maintained [architecture guide](../../docs/ARCHITECTURE.md)
+reasoning behind the inference work; see the maintained [architecture guide](../../docs/BUILD_PROCESS.md#runtime-architecture)
 for the published application.
 
 Files inspected:

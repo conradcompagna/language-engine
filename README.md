@@ -4,13 +4,13 @@
 
 I built Language Engine to bring close reading and language research into one workspace: open a document, select a passage, and inspect its vocabulary, grammar, and named entities without losing the original context.
 
-[Live application](https://language-engine.ai) · [Setup](docs/SETUP.md) · [Architecture](docs/ARCHITECTURE.md) · [Portfolio](https://github.com/conradcompagna)
+The work combines multilingual corpus preparation and model training, shared INT8
+inference on CPU, dictionary conversion and pruning, browser-side lexical search,
+and document rendering. I connected those components through a Flask backend and
+an interactive reader, with contextual Gemini services, accounts and subscriptions.
 
-![Real reader template with a synthetic local lookup](docs/images/reader-fixture.png)
-
-The fixture uses synthetic responses; full dictionary and neural resources are provisioned separately.
-
----
+This development record connects the application source to retained corpus builders,
+training configurations, dictionary transformations and saved run results.
 
 ## Application architecture
 
@@ -38,8 +38,7 @@ Accounts, subscriptions and quotas govern the server request paths; document
 rendering keeps results attached to the selected passage. Follow the
 [construction story](docs/BUILD_PROCESS.md) for source preparation, model selection,
 Sanskrit dictionary engineering and CPU export, or the
-[runtime guide](docs/ARCHITECTURE.md) for the code behind each request.
-
+[runtime guide](docs/BUILD_PROCESS.md#runtime-architecture) for the code behind each request.
 
 ### Engineering highlights
 
@@ -50,14 +49,14 @@ Sanskrit dictionary engineering and CPU export, or the
 
 ### Scope
 
-The code includes **27 language display configurations and enabled NLP registry entries**, covering modern and historical languages. The deployment uses 42 SQLite dictionary files; dictionary contents and model weights remain external to this repository.
+The code includes **27 language display configurations and enabled NLP registry entries**, covering modern and historical languages. The dictionary infrastructure brings 42 SQLite resources into a common lookup and display system.
 
 ### Explore the runtime
 
 | Area | Starting point |
 |---|---|
 | Application composition and HTTP services | [application factory](language_engine/application.py), [HTTP modules](language_engine/http/), [authentication](auth.py), [billing](payments.py) |
-| Browser segmentation and hydration | [dictionary client modules](frontend/dictionary/client/), [browser build and fixture demo](frontend/README.md) |
+| Browser segmentation and hydration | [dictionary client modules](frontend/dictionary/client/), [browser module map](frontend/README.md) |
 | Reader UI and document views | [reader modules](frontend/reader/), [snapshot renderer](frontend/documents/snapshot/) |
 | Contextual language services | [Gemini task services](language_engine/gemini/README.md) |
 | Lexical indexes and SQLite access | [dict_lookup_sqlite.py](dict_lookup_sqlite.py) |
@@ -65,11 +64,9 @@ The code includes **27 language display configurations and enabled NLP registry 
 | Deployment | [wsgi.py](wsgi.py), [deploy/](deploy/) |
 
 The server is organized into Flask blueprints and task services; the browser uses
-ES modules with explicit imports and feature-owned state. CI enforces a 2,000-line
-limit for maintained files and runs backend, browser, and fixture checks. Follow
-the [architecture guide](docs/ARCHITECTURE.md) for the request and data flow.
-
-Model weights, dictionaries, and account data are provisioned separately. See [setup](docs/SETUP.md) and [publication contents](docs/PUBLICATION.md).
+ES modules with explicit imports and feature-owned state. The
+[runtime architecture](docs/BUILD_PROCESS.md#runtime-architecture) connects these
+boundaries to the request and data flow.
 
 ---
 
@@ -83,7 +80,7 @@ building the tools that turn research outputs into deployable assets.
 
 | | |
 |---|---|
-| [**From resources to the deployed product**](docs/BUILD_PROCESS.md) | The complete construction path, selected artifacts, measurements and reconstruction checklist. |
+| [**From resources to the deployed product**](docs/BUILD_PROCESS.md) | The construction path, selected artifacts, measurements and evidence by stage. |
 | [**Build chains**](research/pipeline/README.md) | Trace corpus construction, model training, and dictionary production from inputs to application assets. |
 | [**Training-to-application record**](research/STATUS.md) | Recorded model choices, run identifiers, and artifact-matching tools. |
 | [`research/pipeline/`](research/pipeline/) | Model training, dataset construction, dictionary building, NER taxonomy derivation. |
@@ -101,10 +98,7 @@ created through a resumable, validated Gemini annotation workflow. The latter re
 **[`extras/`](extras/)** — a Chrome extension and a standalone document-renderer test
 harness, showing the development of document capture and reading workflows.
 
-## Development and validation
 
-[Development commands](docs/DEVELOPMENT.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
-
-Try the [local fixture demo](docs/SETUP.md), then follow the
-[research evidence index](research/EVIDENCE.md) from build decisions to recorded
-results and the [reproduction guide](research/REPRODUCIBILITY.md) for checks and new runs.
+The [research evidence index](research/EVIDENCE.md) connects selected training
+results, annotation costs, corpus statistics and inference measurements to their
+source records.

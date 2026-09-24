@@ -221,11 +221,9 @@ Punjabi, Sanskrit), used to seed entries where no free dictionary exists.
 
 ---
 
-## Reproducing any of this
+## Engineering examples
 
-You need the source corpora and dictionaries, which are third-party and not
-redistributed here. Each script names its inputs at the top. The three that give the
-clearest picture of method, in order:
+Three examples show the construction methods in detail:
 
 1. `datasets/build_dcs_trankit_mwt_subset.py` — deterministic dataset construction with
    a recorded seed and a stats file.

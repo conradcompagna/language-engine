@@ -10,7 +10,7 @@ generated artifacts can be inspected separately.
 | Software dependencies and bundled notices | [Third-party notices](../../THIRD_PARTY_NOTICES.md), dependency manifests, and upstream notices alongside vendored assets |
 | Dictionary and lexical sources | [Attribution inventory](../evaluation/reports/transparency_attribution_inventory.md) and [dictionary build chain](../pipeline/README.md#3-dictionaries) |
 | NER corpora and label mapping | [Dataset cards](../datasets/README.md), [training configurations](../models/README.md), and [training record](../STATUS.md) |
-| Included and external resources | [Publication contents](../../docs/PUBLICATION.md) and [setup](../../docs/SETUP.md) |
+| Selected application resources | [Construction record](../../docs/BUILD_PROCESS.md) and [artifact identities](../models/deployed_artifacts.json) |
 
 The maintained reader source is in [frontend/reader/](../../frontend/reader/),
 with dictionary matching in [frontend/dictionary/](../../frontend/dictionary/).

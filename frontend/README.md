@@ -1,10 +1,9 @@
 # Browser source
 
-Run `npm ci --ignore-scripts && npm run build` before starting Flask. Node 22 or
-newer is used in CI. The build produces readable bundles and source maps at the
-existing `static/*.js` URLs, so templates and classic `importScripts` workers
-retain their loading contract. Generated bundles are ignored by Git; edit these
-ES modules instead. Vendored PDF.js, Mammoth, DOMPurify and Foliate remain separate.
+
+ES modules compile into the `static/*.js` assets consumed by templates and classic
+workers. Entrypoints preserve those loading contracts; PDF.js, Mammoth, DOMPurify
+and Foliate provide the document-rendering dependencies.
 
 | Directory                    | Responsibility                                                                                 |
 | ---------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -20,25 +19,3 @@ adjacent `*.state.mjs` module; `index.mjs` initializes each entrypoint in depend
 order. Browser and worker APIs are synchronous where their callers require it.
 Modules import cross-feature functions directly; state modules have no DOM or
 network effects on import.
-
-## Checks and fixture demo
-
-```sh
-npm run build
-npm test
-npx playwright install chromium
-npm run test:browser
-node tests/browser/fixture-server.mjs
-```
-
-The last command serves the real reader template at `http://127.0.0.1:8791`
-with synthetic authentication/configuration responses, without importing the
-production server, loading a model, or calling an external service.
-
-Regression fixtures cover dictionary/form lookup, compact row
-identity, fuzzy tiers, custom-key updates, lemma alignment, every published tag
-label, and pronunciation results for all profile table keys and spans. Browser
-tests exercise rendering, snapshot selection/isolation, classic worker imports,
-and PDF loading/search using a synthetic local PDF. Stylesheets use explicit
-imports to define cascade order. Model-backed evaluation is documented separately
-in the [research evidence index](../research/EVIDENCE.md).

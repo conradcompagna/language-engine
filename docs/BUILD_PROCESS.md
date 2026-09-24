@@ -7,9 +7,9 @@ CPU inference and browser interaction as parts of the same system.
 
 For a short route through the evidence, read the [selected model map](../research/STATUS.md),
 the [training results](../research/models/README.md#selected-training-results), and
-the [request architecture](ARCHITECTURE.md). The
+the [request architecture](BUILD_PROCESS.md#runtime-architecture). The
 [artifact record](../research/models/deployed_artifacts.json) identifies the model
-files checked against production on 23 September 2026 without distributing weights.
+files checked against production on 23 September 2026.
 
 ## 1. Construct language-appropriate supervision
 
@@ -137,20 +137,70 @@ decomposition. Their modules preserve prompt construction, response schemas and
 usage handling. [Authentication](../auth.py), [billing](../payments.py), quotas,
 document capture and persistence make these services part of a deployed application.
 
-## Reconstruction checklist
 
-| Step | Public material | Separately supplied input / result |
+## Runtime architecture
+
+### Server composition
+
+| Responsibility | Implementation |
+|---|---|
+| Application factory and resource initialization | [application.py](../language_engine/application.py), [startup.py](../language_engine/http/startup.py) |
+| HTTP lookup and language selection | [lookup.py](../language_engine/http/lookup.py), [language_registry.py](../language_registry.py) |
+| Dictionary indexes and hydration | [dictionary_index.py](../language_engine/http/dictionary_index.py), [serializers.py](../language_engine/http/serializers.py), [dict_lookup_sqlite.py](../dict_lookup_sqlite.py) |
+| Accounts, subscriptions, and persistence | [auth.py](../auth.py), [payments.py](../payments.py), [db.py](../db.py) |
+| Contextual language tasks | [Gemini service modules](../language_engine/gemini/README.md), [api_services.py](../api_services.py) |
+| Capture policy and isolation | [capture guide](CAPTURES.md), [capture package](../language_engine/captures/) |
+| Deployment entrypoints | [wsgi.py](../wsgi.py), [router.py](../router.py), [deployment templates](../deploy/) |
+
+`create_app()` composes Flask blueprints and accepts explicit resource-loading
+and NLP adapters. Importing the factory does not open a database or load a model.
+The server entrypoints select production initialization. Database preparation
+lives in [database.py](../language_engine/database.py).
+
+Model registries and immutable dictionary index-version maps are shared within
+a process. HTTP policy checks account tiers and quotas at the blueprint boundary.
+
+### Lookup and dictionary identity
+
+The [request adapter](../frontend/dictionary/client/public-api.mjs) handles
+reader lookup calls. [lookup-service.mjs](../frontend/dictionary/client/lookup-service.mjs)
+combines server NLP with [surface matching](../frontend/dictionary/client/surface-lookup.mjs)
+and the [dictionary engine](../frontend/dictionary/engine/). Side-panel dictionary
+lookup uses the same lexical engine without requesting a new neural parse.
+
+Compact indexes carry database and row identifiers. `/js/hydrate` validates the
+requested sources, loads selected SQLite records, and builds explicit display
+fields. The [hydration contract](../research/notes/HYDRATION_FIRST_RENDERING_REFERENCE.md)
+explains how matched forms, headwords, provenance, and display identity travel
+together through the interface.
+
+[pipeline_common.py](../pipeline_common.py) prepares NLP overlays and surface
+spans; [language_registry.py](../language_registry.py) selects models and display
+configurations. [trankit_compressed_runtime.py](../trankit_compressed_runtime.py)
+and [trankit_onnx_live_switch.py](../trankit_onnx_live_switch.py) implement shared
+compressed-encoder execution. Index construction uses the same JavaScript key
+normalization as browser queries through [normalize_keys.js](../tools/normalize_keys.js).
+
+### Browser and document boundaries
+
+[frontend/reader/](../frontend/reader/) owns document interaction, popups, grammar
+overlays, and settings. [frontend/dictionary/](../frontend/dictionary/) owns
+matching and hydration. [frontend/documents/snapshot/](../frontend/documents/snapshot/)
+owns captured-document layout and selection. Feature modules import their
+dependencies explicitly and keep mutable state in adjacent state modules.
+
+`npm run build` compiles the entrypoints in [frontend/entries.json](../frontend/entries.json)
+into the public assets loaded by [reader_jshybrid.html](../templates/reader_jshybrid.html).
+Generated bundles and source maps are build products; maintained browser source
+lives under `frontend/`. PDF.js and Foliate provide document rendering services.
+
+
+## Evidence by stage
+
+| Stage | Engineering work | Record |
 |---|---|---|
-| Inspect product mechanics | [Fixture demo and setup](SETUP.md), [browser source](../frontend/README.md), [tests](../tests/) | Synthetic fixtures run without private models or dictionaries. |
-| Reconstruct supervision | Dataset cards, corpus builders, annotation validators, split summaries | Obtain the relevant source revision and rights; supply corpora or authorized annotation input. |
-| Train selected tasks | Run configurations, trainer, vocabularies, saved evaluation excerpts | Training environment and corpus files; preserve input hashes, seeds and selected outputs. |
-| Rebuild dictionaries | Source converters, DCS join, repair/audit scripts | Authorized lexical sources; output the common SQLite entry/form schema. |
-| Export CPU assets | Encoder/bundle builders and ORT tuning tools | Selected checkpoints and export dependencies; compare against the artifact inventory when using the original assets. |
-| Assemble an instance | [Runtime architecture](ARCHITECTURE.md), [resource paths](SETUP.md), deployment templates | Model store, compressed bundle, SQLite files, new account database and your own service credentials. |
-| Verify behavior | [Development commands](DEVELOPMENT.md), fixture tests, lexical/alignment checks and evaluation tools | Real-data evaluations use their own documented corpora and splits. |
-
-The [reproduction guide](../research/REPRODUCIBILITY.md) supplies runnable public
-checks and trainer commands. Historical one-off builders retain their original
-input assumptions; adapt those paths in a separate workspace. The public record
-provides code, configurations, selected results and artifact identities while
-weights, complete dictionaries and training corpora remain separately provisioned.
+| Supervision | Corpus conversion, label design, annotation validation and deterministic splits | [Dataset cards](../research/datasets/README.md), [corpus builders](../research/pipeline/datasets/), [annotation records](../research/pipeline/datasets/sanskrit/gemini_ner/). |
+| Model selection | Component-level combinations and selected NER runs | [Active model map](../research/STATUS.md), [configurations and scores](../research/models/README.md), [training procedure](../research/REPRODUCIBILITY.md). |
+| CPU inference | Shared encoder export, INT8 adapters and session tuning | [Runtime builders](../research/pipeline/models/), [measurements](../research/evaluation/README.md), [artifact identities](../research/models/deployed_artifacts.json). |
+| Dictionaries | Source conversion, DCS lemma/form joins, repairs and display policies | [Dictionary build chains](../research/pipeline/README.md#3-dictionaries), [audits](../research/evaluation/reports/), [pruning policy](../sqlite_prune_policy.py). |
+| Reading product | Neural/surface alignment, browser matching, hydration and contextual services | [Browser modules](../frontend/README.md), [HTTP services](../language_engine/http/), [Gemini modules](../language_engine/gemini/README.md). |

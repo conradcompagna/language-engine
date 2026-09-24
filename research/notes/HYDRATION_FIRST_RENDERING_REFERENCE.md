@@ -52,5 +52,5 @@ the explicit `is_alternate_match` field from hydration.
 
 A useful inspection path is the selected reference, its SQLite record, the
 serialized payload, and then the rendered row. The
-[fixture checks](../../frontend/README.md#checks-and-fixture-demo) exercise
+[fixture checks](../../tests/browser/) exercise
 compact identity, form lookup, custom entries, and presentation contracts.

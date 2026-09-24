@@ -38,7 +38,7 @@ adjacent `*.state.mjs` modules. [reader/index.mjs](../../frontend/reader/index.m
 initializes the interface. The build produces the script URL used by the Flask
 template; source maps connect browser behavior to the maintained modules.
 
-[Browser fixtures](../../frontend/README.md#checks-and-fixture-demo) exercise
+[Browser fixtures](../../tests/browser/) exercise
 rendering and document interaction with synthetic local responses. Dictionary
 regressions check form selection, compact identity, and hydration independently
 of neural model loading. The [document guide](LOOKUP_RENDERING_PIPELINE_MAP.md)

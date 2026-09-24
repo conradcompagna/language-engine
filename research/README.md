@@ -1,6 +1,6 @@
 # Research and build infrastructure
 
-Start with the [construction story and reconstruction checklist](../docs/BUILD_PROCESS.md)
+Start with the [construction story and supporting evidence](../docs/BUILD_PROCESS.md)
 for the selected artifacts and the process connecting them to the application.
 
 This is the development record behind Language Engine: multilingual model training,
@@ -34,16 +34,14 @@ outputs that produced them.
 
 [STATUS.md](STATUS.md) records the historical mapping between training runs and
 application artifacts. The [application overview](../README.md) and
-[architecture](../docs/ARCHITECTURE.md) describe the reading platform itself.
+[architecture](../docs/BUILD_PROCESS.md#runtime-architecture) describe the reading platform itself.
 
-## Working with the build tools
+## Construction records
 
-Scripts identify their inputs and outputs; historical scripts may need local paths
-adapted to a new environment. Model weights and full corpora are provisioned separately,
-with resource details in [publication contents](../docs/PUBLICATION.md).
+Scripts identify the inputs, transformations and outputs at each stage.
 Aggregate records, such as the [Sanskrit annotation run](pipeline/datasets/sanskrit/gemini_ner/RUN_AGGREGATE.json),
 make the scale, validation, and cost of the work inspectable.
 
 The [evidence index](EVIDENCE.md) connects each research path to its data, training
-configuration, and evaluation record. The [reproduction guide](REPRODUCIBILITY.md)
-provides public checks and commands for preparing new runs.
+configuration, and evaluation record. The [training procedure](REPRODUCIBILITY.md)
+explains corpus validation, trainer configuration and artifact tracking.

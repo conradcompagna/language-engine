@@ -45,6 +45,6 @@ Side-panel lookups reuse compact matching and hydration without an additional
 neural parse. [Custom-entry services](../../language_engine/gemini/README.md)
 add user-authored and generated entries with persistence and usage accounting.
 
-The [application architecture](../../docs/ARCHITECTURE.md) maps service ownership;
+The [application architecture](../../docs/BUILD_PROCESS.md#runtime-architecture) maps service ownership;
 the [evaluation guide](../evaluation/README.md) links measurements and regressions
 behind the lookup and inference design.
