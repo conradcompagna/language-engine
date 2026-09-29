@@ -35,12 +35,4 @@ The selected method is in `research/pipeline/taxonomy/`: fastText label
 embeddings, Louvain community detection over label co-occurrence, centroid clustering
 with a frequency-weighted internal-coherence gate at 90. The dataset builders for the
 chosen schemes are in `research/pipeline/taxonomy/dataset_builders/`, and the resulting
-models are recorded in `research/models/` — the `vie_*` and `san_*` families are
-comparisons between selected label schemes.
-
-## A note on method
-
-The experiment varies clustering, weighting, seeding, and acceptance thresholds
-explicitly, with audit scripts and reports retained alongside the variants. This
-makes the selected taxonomy traceable to its design criteria and provides a basis
-for comparing downstream NER models trained with different label schemes.
+models are recorded in `research/models/`.

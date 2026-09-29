@@ -1,11 +1,5 @@
-# Old English OEDT: corpus preparation
+# Old English OEDT
 
-I prepared the Old English OEDT NER dataset in Trankit BIO format.
-
-Source: `training\nerdump\commercial_ner_datasets_downloaded.zip` members under `datasets/ang/Old_English-OEDT/`.
-
-Corpus-build outputs: `train.bio`, `dev.bio`, `test.bio`, `all.bio`, `label_token_counts.tsv`, `dataset_report.json`.
-
-The [dataset report](dataset_report.json) records corpus sizes and label counts.
-The [model-run record](../../models/ang_oedt/) connects
-it to the NER training work.
+The Old English OEDT NER corpus converted to Trankit BIO format (one token and tag per
+line). Split sizes and label counts are in [`dataset_report.json`](dataset_report.json).
+The training run is [`../../models/ang_oedt/`](../../models/ang_oedt/).

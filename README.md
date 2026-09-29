@@ -35,10 +35,7 @@ flowchart TB
 ```
 
 Accounts, subscriptions and quotas govern the server request paths; document
-rendering keeps results attached to the selected passage. Follow the
-[construction story](docs/BUILD_PROCESS.md) for source preparation, model selection,
-Sanskrit dictionary engineering and CPU export, or the
-[runtime guide](docs/BUILD_PROCESS.md#runtime-architecture) for the code behind each request.
+rendering keeps results attached to the selected passage.
 
 ### Engineering highlights
 
@@ -60,9 +57,9 @@ model cards, training evidence and measured development results:
 - [Sanskrit sandhi splitting](research/releases/sanskrit-sandhi-tokenizer/README.md): tokenizer and expansion models trained on DCS fused forms and their underlying words.
 - [Sanskrit interpretive NER](research/releases/sanskrit-interpretive-ner/README.md): 18 semantic categories learned from Gemini-assisted annotations of authentic Sanskrit documents.
 
-The [full score collection](research/models/TRAINING_RESULTS.md) covers all 61
-custom component selections; the [component map](research/STATUS.md) distinguishes
-them from the upstream models used elsewhere in the application.
+The [model record](research/models/README.md) lists all 61 custom components with
+their scores and distinguishes them from the upstream models used elsewhere in the
+application.
 
 ### Explore the runtime
 
@@ -77,9 +74,7 @@ them from the upstream models used elsewhere in the application.
 | Deployment | [wsgi.py](wsgi.py), [deploy/](deploy/) |
 
 The server is organized into Flask blueprints and task services; the browser uses
-ES modules with explicit imports and feature-owned state. The
-[runtime architecture](docs/BUILD_PROCESS.md#runtime-architecture) connects these
-boundaries to the request and data flow.
+ES modules with explicit imports and feature-owned state.
 
 ---
 
@@ -93,15 +88,12 @@ building the tools that turn research outputs into deployable assets.
 
 | | |
 |---|---|
-| [**From resources to the deployed product**](docs/BUILD_PROCESS.md) | The construction path, selected artifacts, measurements and evidence by stage. |
 | [**Build chains**](research/pipeline/README.md) | Trace corpus construction, model training, and dictionary production from inputs to application assets. |
-| [**Training-to-application record**](research/STATUS.md) | Recorded model choices, run identifiers, and artifact-matching tools. |
-| [**Selected model scores**](research/models/TRAINING_RESULTS.md) | All 61 custom component selections: tokenizer, MWT, POS/parser, lemma and NER scores, linked to selected checkpoints and original records. |
+| [**Model components and scores**](research/models/README.md) | Which components are custom or stock, and tokenizer, MWT, POS/parser, lemma and NER scores for all 61 custom components. |
 | [`research/pipeline/`](research/pipeline/) | Model training, dataset construction, dictionary building, NER taxonomy derivation. |
 | [`research/evaluation/`](research/evaluation/) | Regression test, benchmarks, latency measurements, dictionary and corpus audits. |
 | [`research/experiments/`](research/experiments/) | Six development paths documenting model comparisons, architecture prototypes, and design decisions. |
-| [`research/notes/`](research/notes/) | Design and architecture records from development. |
-| [`research/datasets/`](research/datasets/), [`research/models/`](research/models/) | Dataset provenance, label vocabularies, and configurations for 29 completed NER runs. |
+| [`research/datasets/`](research/datasets/), [`research/models/`](research/models/) | Dataset provenance, label vocabularies, and configurations for 27 completed NER runs (one, `ang_oedt`, has a vocabulary only). |
 
 Two examples show the connection between linguistic analysis and engineering: a
 Sanskrit sandhi splitter trained as a multi-word-token expander over a deterministic
@@ -112,8 +104,3 @@ annotated from authentic Sanskrit texts through a resumable, validated Gemini wo
 **[Document capture and rendering](extras/)** — the Chrome capture extension and
 document-model study, covering static page capture, format conversion, pagination
 and annotation geometry.
-
-
-The [research evidence index](research/EVIDENCE.md) connects selected training
-results, annotation costs, corpus statistics and inference measurements to their
-source records.

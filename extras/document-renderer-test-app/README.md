@@ -1,9 +1,8 @@
 # Document rendering and annotation geometry
 
-I built this development application to work through a central reading-interface
-problem: keeping annotations attached to source text as documents change format,
-page size and layout. It separates format parsing, canonical text, browser geometry
-and annotation placement.
+A development application for keeping annotations attached to source text when a
+document is shown in different formats, page sizes and layouts. It separates format
+parsing, a common text model, page layout and annotation placement.
 
 ```text
 PDF / EPUB / DOCX / HTML / Markdown / plain text / captured URL
@@ -58,6 +57,12 @@ other formats.
 | [align.js](src/align.js) | Normalized text alignment and development token fixtures |
 | [annotator.js](src/annotator.js) | Range selection and token markup |
 
-This study records the document and layout mechanisms. The integrated reader's
-neural analysis and lexical lookup are described in the
-[application construction guide](../../docs/BUILD_PROCESS.md).
+
+## Running
+
+```sh
+npm start   # local development server
+npm test    # smoke test
+```
+
+The app entry point is `src/app.js`, loaded by `index.html`.

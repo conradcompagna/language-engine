@@ -1,15 +1,8 @@
-# Document capture and rendering
+# Extras
 
-I developed these components around two parts of the reading workflow: capturing
-web pages with their visual context, and connecting rendered document text to
-stable annotation offsets.
+Two standalone components related to the Language Engine reader.
 
-| Component | Engineering focus |
+| Folder | Contents |
 |---|---|
-| [Chrome capture extension](chrome-extension/README.md) | DOM serialization, asset capture, frame handling and static HTML export |
-| [Document-rendering study](document-renderer-test-app/README.md) | Format adapters, a canonical text model, pagination and character geometry |
-
-The extension produces a captured HTML document. The rendering study records the
-document-model and layout work in a separate development application. The
-[reader architecture](../docs/BUILD_PROCESS.md#runtime-architecture) maps the
-integrated application's document and annotation services.
+| [chrome-extension/](chrome-extension/) | Chrome extension that saves a web page as a single static HTML file for reading |
+| [document-renderer-test-app/](document-renderer-test-app/) | Development app for rendering PDF, EPUB, DOCX, HTML and text in one document model and keeping annotations aligned to the source text |

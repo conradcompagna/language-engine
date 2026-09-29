@@ -1,21 +1,20 @@
 # Browser source
 
+Source for the reader's browser code, as ES modules. `npm run build` compiles the
+entry points listed in `entries.json` into the `static/*.js` files loaded by the
+templates; those build outputs are not tracked. PDF.js, Mammoth, DOMPurify and Foliate
+provide document rendering.
 
-ES modules compile into the `static/*.js` assets consumed by templates and classic
-workers. Entrypoints preserve those loading contracts; PDF.js, Mammoth, DOMPurify
-and Foliate provide the document-rendering dependencies.
+| Folder | Contents |
+|---|---|
+| `reader/` | Reader interface: popups, overlays, entry editing, document navigation, settings |
+| `dictionary/engine/` | Dictionary index loading, word matching, segmentation and fuzzy search |
+| `dictionary/client/` | Caching, workers and requests to the server for full entries |
+| `documents/pdf/` | PDF display |
+| `documents/snapshot/` | Display of saved web pages |
+| `linguistics/tags/` | Grammatical tag tables |
+| `linguistics/pronunciation/` | Grapheme analysis and pronunciation tables by script |
+| `styles/` | Stylesheets |
 
-| Directory                    | Responsibility                                                                                 |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- |
-| `reader/`                    | Reader presentation, entry editing, popups, overlays, document navigation and settings         |
-| `dictionary/engine/`         | Entry parsing, index loading, identity, selection, segmentation, fuzzy search and hydration    |
-| `dictionary/client/`         | Cache and workers, winner references, result assembly, language lifecycle and request adapters |
-| `documents/snapshot/`        | Snapshot frame lifecycle, selection, layout, pagination and inert interaction                  |
-| `linguistics/tags/`          | Language tag tables and lookup API                                                             |
-| `linguistics/pronunciation/` | Grapheme analysis, script-specific algorithms, profiles and tables                             |
-
-Each entrypoint imports feature modules explicitly. Feature state lives in the
-adjacent `*.state.mjs` module; `index.mjs` initializes each entrypoint in dependency
-order. Browser and worker APIs are synchronous where their callers require it.
-Modules import cross-feature functions directly; state modules have no DOM or
-network effects on import.
+Each feature module keeps its state in an adjacent `*.state.mjs` file, and each entry
+point's `index.mjs` initializes its modules.

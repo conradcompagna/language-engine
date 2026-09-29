@@ -12,7 +12,6 @@ from research.pipeline.dictionaries.japanese.data.analyzer import JpInflectionAn
 ROOT = Path(__file__).resolve().parents[1]
 RULES = ROOT / 'research/pipeline/dictionaries/japanese/data/rules'
 MANIFESTS = [RULES / 'manifest.json',
-    ROOT / 'research/evaluation/reports/grc_lsj_vs_wiktionary_samples/manifest.json',
     ROOT / 'research/experiments/sanskrit-vedic-v1/run_logs/tokenize/manifest.json']
 
 

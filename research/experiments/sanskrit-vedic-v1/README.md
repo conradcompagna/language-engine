@@ -10,8 +10,7 @@ are in `research/pipeline/datasets/convert_vedic_iast_to_slp1.py` and the
 
 ## What happened
 
-The run completed and produced weights, establishing an initial Vedic UD training
-path before the application selected DCS supervision.
+The run completed and produced weights.
 
 ## Selecting DCS supervision
 
@@ -21,7 +20,6 @@ underlying dictionary forms, and the Digital Corpus of Sanskrit provides an orde
 magnitude more multi-word-token supervision for exactly that. The DCS run
 (`trankit_save_sa_dcs_v1`) shipped instead.
 
-The application retains the `sanskrit-vedic` model name for the selected DCS build.
-The [artifact mapping](../../STATUS.md) records that lineage explicitly.
+The application still uses the model name `sanskrit-vedic` for the DCS models.
 
 `run_logs/` holds the training logs.

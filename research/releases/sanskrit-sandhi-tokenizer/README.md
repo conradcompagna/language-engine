@@ -16,30 +16,25 @@ inference: false
 
 # Sanskrit Sandhi Tokenizer and Multiword Expander
 
-I trained these components to recover underlying Sanskrit words from the fused
-surface forms encountered in actual Sanskrit texts. They supply the sandhi
-segmentation stage of [Language Engine](https://github.com/conradcompagna/language-engine).
+A Sanskrit tokenizer and sandhi expander that recovers the underlying words from
+fused surface forms, used for Sanskrit in
+[Language Engine](https://github.com/conradcompagna/language-engine).
 
-I used the **Digital Corpus of Sanskrit (DCS)** to preserve both sides of the
-problem: a fused surface token and its annotated underlying words. The tokenizer
-learns boundaries and expansion candidates; a character-level sequence-to-sequence
-model learns to recover the underlying forms, including changes at sandhi
-boundaries. This goes beyond inserting spaces into the surface string.
+Training data is the **Digital Corpus of Sanskrit (DCS)**, which records both the fused
+surface token and its underlying words. The tokenizer learns word boundaries and which
+tokens need expansion; a character-level sequence-to-sequence model recovers the
+underlying forms, including the sound changes at sandhi boundaries.
 
-## How I built it
+## Training
 
 The dataset builder walks DCS chapters in corpus order and preserves CoNLL-U
 multiword-token range rows instead of flattening away the fused forms. I used
 the surface forms as tokenizer input and the annotated underlying words as
-expansion targets. The selected run's retained MWT development input spans
-1,590 DCS chapters; the evaluation record gives its reference reconstruction and
-exact file identities. A separate focused-subset builder records another
-preparation track in the development archive.
+expansion targets. The development data spans 1,590 DCS chapters.
 
-The selected tokenizer and expander come from `trankit_save_sa_dcs_v1`.
-The historical `sanskrit-vedic` runtime alias is a file-layout identifier: these
-released components were trained on the DCS track. I retained a separate
-Vedic-treebank experiment during development.
+The tokenizer and expander come from run `trankit_save_sa_dcs_v1`. Language Engine
+loads them under the model name `sanskrit-vedic`, which is a leftover from an earlier
+Vedic-treebank experiment; these components were trained on DCS.
 
 ## Evaluation
 
@@ -50,10 +45,8 @@ Vedic-treebank experiment during development.
 | Expanded-word F1, selected MWT checkpoint with reference boundaries | 93.91% |
 
 The tokenizer scores come from the historical evaluation at stored checkpoint
-epoch 20. I re-evaluated the selected expander on 24 September 2026 using the
-retained DCS development input: 73,807 sentences with 97,960 expansion candidates,
-spanning 1,590 chapters. The reference was rebuilt from those source chapters
-with the original exporter.
+epoch 20. The expander was re-evaluated on 24 September 2026 on the DCS development
+data: 73,807 sentences with 97,960 expansion candidates across 1,590 chapters.
 
 The MWT score uses **reference surface boundaries and expansion flags** and the
 reader's dictionary ensemble. It measures expanded words across the development
@@ -83,15 +76,15 @@ result = predict("yogas cittavṛttinirodhaḥ")
 
 Use **Python 3.10** and the tested versions in `requirements.txt`. The base encoder downloads on
 first use; the adapter/head weights come from this release. The weights are the
-native training checkpoints; Language Engine's shared INT8 deployment format is
-documented separately in the [CPU build record](https://github.com/conradcompagna/language-engine/blob/main/docs/BUILD_PROCESS.md#3-package-inference-for-cpu-deployment).
+native training checkpoints; Language Engine serves them through a shared INT8 ONNX
+encoder, built by [these scripts](https://github.com/conradcompagna/language-engine/tree/main/research/pipeline/models).
 
 ## Artifact and source record
 
 [artifact-manifest.json](artifact-manifest.json) records checkpoint sizes and
 SHA-256 identities; [evaluation.json](evaluation.json) records the evaluation
-source, split and scores. The [Language Engine training record](https://github.com/conradcompagna/language-engine/blob/main/research/models/TRAINING_RESULTS.md)
-places these components in the wider multilingual system.
+source, split and scores. Scores for every Language Engine component are in the
+[model record](https://github.com/conradcompagna/language-engine/blob/main/research/models/README.md).
 
 ## Credits
 

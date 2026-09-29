@@ -1,51 +1,131 @@
-# Model runs
+# Model components and training results
 
-The [complete selected-training results](TRAINING_RESULTS.md) cover tokenization,
-POS/dependency parsing, lemmatization and NER, with checkpoint identities and
-exact score records; the [component map](../STATUS.md) distinguishes my trained
-components from upstream Trankit resources.
+Language Engine runs a Trankit pipeline per language. Each pipeline has up to five
+components: tokenizer, multi-word-token (MWT) expander, POS/morphology/parser,
+lemmatizer and named-entity recognizer. For each language and component the
+application uses either a component I trained (Custom), an unchanged upstream Trankit
+release (Stock), or an identity lemmatizer.
 
-One directory per finished NER training run, holding the training configuration and the
-label vocabulary. The configuration records the base encoder, the
-dataset, and the hyperparameters; the vocabulary records the label set the run was
-trained against.
+Across the 28 configured pipelines, 61 components are custom, 62 are stock, 2 use
+identity lemmatization, and 15 have no MWT component.
 
-Twenty-nine runs across Old English, Ancient Greek, Armenian, Classical Chinese,
-Filipino, Hebrew, Hindi, Indonesian, Italian, Latin, Persian, Portuguese, Sanskrit,
-Swahili, Thai, Turkish and Vietnamese.
+## Contents of this folder
 
-Several languages have complementary runs comparing label schemes, corpus sizes,
-and supervision settings:
+| Path | Contents |
+|---|---|
+| `component-origins.json` | Checkpoint hashes for custom components and upstream sources for stock ones |
+| `stock-models.json` | SHA-256 matches between stock components and the official Trankit release archives |
+| `deployed_artifacts.json` | Model files checked against the production server on 23 September 2026 |
+| 27 run folders (`ang_oedt/` … `wikiann_vi/`) | One per finished NER training run: `training_config.json` and/or the label vocabulary `customized-ner.ner-vocab.json` |
 
-- `vie_plo75`, `vie_manual12_direct_raw`, `vie_collapse13_all_tags_raw`, `wikiann_vi` —
-  four different coarse label sets for Vietnamese
-- `san_gemini_ner_chunks_0001_1800_corrected` and its `_supervised_even95_5` and
-  `_tag_scores` variants — the Sanskrit set under different supervision and scoring
-  regimes, plus two per-label probes
-- `lzh_cmag_200k` and `lzh_cmag_1m` — Classical Chinese at two corpus sizes
-- `swh_finerweb_top100_lpo` — two runs, the second a rerun with a timestamped output
+The NER runs cover Old English, Ancient Greek, Modern Greek, Armenian, Classical
+Chinese, Filipino, Hebrew, Hindi, Indonesian, Italian, Latin, Persian, Portuguese,
+Sanskrit, Swahili, Thai, Turkish and Vietnamese. Several languages have more than one
+run comparing label schemes or corpus sizes (four Vietnamese label sets; four Sanskrit
+supervision and scoring variants; Classical Chinese at 200k and 1M tokens).
+Folders with a timestamp suffix are reruns of the folder of the same name. The trainer
+is [`../pipeline/models/train_ner.py`](../pipeline/models/train_ner.py) and the corpora
+are described in [`../datasets/`](../datasets/).
 
-The trainer is [`../pipeline/models/train_ner.py`](../pipeline/models/train_ner.py).
-Dataset cards for the corpora are in [`../datasets/`](../datasets/).
+## Component map
 
-## Selected training results
+| Language | Tokenizer | MWT expansion | POS/morphology/parser | Lemmatizer | NER |
+|---|---|---|---|---|---|
+| Chinese (Simplified) | Stock | — | Stock | Stock | Stock |
+| Japanese | Stock | — | Stock | Stock | Custom |
+| Korean | Stock | — | Stock | Stock | Custom |
+| Vietnamese | Stock | — | Stock | Identity | Custom |
+| Classical Chinese | Stock | — | Stock | Stock | Custom |
+| Turkish | Custom | Custom | Custom | Custom | Custom |
+| Persian | Stock | Stock | Stock | Custom | Custom |
+| Indonesian | Stock | — | Stock | Stock | Custom |
+| Hindi | Custom | — | Custom | Custom | Custom |
+| Arabic | Custom | Custom | Custom | Custom | Stock |
+| Thai | Custom | — | Custom | Identity | Custom |
+| Sanskrit | Custom | Custom | Custom | Custom | Custom |
+| Old English | Custom | — | Custom | Custom | Custom |
+| French | Stock | Stock | Stock | Stock | Stock |
+| Italian | Stock | Stock | Stock | Stock | Custom |
+| Russian | Stock | — | Stock | Stock | Stock |
+| Spanish | Stock | Stock | Stock | Stock | Stock |
+| German | Stock | Stock | Stock | Stock | Stock |
+| Dutch | Stock | — | Stock | Stock | Stock |
+| Portuguese | Stock | Stock | Stock | Stock | Custom |
+| Latin | Custom | — | Custom | Custom | Custom |
+| Greek | Custom | Stock | Custom | Custom | Custom |
+| Armenian | Stock | Stock | Stock | Stock | Custom |
+| Ancient Greek | Custom | — | Custom | Custom | Custom |
+| Hebrew | Custom | Custom | Custom | Custom | Custom |
+| Tagalog | Custom | Custom | Custom | Custom | Custom |
+| Swahili | Custom | — | Custom | Custom | Custom |
+| Chinese (Traditional) | Stock | — | Stock | Stock | Stock |
 
-These runs connect the dataset work to measured NER outcomes: converting an existing
-Old English corpus, separating an Ancient Greek entity category, preparing Gemini-assisted
-annotations over authentic Sanskrit text, and adapting Vietnamese WikiANN to Trankit's BIO format.
+Korean syntax uses the stock Korean-Kaist components; Korean NER is trained on KLUE.
 
-| Run | Dataset / build record | Best dev F1 (%) | Selected epoch | Run assets |
-|---|---|---:|---:|---|
-| Old English OEDT | [BIO conversion](../datasets/ang_oedt/README.md) | 88.20 | 13 | [label vocabulary](ang_oedt/customized-ner.ner-vocab.json) |
-| Ancient Greek Pausanias | [ethnic/civic label remap](../datasets/grc_pausanias_ethnic_civic_misc/README.md) | 78.81 | 13 | [configuration](grc_pausanias_ethnic_civic_misc/training_config.json) |
-| Sanskrit interpretive NER | [corpus construction](../pipeline/README.md#1b-sanskrit--semantic-annotations-over-authentic-texts) | 54.28 | 29 | [supervised 95/5 configuration](san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/training_config.json) |
-| Vietnamese WikiANN | [source and split policy](../datasets/wikiann_vi/README.md) | 91.72 | 18 | [configuration](wikiann_vi/training_config.json) |
+## Development scores
 
-The [saved-log excerpts](../evaluation/results/selected_ner_training.json) include
-exact score lines, original line numbers, run identifiers, and source-log SHA-256
-hashes. These best-development scores record epoch selection within each
-run's dataset and label scheme. WikiANN uses upstream train + test for training and
-validation for development; the table therefore reports dev performance, with
-independent test evaluation treated separately. The Old English snapshot includes
-the vocabulary and log excerpt; its configuration remains a separate run asset.
-[Run history](../STATUS.md) records application artifact selection.
+All values are percentages on each run's own development split. Corpora, label schemes
+and input stages differ between runs, so the columns are not a cross-language
+comparison. A dash marks a stock or identity component. An asterisk marks a
+re-evaluation of the saved checkpoint performed on 24 September 2026; other values come
+from the selected checkpoint's training log.
+
+| Language | Token F1 | POS F1 | UAS | LAS | Lemma F1 | NER F1 |
+|---|---:|---:|---:|---:|---:|---:|
+| Ancient Greek | 91.99 | 91.48 | 71.85 | 64.43 | 95.11 | 78.81 |
+| Arabic | 99.86 | 95.87 | 90.71 | 87.85 | 75.04 | — |
+| Armenian | — | — | — | — | — | 94.12 |
+| Classical Chinese | — | — | — | — | — | 80.88 |
+| Greek | 99.80 | 98.31 | 92.58 | 90.05 | 88.03 | 84.84 |
+| Hebrew | 99.63 | 97.01 | 94.04 | 92.10 | 94.21 | 78.22 |
+| Hindi | 99.36 | 96.05 | 89.06 | 84.38 | 94.59 | 81.31 |
+| Indonesian | — | — | — | — | — | 81.60 |
+| Italian | — | — | — | — | — | 82.90 |
+| Japanese | — | — | — | — | — | 81.79* |
+| Korean | — | — | — | — | — | 88.79 |
+| Latin | 99.99 | 99.72 | 95.95 | 94.89 | 97.76 | 81.30 |
+| Old English | 98.32 | 91.20 | 76.81 | 72.33 | 86.40 | 88.20 |
+| Persian | — | — | — | — | 99.53 | 72.67 |
+| Portuguese | — | — | — | — | — | 78.85 |
+| Sanskrit | 97.09 | 90.10* | 72.74* | 62.26* | 95.68 | 54.28 |
+| Swahili | 99.63 | 93.66 | 82.68 | 79.77 | 86.85 | 77.60 |
+| Tagalog | 98.68 | 95.68 | 71.22 | 64.71 | 7.60 | 89.74 |
+| Thai | 85.73 | 78.01 | 61.93 | 55.08 | — | 72.39 |
+| Turkish | 99.34 | 92.52 | 81.83 | 75.25 | 79.17 | 78.14 |
+| Vietnamese | — | — | — | — | — | 91.72 |
+
+The Vietnamese NER run (`wikiann_vi`) trained on the WikiANN train and test splits
+combined and used the validation split for development, so its score is a development
+score only.
+
+### Multi-word-token expansion
+
+Expanded-word F1 from the CoNLL UD scorer, measured on the retained development data
+with the dictionary ensemble the application uses.
+
+| Language | Expanded-word F1 | Input to the expander |
+|---|---:|---|
+| Arabic | 98.09% | Retained tokenizer predictions |
+| Sanskrit | 93.91% | Reference surface boundaries and MWT flags |
+| Turkish | 99.67% | Reference surface boundaries and MWT flags |
+| Hebrew | 98.30% | Reference surface boundaries and MWT flags |
+| Tagalog | 97.38% | Retained tokenizer predictions |
+
+## Score records
+
+| File | Contents |
+|---|---|
+| [tokenizer-training.json](../evaluation/results/tokenizer-training.json) | Token and sentence F1 at the selected and last logged epochs |
+| [tagger_parser-training.json](../evaluation/results/tagger_parser-training.json) | POS, features, UAS and LAS |
+| [lemmatizer-training.json](../evaluation/results/lemmatizer-training.json) | Lemmatizer development scores, with dictionary baselines |
+| [ner-training.json](../evaluation/results/ner-training.json) | NER scores and checkpoint hashes for the 19 custom NER components |
+| [mwt-development.json](../evaluation/results/mwt-development.json) | MWT re-evaluation inputs, references and results |
+| [japanese-ner-development.json](../evaluation/results/japanese-ner-development.json) | Japanese NER re-evaluation |
+| [sanskrit-parser-development.json](../evaluation/results/sanskrit-parser-development.json) | Sanskrit parser re-evaluation |
+| [syntax-log-excerpts.json](../evaluation/results/syntax-log-excerpts.json) | Original score tables from the training logs |
+| [selected_ner_training.json](../evaluation/results/selected_ner_training.json) | Training-log excerpts for four NER runs (Old English, Ancient Greek, Sanskrit, Vietnamese) |
+| [sanskrit-parser-dataset.json](../evaluation/results/sanskrit-parser-dataset.json) | Match between the Sanskrit parser's vocabulary and its training data |
+
+The scripts behind the re-evaluations are in
+[`../evaluation/selected_components/`](../evaluation/selected_components/).
+Epoch numbers follow the trainer's zero-based convention.

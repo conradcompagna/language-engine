@@ -1,11 +1,16 @@
 # Build chains
 
-These build chains document corpus, model and dictionary construction. The
-[verified selection map](../STATUS.md) identifies current components and separates
-retained alternatives; the [construction story](../../docs/BUILD_PROCESS.md) connects
-the chains to the product. The [evidence index](../EVIDENCE.md) and
-[training record](../REPRODUCIBILITY.md) connect measurements to corpus preparation,
-training configuration and artifact tracking.
+Scripts that build the training corpora, train and export the models, and convert
+dictionaries for Language Engine.
+
+| Folder | Contents |
+|---|---|
+| `datasets/` | Corpus builders and converters, by language |
+| [`models/`](models/) | NER training, ONNX export and runtime-bundle scripts |
+| [`taxonomy/`](taxonomy/) | Derivation of coarse NER label sets from FiNERweb |
+| `dictionaries/` | Dictionary converters, repair passes and audits; per-language packages |
+
+Which components are custom and their scores are in [`../models/README.md`](../models/README.md).
 
 ---
 
@@ -39,9 +44,8 @@ Digital Corpus of Sanskrit (15,900 CoNLL-U chapters + chapter-info.xml)
   │     Random 10% sample, seed 1337 → 1,455 chapters.
   │     Result (stats.json): 70,355 train sentences, 532,329 token rows,
   │     100,349 MWT rows; 9,349 dev sentences, 67,004 token rows.
-  │     This records the focused-subset preparation track. The selected run's
-  │     retained development artifacts cover the full 1,590-chapter split;
-  │     its evaluation record identifies that material separately.
+  │     This is a separate subset track; the selected run's development
+  │     data is the full 1,590-chapter split.
   │
   ├─ datasets/convert_vedic_iast_to_slp1.py
   │     Separate Vedic UD track. Transliteration between IAST and SLP1, plus
@@ -75,9 +79,8 @@ DCS MWT subset → train_10k_parent_tokens.conllu
   │
   ├─ datasets/sanskrit/gemini_sanskrit_ner_10_sentence_test.py
   │     Defines the label set, prompt construction, BIO conversion, and the
-  │     validator. The validator is the important part: it checks the model's
-  │     returned tokens against the input tokens and records any divergence
-  │     rather than trusting the response.
+  │     validator, which checks the model's returned tokens against the input
+  │     tokens and records any divergence.
   │
   ├─ datasets/sanskrit/gemini_sanskrit_ner_batch_runner.py
   │     Parallel batch runner over every chunk. Per job it writes the input,
@@ -105,9 +108,8 @@ tokens, 728,721 output tokens, 3,836,573 total, USD 0.60. Recorded in
 selected per-job records are in
 [`sample_summaries/`](datasets/sanskrit/gemini_ner/sample_summaries/).
 
-The label set was derived from the corpus rather than imported: 18 semantic categories including
-DEITY, RITUAL, SUBSTANCE, PLANT, DISEASE, BODY, MEASURE, ASTRO and PROCEDURE, which is
-what Sanskrit śāstra literature actually contains. The [dataset summary](datasets/sanskrit/gemini_ner/final/dataset_summary.json)
+The label set has 18 semantic categories chosen for the corpus, including
+DEITY, RITUAL, SUBSTANCE, PLANT, DISEASE, BODY, MEASURE, ASTRO and PROCEDURE. The [dataset summary](datasets/sanskrit/gemini_ner/final/dataset_summary.json)
 records chunk coverage, token rows, and annotation corrections.
 
 ### 1c. Other trained languages
@@ -120,10 +122,10 @@ records chunk coverage, token rows, and annotation corrections.
 | Swahili | augmented UD set, see `datasets/swahili/DATASET_README.txt` | `swh_v1` | `swahili-custom` tokenizer, tagger and lemmatizer |
 | Bengali, Punjabi | `datasets/process_rarelangs.py` over UD treebanks | `ben_v1`, `rarelangs_v1` | Retained development resources; outside the current language registry |
 | Ancient Greek | `datasets/ancient_greek/convert_perseus_greek_to_conllu.py`, `build_sampled_subset.py`, `_build_naturalpara_10k.py`, `_verify_naturalpara.py` | `t_grc_naturalpara_tok`, `t_grc10k_tok1` | Natural-paragraph tokenizer; 10k tagger/lemmatizer; separate Pausanias NER |
-| Thai | `datasets/` Thai UD + NNER conversion | `th_customized_ner` | `thai-ner` tokenizer/tagger; NER from the separately finished NNER run |
+| Thai | Conversion scripts not included | `th_customized_ner` | `thai-ner` tokenizer/tagger; NER from the separately finished NNER run |
 | Korean | `datasets/korean/convert_to_bio.py` → `train_ner.py` | KLUE-NER | `korean-ner` |
 | Arabic | [CAMeL teacher-data builder and correction rules](datasets/arabic/README.md) | `t_ar10k2`, `commercial_v1/ar` | Corrected teacher-supervised tokenizer/MWT; commercial-v1 tagger/lemmatizer |
-| Greek, Hebrew, Hindi, Latin, Turkish | Component matches in [STATUS.md](../STATUS.md) | `commercial_v1` | Selected syntax/lemma components; NER selected separately |
+| Greek, Hebrew, Hindi, Latin, Turkish | See [`../models/README.md`](../models/README.md) | `commercial_v1` | Selected syntax/lemma components; NER selected separately |
 
 `datasets/convert_train_jsonl_to_trankit.py` is the shared converter from annotated
 JSONL into Trankit's expected CoNLL-U and plain-text pair.
@@ -147,12 +149,11 @@ The ~80 parameter variants behind the chosen thresholds are in
 
 The service initializes selected Trankit checkpoints, installs the shared
 INT8 ONNX encoder/adapter runtime, and dynamically quantizes supported PyTorch
-task modules. The [CPU build record](../../docs/BUILD_PROCESS.md#3-package-inference-for-cpu-deployment)
-connects those stages to the verified deployed bundle.
+task modules.
 
 ```
-models/prep_trankit.py                        fetch and lay out base models
-models/apply_patch.py                         apply the tpipeline patch
+models/prep_trankit.py                        split local UD treebanks into train/dev files
+models/apply_patch.py                         extract a patch archive over the project
 models/build_trankit_xlmr_onnx_cpu.py         export the XLM-R encoder to ONNX,
                                               dynamic INT8, CPU execution provider
 models/tune_trankit_onnx_ort_session.py       search ORT session options
@@ -163,9 +164,9 @@ models/build_trankit_compressed_runtime_artifacts.py
 ```
 
 Memory and device profiling tools are in [evaluation/](../evaluation/). The
-[adapter-bank prototypes](../experiments/arabic-onnx-adapter-bank/OUTCOME.md) document
-the exploration of shared encoder and dynamic adapter inputs; the application
-implementation is in the root compressed-runtime and live-switch modules.
+[adapter-bank prototypes](../experiments/arabic-onnx-adapter-bank/) preceded this
+design; the application implementation is in `trankit_compressed_runtime.py` and
+`trankit_onnx_live_switch.py` at the repository root.
 
 ---
 
@@ -173,9 +174,8 @@ implementation is in the root compressed-runtime and live-switch modules.
 
 The selected Sanskrit SQLite resource is the **DCS-derived build**: its
 [builder](datasets/sanskrit/build_sa_sqlite.py) joins lemma IDs to attested corpus
-forms, yielding 180,000 entries and 479,041 forms in the verified local build.
-See the [DCS and runtime-pruning explanation](../../docs/BUILD_PROCESS.md#4-engineer-the-dictionaries).
-The Monier-Williams converter below records a separate development path.
+forms, yielding 180,000 entries and 479,041 forms. The Monier-Williams converter below
+is an earlier, separate build.
 
 The deployment uses 42 SQLite dictionary files. This build chain turns their
 heterogeneous sources into a common lexical index and entry store.
@@ -206,7 +206,6 @@ source (Wiktionary JSONL, JMdict, KRDict XML, CC-CEDICT, LSJ, Monier-Williams, �
         audit_sqlite_form_tags_flat.py, audit_nonshared_form_chars.py,
         audit_gloss_of_word_tags.py, audit_yomitan_extra_prune.py,
         diagnose_ccedict_index.py
-        Reports these produced: ../evaluation/reports/
 ```
 
 Per-language packages under `dictionaries/<lang>/` hold the language-specific display
@@ -217,21 +216,8 @@ into the registry, `lang_config.json` declares its runtime behaviour.
 base generation rules, godan row map, allomorph map, contraction rules, orthography
 rules, attachment states and edges, ambiguity resolution, lexical exceptions, and
 validation examples. `jp_inflection_table_analyzer.py` and `inflection_adapter.py`
-apply it. This is the largest piece of hand-authored linguistic data in the project.
+apply it. The rules are stored as shards; see [`../README.md`](../README.md#split-files).
 
-`dictionaries/gemini_generated_glosses/` holds LLM-generated gloss tables for languages
-with thin dictionary coverage (Arabic, Bengali, Hebrew, Armenian, Indonesian, Korean,
-Punjabi, Sanskrit), used to seed entries where no free dictionary exists.
+`dictionaries/tools/` holds small one-off maintenance scripts; `dictionaries/vietnamese/` is
+the Vietnamese package.
 
----
-
-## Engineering examples
-
-Three examples show the construction methods in detail:
-
-1. `datasets/build_dcs_trankit_mwt_subset.py` — deterministic dataset construction with
-   a recorded seed and a stats file.
-2. `datasets/sanskrit/gemini_sanskrit_ner_batch_runner.py` — a validated, resumable,
-   cost-tracked LLM annotation run.
-3. `dictionaries/convert_tsv_to_sqlite.py` — the importer that builds the SQLite
-   entry/form store from which runtime policies derive the browser index.

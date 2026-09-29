@@ -1,35 +1,14 @@
-# Classical Chinese CMAG: corpus-size comparison
+# Classical Chinese CMAG, 200k tokens
 
-A smaller Classical Chinese CMAG Trankit BIO dataset derived from `lzh_cmag_1m`.
+Every fifth sentence of each split of [`lzh_cmag_1m`](../lzh_cmag_1m/), keeping the
+split proportions and reducing the size about five times.
 
-Sampling rule:
+| Split | Tokens |
+|---|---:|
+| train | 159,903 |
+| dev | 20,030 |
+| test | 20,467 |
 
-```text
-Take every fifth complete sentence from each original split: sentence_index % 5 == 0.
-```
-
-This keeps train/dev/test proportions close to the 1M-token source while reducing total size by about 5x.
-
-Corpus-build outputs:
-
-```text
-train.bio
-dev.bio
-test.bio
-all.bio
-label_token_counts.tsv
-dataset_report.json
-```
-
-Token counts:
-
-```text
-train  159,903
-dev     20,030
-test    20,467
-all    200,400
-```
-
-The [dataset report](dataset_report.json) records corpus sizes and label counts.
-The [model-run record](../../models/lzh_cmag_200k/) connects
-it to the NER training work.
+Details are in [`dataset_report.json`](dataset_report.json). The training run is
+[`../../models/lzh_cmag_200k/`](../../models/lzh_cmag_200k/); this is the Classical
+Chinese NER model used in the application.

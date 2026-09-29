@@ -17,7 +17,5 @@ text exists.
 
 ## Outcome
 
-The experiment produced a statistical dictionary and a reusable sequence of corpus,
-morphology, alignment, and lexicon-assembly tools. It is a separate low-resource NLP
-study alongside Language Engine, addressing lexical coverage through monolingual
-embedding alignment. Amharic is outside the deployed reader's language set.
+The experiment produced a statistical Amharic–English dictionary. Amharic is not one
+of the application's languages, and the dictionary is not used in it.

@@ -1,17 +1,14 @@
-# Development experiments
+# Experiments
 
-These records show how model, data, and architecture choices developed into the
-reading platform. Each `OUTCOME.md` connects a specific problem to the approach
-tested, the retained result, and its relationship to the application.
+Development experiments for Language Engine. Each folder holds the scripts and logs
+of one line of work and a README describing what was tried and what was adopted.
+Maintained build code is in [`../pipeline/`](../pipeline/).
 
-| Development path | What it demonstrates |
-|---|---|
-| [Arabic morphology](arabic-cameltools/OUTCOME.md) | Comparing morphology-derived segmentation with the selected UD training path |
-| [Shared ONNX encoder](arabic-onnx-adapter-bank/OUTCOME.md) | Prototyping adapter inputs and INT8 inference for a multilingual runtime |
-| [Sanskrit supervision](sanskrit-vedic-v1/OUTCOME.md) | Moving from a Vedic UD experiment to DCS multi-word-token supervision |
-| [Pooled language training](rarelangs-per-language/OUTCOME.md) | Recording the selected pooled run alongside per-language configurations |
-| [FiNERweb taxonomy](finerweb-taxonomy-sweeps/OUTCOME.md) | Comparing clustering, weighting, and acceptance criteria for multilingual labels |
-| [Amharic lexicon induction](amharic-lexicon-induction/OUTCOME.md) | A separate low-resource NLP study using embedding alignment and morphology |
-
-Application build tools are maintained in [pipeline/](../pipeline/); these directories
-preserve the development experiments and their original artifacts.
+| Folder | Subject | Outcome |
+|---|---|---|
+| [arabic-cameltools/](arabic-cameltools/) | CAMeL Tools morphology as supervision for Arabic segmentation | Superseded by the corrected teacher-data build in `pipeline/datasets/arabic/` |
+| [arabic-onnx-adapter-bank/](arabic-onnx-adapter-bank/) | One shared ONNX encoder with language adapters supplied as inputs | Adopted in the production CPU runtime |
+| [sanskrit-vedic-v1/](sanskrit-vedic-v1/) | Sanskrit models trained on the Vedic UD treebank | Superseded by Digital Corpus of Sanskrit (DCS) training |
+| [rarelangs-per-language/](rarelangs-per-language/) | Pooled versus per-language training for low-resource languages | Pooled run used for Bengali and Punjabi |
+| [finerweb-taxonomy-sweeps/](finerweb-taxonomy-sweeps/) | Parameter sweeps for deriving coarse NER label sets from FiNERweb | Informed the schemes in `pipeline/taxonomy/` |
+| [amharic-lexicon-induction/](amharic-lexicon-induction/) | Inducing an Amharic–English dictionary from monolingual corpora | Not used in the application |

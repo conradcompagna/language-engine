@@ -1,19 +1,11 @@
-# Vietnamese WikiANN: Trankit preparation
+# Vietnamese WikiANN
 
-Vietnamese WikiANN converted into Trankit BIO format.
+Vietnamese WikiANN converted to Trankit BIO format, with tags `O`, `B-/I-PER`,
+`B-/I-ORG` and `B-/I-LOC`.
 
-Source: `training\nerdump\wikiann` parquet files.
+Training data is the WikiANN train and test splits combined; development data is the
+WikiANN validation split. Because the test split is part of the training data, results
+for this run are development scores only.
 
-Split policy: `train.bio` is WikiANN train + test joined together; `dev.bio` is WikiANN validation. `test.bio` is kept separately for auditing.
-
-WikiANN label mapping from parquet metadata: `0=O`, `1=B-PER`, `2=I-PER`, `3=B-ORG`, `4=I-ORG`, `5=B-LOC`, `6=I-LOC`.
-
-Corpus-build outputs: `train.bio`, `dev.bio`, `test.bio`, `all.bio`, `label_token_counts.tsv`, `dataset_report.json`.
-
-The [dataset report](dataset_report.json) records corpus sizes and label counts.
-The [model-run record](../../models/wikiann_vi/) connects
-it to the NER training work.
-
-The separately retained test copy overlaps training; I report this run's
-results as [development F1](../../models/README.md#selected-training-results)
-on the validation split.
+Details are in [`dataset_report.json`](dataset_report.json). The training run is
+[`../../models/wikiann_vi/`](../../models/wikiann_vi/).

@@ -1,62 +1,40 @@
 # Evaluation
 
-## Selected models
+Tests, benchmarks and recorded measurements for the Language Engine models and runtime.
+The model development scores are summarised in [`../models/README.md`](../models/README.md).
 
-The [complete training results](../models/TRAINING_RESULTS.md) cover all 61
-custom component selections: 54 historical selected-checkpoint score records
-and seven fresh evaluations of retained checkpoints. The records include model
-and dataset hashes, metric definitions, source-log excerpts and input-stage details.
-
-## Regression
-
-`test_mwt_realign_dp.py` — the multi-word-token realignment regression. This covers the
-dynamic-programming alignment between a tokenizer's surface tokens and an expander's
-underlying tokens, which is the step most likely to break silently when a model is
-swapped. It passes against the current runtime.
+| Path | Contents |
+|---|---|
+| `results/` | JSON score records for the selected tokenizer, MWT, parser, lemmatizer and NER components, and the ONNX session-tuning measurements |
+| [`selected_components/`](selected_components/) | Scripts that re-evaluate saved checkpoints where the training logs did not keep the final score |
+| `test_mwt_realign_dp.py` | Regression test for the dynamic-programming alignment between surface tokens and expanded MWT words |
+| `benchmarks/` | Profiling and comparison scripts (below) |
+| [`benchmarks/trankit_benchmark/`](benchmarks/trankit_benchmark/) | Browser-based CPU/GPU inference comparison tool |
+| `browser_probes/` | Devtools scripts used to inspect reader behaviour in a live page (entry provenance, dictionary download, save and cancel, headword rendering) |
+| `reports/grc_lsj_regeneration_summary.json` | Counts from regenerating the Ancient Greek LSJ dictionary database |
 
 ## Benchmarks
 
 | Script | Measures |
 |---|---|
-| `benchmarks/memory_probe.py` | resident memory per loaded language, used to decide how many models can be held at once |
-| `benchmarks/trankit_dual_device_benchmark_app.py` | CPU vs GPU inference across the pipeline stages |
-| `benchmarks/profile_sqlite_segmenter.py` | segmentation cost against dictionary size |
-| `benchmarks/compare_arabic_tokenization.py` | shipped Arabic tokenizer against CAMeL Tools as an external reference |
-| `benchmarks/run_crusades_comparison.py`, `analyze_comparison.py`, `realign_comparison.py` | end-to-end pipeline comparison on a fixed historical text |
-| `benchmarks/tag_overlap_analysis.py` | agreement between tagsets across models |
+| `memory_probe.py` | Resident memory per loaded language |
+| `trankit_dual_device_benchmark_app.py` | Entry point for the CPU/GPU comparison tool |
+| `profile_sqlite_segmenter.py` | Segmentation time against dictionary size |
+| `compare_arabic_tokenization.py` | The selected Arabic tokenizer against CAMeL Tools |
+| `run_crusades_comparison.py`, `analyze_comparison.py`, `realign_comparison.py` | End-to-end pipeline comparison on a fixed historical text |
+| `tag_overlap_analysis.py` | Agreement between tag sets across models |
 
-### ONNX session tuning
+## ONNX session tuning
 
-After building the shared INT8 encoder, the
-[session tuner](../pipeline/models/tune_trankit_onnx_ort_session.py) compared thread
-counts, execution mode, and memory settings on the same Japanese request. The
-selected configuration used sequential execution, eight intra-op threads, one
-inter-op thread, and disabled memory patterns.
+[`tune_trankit_onnx_ort_session.py`](../pipeline/models/tune_trankit_onnx_ort_session.py)
+compared ONNX Runtime thread counts, execution mode and memory settings for the shared
+INT8 encoder on one Japanese request (620 characters, 351 tokens) on a 16-thread Windows
+machine, with one warm-up and two timed requests per setting.
 
-| Configuration | Timed requests (seconds) | Mean (seconds) |
+| Configuration | Timed requests (s) | Mean (s) |
 |---|---|---:|
-| ORT defaults | 1.914, 1.896 | 1.905 |
-| Selected session settings | 0.906, 0.906 | 0.906 |
+| ONNX Runtime defaults | 1.914, 1.896 | 1.905 |
+| Sequential execution, 8 intra-op threads, 1 inter-op thread, memory patterns off | 0.906, 0.906 | 0.906 |
 
-The [recorded measurements](results/ort_session_tuning_excerpt.json) preserve the
-exact timings, profiles, matching annotation fingerprints, CPU/runtime versions,
-and original report hash. The input contained 620 characters and produced 351
-tokens on a 16-logical-CPU Windows machine. Each profile had one warmup and two
-timed requests: this is a small tuning experiment within the same INT8 runtime,
-not a general throughput or tail-latency benchmark.
-
-## Reports
-
-Selected dictionary examples and implementation guides:
-
-- [Lookup normalization responsibilities](reports/lookup_normalization_audit.md)
-  — shared key rules from index construction to browser matching
-- [LSJ and Wiktionary samples](reports/grc_lsj_vs_wiktionary_samples.md)
-  — Liddell–Scott–Jones against Wiktionary for Ancient Greek
-- [Multi-word-token alignment](../notes/MWT_SYSTEM.md) — surface and child
-  representations, maintained modules, and the realignment regression
-
-## Browser probes
-
-`browser_probes/` holds the devtools scripts used to inspect reader behaviour in a live
-page: entry provenance, dictionary download, save and cancel paths, headword rendering.
+Both settings produced identical annotations. The full record is
+[`results/ort_session_tuning_excerpt.json`](results/ort_session_tuning_excerpt.json).

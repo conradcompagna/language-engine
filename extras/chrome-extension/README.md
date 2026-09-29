@@ -1,8 +1,7 @@
 # Web-page capture
 
-I built a Manifest V3 Chrome extension to capture web pages as static HTML while
-preserving the text and visual context needed for reading. The work combines DOM
-serialization, resource fetching, frame capture and browser download handling.
+A Manifest V3 Chrome extension that saves the current web page as a single static
+HTML file, with its text, styling and images, for opening in the reader.
 
 ## Capture pipeline
 
@@ -27,6 +26,5 @@ JavaScript application state is not part of that representation.
 | [freeze.js](freeze.js) | DOM cloning, asset embedding, URL rewriting and static serialization |
 | [popup.js](popup.js) | Capture interaction and progress |
 | [manifest.json](manifest.json) | Manifest V3 service worker, permissions and extension entrypoints |
-
-I implemented the capture logic for Language Engine; it is independent of the
-SingleFile codebase.
+| `popup.html`, `popup.css` | Popup interface |
+| `options.html`, `options.js`, `options.css` | Settings page |

@@ -16,10 +16,10 @@ inference: false
 
 # Arabic Clitic Tokenizer and Multiword Expander
 
-I built this Arabic segmentation model for [Language Engine](https://github.com/conradcompagna/language-engine)
-by turning CAMeL Tools analyses of authentic news text into training supervision,
-correcting recurring teacher errors, and training an XLM-R/Trankit tokenizer and
-a character-level sequence-to-sequence multiword expander.
+An Arabic tokenizer and clitic expander trained for [Language Engine](https://github.com/conradcompagna/language-engine).
+The training data is Arabic news text segmented by CAMeL Tools, with recurring CAMeL
+errors corrected. The model is an XLM-R/Trankit tokenizer and a character-level
+sequence-to-sequence multiword expander.
 
 The tokenizer identifies surface boundaries and expansion candidates; the
 expander recovers attached conjunctions, prepositions and pronominal clitics.
@@ -27,7 +27,7 @@ For example, the released model expands `وبالكتاب` into `و` + `ب` + `�
 CAMeL Tools is part of the training-data construction process; inference runs
 through the trained components.
 
-## How I built it
+## Training
 
 I processed the 10,000-sentence `ara_news_2022` corpus with CAMeL's
 `calima-msa-r13` MLE disambiguator and `atbtok` segmentation. I converted the
@@ -51,10 +51,8 @@ with its learned expansion dictionary. These are separate model architectures.
 The tokenizer scores come from the evaluation at stored checkpoint epoch 11.
 The MWT score was re-evaluated on 24 September 2026 against the retained corrected
 CAMeL-teacher development reference, using the retained tokenizer predictions.
-It measures expanded words across the development text, not accuracy only on
-tokens that require splitting. These are development-set measurements against
-the corrected supervision; the separate CAMeL comparison record documents
-individual segmentation decisions rather than a general system ranking.
+The score covers all words in the development text, including words that need no
+splitting.
 
 ## Use the released components
 
@@ -78,15 +76,15 @@ result = predict("وبالكتاب يقرأ الطالب في المدرسة.")
 
 Use **Python 3.10** and the tested versions in `requirements.txt`. The base encoder downloads on
 first use; the adapter/head weights come from this release. The weights are the
-native training checkpoints; Language Engine's shared INT8 deployment format is
-documented separately in the [CPU build record](https://github.com/conradcompagna/language-engine/blob/main/docs/BUILD_PROCESS.md#3-package-inference-for-cpu-deployment).
+native training checkpoints; Language Engine serves them through a shared INT8 ONNX
+encoder, built by [these scripts](https://github.com/conradcompagna/language-engine/tree/main/research/pipeline/models).
 
 ## Artifact and source record
 
 [artifact-manifest.json](artifact-manifest.json) records checkpoint sizes and
 SHA-256 identities; [evaluation.json](evaluation.json) records the evaluation
-source, split and scores. The [Language Engine training record](https://github.com/conradcompagna/language-engine/blob/main/research/models/TRAINING_RESULTS.md)
-places these components in the wider multilingual system.
+source, split and scores. Scores for every Language Engine component are in the
+[model record](https://github.com/conradcompagna/language-engine/blob/main/research/models/README.md).
 
 ## Credits
 

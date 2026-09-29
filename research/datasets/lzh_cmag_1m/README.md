@@ -1,15 +1,12 @@
-# Classical Chinese CMAG: one-million-token corpus
+# Classical Chinese CMAG, 1 million tokens
 
-Ancient Chinese CMAG subset for Trankit NER training. The subset keeps complete sentences and lands at roughly one million non-blank source tokens.
+A subset of the CMAG Classical Chinese NER corpus (AncientChineseProject), sampled as
+complete sentences with a fixed seed: 800,018 training tokens from the CMAG training
+split, and disjoint development (100,004) and test (100,018) sets from the CMAG
+development split. The original CMAG test file could not be read and was not used.
 
-Source: `training\nerdump\anc\AncientChineseProject-main.zip` / `AncientChineseProject-main/CMAG`.
+CMAG's BEIS tags were converted to BIO: `*-S` and `*-B` become `B-*`; `*-I` and `*-E`
+become `I-*`.
 
-I sampled complete sentences with a fixed seed: 800,018 training tokens from the upstream training pool, plus disjoint development and test subsets of 100,004 and 100,018 tokens from the upstream development pool. The dataset report records the seed and source-file selection.
-
-CMAG BEIS labels were converted to BIO labels for Trankit: `*-S` and `*-B` become `B-*`; `*-I` and `*-E` become `I-*`; `O` stays `O`. Blank source tokens are skipped.
-
-Corpus-build outputs: `train.bio`, `dev.bio`, `test.bio`, `all.bio`, `label_token_counts.tsv`, `dataset_report.json`.
-
-The [dataset report](dataset_report.json) records corpus sizes and label counts.
-The [model-run record](../../models/lzh_cmag_1m/) connects
-it to the NER training work.
+Details are in [`dataset_report.json`](dataset_report.json). The training run is
+[`../../models/lzh_cmag_1m/`](../../models/lzh_cmag_1m/).

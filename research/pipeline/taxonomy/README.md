@@ -1,17 +1,18 @@
-# FiNERweb label-taxonomy preparation
+# NER label taxonomy
 
-Created: 2026-05-03T01:01:08
+Scripts for grouping the fine-grained FiNERweb entity labels into coarse label sets
+suitable for training. Labels are compared by fastText embeddings of the label strings
+and by co-occurrence, then grouped with Louvain community detection or centroid
+clustering. The review inventories these scripts produced are not included.
 
-Source folder: `training\nerdump\fiNERweb_app_languages`
+| Scripts | Role |
+|---|---|
+| `cluster_all_finerweb_labels_fasttext.py`, `derive_finerweb_fasttext_categories.py` | Embed and cluster all labels |
+| `build_statistical_ner_taxonomy_louvain.py`, `build_statistical_ner_taxonomy_louvain_full_tagset.py` | Louvain communities over label co-occurrence |
+| `cluster_coarse_tags_centroid_freqweighted_internalcoherence90_intact.py`, `cluster_coarse_tags_snowball_recursive.py`, `greedy_foundational_coarse_tags.py` | Alternative grouping methods |
+| `pairwise_coarse_tag_similarity.py`, `compute_user_category_similarity.py`, `balance_user_labels_by_fasttext.py`, `build_coarse_tag_grouping_recommendation.py` | Compare and adjust candidate groupings |
+| `extract_finerweb_coarse_examples_ge100.py`, `sample_finerweb_ge100_tag_span_examples.py`, `write_top500_freqweighted_threshold_md_reports_90_to70.py` | Examples and review reports |
+| `dataset_builders/` | One script per candidate label scheme, each building a training set |
 
-I built this review inventory to organize the fine-grained FiNERweb labels into candidate training categories. It preserves every original label across the source parquet files and assigns each to one proposed bucket, with counts, language distributions and mention examples supporting review.
-
-Files:
-
-- `finerweb_source_files.tsv`: source parquet files, rows, spans.
-- `finerweb_label_inventory.tsv`: global original label counts and proposed bucket.
-- `finerweb_label_bucket_map.tsv`: review file with bucket, original label, count, language counts, and mention examples.
-- `finerweb_label_bucket_map.json`: machine-readable mapping to edit/review.
-- `finerweb_bucket_summary.tsv`: aggregate span counts per proposed bucket.
-
-The [dataset builders](dataset_builders/) encode the candidate label schemes for Trankit training; the [taxonomy experiments](../../experiments/finerweb-taxonomy-sweeps/OUTCOME.md) record the clustering and acceptance criteria.
+Parameter sweeps behind these scripts are in
+[`../../experiments/finerweb-taxonomy-sweeps/`](../../experiments/finerweb-taxonomy-sweeps/).
