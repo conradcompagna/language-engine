@@ -1,0 +1,70 @@
+{
+  "selected_vocabulary": {
+    "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.vocabs.json",
+    "sha256": "4902589a4e4b2cd2f592b1cf5e9275d3c044a49fa0783d5b23eb73d595c547de"
+  },
+  "comparison_method": "Regenerate all Trankit POS/parser vocabularies from retained training data using the installed original Trankit tget_examples_from_conllu, and compare every label-to-index mapping. Vocabulary collection occurs before tokenizer length filtering.",
+  "candidates": [
+    {
+      "file": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/train_10000.conllu",
+      "sha256": "4ab05355465b0a5c6753cadf4a7e5b7b39841fd3cbb43bd5ed0817d0180b7be1",
+      "sentence_count": 10000,
+      "exact_label_to_index_mapping_match": true,
+      "field_sizes": {
+        "lemma": 1,
+        "upos": 10,
+        "xpos": 1,
+        "feats": 445,
+        "head": 1,
+        "deprel": 65,
+        "deps": 1
+      },
+      "field_equality": {
+        "lemma": true,
+        "upos": true,
+        "xpos": true,
+        "feats": true,
+        "head": true,
+        "deprel": true,
+        "deps": true
+      }
+    },
+    {
+      "file": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/train.conllu",
+      "sha256": "55995b5f4e1d6387b0fba2043aab243b0094ff23cb0bc5ee289291780ab9e564",
+      "sentence_count": 29071,
+      "exact_label_to_index_mapping_match": false,
+      "field_sizes": {
+        "lemma": 1,
+        "upos": 10,
+        "xpos": 1,
+        "feats": 540,
+        "head": 1,
+        "deprel": 71,
+        "deps": 1
+      },
+      "field_equality": {
+        "lemma": true,
+        "upos": false,
+        "xpos": true,
+        "feats": false,
+        "head": true,
+        "deprel": false,
+        "deps": true
+      }
+    }
+  ],
+  "paired_development": {
+    "file": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/dev.conllu",
+    "sha256": "cacf6991faf32b50f5de541a2f58c3b1030e6976c5b161e9ca1427043b8eb398"
+  },
+  "builder": {
+    "file": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/build_dataset.js",
+    "sha256": "e29eeac653815e2aa0dc79c0c35bb63d8f2ae5401bba352a5d1d6052696cc5c5"
+  },
+  "training_script": {
+    "file": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/train_posdep.py",
+    "sha256": "a55e3f7181b444eca6510cdf43f0733e4b2f50b35db9d2cd384c4eee72ff1db3"
+  },
+  "qualification": "The exact training vocabulary identifies the 10,000-sentence subset; the selected epoch74 checkpoint survives. The original training log is empty, so evaluation must be labelled a fresh development reevaluation, not a recovered historical score."
+}

@@ -1,0 +1,312 @@
+[
+  {
+    "entry": null,
+    "display": {},
+    "ref": ""
+  },
+  {
+    "entry": {},
+    "display": {
+      "runtime_entry_id": "",
+      "ref_key": "",
+      "match_kind": "headword",
+      "_match_kind": "headword",
+      "_match_source": "headword",
+      "display_headword": "",
+      "lemma_headword": "",
+      "display_reading": "",
+      "entry_reading": "",
+      "headword": "",
+      "surface_form": "",
+      "reading": "",
+      "roman": "",
+      "source": "",
+      "_source": "",
+      "senses": [],
+      "senses_full": [],
+      "is_alternate_match": false
+    },
+    "ref": ""
+  },
+  {
+    "entry": {
+      "headword": "語",
+      "reading": "ご",
+      "source": "wiktionary",
+      "senses": [
+        "word"
+      ],
+      "_storage_kind": "sqlite",
+      "_storage_db_alias": "ja",
+      "_storage_row_id": 12
+    },
+    "display": {
+      "runtime_entry_id": "sqlite|ja|12",
+      "ref_key": "sqlite|ja|12",
+      "match_kind": "headword",
+      "_match_kind": "headword",
+      "_match_source": "headword",
+      "display_headword": "語",
+      "lemma_headword": "語",
+      "display_reading": "ご",
+      "entry_reading": "ご",
+      "headword": "語",
+      "surface_form": "語",
+      "reading": "ご",
+      "roman": "ご",
+      "source": "wiktionary",
+      "_source": "wiktionary",
+      "senses": [
+        "word"
+      ],
+      "senses_full": [
+        "word"
+      ],
+      "is_alternate_match": false,
+      "_storage_kind": "sqlite",
+      "_storage_db_alias": "ja",
+      "_storage_row_id": 12
+    },
+    "ref": "sqlite|ja|12"
+  },
+  {
+    "entry": {
+      "headword": "go",
+      "pos": "VERB",
+      "_storage_kind": "sqlite",
+      "_storage_db_alias": "en",
+      "_storage_row_id": 4,
+      "_storage_form_row_id": 7,
+      "_match_kind": "form",
+      "_form_match_key": "went",
+      "_matched_forms": [
+        {
+          "form_text": "gone",
+          "tags": "participle",
+          "index_keys": [
+            "gone"
+          ]
+        },
+        {
+          "form_text": "went",
+          "tags": "past",
+          "index_keys": [
+            "went"
+          ]
+        }
+      ],
+      "senses_full": [
+        {
+          "glosses": [
+            "move",
+            "travel"
+          ]
+        }
+      ]
+    },
+    "display": {
+      "runtime_entry_id": "sqlite|en|4",
+      "ref_key": "sqlite|en|4|7",
+      "match_kind": "form",
+      "_match_kind": "form",
+      "_match_source": "form",
+      "display_headword": "went",
+      "lemma_headword": "go",
+      "display_reading": "",
+      "entry_reading": "",
+      "headword": "went",
+      "surface_form": "went",
+      "reading": "",
+      "roman": "",
+      "source": "",
+      "_source": "",
+      "senses": [
+        "move; travel"
+      ],
+      "senses_full": [
+        {
+          "glosses": [
+            "move",
+            "travel"
+          ]
+        }
+      ],
+      "is_alternate_match": false,
+      "pos": "VERB",
+      "pos_raw": "VERB",
+      "forms": {
+        "rows": [
+          [
+            "gone",
+            "participle",
+            ""
+          ],
+          [
+            "went",
+            "past",
+            ""
+          ]
+        ]
+      },
+      "morph_info": [
+        "past"
+      ],
+      "morph_base": "go",
+      "_storage_kind": "sqlite",
+      "_storage_db_alias": "en",
+      "_storage_row_id": 4,
+      "_storage_form_row_id": 7,
+      "matched_form": {
+        "form_text": "went",
+        "tags": "past",
+        "index_keys": [
+          "went"
+        ]
+      },
+      "_matched_forms": [
+        {
+          "form_text": "went",
+          "tags": "past",
+          "index_keys": [
+            "went"
+          ]
+        }
+      ]
+    },
+    "ref": "sqlite|en|4|7"
+  },
+  {
+    "entry": {
+      "headword": "語",
+      "source": "gemini",
+      "commentary": "fixture",
+      "lemma": "語る",
+      "decomp": [
+        {
+          "part": "語"
+        }
+      ],
+      "forms": [
+        [
+          "語",
+          "headword"
+        ],
+        [
+          "語",
+          "headword"
+        ]
+      ]
+    },
+    "display": {
+      "runtime_entry_id": "",
+      "ref_key": "",
+      "match_kind": "headword",
+      "_match_kind": "headword",
+      "_match_source": "headword",
+      "display_headword": "語",
+      "lemma_headword": "語",
+      "display_reading": "",
+      "entry_reading": "",
+      "headword": "語",
+      "surface_form": "語",
+      "reading": "",
+      "roman": "",
+      "source": "gemini",
+      "_source": "gemini",
+      "senses": [],
+      "senses_full": [],
+      "is_alternate_match": false,
+      "forms": {
+        "rows": [
+          [
+            "語",
+            "headword",
+            ""
+          ]
+        ]
+      },
+      "commentary": "fixture",
+      "_commentary": "fixture",
+      "lemma": "語る",
+      "_lemma": "語る",
+      "morph_info": [
+        "fixture"
+      ],
+      "morph_base": "語る",
+      "decomp": [
+        {
+          "part": "語"
+        }
+      ]
+    },
+    "ref": ""
+  },
+  {
+    "entry": {
+      "headword": "စာ",
+      "senses": [
+        "text",
+        "text"
+      ],
+      "_storage_row_id": "bad",
+      "_match_kind": "form",
+      "_matched_forms": [
+        {
+          "display_text": "စာ",
+          "tags": "alternative;redirect"
+        }
+      ]
+    },
+    "display": {
+      "runtime_entry_id": "",
+      "ref_key": "",
+      "match_kind": "form",
+      "_match_kind": "form",
+      "_match_source": "form",
+      "display_headword": "စာ",
+      "lemma_headword": "စာ",
+      "display_reading": "",
+      "entry_reading": "",
+      "headword": "စာ",
+      "surface_form": "စာ",
+      "reading": "",
+      "roman": "",
+      "source": "",
+      "_source": "",
+      "senses": [
+        "text",
+        "text"
+      ],
+      "senses_full": [
+        "text",
+        "text"
+      ],
+      "is_alternate_match": true,
+      "forms": {
+        "rows": [
+          [
+            "စာ",
+            "alternative;redirect",
+            ""
+          ]
+        ]
+      },
+      "morph_info": [
+        "alternative;redirect"
+      ],
+      "morph_base": "စာ",
+      "_storage_row_id": "bad",
+      "matched_form": {
+        "display_text": "စာ",
+        "tags": "alternative;redirect"
+      },
+      "_matched_forms": [
+        {
+          "display_text": "စာ",
+          "tags": "alternative;redirect"
+        }
+      ]
+    },
+    "ref": ""
+  }
+]

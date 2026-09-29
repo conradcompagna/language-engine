@@ -1,0 +1,30 @@
+{
+  "evaluated_on": "2026-09-24",
+  "scripts": [
+    {
+      "file": "evaluate_sanskrit_parser.py",
+      "sha256": "57a1f47943990fe04511538eb8e2ddf70a9a47179b2985e183c2704dc28272ba",
+      "lines": 172
+    },
+    {
+      "file": "recover_sanskrit_mwt_reference.py",
+      "sha256": "4b385e8d1d12d6761ee13ec1f49c6cbee4c2ad07cec6d29e88ab1a848317d357",
+      "lines": 52
+    },
+    {
+      "file": "reevaluate_japanese_ner.py",
+      "sha256": "697102f7d5c4df8bc4f7a77883714561e16a7b72e74d38b22a1444e888d1d60c",
+      "lines": 104
+    },
+    {
+      "file": "reevaluate_mwt.py",
+      "sha256": "f5e59fc7bb23fc5da999dffc058f4cd5e63ed918a335f78002d634d08f7d7518",
+      "lines": 136
+    }
+  ],
+  "verification": {
+    "reevaluate_mwt.py": "Both Arabic prediction files exactly reproduce original evaluation SHA-256; Turkish and Hebrew collapsed reference inputs are byte-identical to original helper outputs.",
+    "reevaluate_japanese_ner.py": "Fresh CPU run reproduces original entity precision, recall and F1 exactly.",
+    "recover_sanskrit_mwt_reference.py": "Fresh source-chapter export reproduces reference SHA-256 21459f1e618f77c58c38c04353be66ff84a966165842455832d74d455dfc81f1."
+  }
+}

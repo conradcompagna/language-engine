@@ -1,0 +1,19 @@
+<svg viewBox="0 0 240 48" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d6a4f"/>
+      <stop offset="100%" style="stop-color:#40916c"/>
+    </linearGradient>
+  </defs>
+  <!-- Stylised "LE" monogram mark -->
+  <g transform="translate(4,4)">
+    <rect x="0" y="0" width="40" height="40" rx="8" fill="url(#logoGrad)"/>
+    <!-- L -->
+    <path d="M10 10 L10 30 L22 30" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- E -->
+    <path d="M24 10 L24 30 M24 10 L34 10 M24 20 L32 20 M24 30 L34 30" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="56" y="22" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-size="16" font-weight="700" fill="#1b4332" letter-spacing="0.5">Language</text>
+  <text x="56" y="40" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-size="16" font-weight="400" fill="#40916c" letter-spacing="2">ENGINE</text>
+</svg>

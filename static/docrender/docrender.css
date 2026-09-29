@@ -1,0 +1,402 @@
+/* DocRender integration: structural CSS only. Source document styles remain dominant. */
+.reader-pager.docrender-source-active {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: var(--le-white, #fff);
+}
+.reader-pager.docrender-websnapshot-active {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: var(--le-white, #fff);
+}
+.reader-pager.docrender-epub-foliate-active {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: var(--le-white, #fff);
+}
+.reader-pager.docrender-foliate-flow-active {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: var(--le-white, #fff);
+}
+.reader-pager.docrender-epub-foliate-active foliate-view,
+.reader-pager.docrender-epub-foliate-active .foliate-epub-view,
+.reader-pager.docrender-foliate-flow-active .foliate-flow-view {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+.reader-pager.docrender-epub-foliate-active foliate-view::part(filter),
+.reader-pager.docrender-foliate-flow-active foliate-view::part(filter) {
+  background: var(--le-white, #fff);
+}
+.reader-pager.docrender-source-active .reader-page-shell,
+.reader-pager.docrender-source-active .reader-page-inner,
+.reader-pager.docrender-source-active .docrender-canonical-page {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.reader-pager.docrender-docx-continuous-active .reader-page-inner.docx-continuous-viewport {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: none;
+}
+.reader-pager.docrender-docx-continuous-active .reader-page-inner.docx-continuous-viewport::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+.reader-pager.docrender-docx-continuous-active .docx-preview-host {
+  min-height: 100%;
+  box-sizing: border-box;
+}
+.reader-pager .epub-container {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: none;
+}
+.reader-pager .epub-container::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+.reader-pager.docrender-websnapshot-active .docrender-websnapshot-shell,
+.reader-pager.docrender-websnapshot-active .docrender-websnapshot-frame {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.docrender-websnapshot-frame {
+  background: #fff;
+}
+.web-doc-controls {
+  margin-left: auto;
+}
+.web-inspector-status {
+  color: var(--le-slate-600, #475569);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.web-inspector-btn.active,
+.web-inspector-btn[aria-pressed="true"],
+.web-js-render-btn.active,
+.web-js-render-btn[aria-pressed="true"] {
+  border-color: var(--le-green-600, #2d6a4f) !important;
+  background: var(--le-green-600, #2d6a4f) !important;
+  color: var(--le-white, #fff) !important;
+}
+.web-js-render-btn {
+  font-size: 11px;
+  font-weight: 700;
+}
+.reader-textarea.raw-continuous-scroll {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  overflow: hidden !important;
+  resize: none;
+  scrollbar-width: none;
+}
+.reader-textarea.raw-continuous-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+.reader-textarea.raw-continuous-readonly {
+  cursor: text;
+}
+.reader-pager.raw-continuous-pager {
+  background: var(--le-white, #fff);
+  overflow: hidden !important;
+}
+.reader-pager.raw-continuous-pager .reader-doc-text {
+  box-sizing: border-box;
+  min-height: 100%;
+}
+.reader-pager.source-inspector-active,
+.reader-pager.source-inspector-active * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text;
+}
+.reader-pager.source-inspector-active {
+  position: relative;
+}
+.reader-pager.source-inspector-active ::selection {
+  background: transparent !important;
+  color: inherit !important;
+  text-shadow: inherit !important;
+}
+.source-inspector-selection-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none !important;
+  z-index: 2147483647;
+}
+.source-inspector-selection-cell {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px dashed rgba(30,64,175,.95);
+  background: repeating-linear-gradient(45deg,rgba(37,99,235,.22) 0,rgba(37,99,235,.22) 4px,rgba(16,185,129,.18) 4px,rgba(16,185,129,.18) 8px);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.72) inset,0 0 0 1px rgba(30,64,175,.18);
+  border-radius: 2px;
+}
+.docrender-canonical-page {
+  position: relative;
+  background: transparent;
+  white-space: normal;
+  line-height: normal;
+}
+#renderedText.docrender-active {
+  padding: 0 !important;
+  overflow: visible !important;
+  overflow-clip-margin: var(--reader-effect-overflow, 72px);
+  white-space: normal !important;
+  line-height: normal !important;
+  font-size: inherit !important;
+  font-family: inherit !important;
+  background: var(--le-white, #fff);
+}
+#renderedText.docrender-active .docrender-bottom-page {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  white-space: normal;
+  line-height: normal;
+}
+.docrender-bottom-page a,
+.docrender-top-page a {
+  pointer-events: none;
+  cursor: text;
+}
+.docrender-nontext-placeholder {
+  color: transparent !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+.docrender-pdf-page,
+.pdf-fixed-page {
+  position: relative;
+  overflow: hidden !important;
+  margin: 0 auto;
+  background: transparent;
+  white-space: normal !important;
+  line-height: normal !important;
+}
+.docrender-fixed-page-viewport {
+  position: relative !important;
+  overflow: hidden !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate !important;
+}
+.docrender-fixed-page-viewport > .docrender-pdf-page,
+.docrender-fixed-page-viewport > .pdf-fixed-page {
+  position: absolute !important;
+  margin: 0 !important;
+  transform-origin: 0 0 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate !important;
+}
+.docrender-pdf-page .pdf-text-item,
+.pdf-fixed-page .pdf-text-item {
+  position: absolute !important;
+  white-space: pre !important;
+  transform-origin: 0 0;
+  line-height: 1 !important;
+}
+/* PDF reading-order separator text nodes — invisible visually but still walked
+   by TreeWalker, so the text-node concat of the page matches the lookup text. */
+.docrender-pdf-page .pdf-sep,
+.pdf-fixed-page .pdf-sep {
+  display: inline-block !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -99999px !important;
+  top: -99999px !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+.docrender-bottom-page .reader-token-fill-hit {
+  position: relative;
+  z-index: 3;
+}
+.docrender-url-controls {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+}
+.docrender-url-controls.open {
+  display: inline-flex;
+}
+.docrender-url-input {
+  width: 260px;
+  max-width: 32vw;
+  height: 28px;
+  border: 1px solid var(--le-slate-300, #cbd5e1);
+  border-radius: 999px;
+  background: var(--le-white, #fff);
+  color: var(--le-slate-900, #0f172a);
+  font-size: 11px;
+  padding: 0 10px;
+  outline: none;
+}
+.docrender-url-input:focus {
+  border-color: var(--le-green-500, #40916c);
+  box-shadow: 0 0 0 2px rgba(64,145,108,.12);
+}
+
+/* Canonical-page corrections: the source pane and lookup clone should each
+   contain exactly one DocRender page. Fixed-layout/PDF pages are scaled by
+   reader.js to the canonical page width and must not escape below the pane. */
+.reader-pager.docrender-source-active {
+  overflow: hidden !important;
+}
+#renderedText.docrender-active {
+  overflow: visible !important;
+  overflow-clip-margin: var(--reader-effect-overflow, 72px);
+}
+.reader-pager.docrender-source-active .docrender-canonical-viewport,
+#renderedText.docrender-active .docrender-bottom-page {
+  overflow: hidden !important;
+}
+.docrender-canonical-page:not(.docrender-fixed-page-viewport) > .pdf-fixed-page,
+.docrender-canonical-page:not(.docrender-fixed-page-viewport) > .docrender-pdf-page,
+.docrender-bottom-page:not(.docrender-fixed-page-viewport) > .pdf-fixed-page,
+.docrender-bottom-page:not(.docrender-fixed-page-viewport) > .docrender-pdf-page {
+  left: 0 !important;
+  top: 0 !important;
+}
+.docrender-bottom-page .docrender-nontext-placeholder {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+/* canonical_reader.css
+ * Bottom-pane textual skeleton renderer.
+ * Source-document CSS should not be required here; this is controlled app DOM.
+ */
+#renderedText.canonical-reader-active,
+#renderedText .canonical-page {
+  box-sizing: border-box;
+}
+
+#renderedText.canonical-reader-active {
+  white-space: normal !important;
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  overflow-clip-margin: var(--reader-effect-overflow, 72px);
+  background: var(--le-white, #fff);
+}
+
+.canonical-page {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100%;
+  color: inherit;
+  background: transparent;
+}
+
+.canonical-page-flow {
+  padding: 16px 24px;
+}
+
+.canonical-page-fixed {
+  margin: 0 auto;
+  overflow: hidden;
+  transform-origin: 0 0;
+}
+
+.canonical-block {
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  margin: 0 0 0.75em 0;
+}
+
+.canonical-block-heading {
+  font-weight: 700;
+  margin: 0.8em 0 0.45em;
+}
+
+.canonical-block-listItem {
+  margin-left: 1.5em;
+}
+
+.canonical-block-listItem::before {
+  content: "• ";
+}
+
+.canonical-block-quote {
+  margin-left: 1.25em;
+  padding-left: 0.75em;
+  border-left: 3px solid rgba(100, 116, 139, 0.35);
+}
+
+.canonical-block-pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+}
+
+.canonical-separator-block {
+  height: 0;
+  margin: 0;
+  line-height: 0;
+}
+
+.canonical-page-fixed .canonical-block {
+  margin: 0;
+  white-space: normal;
+  overflow: visible;
+}
+
+.canonical-run {
+  white-space: pre-wrap;
+}
+
+.canonical-run-fixed {
+  position: absolute;
+  display: inline-block;
+  white-space: pre;
+  transform-origin: 0 0;
+}
+
+.canonical-hidden-separator {
+  position: absolute !important;
+  left: -99999px !important;
+  top: -99999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+.reader-token.canonical-token {
+  position: relative;
+}
+
+.reader-token.canonical-token.has-fill-hits .reader-token-fill-hit,
+.reader-token.canonical-token .reader-token-fill-hit {
+  position: relative;
+  z-index: 3;
+}

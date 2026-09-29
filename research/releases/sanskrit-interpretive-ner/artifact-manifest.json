@@ -1,0 +1,24 @@
+{
+  "author": "Conrad Compagna",
+  "model_id": "sanskrit-interpretive-ner",
+  "format": "Trankit 1.1.1 native checkpoint",
+  "base_model": "FacebookAI/xlm-roberta-base",
+  "runtime_alias": "sanskrit-vedic",
+  "deployment_identity_checked": "2026-09-23",
+  "files": [
+    {
+      "path": "weights/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.ner.mdl",
+      "bytes": 10532365,
+      "sha256": "a987748ad57752fca968f30e26d75fcd39795bffb0ff9c2ce23acf36624d08b0",
+      "source": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.ner.mdl"
+    },
+    {
+      "path": "weights/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.ner-vocab.json",
+      "bytes": 1143,
+      "sha256": "bf75522df267a22c1d805cc2e28692c0dfe1920ad2574976db2aa7f2c9b5e7db",
+      "source": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.ner-vocab.json"
+    }
+  ],
+  "task": "ner",
+  "treebank": "UD_Vedic_Sanskrit-Vedic"
+}

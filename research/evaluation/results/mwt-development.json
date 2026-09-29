@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "record_type": "Fresh development reevaluation of selected custom MWT checkpoints",
+  "metric": "UD Words precision/recall/F1, scale0-100",
+  "scope": "These are new measurements of retained native checkpoints, not recovered historical training-log scores or independent held-out tests. Each input boundary condition is stated; values must not be ranked across different corpora. Dictionary ensemble follows the reader native MWT configuration.",
+  "evaluation_script_sha256": "140ee13483483b3db9d1f50979c1ab5865e2491ccd583df5b698a3e1faac302e",
+  "results": [
+    {
+      "language_code": "ar",
+      "language": "Arabic",
+      "checkpoint": {
+        "path": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic_mwt_expander.pt",
+        "sha256": "c9e2cd69fa05a44e6b16d56112b1fcec74654bba7e6998e0d9c2877c2273c044",
+        "bytes": 1384901
+      },
+      "evaluation_date": "2026-09-24",
+      "device": "CPU",
+      "checkpoint_format": "native PyTorch, unquantized",
+      "split": "retained development material",
+      "input": {
+        "path": "_deprecated_nonruntime_20260514_184819/training/t_ar10k2/xlm-roberta-base/customized-mwt/preds/tokenizer.dev.conllu",
+        "sha256": "83be526273aeb88f058564bfc02569e011c24ff53bf22b022a64c80fa452628c",
+        "bytes": 428935
+      },
+      "input_kind": "retained_tokenizer_development_predictions",
+      "reference": {
+        "path": "_deprecated_nonruntime_20260514_184819/training/arabiccomponents/lessbad/ara_news_2022_10K_plain_trankit_tok_dev_fixed.conllu",
+        "sha256": "7f142595a3f116ab557c07230a0e447cb7b31799358676e366796e2db186d12c",
+        "bytes": 806800
+      },
+      "sentence_count": 497,
+      "mwt_candidate_count": 1962,
+      "dictionary_ensemble": {
+        "precision": 98.108346,
+        "recall": 98.071366,
+        "f1": 98.089852
+      },
+      "seq2seq_only": {
+        "precision": 97.806687,
+        "recall": 97.76982,
+        "f1": 97.78825
+      },
+      "prediction_sha256": "77eb44b3c8e233c532ab0c520d124c0f502424188b7d3c6247198a92668e9386",
+      "torch_version": "2.12.0.dev20260217+cu128",
+      "scope_note": "Retained selected-tokenizer development predictions feed the expander. The input token/sentence metrics match the selected tokenizer training log."
+    },
+    {
+      "language_code": "sa",
+      "language": "Sanskrit",
+      "checkpoint": {
+        "path": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic_mwt_expander.pt",
+        "sha256": "5d444e53a231c5fcfcd9bd141529b03575cb33dbd250cb50c7c35a00bb5d5c32",
+        "bytes": 35706757
+      },
+      "evaluation_date": "2026-09-24",
+      "device": "CPU",
+      "checkpoint_format": "native PyTorch, unquantized",
+      "split": "retained development material",
+      "input": {
+        "path": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/preds/tokenizer.dev.conllu",
+        "sha256": "74467869be4fb1e2151f55cf7144677646bec724be3836243b090b922be8eaa7",
+        "bytes": 43939121
+      },
+      "input_kind": "retained_reference_surface_boundaries_and_mwt_flags",
+      "reference": {
+        "path": "work/model-publication-audit/mwt-reevaluation/sa-recovered-reference.conllu",
+        "sha256": "21459f1e618f77c58c38c04353be66ff84a966165842455832d74d455dfc81f1",
+        "bytes": 82345709
+      },
+      "sentence_count": 73807,
+      "mwt_candidate_count": 97960,
+      "dictionary_ensemble": {
+        "precision": 94.103215,
+        "recall": 93.720553,
+        "f1": 93.911494
+      },
+      "seq2seq_only": {
+        "precision": 92.995371,
+        "recall": 92.629111,
+        "f1": 92.811879
+      },
+      "prediction_sha256": "823f5dbe3718a5ec447ed54ea0df1ffdac857ab609637d1d45c822c1d886299f",
+      "torch_version": "2.12.0.dev20260217+cu128",
+      "reference_recovery": {
+        "chapter_count": 1590,
+        "stats": {
+          "sentences": 73819,
+          "token_rows": 547166,
+          "mwt_rows": 97960,
+          "empty_nodes": 0,
+          "blank_head_rows_filled": 525008,
+          "blank_deprel_rows_filled": 525008
+        },
+        "method": "Recover chapter IDs in order from retained MWT input comments, map through original chapter-info.xml, and invoke original CoNLL-U export builder on retained corpus chapters.",
+        "builder_sha256": "1f5c31afa20a48b7efa8c651d8585386947b43d016c7046d96fb525e0d0422f0",
+        "chapter_metadata_sha256": "59144c194160408340095c3f91ab7dc19f08102703427c77b7dc25d6cd4e4663",
+        "reference_sha256": "21459f1e618f77c58c38c04353be66ff84a966165842455832d74d455dfc81f1"
+      },
+      "scope_note": "Gold surface boundaries and MWT flags from the retained full DCS development input. The original reference was rebuilt from 1,590 identified corpus chapters using the original exporter. This evaluates expansion, not tokenizer boundary detection."
+    },
+    {
+      "language_code": "tr",
+      "language": "Turkish",
+      "checkpoint": {
+        "path": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish_mwt_expander.pt",
+        "sha256": "b25c633734e1c3c3348f1a8a7e8ad6acf8f33c018e1e4c59a0bac1e02bf9559c",
+        "bytes": 669701
+      },
+      "evaluation_date": "2026-09-24",
+      "device": "CPU",
+      "checkpoint_format": "native PyTorch, unquantized",
+      "split": "retained development material",
+      "input": {
+        "path": "work/model-publication-audit/mwt-reevaluation/tr-reference-boundaries.conllu",
+        "sha256": "481a6ed5f4f1adad141d4b8e5e50662a9733270796d800d55aaf6c5ad109b869",
+        "bytes": 510016
+      },
+      "input_kind": "reference_surface_boundaries_and_mwt_flags",
+      "reference": {
+        "path": "_deprecated_nonruntime_20260514_184819/training/commercialviable_prepped/turkish_boun/tr-dev.conllu",
+        "sha256": "fe1f88d7f7dadae7e6d0caf6817878f14da8925900baef961930b3e11f6459f6",
+        "bytes": 982570
+      },
+      "sentence_count": 979,
+      "mwt_candidate_count": 266,
+      "dictionary_ensemble": {
+        "precision": 99.682591,
+        "recall": 99.666368,
+        "f1": 99.674479
+      },
+      "seq2seq_only": {
+        "precision": 99.601205,
+        "recall": 99.584995,
+        "f1": 99.593099
+      },
+      "prediction_sha256": "ed19c0cbfc47a0010a8bb0fd3171b1080401682626b17493b116f9f64a1a6744",
+      "torch_version": "2.12.0.dev20260217+cu128",
+      "scope_note": "Gold surface boundaries and MWT flags from the retained development reference. This evaluates expansion, not tokenizer boundary detection."
+    },
+    {
+      "language_code": "he",
+      "language": "Hebrew",
+      "checkpoint": {
+        "path": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew_mwt_expander.pt",
+        "sha256": "d76b0fbc1656d68da00d6de2504023650aec28e320e7b0a511b73d099fc51479",
+        "bytes": 1111685
+      },
+      "evaluation_date": "2026-09-24",
+      "device": "CPU",
+      "checkpoint_format": "native PyTorch, unquantized",
+      "split": "retained development material",
+      "input": {
+        "path": "work/model-publication-audit/mwt-reevaluation/he-reference-boundaries.conllu",
+        "sha256": "b5e73ed66fe41e54e90da5b002205d7ab1095befe63e7afc2bbb170ebbea7883",
+        "bytes": 333428
+      },
+      "input_kind": "reference_surface_boundaries_and_mwt_flags",
+      "reference": {
+        "path": "_deprecated_nonruntime_20260514_184819/training/commercialviable_prepped/hebrew_iahltwiki/he-dev.conllu",
+        "sha256": "cb1129a23cacdc54f544ad6d9df33ad822ee5e5224c89fbe86cdbe6a589fbb5b",
+        "bytes": 755668
+      },
+      "sentence_count": 348,
+      "mwt_candidate_count": 2281,
+      "dictionary_ensemble": {
+        "precision": 98.545299,
+        "recall": 98.062799,
+        "f1": 98.303457
+      },
+      "seq2seq_only": {
+        "precision": 98.39555,
+        "recall": 97.913784,
+        "f1": 98.154076
+      },
+      "prediction_sha256": "f135901a8da3be9f72fbacd1e2c4a7e79de7e0c6a30c6686585463c4953c4aab",
+      "torch_version": "2.12.0.dev20260217+cu128",
+      "scope_note": "Gold surface boundaries and MWT flags from the retained development reference. This evaluates expansion, not tokenizer boundary detection."
+    },
+    {
+      "language_code": "tl",
+      "language": "Tagalog",
+      "checkpoint": {
+        "path": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom_mwt_expander.pt",
+        "sha256": "82c2c0414346549dc81c19438d95767994c1d6b6285f11701a2e7fc10c5037b2",
+        "bytes": 664645
+      },
+      "evaluation_date": "2026-09-24",
+      "device": "CPU",
+      "checkpoint_format": "native PyTorch, unquantized",
+      "split": "retained development material",
+      "input": {
+        "path": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v2/xlm-roberta-base/tagalog-v2/preds/tokenizer.dev.conllu",
+        "sha256": "a8cad5b93b40158a74135a4f83083fcd99a13747e636bbeb97e68fae85dfb287",
+        "bytes": 861016
+      },
+      "input_kind": "retained_tokenizer_development_predictions",
+      "reference": {
+        "path": "_deprecated_nonruntime_20260514_184819/training/tagalog_mwt_retrain/tgl-dev.udfixed.conllu",
+        "sha256": "e58f9a3da619f9f70d8c915dadaa709b34b49c8e06f9205635b4ceee9d99bfa5",
+        "bytes": 1670643
+      },
+      "sentence_count": 1572,
+      "mwt_candidate_count": 2131,
+      "dictionary_ensemble": {
+        "precision": 97.439569,
+        "recall": 97.319717,
+        "f1": 97.379606
+      },
+      "seq2seq_only": {
+        "precision": 97.439569,
+        "recall": 97.319717,
+        "f1": 97.379606
+      },
+      "prediction_sha256": "2ec1bf417df9eadd4e6cba77f581b42feb9c8f7f67df1227b53d9f942880b152",
+      "torch_version": "2.12.0.dev20260217+cu128",
+      "scope_note": "Retained selected-tokenizer development predictions feed the expander. The input token/sentence metrics match the selected tokenizer training log.",
+      "reference_note": "The retained udfixed development file has exactly the same first six CoNLL-U fields as tgl-dev.conllu; dependency-tree repairs allow the UD scorer to load it without changing segmentation targets."
+    }
+  ]
+}

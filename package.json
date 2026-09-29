@@ -1,0 +1,16 @@
+{
+  "name": "language-engine-browser",
+  "private": true,
+  "scripts": {
+    "build": "node tools/build_frontend.mjs",
+    "test": "node --test tests/browser/*.test.mjs",
+    "check": "node tools/check_javascript.mjs",
+    "test:browser": "playwright test",
+    "format": "prettier --write frontend tests/browser tools/build_frontend.mjs playwright.config.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "esbuild": "0.28.2",
+    "prettier": "3.9.8"
+  }
+}

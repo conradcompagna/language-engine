@@ -1,0 +1,20 @@
+[
+  {
+    "rule_id": "TOK_PART_BA",
+    "lemma": "ば",
+    "pos_major": "PART",
+    "pos_detail": "CONDITIONAL_PARTICLE",
+    "lemma_class": "PART_BA",
+    "surface": "ば",
+    "morph_slot": "CONDITIONAL_PART",
+    "reason_code": "CONDITIONAL_PARTICLE_AFTER_KATEI",
+    "orthography_rule_id": "",
+    "requires_prev_state": "EXPECTS_KATEI",
+    "emits_state": "FINITE",
+    "morph_features": "Mood=Cnd",
+    "register": "neutral",
+    "productivity": "productive",
+    "ambiguity_group": "AMB_BA",
+    "notes": ""
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "ambiguity_group": "AMB_NI",
+    "surface": "に",
+    "preferred_rule_id": "TOK_COP_DA_ADV_NI",
+    "conditions": "lemma=だ AND pos in {AUX,COP} OR (xpos indicates copula/adjectival-copula form)",
+    "resolution_code": "COPULA_DA_ADVERBIAL",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_NI",
+    "surface": "に",
+    "preferred_rule_id": "TOK_PART_NI_CASE",
+    "conditions": "pos=PART OR deprel in {case,mark} OR lemma!=だ",
+    "resolution_code": "CASE_PARTICLE",
+    "priority": 20,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_DE",
+    "surface": "で",
+    "preferred_rule_id": "TOK_COP_DA_TE_DE",
+    "conditions": "lemma=だ AND pos in {AUX,COP}",
+    "resolution_code": "COPULA_TE_FORM",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_DE",
+    "surface": "で",
+    "preferred_rule_id": "TOK_AUX_TE_DE",
+    "conditions": "lemma=て AND pos in {PART,SCONJ} AND prev_state expects voiced te-form",
+    "resolution_code": "TE_ALLOMORPH_DE",
+    "priority": 15,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_DE",
+    "surface": "で",
+    "preferred_rule_id": "TOK_PART_DE_CASE",
+    "conditions": "pos=PART OR deprel=case",
+    "resolution_code": "CASE_PARTICLE_DE",
+    "priority": 20,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_NA",
+    "surface": "な",
+    "preferred_rule_id": "TOK_COP_DA_ATTR_NA",
+    "conditions": "lemma=だ AND modifies following noun",
+    "resolution_code": "COPULA_ATTR_NA",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_NA",
+    "surface": "な",
+    "preferred_rule_id": "TOK_PART_NA_FINAL",
+    "conditions": "pos=PART OR sentence_final",
+    "resolution_code": "FINAL_PARTICLE_NA",
+    "priority": 20,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_TE",
+    "surface": "て",
+    "preferred_rule_id": "TOK_AUX_TE_TE",
+    "conditions": "lemma=て AND prev_state expects te-slot-t",
+    "resolution_code": "TE_CONNECTIVE_T",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_TE",
+    "surface": "て",
+    "preferred_rule_id": "TOK_PART_TE_CONN",
+    "conditions": "pos=PART and no te-slot context",
+    "resolution_code": "GENERIC_PARTICLE_TE",
+    "priority": 20,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_TA",
+    "surface": "た",
+    "preferred_rule_id": "TOK_AUX_TA_BASE",
+    "conditions": "lemma=た AND pos=AUX AND prev_state in {EXPECTS_TA_SLOT_T,EXPECTS_TA}",
+    "resolution_code": "PAST_AUX_TA",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_TA",
+    "surface": "た",
+    "preferred_rule_id": "TOK_AUX_TA_BASE",
+    "conditions": "lemma=た AND pos=ADJ? tokenizer-specific past auxiliary labeling",
+    "resolution_code": "PAST_AUX_TA_BROAD",
+    "priority": 20,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_DA",
+    "surface": "だ",
+    "preferred_rule_id": "TOK_AUX_TA_DA_BASE",
+    "conditions": "lemma=た AND pos=AUX AND prev_state=EXPECTS_TA_SLOT_D",
+    "resolution_code": "PAST_AUX_DA_ALLOMORPH",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_DA",
+    "surface": "だ",
+    "preferred_rule_id": "TOK_COP_DA_BASE",
+    "conditions": "lemma=だ AND pos in {AUX,COP}",
+    "resolution_code": "COPULA_BASE_DA",
+    "priority": 20,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_DATT_STEM",
+    "surface": "だっ",
+    "preferred_rule_id": "TOK_COP_DA_RENYO_DATT",
+    "conditions": "lemma=だ AND next_token.lemma=た",
+    "resolution_code": "COPULA_RENYO_BEFORE_TA",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_RERU",
+    "surface": "れる",
+    "preferred_rule_id": "TOK_AUX_RERU_BASE",
+    "conditions": "lemma=れる",
+    "resolution_code": "RERU_AUX_BASE",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_RERU",
+    "surface": "れる",
+    "preferred_rule_id": "TOK_AUX_RERU_RA_DROPPED_POT",
+    "conditions": "lemma=られる AND register=colloquial",
+    "resolution_code": "RARERU_RA_DROPPED",
+    "priority": 20,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_SE",
+    "surface": "せ",
+    "preferred_rule_id": "TOK_AUX_SERU_SE",
+    "conditions": "lemma=せる",
+    "resolution_code": "SERU_RENYO_STEM",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_SE",
+    "surface": "せ",
+    "preferred_rule_id": "TOK_SURU_SEYO",
+    "conditions": "lemma=する AND surface=せよ",
+    "resolution_code": "SURU_IMPERATIVE_SEYO",
+    "priority": 20,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_I",
+    "surface": "い",
+    "preferred_rule_id": "TOK_AUX_IRU_I",
+    "conditions": "lemma=いる AND pos=AUX",
+    "resolution_code": "IRU_RENYO_STEM",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "ambiguity_group": "AMB_I",
+    "surface": "い",
+    "preferred_rule_id": "TOK_IADJ_BASE_I",
+    "conditions": "pos=ADJ and surface endswith い",
+    "resolution_code": "IADJ_TERMINAL_I",
+    "priority": 20,
+    "notes": ""
+  }
+]

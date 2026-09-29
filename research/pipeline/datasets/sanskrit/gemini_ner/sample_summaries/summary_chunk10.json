@@ -1,0 +1,72 @@
+{
+  "chunk": 10,
+  "sentence_count": 10,
+  "input_token_rows": 163,
+  "sources": [
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 91
+    },
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 92
+    },
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 93
+    },
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 94
+    },
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 95
+    },
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 96
+    },
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 97
+    },
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 98
+    },
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 99
+    },
+    {
+      "source_file": "unannotatedchild_chunk_001_source_01_sent_0001_0100.bio",
+      "source_sentence": 100
+    }
+  ],
+  "status": "completed",
+  "output_token_rows": 163,
+  "divergence_count": 0,
+  "usage": {
+    "model": "gemini-2.5-flash-lite",
+    "prompt_token_count": 2031,
+    "candidate_token_count": 859,
+    "total_token_count": 2890,
+    "estimated_input_cost_usd": 0.00020310000000000003,
+    "estimated_output_cost_usd": 0.0003436,
+    "estimated_total_cost_usd": 0.0005467,
+    "raw_usage": {
+      "promptTokenCount": 2031,
+      "candidatesTokenCount": 859,
+      "totalTokenCount": 2890,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 2031
+        }
+      ],
+      "serviceTier": "standard"
+    }
+  },
+  "validation": "passed"
+}

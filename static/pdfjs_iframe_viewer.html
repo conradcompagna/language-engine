@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF.js Iframe Viewer</title>
+  <link rel="stylesheet" href="/static/vendor/pdfjs/pdf_viewer.min.css">
+  <link rel="stylesheet" href="/static/pdfjs_viewer.css">
+</head>
+<body>
+  <div id="pdfContainer">
+    <div id="pdfViewer" class="pdfViewer"></div>
+  </div>
+
+  <div id="pageCornerBadge">1 / 1</div>
+
+  <div id="topRightControls">
+    <div id="pdfModeBar" aria-label="Interaction Mode">
+      <button id="pdfModeToggle" class="search-btn mode-toggle-btn" type="button" aria-label="Toggle Drag Mode">✎</button>
+    </div>
+    <div id="pdfZoomBar" aria-label="Zoom Controls">
+      <button id="pdfZoomIn" class="search-btn" type="button" aria-label="Zoom In">+</button>
+      <button id="pdfZoomOut" class="search-btn" type="button" aria-label="Zoom Out">-</button>
+      <button id="pdfZoomReset" class="search-btn zoom-reset-btn" type="button" aria-label="Reset Zoom">reset</button>
+    </div>
+    <div id="pdfSearchBar" aria-label="Search">
+      <input id="pdfSearchInput" type="text" placeholder="Search in PDF" autocomplete="off" />
+      <button id="pdfSearchPrev" class="search-btn" type="button" aria-label="Previous Match">↑</button>
+      <button id="pdfSearchNext" class="search-btn" type="button" aria-label="Next Match">↓</button>
+      <span id="pdfSearchCount" aria-live="polite" data-state="idle">0/0</span>
+      <button id="pdfSearchClear" class="search-btn" type="button" aria-label="Clear Search">×</button>
+    </div>
+  </div>
+  <div id="pdfSearchDropdown" hidden>
+    <div id="pdfSearchDropdownMeta">Type to search</div>
+    <div id="pdfSearchDropdownList"></div>
+  </div>
+
+  <div id="pageNavigator" aria-label="Page Navigator">
+    <button id="navPrev" class="nav-btn" type="button" aria-label="Previous Page">▲</button>
+    <div id="navTrack" aria-hidden="true">
+      <div id="navThumb"></div>
+    </div>
+    <button id="navNext" class="nav-btn" type="button" aria-label="Next Page">▼</button>
+  </div>
+
+  <script src="/static/vendor/pdfjs/pdf.min.js"></script>
+  <script src="/static/vendor/pdfjs/pdf_viewer.min.js"></script>
+  <script src="/static/pdfjs_viewer.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+[
+  {
+    "contraction_id": "CONTR_DEWA_JA",
+    "surface": "じゃ",
+    "canonical_sequence": "では",
+    "token_sequence": "で + は",
+    "scope": "copula_chain/particle_chain",
+    "orthography_rule_id": "GR_COPULA_DEWA_JA_CONTRACTION",
+    "register": "colloquial",
+    "productivity": "common_colloquial",
+    "notes": ""
+  },
+  {
+    "contraction_id": "CONTR_TEIRU_TERU",
+    "surface": "てる",
+    "canonical_sequence": "ている",
+    "token_sequence": "て + いる",
+    "scope": "aux_chain",
+    "orthography_rule_id": "GR_TEIRU_CONTRACTION_TERU",
+    "register": "colloquial",
+    "productivity": "common_colloquial",
+    "notes": ""
+  },
+  {
+    "contraction_id": "CONTR_TEOKU_TOKU",
+    "surface": "とく",
+    "canonical_sequence": "ておく",
+    "token_sequence": "て + おく",
+    "scope": "aux_chain",
+    "orthography_rule_id": "GR_TEOKU_CONTRACTION_TOKU",
+    "register": "colloquial",
+    "productivity": "common_colloquial",
+    "notes": ""
+  },
+  {
+    "contraction_id": "CONTR_DEOKU_DOKU",
+    "surface": "どく",
+    "canonical_sequence": "でおく",
+    "token_sequence": "で + おく",
+    "scope": "aux_chain",
+    "orthography_rule_id": "GR_DEOKU_CONTRACTION_DOKU",
+    "register": "colloquial",
+    "productivity": "common_colloquial",
+    "notes": ""
+  },
+  {
+    "contraction_id": "CONTR_TESHIMAU_CHAU",
+    "surface": "ちゃう",
+    "canonical_sequence": "てしまう",
+    "token_sequence": "て + しまう",
+    "scope": "aux_chain",
+    "orthography_rule_id": "GR_TESHIMAU_CONTRACTION_CHAU",
+    "register": "colloquial",
+    "productivity": "common_colloquial",
+    "notes": ""
+  },
+  {
+    "contraction_id": "CONTR_DESHIMAU_JAU",
+    "surface": "じゃう",
+    "canonical_sequence": "でしまう",
+    "token_sequence": "で + しまう",
+    "scope": "aux_chain",
+    "orthography_rule_id": "GR_DESHIMAU_CONTRACTION_JAU",
+    "register": "colloquial",
+    "productivity": "common_colloquial",
+    "notes": ""
+  }
+]

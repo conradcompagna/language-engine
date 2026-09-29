@@ -1,0 +1,26 @@
+/** Mutable feature state; initialized explicitly by the ordered bootstrap. */
+export const flashcardsState = {
+  flashcardOverlay: undefined,
+  flashcardWord: undefined,
+  flashcardMessage: undefined,
+  flashcardStats: undefined,
+  flashcardShowAnswerBtn: undefined,
+  flashcardAnswer: undefined,
+  flashcardGradeButtons: undefined,
+  flashcardPronunciation: undefined,
+  flashcardDictionary: undefined,
+  flashcardGrammar: undefined,
+  flashcardAnnotation: undefined,
+  flashcardKnowBtn: undefined,
+  flashcardDontKnowBtn: undefined,
+  flashcardCloseBtn: undefined,
+  flashcardModeBtn: undefined,
+  flashcardCurrent: undefined,
+  flashcardIsLoading: undefined,
+  flashcardAnnotationSaveTimeout: undefined,
+  leftMenu: undefined,
+  menuToggle: undefined,
+  menuSections: undefined,
+  thresholdSlider: undefined,
+  thresholdValue: undefined
+};

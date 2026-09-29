@@ -1,0 +1,18 @@
+{
+    "display_name": "Sanskrit",
+    "code": "sa",
+    "font_family": "\"Noto Sans Devanagari\", \"Noto Sans\", \"Segoe UI\", system-ui, sans-serif",
+    "ner_labels": {
+        "PER": "Person",
+        "PERSON": "Person",
+        "LOC": "Location",
+        "LOCATION": "Location",
+        "ORG": "Organization",
+        "ORGANIZATION": "Organization",
+        "GPE": "Geopolitical Entity",
+        "DATE": "Date",
+        "TIME": "Time",
+        "CARDINAL": "Cardinal Number",
+        "ORDINAL": "Ordinal Number"
+    }
+}

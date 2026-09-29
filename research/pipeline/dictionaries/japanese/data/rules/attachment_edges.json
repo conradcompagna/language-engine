@@ -1,0 +1,245 @@
+[
+  {
+    "edge_id": "E_START_LEXV_FIN",
+    "from_state": "START",
+    "to_state": "LEX_V_FIN",
+    "token_rule_pattern": "TOK_* lexical finite verb",
+    "condition": "pos=VERB AND finite",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_START_V_MIZEN",
+    "from_state": "START",
+    "to_state": "V_MIZEN",
+    "token_rule_pattern": "TOK_V_*_MIZEN*",
+    "condition": "lexical stem token in mizen slot",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_START_V_RENYO",
+    "from_state": "START",
+    "to_state": "V_RENYO",
+    "token_rule_pattern": "TOK_V_*_RENYO*|TOK_SURU_SHI|TOK_KURU_KI",
+    "condition": "lexical stem token in renyou slot",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_START_V_ONBIN_T",
+    "from_state": "START",
+    "to_state": "V_ONBIN_T",
+    "token_rule_pattern": "TOK_V_GODAN_*_ONBIN|TOK_V_GODAN_KU_IKU_ONBIN_SPECIAL",
+    "condition": "onbin token + next in {て,た,たり}",
+    "priority": 10,
+    "notes": "Branch to T/D by next token surface"
+  },
+  {
+    "edge_id": "E_START_AI_FIN",
+    "from_state": "START",
+    "to_state": "A_I_FIN",
+    "token_rule_pattern": "TOK_IADJ_BASE_I|TOK_IADJ_PAST_KATTA|TOK_IADJ_NEG_KUNAI",
+    "condition": "pos=ADJ",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_START_AI_RENYO",
+    "from_state": "START",
+    "to_state": "A_I_RENYO",
+    "token_rule_pattern": "TOK_IADJ_ADV_KU|TOK_II_INFLECTED_YO_SERIES|TOK_YOI_INFLECTED_YO_SERIES",
+    "condition": "i-adj renyou",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_START_AI_KATEI",
+    "from_state": "START",
+    "to_state": "A_I_KATEI",
+    "token_rule_pattern": "TOK_IADJ_COND_KEREBA",
+    "condition": "i-adj conditional",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_START_ANA",
+    "from_state": "START",
+    "to_state": "A_NA_STEM",
+    "token_rule_pattern": "TOK_NAADJ_PRED",
+    "condition": "na-adjective stem",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_ANA_COPSLOT",
+    "from_state": "A_NA_STEM",
+    "to_state": "COPULA_SLOT",
+    "token_rule_pattern": "TOK_COP_*|TOK_AUX_DESU_*",
+    "condition": "na-adj predication or modification",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_COPSLOT_FIN_DA",
+    "from_state": "COPULA_SLOT",
+    "to_state": "COP_FIN",
+    "token_rule_pattern": "TOK_COP_DA_BASE|TOK_COP_DA_ATTR_NA|TOK_COP_DA_ADV_NI|TOK_COP_DA_COND_NARA|TOK_COP_DA_TE_DE|TOK_COP_DA_RENYO_DATT",
+    "condition": "copula allomorph",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_V_MIZEN_NEG",
+    "from_state": "V_MIZEN",
+    "to_state": "AUX_VERB_FIN",
+    "token_rule_pattern": "TOK_AUX_NAI_*|TOK_AUX_NU_BASE|TOK_AUX_ZU_BASE",
+    "condition": "negative auxiliary after mizen",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_V_MIZEN_PASSCAUS",
+    "from_state": "V_MIZEN",
+    "to_state": "AUX_VERB_FIN",
+    "token_rule_pattern": "TOK_AUX_RERU_*|TOK_AUX_RARERU_*|TOK_AUX_SERU_*|TOK_AUX_SASERU_*",
+    "condition": "voice aux after mizen",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_V_RENYO_POLITE",
+    "from_state": "V_RENYO",
+    "to_state": "POLITE_SLOT",
+    "token_rule_pattern": "TOK_AUX_MASU_BASE|TOK_AUX_MASU_MASHI",
+    "condition": "polite aux after renyou",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_V_RENYO_DESID",
+    "from_state": "V_RENYO",
+    "to_state": "AUX_VERB_FIN",
+    "token_rule_pattern": "TOK_AUX_TAI_*|TOK_AUX_TAGARU_*",
+    "condition": "desiderative aux after renyou",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_V_RENYO_TECHAIN",
+    "from_state": "V_RENYO",
+    "to_state": "TE_CHAIN",
+    "token_rule_pattern": "TOK_AUX_TE_TE|TOK_AUX_TE_DE",
+    "condition": "te/de connective after renyou where tokenization outputs separate て/で",
+    "priority": 20,
+    "notes": "less common if onbin stem used"
+  },
+  {
+    "edge_id": "E_V_ONBIN_T_TE",
+    "from_state": "V_ONBIN_T",
+    "to_state": "TE_CHAIN",
+    "token_rule_pattern": "TOK_AUX_TE_TE",
+    "condition": "surface te after T-series onbin",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_V_ONBIN_D_DE",
+    "from_state": "V_ONBIN_D",
+    "to_state": "TE_CHAIN",
+    "token_rule_pattern": "TOK_AUX_TE_DE",
+    "condition": "surface de after D-series onbin",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_V_ONBIN_T_TA",
+    "from_state": "V_ONBIN_T",
+    "to_state": "AUX_VERB_FIN",
+    "token_rule_pattern": "TOK_AUX_TA_BASE|TOK_AUX_TARI_TARI",
+    "condition": "past/listing after T-series onbin",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_V_ONBIN_D_DA",
+    "from_state": "V_ONBIN_D",
+    "to_state": "AUX_VERB_FIN",
+    "token_rule_pattern": "TOK_AUX_TA_DA_BASE|TOK_AUX_TARI_DARI",
+    "condition": "past/listing after D-series onbin",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_TECHAIN_ASPECT",
+    "from_state": "TE_CHAIN",
+    "to_state": "AUX_VERB_FIN",
+    "token_rule_pattern": "TOK_AUX_IRU_*|TOK_AUX_OKU_BASE|TOK_AUX_SHIMAU_BASE|TOK_AUX_KURU_BASE_AUX|TOK_AUX_IKU_BASE_AUX|TOK_CONTR_*",
+    "condition": "aspectual/directional aux after te/de",
+    "priority": 10,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_AUX_FIN_TO_END",
+    "from_state": "AUX_VERB_FIN",
+    "to_state": "END",
+    "token_rule_pattern": "finite aux or finite lexical",
+    "condition": "terminal if no further chain",
+    "priority": 90,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_COP_FIN_TO_END",
+    "from_state": "COP_FIN",
+    "to_state": "END",
+    "token_rule_pattern": "copula finite/adnominal/adverbial",
+    "condition": "terminal or continue by syntax",
+    "priority": 90,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_LEXFIN_TO_END",
+    "from_state": "LEX_V_FIN",
+    "to_state": "END",
+    "token_rule_pattern": "lexical finite verb",
+    "condition": "terminal",
+    "priority": 90,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_AIFIN_TO_END",
+    "from_state": "A_I_FIN",
+    "to_state": "END",
+    "token_rule_pattern": "i-adjective finite",
+    "condition": "terminal",
+    "priority": 90,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_ONBIN_SPLIT_T_CLASSES",
+    "from_state": "START",
+    "to_state": "V_ONBIN_T",
+    "token_rule_pattern": "TOK_V_GODAN_{う,つ,る}_ONBIN|TOK_V_GODAN_く_IKU_ONBIN_SPECIAL",
+    "condition": "lemma_class in {V_GODAN_う,V_GODAN_つ,V_GODAN_る} or lemma=行く",
+    "priority": 5,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_ONBIN_SPLIT_D_CLASSES",
+    "from_state": "START",
+    "to_state": "V_ONBIN_D",
+    "token_rule_pattern": "TOK_V_GODAN_{ぬ,ぶ,む,ぐ}_ONBIN",
+    "condition": "lemma_class in {V_GODAN_ぬ,V_GODAN_ぶ,V_GODAN_む,V_GODAN_ぐ}",
+    "priority": 5,
+    "notes": ""
+  },
+  {
+    "edge_id": "E_ONBIN_SU_TO_T",
+    "from_state": "START",
+    "to_state": "V_ONBIN_T",
+    "token_rule_pattern": "TOK_V_GODAN_す_ONBIN",
+    "condition": "lemma_class=V_GODAN_す and next in {て,た,たり}",
+    "priority": 6,
+    "notes": "し + て/た-series uses t-surface auxiliaries"
+  }
+]

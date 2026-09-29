@@ -1,0 +1,588 @@
+/* ===================== INPUT AREA ===================== */
+.reader-input-container {
+  border-radius: var(--le-radius);
+  border: 1.5px dashed var(--le-slate-300);
+  background: var(--le-slate-100);
+  padding: 12px;
+  transition: all var(--le-transition);
+}
+.reader-input-container.drag-over {
+  border-color: var(--le-green-500);
+  background: var(--le-green-50);
+}
+.reader-input-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--le-slate-500);
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.reader-input-label .right {
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--le-slate-500);
+}
+.reader-textarea {
+  width: 100%;
+  border: 1.5px solid var(--le-slate-300);
+  outline: none;
+  resize: none;
+  overflow: auto;
+  padding: 10px 12px;
+  border-radius: var(--le-radius-sm);
+  background: var(--le-white);
+  color: var(--le-slate-900);
+  font-size: 16px;
+  line-height: 1.6;
+  font-family:
+    'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans Myanmar', 'Myanmar Text', system-ui,
+    sans-serif;
+  transition: border-color var(--le-transition);
+}
+.reader-textarea:focus {
+  border-color: var(--le-green-500);
+}
+.reader-textarea::placeholder {
+  color: var(--le-slate-500);
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}
+
+.reader-pager {
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  overflow-x: hidden;
+  border: 1.5px solid var(--le-slate-300);
+  border-radius: var(--le-radius-sm);
+  background: var(--le-slate-100);
+  padding: 0;
+  position: relative;
+}
+.reader-pager,
+.reader-pager * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.reader-pager.source-inspector-active,
+.reader-pager.source-inspector-active * {
+  user-select: text;
+  -webkit-user-select: text;
+}
+.reader-pager.source-inspector-active ::selection {
+  background: transparent;
+  color: inherit;
+}
+.source-inspector-selection-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+}
+.source-inspector-selection-cell {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px dashed rgba(37, 99, 235, 0.92);
+  background: rgba(96, 165, 250, 0.18);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65) inset;
+  border-radius: 2px;
+}
+
+.doc-toolbar {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 7px 8px;
+  border: 1px solid var(--le-slate-200);
+  border-radius: var(--le-radius-sm);
+  background: var(--le-white);
+}
+.doc-toolbar-left,
+.doc-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.doc-toolbar-controls {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.doc-capability-controls {
+  position: relative;
+  flex: 1 1 auto;
+}
+.doc-page-label {
+  color: var(--le-slate-600);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.doc-page-number-input {
+  width: 54px;
+  height: 28px;
+  box-sizing: border-box;
+  border: 1px solid var(--le-slate-300);
+  border-radius: 6px;
+  background: var(--le-white);
+  color: var(--le-slate-800);
+  font-size: 12px;
+  line-height: 1;
+  padding: 0 4px 0 7px;
+  font-variant-numeric: tabular-nums;
+}
+.doc-page-number-input:focus {
+  border-color: var(--le-green-500);
+  box-shadow: 0 0 0 2px rgba(64, 145, 108, 0.12);
+  outline: none;
+}
+.doc-icon-btn,
+.doc-text-btn {
+  height: 28px;
+  min-width: 28px;
+  box-sizing: border-box;
+  border: 1px solid var(--le-slate-300);
+  border-radius: 6px;
+  background: var(--le-white);
+  color: var(--le-slate-700);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0 8px;
+  cursor: pointer;
+}
+.doc-icon-btn:hover,
+.doc-text-btn:hover {
+  border-color: var(--le-green-500);
+  background: var(--le-green-50);
+  color: var(--le-green-700);
+}
+.doc-icon-btn:disabled,
+.doc-text-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+#pdfModeButton,
+#pdfModeButton:hover,
+#pdfModeButton:focus {
+  color: #000;
+}
+.doc-search-input {
+  width: 180px;
+  max-width: 28vw;
+  height: 28px;
+  box-sizing: border-box;
+  border: 1px solid var(--le-slate-300);
+  border-radius: 6px;
+  background: var(--le-white);
+  color: var(--le-slate-900);
+  font-size: 12px;
+  padding: 0 9px;
+  outline: none;
+}
+.doc-search-input:focus {
+  border-color: var(--le-green-500);
+  box-shadow: 0 0 0 2px rgba(64, 145, 108, 0.12);
+}
+.doc-search-count {
+  min-width: 52px;
+  height: 28px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--le-slate-200);
+  border-radius: 6px;
+  color: var(--le-slate-600);
+  background: var(--le-slate-50);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.doc-nav-menu-wrap,
+.doc-search-menu-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.doc-contents-btn {
+  min-width: 76px;
+}
+.doc-nav-menu,
+.doc-search-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1200;
+  width: min(380px, 82vw);
+  max-height: max(220px, min(640px, calc(100vh - 380px)));
+  box-sizing: border-box;
+  border: 1px solid var(--le-slate-200);
+  border-radius: var(--le-radius-sm);
+  background: var(--le-white);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
+  overflow: hidden;
+}
+.doc-search-menu {
+  left: 0;
+  right: auto;
+  width: min(540px, 82vw);
+}
+.doc-nav-menu-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 7px;
+  border-bottom: 1px solid var(--le-slate-200);
+  background: var(--le-slate-50);
+}
+.doc-nav-tab {
+  flex: 1 1 0;
+  height: 26px;
+  border: 1px solid var(--le-slate-200);
+  border-radius: 6px;
+  background: var(--le-white);
+  color: var(--le-slate-600);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.doc-nav-tab.active {
+  border-color: var(--le-green-500);
+  background: var(--le-green-50);
+  color: var(--le-green-700);
+  font-weight: 600;
+}
+.doc-nav-menu-meta {
+  padding: 7px 9px;
+  border-bottom: 1px solid var(--le-slate-200);
+  color: var(--le-slate-500);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.doc-nav-menu-list {
+  max-height: max(180px, min(560px, calc(100vh - 440px)));
+  overflow-y: auto;
+  padding: 4px;
+  scrollbar-width: thin;
+}
+.doc-nav-item {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--le-slate-800);
+  text-align: left;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.35;
+  padding: 7px 8px;
+  cursor: pointer;
+}
+.doc-nav-item:hover,
+.doc-nav-item.active {
+  background: var(--le-green-50);
+  color: var(--le-green-800);
+}
+.doc-nav-item-label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.doc-nav-item-excerpt {
+  display: block;
+  margin-top: 2px;
+  color: var(--le-slate-500);
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: normal;
+}
+.doc-search-result-excerpt {
+  margin-top: 0;
+  color: var(--le-slate-700);
+  font-size: 12px;
+}
+.doc-nav-item-excerpt mark {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: #fef08a;
+  color: inherit;
+}
+.web-inspector-status {
+  display: none !important;
+}
+.web-inspector-btn,
+#webInspectorButton {
+  position: relative;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 0;
+  line-height: 1;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+#webInspectorButton::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background:
+    linear-gradient(currentColor, currentColor) center / 1.5px 16px no-repeat,
+    linear-gradient(90deg, currentColor, currentColor) center / 16px 1.5px no-repeat,
+    radial-gradient(circle at center, transparent 0 5px, currentColor 5px 6.5px, transparent 6.5px);
+}
+#webInspectorButton:not(.active),
+#webInspectorButton[aria-pressed='false'] {
+  border-color: var(--le-slate-300) !important;
+  background: var(--le-white) !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+#webInspectorButton:not(.active):hover,
+#webInspectorButton:not(.active):focus,
+#webInspectorButton:not(.active):active,
+#webInspectorButton[aria-pressed='false']:hover,
+#webInspectorButton[aria-pressed='false']:focus,
+#webInspectorButton[aria-pressed='false']:active {
+  border-color: var(--le-slate-400) !important;
+  background: var(--le-white) !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+.web-inspector-btn:not(.active)::after {
+  display: none;
+}
+#webInspectorButton.active,
+#webInspectorButton.active:hover,
+#webInspectorButton.active:focus,
+#webInspectorButton.active:active,
+#webInspectorButton[aria-pressed='true'],
+#webInspectorButton[aria-pressed='true']:hover,
+#webInspectorButton[aria-pressed='true']:focus,
+#webInspectorButton[aria-pressed='true']:active {
+  border-color: #ff2bd6 !important;
+  background: #ff2bd6 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+#pdfModeButton {
+  display: none !important;
+}
+.doc-viewport-wrap {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 32px;
+}
+.doc-page-navigator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  user-select: none;
+  touch-action: none;
+}
+.doc-nav-btn {
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  box-sizing: border-box;
+  border: 1px solid var(--le-slate-300);
+  border-radius: 6px;
+  background: var(--le-white);
+  color: var(--le-slate-600);
+  font-size: 10px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+.doc-nav-btn:hover {
+  border-color: var(--le-green-500);
+  background: var(--le-green-50);
+  color: var(--le-green-700);
+}
+.doc-nav-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.doc-nav-track {
+  position: relative;
+  flex: 1 1 auto;
+  width: 24px;
+  box-sizing: border-box;
+  border: 1px solid var(--le-slate-300);
+  border-radius: 999px;
+  background: var(--le-slate-200);
+  cursor: pointer;
+}
+.doc-nav-thumb {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 0;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--le-white);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
+  cursor: grab;
+  transform: translateY(0);
+  touch-action: none;
+}
+.doc-nav-thumb.dragging {
+  cursor: grabbing;
+}
+.reader-page-shell {
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  background: var(--le-white);
+}
+.reader-page-inner {
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+.reader-page-inner.page-overflow {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--le-slate-400) var(--le-slate-100);
+}
+.reader-page-inner.page-overflow::-webkit-scrollbar {
+  width: 9px;
+}
+.reader-page-inner.page-overflow::-webkit-scrollbar-track {
+  background: var(--le-slate-100);
+}
+.reader-page-inner.page-overflow::-webkit-scrollbar-thumb {
+  background: var(--le-slate-400);
+  border-radius: 999px;
+  border: 2px solid var(--le-slate-100);
+}
+/* Native PDF.js viewer mode inside sourcePager */
+.reader-pager.pdfjs-native-mode {
+  background: #525659;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+}
+.reader-pager.pdfjs-native-mode .pdfjs-host-iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #525659;
+}
+.reader-pager.pdfjs-native-mode .pdfViewer {
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+.reader-pager.pdfjs-native-mode .pdfViewer .page {
+  margin: 0 auto 8px auto;
+  border: none;
+  background: white;
+}
+.reader-pager.pdfjs-native-mode .pdfViewer .textLayer {
+  inset: 0;
+}
+.reader-pager.pdfjs-native-mode .pdfViewer .canvasWrapper {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* PDF.js page containers */
+.pdfjs-pages-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+.pdfjs-page {
+  background: var(--le-white);
+  box-shadow: var(--le-shadow-sm);
+  position: relative;
+  overflow: hidden;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+.pdfjs-page-header {
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--le-slate-500);
+  user-select: none;
+  pointer-events: none;
+}
+.pdfjs-page canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.pdfjs-page .textLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  opacity: 0.25;
+  line-height: 1;
+}
+.pdfjs-page .textLayer span {
+  position: absolute;
+  white-space: pre;
+  color: transparent;
+  pointer-events: all;
+}
+.pdfjs-page .textLayer span::selection {
+  background: rgba(0, 0, 255, 0.3);
+}
+.reader-doc-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--le-slate-900);
+  font-family:
+    'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans Myanmar', 'Myanmar Text', system-ui,
+    sans-serif;
+  padding: 12px;
+}

@@ -1,0 +1,11 @@
+{
+  "category": "customized-ner",
+  "task": "ner",
+  "save_dir": "training\\t",
+  "train_bio_fpath": "training\\nerdump\\training_data\\heb_nemo_token_single\\train.bio",
+  "dev_bio_fpath": "training\\nerdump\\training_data\\heb_nemo_token_single\\dev.bio",
+  "embedding": "xlm-roberta-base",
+  "max_epoch": 100,
+  "batch_size": 20,
+  "gpu": true
+}

@@ -1,0 +1,101 @@
+{
+  "dataset": "ang_oedt",
+  "created_utc": "2026-05-03T20:55:29Z",
+  "source": "training\\nerdump\\commercial_ner_datasets_downloaded.zip",
+  "source_members": {
+    "train": "datasets/ang/Old_English-OEDT/ang_oedt.train.bio",
+    "dev": "datasets/ang/Old_English-OEDT/ang_oedt.dev.bio",
+    "test": "datasets/ang/Old_English-OEDT/ang_oedt.test.bio"
+  },
+  "format": "Trankit BIO, one token and one BIO tag per line, blank line between sentences.",
+  "splits": {
+    "train": {
+      "sentences": 2305,
+      "tokens": 58848,
+      "tag_counts": {
+        "B-OBJECT": 17,
+        "B-ORGANIZATION": 43,
+        "B-PERSON": 425,
+        "B-PLACE": 8,
+        "B-RELIGIOUS": 808,
+        "I-ORGANIZATION": 2,
+        "I-PERSON": 34,
+        "O": 57511
+      },
+      "label_token_counts": {
+        "O": 57511,
+        "OBJECT": 17,
+        "ORGANIZATION": 45,
+        "PERSON": 459,
+        "PLACE": 8,
+        "RELIGIOUS": 808
+      }
+    },
+    "dev": {
+      "sentences": 942,
+      "tokens": 29984,
+      "tag_counts": {
+        "B-OBJECT": 11,
+        "B-ORGANIZATION": 19,
+        "B-PERSON": 151,
+        "B-PLACE": 10,
+        "B-RELIGIOUS": 191,
+        "I-ORGANIZATION": 2,
+        "I-PERSON": 7,
+        "O": 29593
+      },
+      "label_token_counts": {
+        "O": 29593,
+        "OBJECT": 11,
+        "ORGANIZATION": 21,
+        "PERSON": 158,
+        "PLACE": 10,
+        "RELIGIOUS": 191
+      }
+    },
+    "test": {
+      "sentences": 970,
+      "tokens": 28370,
+      "tag_counts": {
+        "B-OBJECT": 5,
+        "B-ORGANIZATION": 23,
+        "B-PERSON": 131,
+        "B-PLACE": 16,
+        "B-RELIGIOUS": 279,
+        "I-ORGANIZATION": 3,
+        "I-PERSON": 2,
+        "O": 27911
+      },
+      "label_token_counts": {
+        "O": 27911,
+        "OBJECT": 5,
+        "ORGANIZATION": 26,
+        "PERSON": 133,
+        "PLACE": 16,
+        "RELIGIOUS": 279
+      }
+    },
+    "all": {
+      "sentences": 4217,
+      "tokens": 117202,
+      "tag_counts": {
+        "B-OBJECT": 33,
+        "B-ORGANIZATION": 85,
+        "B-PERSON": 707,
+        "B-PLACE": 34,
+        "B-RELIGIOUS": 1278,
+        "I-ORGANIZATION": 7,
+        "I-PERSON": 43,
+        "O": 115015
+      },
+      "label_token_counts": {
+        "O": 115015,
+        "OBJECT": 33,
+        "ORGANIZATION": 92,
+        "PERSON": 750,
+        "PLACE": 34,
+        "RELIGIOUS": 1278
+      }
+    }
+  }
+}

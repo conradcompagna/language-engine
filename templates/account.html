@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Account | Language Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='le-logo.svg') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='reader.css') }}?v={{ mtime('reader.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='top_nav.css') }}?v={{ mtime('top_nav.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='contact_support.css') }}?v={{ mtime('contact_support.css') }}"/>
+<style>
+  body { background: var(--le-slate-100); }
+  .acct-wrap {
+    max-width: 760px;
+    margin: 30px auto 56px;
+    padding: 0 22px;
+  }
+  .acct-card {
+    background: var(--le-white);
+    border: 1px solid var(--le-slate-100);
+    border-radius: var(--le-radius);
+    padding: 22px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--le-shadow-sm);
+  }
+  .acct-card h2 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 14px;
+  }
+  .acct-row {
+    display: grid;
+    grid-template-columns: 130px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    min-height: 42px;
+    border-top: 1px solid var(--le-slate-100);
+  }
+  .acct-row:first-of-type { border-top: 0; }
+  .acct-label {
+    color: var(--le-slate-500);
+    font-size: 13px;
+  }
+  .acct-value {
+    color: var(--le-slate-900);
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .acct-muted {
+    color: var(--le-slate-500);
+    font-size: 13px;
+  }
+  .acct-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .acct-badge.active { background: var(--le-green-100); color: var(--le-green-900); }
+  .acct-badge.free { background: #dbeafe; color: #1e40af; }
+  .acct-badge.inactive { background: var(--le-slate-100); color: var(--le-slate-500); }
+  .acct-email-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .acct-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .acct-small-btn {
+    border: 1px solid var(--le-slate-100);
+    background: var(--le-white);
+    color: var(--le-green-700);
+    border-radius: 8px;
+    padding: 8px 11px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .acct-small-btn:hover { background: var(--le-green-50); }
+  .acct-actions .acct-small-btn {
+    border-color: transparent;
+    background: transparent;
+    padding: 7px 8px;
+  }
+  .acct-actions .acct-small-btn:hover {
+    background: var(--le-green-50);
+  }
+  .acct-small-btn:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+  .acct-message {
+    display: none;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+  .acct-message.ok { display: block; background: var(--le-green-100); color: var(--le-green-900); }
+  .acct-message.err { display: block; background: #fee2e2; color: #991b1b; }
+  .acct-quota-bar {
+    height: 6px;
+    background: var(--le-slate-100);
+    border-radius: 999px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .acct-quota-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--le-green-500);
+    border-radius: 999px;
+  }
+  .acct-quota-fill.over { background: #ef4444; }
+  .acct-upgrade-banner {
+    background: linear-gradient(135deg, var(--le-green-700), var(--le-green-500));
+    color: var(--le-white);
+    border-radius: var(--le-radius);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .acct-upgrade-banner h3 { font-size: 20px; margin-bottom: 8px; }
+  .acct-upgrade-banner p { font-size: 14px; opacity: 0.9; margin-bottom: 20px; }
+  .acct-upgrade-banner .le-btn {
+    background: var(--le-white);
+    color: var(--le-green-700);
+    font-weight: 700;
+  }
+  .acct-upgrade-banner .le-btn:hover { background: var(--le-green-50); }
+  .acct-upgrade-option {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 16px 20px;
+    min-width: 160px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .acct-upgrade-option:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.5);
+  }
+  .acct-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .acct-plan-option {
+    border: 1px solid var(--le-slate-100);
+    border-radius: 8px;
+    padding: 14px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .acct-plan-option:hover {
+    background: var(--le-green-50);
+    border-color: var(--le-green-500);
+  }
+  .acct-plan-price {
+    color: var(--le-slate-900);
+    font-size: 22px;
+    font-weight: 800;
+  }
+  .acct-plan-note {
+    color: var(--le-slate-500);
+    font-size: 12px;
+    margin: 4px 0 12px;
+  }
+  .acct-invoice-list {
+    display: grid;
+    gap: 8px;
+  }
+  .acct-invoice-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+    border-top: 1px solid var(--le-slate-100);
+    padding-top: 10px;
+  }
+  .acct-invoice-row:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .acct-danger-card {
+    border-color: #fecaca;
+  }
+  .acct-danger-card h2 {
+    color: #991b1b;
+  }
+  .acct-danger-btn {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+  }
+  .acct-danger-btn:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+  }
+  .acct-policy {
+    display: grid;
+    gap: 10px;
+  }
+  .acct-policy details {
+    border-top: 1px solid var(--le-slate-100);
+    padding-top: 10px;
+  }
+  .acct-policy details:first-of-type {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .acct-policy summary {
+    color: var(--le-slate-900);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    list-style-position: outside;
+  }
+  .acct-policy-body {
+    margin-top: 12px;
+  }
+  .acct-policy-body p {
+    margin: 0 0 8px;
+    color: var(--le-slate-600);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .acct-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.46);
+  }
+  .acct-modal-overlay.active { display: flex; }
+  .acct-modal {
+    width: min(440px, 100%);
+    background: var(--le-white);
+    border-radius: var(--le-radius);
+    box-shadow: var(--le-shadow-lg);
+    padding: 24px;
+  }
+  .acct-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .acct-modal h3 {
+    margin: 0;
+    font-size: 18px;
+  }
+  .acct-modal-close {
+    border: 0;
+    background: transparent;
+    color: var(--le-slate-500);
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+  }
+  .acct-modal-panel { display: none; }
+  .acct-modal-panel.active { display: block; }
+  .acct-form {
+    display: grid;
+    gap: 12px;
+  }
+  .acct-form label {
+    display: grid;
+    gap: 6px;
+    color: var(--le-slate-500);
+    font-size: 13px;
+  }
+  .acct-form input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--le-slate-100);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font: inherit;
+    color: var(--le-slate-900);
+    background: var(--le-white);
+  }
+  @media (max-width: 640px) {
+    .acct-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      padding: 12px 0;
+    }
+    .acct-small-btn {
+      width: 100%;
+    }
+    .acct-actions {
+      width: 100%;
+      justify-content: stretch;
+    }
+    .acct-plan-grid,
+    .acct-invoice-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+{% include "_top_nav.html" %}
+
+<div class="acct-wrap">
+  <div class="acct-message" id="accountMessage"></div>
+
+  <!-- Upgrade banner (shown for free users) -->
+  <div class="acct-upgrade-banner" id="upgradeBanner" style="display:none;">
+    <h3>Upgrade to Pro</h3>
+    <p>Unlock unlimited lookups, auto-glossing, LLM assistant, and community features.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <div class="acct-upgrade-option">
+        <div style="font-size:24px;font-weight:700;">$10</div>
+        <div style="font-size:13px;opacity:0.9;">/month</div>
+        <div style="font-size:11px;margin-top:6px;opacity:0.8;">Unlimited access<br>Cancel anytime</div>
+        <button class="le-btn" onclick="startCheckout('monthly')" style="margin-top:10px;">Choose Monthly</button>
+      </div>
+      <div class="acct-upgrade-option">
+        <div style="font-size:24px;font-weight:700;">$100</div>
+        <div style="font-size:13px;opacity:0.9;">/year</div>
+        <div style="font-size:11px;margin-top:6px;opacity:0.8;">2 months free<br>Same Pro features</div>
+        <button class="le-btn" onclick="startCheckout('yearly')" style="margin-top:10px;">Choose Yearly</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="acct-card">
+    <h2>Account</h2>
+    <div class="acct-row">
+      <div class="acct-label">Email</div>
+      <div class="acct-value acct-email-line">
+        <span id="infoEmail">Loading...</span>
+      </div>
+      <span></span>
+    </div>
+    <div class="acct-row">
+      <div class="acct-label">Password</div>
+      <div class="acct-value" id="passwordStatus">xxxxxxxx</div>
+      <div class="acct-actions">
+        <button class="acct-small-btn" id="changePasswordButton" type="button" onclick="openAccountModal('password')">Change Password</button>
+      </div>
+    </div>
+    <div class="acct-row">
+      <div class="acct-label">Plan</div>
+      <div class="acct-value" id="infoPlan"><span class="acct-badge inactive">Loading...</span></div>
+      <span></span>
+    </div>
+  </div>
+
+  <div class="acct-card" id="usageCard">
+    <h2>Usage</h2>
+    <div id="lookupUsageBlock">
+      <div class="acct-row">
+        <div class="acct-label">Lookup tokens today</div>
+        <div class="acct-value"><span id="quotaUsed">0</span> / <span id="quotaLimit">1000</span></div>
+        <span></span>
+      </div>
+      <div class="acct-quota-bar"><div class="acct-quota-fill" id="quotaFill"></div></div>
+    </div>
+    <div id="paidUsageBlock" style="display:none;">
+      <div class="acct-row" id="llmRow" style="display:none;">
+        <div class="acct-label">LLM budget</div>
+        <div class="acct-value"><span id="llmUsed">0%</span> used</div>
+        <span></span>
+      </div>
+      <div class="acct-quota-bar" id="llmBar" style="display:none;"><div class="acct-quota-fill" id="llmFill"></div></div>
+    </div>
+  </div>
+
+  <div class="acct-card">
+    <h2>Billing history</h2>
+    <div class="acct-invoice-list" id="invoiceList">
+      <div class="acct-muted">Loading billing history...</div>
+    </div>
+  </div>
+
+  <div class="acct-card" id="subscriptionCard" style="display:none;">
+    <h2 id="subscriptionTitle">Manage subscription</h2>
+    <div id="proManageBlock" style="display:none;">
+      <div class="acct-row">
+        <div class="acct-label" id="subPeriodLabel">Renews</div>
+        <div class="acct-value" id="subPeriod">-</div>
+        <button class="acct-small-btn" type="button" onclick="openPortal()">Manage Subscription</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="acct-card acct-danger-card">
+    <h2>Delete account</h2>
+    <div class="acct-row">
+      <div class="acct-label">Account removal</div>
+      <div class="acct-muted">Removes your login and billing account.</div>
+      <button class="acct-small-btn acct-danger-btn" type="button" onclick="openAccountModal('delete')">Delete Account</button>
+    </div>
+  </div>
+
+  <div class="acct-card acct-policy">
+    <h2>Policies</h2>
+    <details>
+      <summary>Privacy policy</summary>
+      <div class="acct-policy-body">
+        <p><strong>Last updated May 11, 2026.</strong></p>
+        <p><strong>Information collected.</strong> Language Engine stores the information needed to run your account, including your email address, login method, subscription status, Stripe billing identifiers, usage counters, support messages, uploaded documents or text, lookup activity, custom entries, and annotations.</p>
+        <p><strong>How it is used.</strong> We use account and usage data to provide the reader, dictionary lookup, NLP analysis, AI features, billing, support, security, and account-management tools.</p>
+        <p><strong>Service providers.</strong> Payments are processed by Stripe, Google sign-in is handled by Google, account emails are sent through the configured email provider, and AI features may send the text needed for a request to the configured AI provider.</p>
+        <p><strong>Sharing.</strong> We do not sell personal data. We share data only with service providers needed to operate the app, when required by law, or when needed to protect the service from abuse.</p>
+        <p><strong>Your choices.</strong> You can change your password, manage billing, or delete your login and billing account from this page. For other privacy questions, use the Contact link.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Terms and cancellation policy</summary>
+      <div class="acct-policy-body">
+        <p><strong>Accounts.</strong> You are responsible for keeping your account email current and for protecting access to your account.</p>
+        <p><strong>Uploaded content.</strong> You are responsible for the documents and text you upload or process with the app, including having the right to use that material.</p>
+        <p><strong>Service output.</strong> Dictionary data, NLP analysis, translations, and AI-generated output can contain mistakes. Check important results before relying on them.</p>
+        <p><strong>Subscriptions.</strong> Paid plans are billed by Stripe at the monthly or yearly price shown at checkout. Subscriptions renew automatically until canceled.</p>
+        <p><strong>Cancellation.</strong> You can manage or cancel a subscription with the Manage Subscription button above. Cancellation normally takes effect at the end of the current billing period. Payments are not prorated or refunded unless required by law or approved by Language Engine.</p>
+        <p><strong>Email.</strong> Language Engine may send account recovery, billing, and service-related emails.</p>
+        <p><strong>Termination.</strong> Access may be suspended or ended for nonpayment, abuse, unlawful use, or attempts to interfere with the service.</p>
+        <p><strong>Contact.</strong> Use the Contact link for questions about these terms.</p>
+      </div>
+    </details>
+  </div>
+</div>
+
+<div class="acct-modal-overlay" id="accountModal" onclick="handleModalOverlayClick(event)">
+  <div class="acct-modal" role="dialog" aria-modal="true">
+    <div class="acct-modal-head">
+      <h3 id="accountModalTitle">Account</h3>
+      <button class="acct-modal-close" type="button" onclick="closeAccountModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="acct-message" id="modalMessage"></div>
+
+    <div class="acct-modal-panel" id="passwordPanel">
+      <form class="acct-form" id="changePasswordForm">
+        <label>Current password
+          <input type="password" id="currentPassword" autocomplete="current-password"/>
+        </label>
+        <label>New password
+          <input type="password" id="newPassword" autocomplete="new-password" minlength="8"/>
+        </label>
+        <button class="le-btn le-btn-primary" type="submit">Update Password</button>
+      </form>
+    </div>
+
+    <div class="acct-modal-panel" id="deletePanel">
+      <form class="acct-form" id="deleteAccountForm">
+        <p class="acct-muted">Type your account email to confirm deletion.</p>
+        <label>Account email
+          <input type="email" id="deleteConfirmEmail" autocomplete="off"/>
+        </label>
+        <label id="deletePasswordLabel">Current password
+          <input type="password" id="deleteCurrentPassword" autocomplete="current-password"/>
+        </label>
+        <button class="le-btn acct-danger-btn" type="submit">Delete Account</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var checkoutBilling = new URLSearchParams(window.location.search).get('checkout');
+  var accountHasPassword = false;
+  var accountDeletionSubscriptionBlocked = false;
+
+  function setMessage(id, text, isError) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text || '';
+    el.className = 'acct-message' + (text ? (isError ? ' err' : ' ok') : '');
+  }
+
+  function setAccountMessage(text, isError) {
+    setMessage('accountMessage', text, isError);
+  }
+
+  function setModalMessage(text, isError) {
+    setMessage('modalMessage', text, isError);
+  }
+
+  function postJson(url, payload) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload || {}),
+    }).then(function(r) {
+      return r.json().then(function(data) {
+        data._status = r.status;
+        return data;
+      });
+    });
+  }
+
+  function money(cents, currency) {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: currency || 'USD',
+    }).format(Number(cents || 0) / 100);
+  }
+
+  function dateText(value) {
+    var d = new Date(value);
+    if (typeof value === 'number') d = new Date(value * 1000);
+    if (isNaN(d.getTime())) return '-';
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function maskedPassword(length) {
+    var n = Number(length || 0);
+    if (!isFinite(n) || n < 1) n = 8;
+    return new Array(n + 1).join('x');
+  }
+
+  window.openAccountModal = function(panel) {
+    if (panel === 'delete' && accountDeletionSubscriptionBlocked) {
+      setAccountMessage('Cancel your subscription from Manage Subscription before deleting this account.', true);
+      return;
+    }
+    var titles = {
+      password: 'Change password',
+      delete: 'Delete account',
+    };
+    document.getElementById('accountModalTitle').textContent = titles[panel] || 'Account';
+    setModalMessage('', false);
+    ['passwordPanel', 'deletePanel'].forEach(function(id) {
+      document.getElementById(id).classList.remove('active');
+    });
+    document.getElementById(panel + 'Panel').classList.add('active');
+    document.getElementById('accountModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeAccountModal = function() {
+    document.getElementById('accountModal').classList.remove('active');
+    document.body.style.overflow = '';
+    setModalMessage('', false);
+  };
+
+  window.handleModalOverlayClick = function(e) {
+    if (e.target && e.target.id === 'accountModal') closeAccountModal();
+  };
+
+  function loadUser() {
+    fetch('/auth/me')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.ok || !data.user) {
+          window.location.href = '/';
+          return;
+        }
+        document.getElementById('infoEmail').textContent = data.user.email;
+        accountHasPassword = !!data.user.has_password;
+        if (!accountHasPassword) {
+          document.getElementById('passwordStatus').textContent = 'Google sign-in';
+          document.getElementById('changePasswordButton').style.display = 'none';
+          document.getElementById('deletePasswordLabel').style.display = 'none';
+        } else {
+          document.getElementById('passwordStatus').textContent = maskedPassword(data.user.password_length);
+        }
+      });
+  }
+
+  function loadStatus() {
+    fetch('/payments/status')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.ok) return;
+        var liveBillingStatuses = ['active', 'trialing', 'past_due', 'unpaid', 'incomplete'];
+        accountDeletionSubscriptionBlocked = liveBillingStatuses.indexOf(data.subscription_status) !== -1 && !data.subscription_cancel_at_period_end;
+
+        var planEl = document.getElementById('infoPlan');
+        var upgradeNav = document.querySelector('[data-upgrade-nav]');
+        if (upgradeNav) upgradeNav.style.display = data.is_subscribed ? 'none' : '';
+
+        if (data.is_subscribed) {
+          planEl.innerHTML = '<span class="acct-badge active">Pro</span>';
+          document.getElementById('subscriptionTitle').textContent = 'Manage subscription';
+          document.getElementById('upgradeBanner').style.display = 'none';
+          document.getElementById('subscriptionCard').style.display = 'block';
+          document.getElementById('lookupUsageBlock').style.display = 'none';
+          document.getElementById('paidUsageBlock').style.display = 'block';
+          document.getElementById('proManageBlock').style.display = 'block';
+
+          if (data.subscription_current_period_end) {
+            document.getElementById('subPeriodLabel').textContent = data.subscription_cancel_at_period_end ? 'Ends' : 'Renews';
+            document.getElementById('subPeriod').textContent = dateText(data.subscription_current_period_end);
+          } else {
+            document.getElementById('subPeriod').textContent = data.subscription_status || 'Active';
+          }
+
+          if ((data.llm_budget_usd || 0) > 0) {
+            document.getElementById('llmRow').style.display = 'grid';
+            document.getElementById('llmBar').style.display = 'block';
+            var llmPct = Math.min(100, Math.max(0, Number(data.llm_usage_pct || 0)));
+            document.getElementById('llmUsed').textContent = llmPct.toFixed(1) + '%';
+            document.getElementById('llmFill').style.width = llmPct + '%';
+          }
+        } else {
+          planEl.innerHTML = '<span class="acct-badge free">Free</span>';
+          document.getElementById('upgradeBanner').style.display = 'block';
+          document.getElementById('subscriptionCard').style.display = 'none';
+          document.getElementById('proManageBlock').style.display = 'none';
+          document.getElementById('quotaUsed').textContent = data.lookup_tokens_used || data.lookups_used || 0;
+          document.getElementById('quotaLimit').textContent = data.lookup_tokens_limit || data.lookups_limit || 1000;
+          var pct = Math.min(100, ((data.lookup_tokens_used || data.lookups_used || 0) / (data.lookup_tokens_limit || data.lookups_limit || 1000)) * 100);
+          var fill = document.getElementById('quotaFill');
+          fill.style.width = pct + '%';
+          fill.classList.toggle('over', pct >= 100);
+          if (checkoutBilling === 'monthly' || checkoutBilling === 'yearly') {
+            window.history.replaceState(null, '', '/account');
+            startCheckout(checkoutBilling);
+          }
+        }
+      });
+  }
+
+  function loadInvoices() {
+    var list = document.getElementById('invoiceList');
+    fetch('/payments/invoices')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.ok) {
+          list.innerHTML = '<div class="acct-muted">' + (data.error || 'Could not load billing history.') + '</div>';
+          return;
+        }
+        var invoices = data.invoices || [];
+        if (!invoices.length) {
+          list.innerHTML = '<div class="acct-muted">No billing history yet.</div>';
+          return;
+        }
+        list.innerHTML = invoices.map(function(inv) {
+          var link = inv.url ? '<a class="acct-small-btn" href="' + inv.url + '" target="_blank" rel="noopener">Open</a>' : '<span></span>';
+          return '<div class="acct-invoice-row">' +
+            '<div><strong>' + dateText(inv.created) + '</strong><div class="acct-muted">' + (inv.status || 'invoice') + '</div></div>' +
+            '<div class="acct-value">' + money(inv.amount, inv.currency) + '</div>' +
+            link +
+          '</div>';
+        }).join('');
+      })
+      .catch(function() {
+        list.innerHTML = '<div class="acct-muted">Could not load billing history.</div>';
+      });
+  }
+
+  window.startCheckout = function(billing) {
+    fetch('/payments/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ billing: billing || 'monthly' }),
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.ok && data.url) {
+          window.location.href = data.url;
+        } else {
+          setAccountMessage(data.error || 'Could not start checkout.', true);
+        }
+      });
+  };
+
+  window.openPortal = function() {
+    window.location.href = '/payments/portal';
+  };
+
+  document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    setModalMessage('', false);
+    postJson('/auth/change-password', {
+      current_password: document.getElementById('currentPassword').value,
+      new_password: document.getElementById('newPassword').value,
+    }).then(function(data) {
+      if (data.ok) {
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        closeAccountModal();
+        setAccountMessage('Password updated.', false);
+      } else {
+        setModalMessage(data.error || 'Could not update password.', true);
+      }
+    }).catch(function() {
+      setModalMessage('Network error. Please try again.', true);
+    });
+  });
+
+  document.getElementById('deleteAccountForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    setModalMessage('', false);
+    postJson('/auth/delete-account', {
+      confirm_email: document.getElementById('deleteConfirmEmail').value.trim(),
+      current_password: accountHasPassword ? document.getElementById('deleteCurrentPassword').value : '',
+    }).then(function(data) {
+      if (data.ok) {
+        window.location.href = '/';
+      } else {
+        setModalMessage(data.error || 'Could not delete account.', true);
+      }
+    }).catch(function() {
+      setModalMessage('Network error. Please try again.', true);
+    });
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeAccountModal();
+  });
+
+  loadUser();
+  loadStatus();
+  loadInvoices();
+})();
+</script>
+</body>
+</html>

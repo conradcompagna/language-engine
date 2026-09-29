@@ -1,0 +1,146 @@
+/* ================================================================
+   Synthetic entry annotation UI
+   ================================================================ */
+
+.synth-annot-ui {
+  margin-top: 8px;
+  padding: 10px;
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: var(--le-radius-sm);
+}
+.synth-annot-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.synth-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f59e0b;
+  color: white;
+  letter-spacing: 0.5px;
+}
+.synth-label {
+  font-size: 11px;
+  color: var(--le-slate-500);
+}
+.synth-annot-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.synth-annot-fields label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--le-slate-700);
+}
+.synth-input {
+  border: 1px solid var(--le-slate-300);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: inherit;
+}
+.synth-input:focus {
+  outline: none;
+  border-color: var(--le-green-500);
+}
+.synth-save-btn {
+  margin-top: 6px;
+  padding: 5px 12px;
+  background: var(--le-green-700);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+}
+.synth-save-btn:hover {
+  background: var(--le-green-500);
+}
+
+/* ================================================================
+   User annotation box (notes on tokens)
+   ================================================================ */
+
+.user-annot-box {
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--le-slate-100);
+  border-radius: var(--le-radius-sm);
+}
+.user-annot-header {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--le-slate-700);
+}
+.user-annot-textarea {
+  width: 100%;
+  border: 1px solid var(--le-slate-300);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  resize: vertical;
+}
+.user-annot-textarea:focus {
+  outline: none;
+  border-color: var(--le-green-500);
+}
+.user-annot-save-btn {
+  margin-top: 4px;
+  padding: 4px 10px;
+  background: var(--le-green-700);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.user-annot-save-btn:hover {
+  background: var(--le-green-500);
+}
+
+/* Community annotations */
+.community-annot-title,
+.community-entries-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--le-slate-500);
+  margin-top: 8px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.community-annot-item,
+.community-entry-item {
+  font-size: 12px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--le-slate-100);
+}
+.community-annot-author,
+.community-entry-author {
+  font-weight: 600;
+  color: var(--le-slate-500);
+  font-size: 11px;
+}
+.community-entry-head {
+  font-weight: 600;
+}
+.community-entry-pos {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--le-slate-500);
+}
+.community-entry-defs {
+  color: var(--le-slate-700);
+}

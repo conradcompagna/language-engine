@@ -1,0 +1,113 @@
+{
+  "methods": [
+    "buildFillSurfaceSlices",
+    "buildMergedLookupPayload",
+    "debugBuildKoreanLemmaXposAlignment",
+    "debugBuildLemmaAlignment",
+    "ensureLanguageEngine",
+    "getDictSource",
+    "getRawGeminiEntry",
+    "hasWord",
+    "init",
+    "injectGeminiEntry",
+    "isEngineReady",
+    "lookupSingle",
+    "onLanguageDictSync",
+    "parseTsvText",
+    "relookupOneSegment",
+    "removeGeminiEntry",
+    "updateGeminiEntry",
+    "wrapFetch"
+  ],
+  "rows": [
+    {
+      "__line_no": 2,
+      "headword": "read",
+      "pos": "verb",
+      "glosses": "interpret text"
+    },
+    {
+      "__line_no": 3,
+      "headword": "book",
+      "pos": "noun",
+      "glosses": "bound pages"
+    }
+  ],
+  "alignments": [
+    {
+      "boundaries": [
+        2
+      ],
+      "groups": [
+        {
+          "start": 0,
+          "end": 2,
+          "part_ids": [
+            0
+          ],
+          "part_count": 1,
+          "xpos_tags": [
+            "nng"
+          ],
+          "shared_xpos_guard": false,
+          "unit_codepoints": []
+        },
+        {
+          "start": 2,
+          "end": 4,
+          "part_ids": [
+            1
+          ],
+          "part_count": 1,
+          "xpos_tags": [
+            "jkb"
+          ],
+          "shared_xpos_guard": false,
+          "unit_codepoints": []
+        }
+      ],
+      "match_basis": "surface",
+      "shared_xpos_guard": false,
+      "codepoint_debug": null
+    },
+    null,
+    null,
+    null
+  ],
+  "korean": {
+    "boundaries": [
+      2
+    ],
+    "groups": [
+      {
+        "start": 0,
+        "end": 2,
+        "part_ids": [
+          0
+        ],
+        "part_count": 1,
+        "xpos_tags": [
+          "nng"
+        ],
+        "shared_xpos_guard": false,
+        "unit_codepoints": []
+      },
+      {
+        "start": 2,
+        "end": 4,
+        "part_ids": [
+          1
+        ],
+        "part_count": 1,
+        "xpos_tags": [
+          "jkb"
+        ],
+        "shared_xpos_guard": false,
+        "unit_codepoints": []
+      }
+    ],
+    "match_basis": "surface",
+    "shared_xpos_guard": false,
+    "codepoint_debug": null
+  }
+}

@@ -1,0 +1,43 @@
+import { japaneseTablesState } from './japanese-tables.state.mjs';
+export function initializeJapaneseExtensions() {
+  Object.assign(japaneseTablesState.JAPANESE_BASE_MAP, {
+    ゕ: 'ka',
+    ゖ: 'ke',
+    ゝ: '',
+    ゞ: '',
+    ゟ: 'yori',
+    ヵ: 'ka',
+    ヶ: 'ke',
+    ヽ: '',
+    ヾ: '',
+    ヷ: 'va',
+    ヸ: 'vi',
+    ヹ: 've',
+    ヺ: 'vo',
+    ㇰ: 'k',
+    ㇱ: 'sh',
+    ㇲ: 's',
+    ㇳ: 't',
+    ㇴ: 'n',
+    ㇵ: 'h',
+    ㇶ: 'hi',
+    ㇷ: 'f',
+    ㇸ: 'he',
+    ㇹ: 'ho',
+    ㇺ: 'm',
+    ㇻ: 'ra',
+    ㇼ: 'ri',
+    ㇽ: 'ru',
+    ㇾ: 're',
+    ㇿ: 'ro',
+    ㇷ゚: 'p',
+    ヰ: 'wi',
+    ヱ: 'we',
+    ゔぁ: 'va',
+    ゔぃ: 'vi',
+    ゔぇ: 've',
+    ゔぉ: 'vo',
+    ゔゅ: 'vyu'
+  });
+  return true;
+}

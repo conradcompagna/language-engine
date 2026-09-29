@@ -1,0 +1,29 @@
+{
+  "note": "Aggregate of the Gemini annotation run that produced the Sanskrit NER training set. Per-job artefacts (one prompt pair, raw response, usage record, divergence report and validation output per 10-sentence job) are not published; the counts below record their volume. Representative samples are in sample_prompts/, sample_summaries/ and sample_validated_bio/.",
+  "models_used": [
+    "gemini-2.5-flash-lite"
+  ],
+  "artefact_file_counts": {
+    "divergences": 1850,
+    "final": 18,
+    "inputs": 1934,
+    "logs": 3,
+    "postprocessed": 3,
+    "prompts": 3868,
+    "raw_atomic": 1852,
+    "responses": 1852,
+    "summaries": 2118,
+    "usage": 1852,
+    "validated_atomic": 1680,
+    "validated_bio": 1680
+  },
+  "usage_totals": {
+    "jobs": 1852,
+    "prompt_tokens": 3107852,
+    "candidate_tokens": 728721,
+    "total_tokens": 3836573,
+    "input_cost_usd": 0.3108,
+    "output_cost_usd": 0.2915,
+    "total_cost_usd": 0.6023
+  }
+}

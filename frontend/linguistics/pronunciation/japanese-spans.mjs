@@ -1,0 +1,108 @@
+import { japaneseSpansState } from './japanese-spans.state.mjs';
+import { japaneseTablesState } from './japanese-tables.state.mjs';
+export function initializeJapaneseSpans() {
+  japaneseSpansState.JAPANESE_SMALL_Y = {
+    ゃ: 'ya',
+    ゅ: 'yu',
+    ょ: 'yo',
+    ャ: 'ya',
+    ュ: 'yu',
+    ョ: 'yo'
+  };
+  japaneseSpansState.JAPANESE_SMALL_VOWEL = {
+    ぁ: 'a',
+    ぃ: 'i',
+    ぅ: 'u',
+    ぇ: 'e',
+    ぉ: 'o',
+    ァ: 'a',
+    ィ: 'i',
+    ゥ: 'u',
+    ェ: 'e',
+    ォ: 'o',
+    ゎ: 'wa',
+    ヮ: 'wa'
+  };
+  japaneseSpansState.JAPANESE_YOON_STEMS = {
+    shi: 'sh',
+    chi: 'ch',
+    ji: 'j',
+    di: 'dy',
+    ti: 'ty',
+    ni: 'ny',
+    hi: 'hy',
+    bi: 'by',
+    pi: 'py',
+    mi: 'my',
+    ri: 'ry',
+    ki: 'ky',
+    gi: 'gy',
+    i: 'y',
+    fu: 'fy',
+    vu: 'vy'
+  };
+  japaneseSpansState.JAPANESE_FOREIGN_STEMS = {
+    shi: 'sh',
+    chi: 'ch',
+    ji: 'j',
+    di: 'd',
+    ti: 't',
+    fu: 'f',
+    vu: 'v',
+    u: 'w',
+    tsu: 'ts',
+    tu: 't',
+    du: 'd'
+  };
+  Object.assign(japaneseTablesState.JAPANESE_SPAN_MAP, {
+    いぇ: 'ye',
+    うぁ: 'wa',
+    うぃ: 'wi',
+    うぇ: 'we',
+    うぉ: 'wo',
+    ゔぁ: 'va',
+    ゔぃ: 'vi',
+    ゔぇ: 've',
+    ゔぉ: 'vo',
+    ゔゅ: 'vyu',
+    イェ: 'ye',
+    ウァ: 'wa',
+    ウィ: 'wi',
+    ウェ: 'we',
+    ウォ: 'wo',
+    ヴァ: 'va',
+    ヴィ: 'vi',
+    ヴェ: 've',
+    ヴォ: 'vo',
+    ヴュ: 'vyu',
+    スィ: 'si',
+    ズィ: 'zi',
+    テュ: 'tyu',
+    デュ: 'dyu',
+    フュ: 'fyu',
+    クァ: 'kwa',
+    クィ: 'kwi',
+    クェ: 'kwe',
+    クォ: 'kwo',
+    グァ: 'gwa',
+    グィ: 'gwi',
+    グェ: 'gwe',
+    グォ: 'gwo',
+    しぇ: 'she',
+    ちぇ: 'che',
+    じぇ: 'je',
+    ふぁ: 'fa',
+    ふぃ: 'fi',
+    ふぇ: 'fe',
+    ふぉ: 'fo',
+    てぃ: 'ti',
+    でぃ: 'di',
+    とぅ: 'tu',
+    どぅ: 'du',
+    つぁ: 'tsa',
+    つぃ: 'tsi',
+    つぇ: 'tse',
+    つぉ: 'tso'
+  });
+  return true;
+}

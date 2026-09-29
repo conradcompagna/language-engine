@@ -1,0 +1,110 @@
+[
+  {
+    "alias_id": "ALIAS_II_TO_YOI_LEMMA",
+    "variant": "いい",
+    "canonical": "良い",
+    "alias_type": "lemma_variant",
+    "applies_to": "A_I_SPECIAL_II",
+    "priority": 10,
+    "notes": "Canonicalize if your dictionary prefers 良い"
+  },
+  {
+    "alias_id": "ALIAS_YOI_HIRAGANA",
+    "variant": "よい",
+    "canonical": "良い",
+    "alias_type": "lemma_variant",
+    "applies_to": "A_I_SPECIAL_II",
+    "priority": 20,
+    "notes": "Hiragana lemma variant"
+  },
+  {
+    "alias_id": "ALIAS_RYAKU_II",
+    "variant": "良い",
+    "canonical": "いい",
+    "alias_type": "ui_display_preferred",
+    "applies_to": "A_I_SPECIAL_II",
+    "priority": 30,
+    "notes": "Optional UI normalization (reverse direction if preferred)"
+  },
+  {
+    "alias_id": "ALIAS_DEKIRU_KANJI",
+    "variant": "出来る",
+    "canonical": "できる",
+    "alias_type": "lemma_variant",
+    "applies_to": "V_IRR_DEKIRU",
+    "priority": 10,
+    "notes": "Potential of する often canonicalized to できる"
+  },
+  {
+    "alias_id": "ALIAS_KURU_KANJI",
+    "variant": "来る",
+    "canonical": "くる",
+    "alias_type": "lemma_variant",
+    "applies_to": "V_IRR_KURU",
+    "priority": 10,
+    "notes": "Kana canonicalization for parser consistency"
+  },
+  {
+    "alias_id": "ALIAS_KURU_OKURIGANA",
+    "variant": "来れる",
+    "canonical": "来られる",
+    "alias_type": "surface_variant_colloq",
+    "applies_to": "AUX_RARERU/POTENTIAL",
+    "priority": 15,
+    "notes": "Ra-dropping potential variant in colloquial"
+  },
+  {
+    "alias_id": "ALIAS_DEWA_JA",
+    "variant": "じゃ",
+    "canonical": "では",
+    "alias_type": "contraction_expand",
+    "applies_to": "COPULA_CHAIN",
+    "priority": 10,
+    "notes": "Expand colloquial contraction"
+  },
+  {
+    "alias_id": "ALIAS_TEIRU_TERU",
+    "variant": "てる",
+    "canonical": "ている",
+    "alias_type": "contraction_expand",
+    "applies_to": "AUX_CHAIN",
+    "priority": 10,
+    "notes": "Expand colloquial contraction"
+  },
+  {
+    "alias_id": "ALIAS_TEOKU_TOKU",
+    "variant": "とく",
+    "canonical": "ておく",
+    "alias_type": "contraction_expand",
+    "applies_to": "AUX_CHAIN",
+    "priority": 10,
+    "notes": "Expand colloquial contraction"
+  },
+  {
+    "alias_id": "ALIAS_DEOKU_DOKU",
+    "variant": "どく",
+    "canonical": "でおく",
+    "alias_type": "contraction_expand",
+    "applies_to": "AUX_CHAIN",
+    "priority": 10,
+    "notes": "Expand colloquial contraction"
+  },
+  {
+    "alias_id": "ALIAS_TESHIMAU_CHAU",
+    "variant": "ちゃう",
+    "canonical": "てしまう",
+    "alias_type": "contraction_expand",
+    "applies_to": "AUX_CHAIN",
+    "priority": 10,
+    "notes": "Expand colloquial contraction"
+  },
+  {
+    "alias_id": "ALIAS_DESHIMAU_JAU",
+    "variant": "じゃう",
+    "canonical": "でしまう",
+    "alias_type": "contraction_expand",
+    "applies_to": "AUX_CHAIN",
+    "priority": 10,
+    "notes": "Expand colloquial contraction"
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "record_type": "New evaluation of retained selected checkpoint; not recovered historical training score",
+  "evaluated_on": "2026-09-24",
+  "model": "Japanese customized-ner",
+  "selected_epoch": 49,
+  "checkpoint": {
+    "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized-ner/customized-ner.ner.mdl",
+    "sha256": "ed2eb0853e1a5e49f4ee929ce811e2721df4e1fe0fc2a69208a44f694722c0a6"
+  },
+  "dataset": {
+    "name": "UD Japanese GSD r2.10 NE",
+    "split": "development",
+    "file": "_deprecated_nonruntime_20260514_184819/training/UD_Japanese-GSD-r2.10-NE/stanza/dev.bio",
+    "sha256": "0fac68f958a61e69d83659c46c8e2fd80030cff4a453217963791959163eaef0",
+    "sentences": 507,
+    "tokens": 12287,
+    "gold_entities": 795
+  },
+  "run_identity_evidence": {
+    "file": "_deprecated_nonruntime_20260514_184819/training/UD_Japanese-GSD-r2.10-NE/stanza/command.txt",
+    "sha256": "2504e98d4f4c2b83c1881a7bd764afc8dc5cbbc680dddc512bdcc40bebbd7e8e",
+    "description": "Retained original training command names trankit_save_ja_ner_v2 as save directory and this corpus stanza/train.bio and stanza/dev.bio as its training and development inputs."
+  },
+  "metrics": {
+    "p": 84.65679676985195,
+    "r": 79.11949685534591,
+    "f1": 81.79453836150846
+  },
+  "metric_scope": "Entity micro-averaged precision, recall, F1 on pretokenized retained development sentences, using Trankit score_by_entity; BIO gold converted to BIOES. Percent scale.",
+  "runtime": {
+    "torch": "2.12.0.dev20260217+cu128",
+    "trankit": "1.1.1",
+    "device": "CPU",
+    "threads": 4,
+    "elapsed_seconds": 61.637529134750366
+  },
+  "evaluation_script": {
+    "file": "evaluate_japanese_ner.py",
+    "sha256": "bce89e31418035dd24314fd8c8e8cb42631ef0b3e76b0970006eb0a9fccfcdcd"
+  }
+}

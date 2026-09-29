@@ -1,0 +1,11 @@
+{
+  "category": "customized-ner",
+  "task": "ner",
+  "save_dir": "training\\t",
+  "train_bio_fpath": "training\\nerdump\\training_data\\swh_finerweb_top100_lpo\\train.bio",
+  "dev_bio_fpath": "training\\nerdump\\training_data\\swh_finerweb_top100_lpo\\dev.bio",
+  "embedding": "xlm-roberta-base",
+  "max_epoch": 100,
+  "batch_size": 12,
+  "gpu": true
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "rule_id": "TOK_AUX_TE_TE",
+    "lemma": "て",
+    "pos_major": "PART",
+    "pos_detail": "CONNECTIVE_TE",
+    "lemma_class": "AUX_TE",
+    "surface": "て",
+    "morph_slot": "CONNECTIVE",
+    "reason_code": "TE_CONNECTIVE_AFTER_T_SERIES_OR_NONVOICED",
+    "orthography_rule_id": "",
+    "requires_prev_state": "EXPECTS_TE_SLOT_T",
+    "emits_state": "AUX_CHAIN",
+    "morph_features": "ConjType=Te",
+    "register": "neutral",
+    "productivity": "productive",
+    "ambiguity_group": "AMB_TE",
+    "notes": ""
+  },
+  {
+    "rule_id": "TOK_AUX_TE_DE",
+    "lemma": "て",
+    "pos_major": "PART",
+    "pos_detail": "CONNECTIVE_TE",
+    "lemma_class": "AUX_TE",
+    "surface": "で",
+    "morph_slot": "CONNECTIVE_ALLOMORPH",
+    "reason_code": "TE_CONNECTIVE_ALLOMORPH_DE_AFTER_VOICED_OR_COPULA",
+    "orthography_rule_id": "",
+    "requires_prev_state": "EXPECTS_TE_SLOT_D",
+    "emits_state": "AUX_CHAIN",
+    "morph_features": "ConjType=Te",
+    "register": "neutral",
+    "productivity": "productive",
+    "ambiguity_group": "AMB_DE",
+    "notes": ""
+  }
+]

@@ -1,0 +1,2 @@
+Historical tokenizer training log: lossless epoch segments are in tokenize/.
+See tokenize/manifest.json for original offsets, hashes and reconstruction order.

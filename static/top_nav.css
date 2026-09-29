@@ -1,0 +1,77 @@
+#leAuthBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  background: var(--le-white);
+  border-bottom: 1px solid var(--le-slate-100);
+  font-size: 13px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+#leAuthBar img {
+  height: 24px;
+}
+
+#leAuthBar a[href="/account"] {
+  color: var(--le-green-700);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.le-chrome-link {
+  color: var(--le-green-700);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.le-chrome-link:hover {
+  color: var(--le-green-900);
+}
+
+.le-signout-btn {
+  background: none;
+  border: none;
+  color: var(--le-slate-500);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: color var(--le-transition);
+}
+
+.le-signout-btn:hover {
+  color: var(--le-slate-900);
+}
+
+.le-upgrade-btn {
+  background: var(--le-green-700);
+  border: 1px solid var(--le-green-700);
+  border-radius: 999px;
+  color: var(--le-white);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 7px 12px;
+  transition: background var(--le-transition), border-color var(--le-transition);
+}
+
+.le-upgrade-btn:hover {
+  background: var(--le-green-900);
+  border-color: var(--le-green-900);
+}
+
+@media (max-width: 720px) {
+  #leAuthBar {
+    align-items: flex-start;
+  }
+
+  #leAuthBar > div {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+}

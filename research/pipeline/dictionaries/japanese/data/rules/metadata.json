@@ -1,0 +1,63 @@
+{
+  "dataset_name": "jp_tokenized_pipeline_morphology_ruleset",
+  "version": "v2.0.0",
+  "created_utc": "2026-02-20T21:11:59Z",
+  "purpose": "Explain token surface-vs-lemma differences for Japanese verbs/adjectives/copula/auxiliaries in already-tokenized NLP output",
+  "target_scope": "modern_standard_japanese_with_common_colloquial_contractions",
+  "pipeline_assumption": "lemma and POS are already assigned and broadly correct",
+  "source_seeds": [
+    {
+      "source_id": "UPL_DEBUG_TXT",
+      "path": "/mnt/data/debug.txt",
+      "kind": "user_uploaded_text",
+      "notes": "Japanese verb conjugation reference text (wiki-style dump)"
+    },
+    {
+      "source_id": "UPL_ADFDFFF_TXT",
+      "path": "/mnt/data/adfdfff.txt",
+      "kind": "user_uploaded_text",
+      "notes": "Japanese adjectives reference text (wiki-style dump)"
+    },
+    {
+      "source_id": "MODEL_KNOWLEDGE",
+      "path": null,
+      "kind": "internal_knowledge",
+      "notes": "Added modern standard Japanese morphology/orthography rules, exceptions, contractions, disambiguation"
+    }
+  ],
+  "coverage_manifest": {
+    "target_use_case": "Already-tokenized Japanese text with lemma and POS assigned by NLP pipeline; classify why token surface differs from lemma for verbs/adjectives/copula/aux chains",
+    "scope_included": [
+      "Modern standard Japanese productive verb morphology (godan/ichidan/suru/kuru)",
+      "i-adjective morphology including いい/良い inflection stem alternation",
+      "na-adjective + copula allomorphs relevant to token-level analysis",
+      "Core auxiliary chains (negation, past, passive, causative, polite, desiderative, te/de linkers)",
+      "Common colloquial contractions used as single tokens (じゃ, てる, とく, ちゃう, etc.)",
+      "Disambiguation rules for ambiguous surfaces using lemma/POS/context",
+      "Lexical exception registry for high-frequency irregulars and honorific -aru verbs"
+    ],
+    "scope_excluded": [
+      "Classical Japanese full conjugational system beyond selected still-seen auxiliaries/forms (ぬ/ず included only minimally)",
+      "Dialect-specific paradigms beyond high-frequency colloquial contractions",
+      "Orthographic noise / typos / OCR corruption / non-standard internet spellings not listed as aliases",
+      "Tokenizer-specific segmentation bugs outside lemma/POS constraints"
+    ],
+    "completeness_claim": "Comprehensive for modern standard Japanese token-level verb/adjective/copula surface-vs-lemma explanation when lemma and POS are already correct, within declared scope.",
+    "version": "v2.0.0"
+  },
+  "counts": {
+    "orthography_rules": 45,
+    "godan_row_map_rows": 9,
+    "base_generation_rules": 108,
+    "token_morph_rules": 124,
+    "morpheme_allomorph_map": 67,
+    "ambiguity_resolution_rules": 20,
+    "lexical_exceptions": 10,
+    "normalization_aliases": 12,
+    "attachment_states": 21,
+    "attachment_edges": 27,
+    "contraction_rules": 6,
+    "validation_examples": 10
+  },
+  "completeness_statement": "Comprehensive for modern standard Japanese token-level verb/adjective/copula surface-vs-lemma explanation when lemma and POS are already correct, within declared scope."
+}

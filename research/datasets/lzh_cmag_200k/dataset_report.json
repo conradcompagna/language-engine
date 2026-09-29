@@ -1,0 +1,89 @@
+{
+  "dataset": "lzh_cmag_200k",
+  "created_utc": "2026-05-03T23:10:11Z",
+  "source_dataset": "training\\trankit_finerweb_prep\\datasets\\lzh_cmag_1m",
+  "source_dataset_report": "training\\trankit_finerweb_prep\\datasets\\lzh_cmag_1m\\dataset_report.json",
+  "sampling": "Deterministic one-in-five sentence sample from each lzh_cmag_1m split: selected 0-based sentence indexes where index % 5 == 0.",
+  "note": "Preserves complete sentences and original train/dev/test split proportions. all.bio is train+dev+test.",
+  "source_note": "Original CMAG test pickle was not used because it fails to unpickle locally at byte 1048580. Dev and test here are disjoint deterministic subsets of the original CMAG dev split.",
+  "label_conversion": "CMAG BEIS tags are converted to BIO: LOC-S/PER-S/OFI-S -> B-*, LOC-E/PER-E/OFI-E -> I-*.",
+  "format": "Trankit BIO, one token and one BIO tag per line, blank line between sentences.",
+  "splits": {
+    "train": {
+      "sentences": 7239,
+      "tokens": 159903,
+      "tag_counts": {
+        "B-LOC": 8707,
+        "B-OFI": 1918,
+        "B-PER": 11215,
+        "I-LOC": 8077,
+        "I-OFI": 2956,
+        "I-PER": 10741,
+        "O": 116289
+      },
+      "label_token_counts": {
+        "LOC": 16784,
+        "O": 116289,
+        "OFI": 4874,
+        "PER": 21956
+      }
+    },
+    "dev": {
+      "sentences": 902,
+      "tokens": 20030,
+      "tag_counts": {
+        "B-LOC": 1105,
+        "B-OFI": 284,
+        "B-PER": 1361,
+        "I-LOC": 1002,
+        "I-OFI": 465,
+        "I-PER": 1374,
+        "O": 14439
+      },
+      "label_token_counts": {
+        "LOC": 2107,
+        "O": 14439,
+        "OFI": 749,
+        "PER": 2735
+      }
+    },
+    "test": {
+      "sentences": 916,
+      "tokens": 20467,
+      "tag_counts": {
+        "B-LOC": 1116,
+        "B-OFI": 240,
+        "B-PER": 1344,
+        "I-LOC": 1020,
+        "I-OFI": 378,
+        "I-PER": 1260,
+        "O": 15109
+      },
+      "label_token_counts": {
+        "LOC": 2136,
+        "O": 15109,
+        "OFI": 618,
+        "PER": 2604
+      }
+    },
+    "all": {
+      "sentences": 9057,
+      "tokens": 200400,
+      "tag_counts": {
+        "B-LOC": 10928,
+        "B-OFI": 2442,
+        "B-PER": 13920,
+        "I-LOC": 10099,
+        "I-OFI": 3799,
+        "I-PER": 13375,
+        "O": 145837
+      },
+      "label_token_counts": {
+        "LOC": 21027,
+        "O": 145837,
+        "OFI": 6241,
+        "PER": 27295
+      }
+    }
+  }
+}

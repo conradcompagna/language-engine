@@ -1,0 +1,86 @@
+{
+  "chunk": 1000,
+  "prefix": "chunk1000",
+  "attempt_no": 1,
+  "is_retry": false,
+  "sentence_count": 10,
+  "input_token_rows": 84,
+  "sources": [
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 91
+    },
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 92
+    },
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 93
+    },
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 94
+    },
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 95
+    },
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 96
+    },
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 97
+    },
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 98
+    },
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 99
+    },
+    {
+      "source_file": "unannotatedchild_chunk_100_source_10_sent_0901_1000.bio",
+      "source_sentence": 100
+    }
+  ],
+  "status": "completed",
+  "output_token_rows": 84,
+  "divergence_count": 0,
+  "non_o_rows": 41,
+  "non_o_label_counts": {
+    "SUBSTANCE": 23,
+    "MEASURE": 5,
+    "PROCEDURE": 4,
+    "FOOD": 3,
+    "CONCEPT": 3,
+    "TOOL": 1,
+    "PLANT": 1,
+    "PERSON": 1
+  },
+  "usage": {
+    "model": "gemini-2.5-flash-lite",
+    "prompt_token_count": 1710,
+    "candidate_token_count": 464,
+    "total_token_count": 2174,
+    "estimated_input_cost_usd": 0.000171,
+    "estimated_output_cost_usd": 0.0001856,
+    "estimated_total_cost_usd": 0.0003566,
+    "raw_usage": {
+      "promptTokenCount": 1710,
+      "candidatesTokenCount": 464,
+      "totalTokenCount": 2174,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 1710
+        }
+      ],
+      "serviceTier": "standard"
+    }
+  },
+  "validation": "passed"
+}

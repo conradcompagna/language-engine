@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "note": "Observed vendored bytes, not an assertion of an upstream commit or an update.",
+  "files": [
+    {
+      "path": "static/vendor/dompurify/purify.min.js",
+      "bytes": 22216,
+      "sha256": "8eb41b658831fab175fad9bcd00fcb2d84e0ed3a25a55053d4ecd4444b8b43a0"
+    },
+    {
+      "path": "static/vendor/mammoth/mammoth.browser.min.js",
+      "bytes": 634129,
+      "sha256": "2a0c24d419b8b6b307b2c59dcad9ac045ef43c29fdb23f3b0f2e82d5b09287fe"
+    },
+    {
+      "path": "static/vendor/pdfjs/pdf.min.js",
+      "bytes": 320004,
+      "sha256": "5b5799e6f8c680663207ac5b42ee14eed2a406fa7af48f50c154f0c0b1566946"
+    },
+    {
+      "path": "static/vendor/pdfjs/pdf.worker.min.js",
+      "bytes": 1087212,
+      "sha256": "feabdf309770ed24bba31a5467836cdc8cf639c705af27d52b585b041bb8527b"
+    },
+    {
+      "path": "static/vendor/pdfjs/pdf_viewer.min.css",
+      "bytes": 45512,
+      "sha256": "31b06d08f5e2ffcf3e83bdf8885229b93941af83a2edd8a37c4fc98202a43f5d"
+    },
+    {
+      "path": "static/vendor/pdfjs/pdf_viewer.min.js",
+      "bytes": 120209,
+      "sha256": "0659061e4540b74a6f1666755a50295ef35771b6d9e1f19b7aa10bb7bebe2819"
+    },
+    {
+      "path": "static/foliate-js/epub.js",
+      "bytes": 43324,
+      "sha256": "2dd3fbc208a8137ae19ab0e600854c25177e2a7845f16bd8b05f44dbf9afd7ad"
+    },
+    {
+      "path": "static/foliate-js/epubcfi.js",
+      "bytes": 13041,
+      "sha256": "0fdd0e1a2041255e4d60bcc8cad4c3293cbd4d8cb4fdecbc24435e0d4195662d"
+    },
+    {
+      "path": "static/foliate-js/fb2.js",
+      "bytes": 12225,
+      "sha256": "53909180c9da4c0529f05b7fcf32ad4a9c73a03cec75f469a5063af2142942fb"
+    },
+    {
+      "path": "static/foliate-js/fixed-layout.js",
+      "bytes": 11978,
+      "sha256": "1bf05e908f19793547731f9640e0c9caa53a3030158c4e800ef087948d93a316"
+    },
+    {
+      "path": "static/foliate-js/LICENSE",
+      "bytes": 1091,
+      "sha256": "0740957f70db5da0a21f4332abca301b4dfe038970af398db70c7990173bc74d"
+    },
+    {
+      "path": "static/foliate-js/mobi.js",
+      "bytes": 46799,
+      "sha256": "ad291b8d798014724c27fae554470d654796b994f3245ec0a4d4059c78d1ec84"
+    },
+    {
+      "path": "static/foliate-js/overlayer.js",
+      "bytes": 9499,
+      "sha256": "2e90417ca2c02bab12dcb478dd9c78bd92e882507b806171f3b4bfa93fbe99cc"
+    },
+    {
+      "path": "static/foliate-js/package.json",
+      "bytes": 591,
+      "sha256": "c9f6467ca6922b2fd3f82bd2cd186561bb2505301f954e4232a3c0fd7bda5543"
+    },
+    {
+      "path": "static/foliate-js/paginator.js",
+      "bytes": 46007,
+      "sha256": "25beb8f4350f7873d34c317f46b0ff8435bd370eeb448bb3a4b8b54ca3068cc6"
+    },
+    {
+      "path": "static/foliate-js/progress.js",
+      "bytes": 4255,
+      "sha256": "544f5e90babc0cb31c5caf971a5f06dd6249ec06600cb62f672fa7179811fde1"
+    },
+    {
+      "path": "static/foliate-js/search.js",
+      "bytes": 5627,
+      "sha256": "e21448760ee996e6f9e0e885e26ea670be134a8022e85430cc97c0520bbf9e18"
+    },
+    {
+      "path": "static/foliate-js/text-walker.js",
+      "bytes": 1493,
+      "sha256": "264382295a1ce3d99f61d59fde6f36c661b822b28466c6c574c0f7b93d538a41"
+    },
+    {
+      "path": "static/foliate-js/vendor/fflate.js",
+      "bytes": 3830,
+      "sha256": "130855b45faa6e69c12b21180de843a3c1d714e1597d37ed92cec8d1af53b85d"
+    },
+    {
+      "path": "static/foliate-js/vendor/zip.js",
+      "bytes": 55607,
+      "sha256": "9edb29bd207345d9c26a39778f63e25795101e566d57bbd64b7ae7320b64d16d"
+    },
+    {
+      "path": "static/foliate-js/view.js",
+      "bytes": 21724,
+      "sha256": "b093425e9f6e2a35e602196847a59b7519867bd3cf1890d128f12d5616a3dc5c"
+    },
+    {
+      "path": "static/marked.min.js",
+      "bytes": 39589,
+      "sha256": "934e3e36e9e2da0afb1a6e75075bb0f09af05293a844e84a7477ef40911c349a"
+    }
+  ]
+}

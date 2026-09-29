@@ -1,0 +1,228 @@
+/* ===================== DICTIONARY ENTRIES ===================== */
+.dict-entry {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--le-slate-100);
+}
+.dict-entry:last-child {
+  border-bottom: none;
+}
+.dict-headword {
+  font-size: 18px;
+  font-weight: 600;
+  display: inline-flex;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.dict-headword-form {
+  display: inline-flex;
+  align-items: baseline;
+}
+.dict-headword-decomp {
+  margin-top: 4px;
+  display: inline-flex;
+  gap: 0;
+  flex-wrap: wrap;
+  font-size: 18px;
+}
+.dict-fill-separator {
+  border-top: 1px solid var(--le-slate-100);
+  margin: 10px 0 8px 0;
+}
+.dict-entry-part-head {
+  margin-top: 8px;
+}
+.dict-entry-part {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 6px;
+}
+.dict-entry-part-unknown {
+  background: transparent;
+  border-left: none;
+}
+.headword-component {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0;
+  display: inline-block;
+  vertical-align: baseline;
+  line-height: 1;
+}
+.panel-headword-token {
+  display: inline;
+  vertical-align: baseline;
+  line-height: inherit;
+  color: #111;
+  font-weight: 600;
+}
+.panel-base-form-token {
+  color: inherit;
+  font-weight: inherit;
+}
+.panel-headword-flow .token-map-live-token,
+.panel-headword-flow .reader-token-fill-hit,
+.panel-headword-flow .headword-component {
+  color: #111;
+  font-weight: 600;
+}
+.popup-headline.popup-headline-inline-flow .reader-token-fill-hit {
+  border-radius: 3px;
+  padding: 0;
+  transition: background var(--le-transition);
+}
+.popup-headline.popup-headline-inline-flow .reader-token-fill-hit:hover,
+.popup-headline.popup-headline-inline-flow .reader-token-fill-hit.hover-reticle-token {
+  background: rgba(64, 145, 108, 0.15);
+}
+.panel-surface-token,
+.panel-entry-headword-token,
+.panel-meta-headword-token,
+.panel-generic-headword-token {
+  color: #111;
+}
+.popup-headword-alt .panel-headword-token {
+  color: #111;
+}
+.panel-headword-reading {
+  color: #666;
+  font-style: italic;
+}
+.headword-component:hover {
+  background: rgba(64, 145, 108, 0.15);
+}
+/* When PSR splits a side-panel token into fill hits, suppress the parent token
+   highlight entirely and keep the hover treatment on the child fill span only. */
+.headword-component[data-psr-has-fill-hits='1'],
+.headword-component[data-psr-has-fill-hits='1']:hover,
+.headword-component[data-psr-has-fill-hits='1'].hover-reticle-token,
+.panel-token[data-psr-has-fill-hits='1'],
+.panel-token[data-psr-has-fill-hits='1']:hover,
+.panel-token[data-psr-has-fill-hits='1'].hover-reticle-token {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.headword-component[data-psr-has-fill-hits='1'] .reader-token-fill-hit,
+.panel-token[data-psr-has-fill-hits='1'] .reader-token-fill-hit {
+  border-radius: 3px;
+  transition:
+    background var(--le-transition),
+    box-shadow var(--le-transition);
+}
+.headword-component[data-psr-has-fill-hits='1'] .reader-token-fill-hit:hover,
+.headword-component[data-psr-has-fill-hits='1'] .reader-token-fill-hit.hover-reticle-token,
+.panel-token[data-psr-has-fill-hits='1'] .reader-token-fill-hit:hover,
+.panel-token[data-psr-has-fill-hits='1'] .reader-token-fill-hit.hover-reticle-token {
+  background: rgba(64, 145, 108, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(64, 145, 108, 0.24);
+}
+.dict-annotation-block {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--le-slate-100);
+}
+.dict-annotation-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--le-slate-500);
+  margin-bottom: 4px;
+}
+.dict-annotation-textarea {
+  width: 100%;
+  min-height: 70px;
+  font-size: 12px;
+  line-height: 1.4;
+  border-radius: 6px;
+  border: 1.5px solid var(--le-slate-300);
+  padding: 6px 8px;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color var(--le-transition);
+}
+.dict-annotation-textarea:focus {
+  outline: none;
+  border-color: var(--le-green-500);
+  box-shadow: 0 0 0 2px rgba(64, 145, 108, 0.15);
+}
+.dict-annotation-status {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--le-slate-500);
+}
+.dict-unknown {
+  font-size: 12px;
+  color: var(--le-slate-500);
+  margin-top: 4px;
+}
+.dict-senses {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.dict-fuzzy-section {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px dashed #f59e0b;
+}
+.dict-fuzzy-header {
+  font-size: 11px;
+  font-weight: 600;
+  color: #d97706;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  padding: 2px 6px;
+  background: #fffbeb;
+  border-radius: 4px;
+  display: inline-block;
+}
+.dict-fuzzy-entry {
+  margin-top: 10px;
+  padding: 8px;
+  background: #fffbeb;
+  border-radius: 6px;
+  border-left: 3px solid #f59e0b;
+}
+.dict-fuzzy-head {
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  flex-wrap: wrap;
+  color: #000;
+}
+.dict-fuzzy-head .headword-component {
+  color: #000;
+}
+.dict-fuzzy-roman {
+  font-style: italic;
+  color: #555;
+  margin-left: 6px;
+}
+.dict-fuzzy-percent {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 9px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+.dict-fuzzy-senses {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.panel-token {
+  border-radius: 2px;
+  cursor: pointer;
+}
+.ko-gloss-hover {
+  border-radius: 2px;
+}
+.ko-gloss-hover:hover {
+  background: rgba(64, 145, 108, 0.15);
+}

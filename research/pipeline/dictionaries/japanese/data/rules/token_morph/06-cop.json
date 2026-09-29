@@ -1,0 +1,38 @@
+[
+  {
+    "rule_id": "TOK_AUX_DESU_BASE",
+    "lemma": "です",
+    "pos_major": "COP",
+    "pos_detail": "POLITE_COPULA",
+    "lemma_class": "AUX_DESU",
+    "surface": "です",
+    "morph_slot": "FINITE",
+    "reason_code": "POLITE_COPULA_BASE",
+    "orthography_rule_id": "",
+    "requires_prev_state": "COPULA_SLOT_OR_ADJ_FIN",
+    "emits_state": "FINITE_OR_AUX_CHAIN",
+    "morph_features": "Polite=Yes",
+    "register": "neutral",
+    "productivity": "productive",
+    "ambiguity_group": "",
+    "notes": ""
+  },
+  {
+    "rule_id": "TOK_AUX_DESU_DESHI",
+    "lemma": "です",
+    "pos_major": "COP",
+    "pos_detail": "POLITE_COPULA",
+    "lemma_class": "AUX_DESU",
+    "surface": "でし",
+    "morph_slot": "RENYO",
+    "reason_code": "DESU_RENYO_STEM_BEFORE_TA",
+    "orthography_rule_id": "GR_DESU_RENYO_DESHI",
+    "requires_prev_state": "COPULA_SLOT_OR_ADJ_FIN",
+    "emits_state": "EXPECTS_TA",
+    "morph_features": "Polite=Yes|ConjType=Renyou",
+    "register": "polite",
+    "productivity": "productive",
+    "ambiguity_group": "",
+    "notes": ""
+  }
+]

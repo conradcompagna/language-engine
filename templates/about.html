@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>About | Language Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='le-logo.svg') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='reader.css') }}?v={{ mtime('reader.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='top_nav.css') }}?v={{ mtime('top_nav.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='contact_support.css') }}?v={{ mtime('contact_support.css') }}"/>
+<style>
+  body {
+    background: var(--le-slate-100);
+    color: var(--le-slate-900);
+  }
+  #leAuthBar a {
+    color: var(--le-green-700);
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .credits-shell {
+    width: min(1180px, calc(100% - 40px));
+    margin: 34px auto 64px;
+  }
+  .credits-head {
+    margin-bottom: 22px;
+  }
+  .credits-kicker {
+    color: var(--le-green-700);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .credits-head h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.1;
+    margin: 0 0 10px;
+    letter-spacing: 0;
+  }
+  .credits-head p {
+    color: var(--le-slate-500);
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 820px;
+    margin: 0;
+  }
+  .credits-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 22px 0 26px;
+  }
+  .credits-tabs a {
+    border: 1px solid var(--le-slate-300);
+    border-radius: var(--le-radius-sm);
+    background: var(--le-white);
+    color: var(--le-slate-700);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 11px;
+  }
+  .credits-tabs a:hover {
+    border-color: var(--le-green-300);
+    background: var(--le-green-50);
+    color: var(--le-green-700);
+  }
+  .credits-section {
+    background: var(--le-white);
+    border: 1px solid var(--le-slate-100);
+    border-radius: var(--le-radius-sm);
+    box-shadow: var(--le-shadow-sm);
+    margin-bottom: 22px;
+    overflow: hidden;
+  }
+  .credits-section-head {
+    border-bottom: 1px solid var(--le-slate-100);
+    padding: 18px 20px;
+  }
+  .credits-section h2 {
+    font-size: 18px;
+    margin: 0;
+    letter-spacing: 0;
+  }
+  .table-wrap {
+    overflow-x: auto;
+  }
+  .dependencies-dropdown {
+    background: var(--le-white);
+    border: 1px solid var(--le-slate-100);
+    border-radius: var(--le-radius-sm);
+    box-shadow: var(--le-shadow-sm);
+    margin: 0;
+    overflow: hidden;
+  }
+  .dependencies-dropdown summary {
+    align-items: center;
+    color: var(--le-slate-800);
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    font-weight: 700;
+    justify-content: space-between;
+    list-style: none;
+    padding: 14px 20px;
+  }
+  .dependencies-dropdown summary::-webkit-details-marker {
+    display: none;
+  }
+  .dependencies-dropdown summary::after {
+    color: var(--le-slate-500);
+    content: "+";
+    font-size: 18px;
+    line-height: 1;
+  }
+  .dependencies-dropdown[open] summary {
+    border-bottom: 1px solid var(--le-slate-100);
+  }
+  .dependencies-dropdown[open] summary::after {
+    content: "-";
+  }
+  .dependencies-dropdown .table-wrap {
+    border: 1px solid var(--le-slate-100);
+    border-radius: var(--le-radius-sm);
+  }
+  .dependencies-dropdown table {
+    min-width: 620px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    background: #f8fafc;
+    border-bottom: 1px solid var(--le-slate-100);
+    color: var(--le-slate-700);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 11px 12px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  td {
+    border-bottom: 1px solid var(--le-slate-100);
+    color: var(--le-slate-700);
+    line-height: 1.55;
+    padding: 12px;
+    vertical-align: top;
+  }
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .lang-code {
+    color: var(--le-slate-500);
+    display: block;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  .source-link {
+    color: var(--le-green-700);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: rgba(45, 106, 79, 0.25);
+    text-underline-offset: 2px;
+  }
+  .tag {
+    border: 1px solid var(--le-green-300);
+    border-radius: 999px;
+    color: var(--le-green-700);
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0 5px 5px 0;
+    padding: 5px 7px;
+  }
+  .note-list {
+    color: var(--le-slate-700);
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 0;
+    padding: 16px 20px 18px 38px;
+  }
+  .recipe-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    padding: 18px 20px 20px;
+  }
+  .recipe-step {
+    border: 1px solid var(--le-slate-100);
+    border-radius: var(--le-radius-sm);
+    background: #f8fafc;
+    padding: 14px;
+  }
+  .recipe-step strong {
+    color: var(--le-slate-900);
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .recipe-step p {
+    color: var(--le-slate-500);
+    font-size: 12px;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .hub-intro {
+    color: var(--le-slate-700);
+    font-size: 14px;
+    line-height: 1.75;
+    padding: 18px 20px 4px;
+  }
+  .hub-intro p {
+    margin: 0 0 12px;
+    max-width: 980px;
+  }
+  .creator-bio {
+    align-items: start;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 260px minmax(0, 1fr);
+    padding: 20px;
+  }
+  .creator-photo {
+    margin: 0;
+    width: 260px;
+  }
+  .creator-photo img {
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--le-slate-200);
+    border-radius: var(--le-radius-sm);
+    display: block;
+    height: auto;
+    object-fit: cover;
+    width: 100%;
+  }
+  .creator-photo figcaption {
+    color: var(--le-slate-500);
+    font-size: 11px;
+    line-height: 1.45;
+    margin-top: 8px;
+  }
+  .creator-copy {
+    color: var(--le-slate-700);
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .creator-copy p {
+    margin: 0 0 12px;
+    max-width: 880px;
+  }
+  .creator-copy p:last-child {
+    margin-bottom: 0;
+  }
+  .essay-stack {
+    color: var(--le-slate-700);
+    font-size: 14px;
+    line-height: 1.76;
+    padding: 18px 20px 20px;
+  }
+  .essay-block {
+    border-top: 1px solid var(--le-slate-100);
+    padding: 16px 0 0;
+  }
+  .essay-block:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+  .essay-block h3 {
+    color: var(--le-slate-900);
+    font-size: 15px;
+    letter-spacing: 0;
+    margin: 0 0 8px;
+  }
+  .essay-block p {
+    margin: 0 0 12px;
+    max-width: 980px;
+  }
+  .essay-block p:last-child {
+    margin-bottom: 0;
+  }
+  .essay-callout {
+    background: linear-gradient(135deg, rgba(45, 106, 79, 0.08), rgba(248, 250, 252, 0.98));
+    border: 1px solid var(--le-green-300);
+    border-radius: var(--le-radius-sm);
+    color: var(--le-slate-800);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.7;
+    margin-top: 14px;
+    padding: 14px 16px;
+  }
+  .prototype-link {
+    color: var(--le-green-700);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: rgba(45, 106, 79, 0.25);
+    text-underline-offset: 2px;
+  }
+  .curation-carousel {
+    padding: 18px 20px 20px;
+  }
+  .curation-tabs {
+    border-bottom: 1px solid var(--le-slate-100);
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  .curation-tab {
+    background: #f8fafc;
+    border: 1px solid var(--le-slate-200);
+    border-radius: var(--le-radius-sm);
+    color: var(--le-slate-700);
+    cursor: pointer;
+    flex: 0 0 auto;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 10px;
+  }
+  .curation-tab[aria-selected="true"] {
+    background: var(--le-green-50);
+    border-color: var(--le-green-300);
+    color: var(--le-green-700);
+  }
+  .curation-panel {
+    display: none;
+    padding-top: 16px;
+  }
+  .curation-panel.is-active {
+    display: block;
+  }
+  .curation-panel h3 {
+    color: var(--le-slate-900);
+    font-size: 17px;
+    letter-spacing: 0;
+    margin: 0 0 8px;
+  }
+  .curation-kicker {
+    color: var(--le-green-700);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .curation-panel p {
+    color: var(--le-slate-700);
+    font-size: 14px;
+    line-height: 1.72;
+    margin: 0 0 12px;
+    max-width: 980px;
+  }
+  .curation-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 14px;
+  }
+  .curation-note {
+    background: #f8fafc;
+    border: 1px solid var(--le-slate-100);
+    border-radius: var(--le-radius-sm);
+    padding: 12px;
+  }
+  .curation-note strong {
+    color: var(--le-slate-900);
+    display: block;
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  .curation-note span {
+    color: var(--le-slate-500);
+    display: block;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .skill-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 20px 18px;
+  }
+  .skill-pill {
+    border: 1px solid var(--le-slate-200);
+    border-radius: 999px;
+    color: var(--le-slate-700);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 10px;
+  }
+  .showcase-list {
+    display: grid;
+    gap: 0;
+    padding: 0 20px 20px;
+  }
+  .showcase-item {
+    border-top: 1px solid var(--le-slate-100);
+    display: grid;
+    gap: 6px;
+    grid-template-columns: minmax(180px, 0.45fr) minmax(0, 1fr);
+    padding: 14px 0;
+  }
+  .showcase-item:first-child {
+    border-top: none;
+  }
+  .showcase-item strong {
+    color: var(--le-slate-900);
+    font-size: 13px;
+  }
+  .showcase-item p {
+    color: var(--le-slate-500);
+    font-size: 13px;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .flow-stack {
+    counter-reset: flow-step;
+    padding: 4px 20px 20px;
+  }
+  .flow-step {
+    border-top: 1px solid var(--le-slate-100);
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 42px minmax(0, 1fr);
+    padding: 15px 0;
+  }
+  .flow-step:first-child {
+    border-top: none;
+  }
+  .flow-step::before {
+    align-items: center;
+    background: var(--le-green-50);
+    border: 1px solid var(--le-green-300);
+    border-radius: 999px;
+    color: var(--le-green-700);
+    content: counter(flow-step);
+    counter-increment: flow-step;
+    display: flex;
+    font-size: 12px;
+    font-weight: 800;
+    height: 28px;
+    justify-content: center;
+    width: 28px;
+  }
+  .flow-step strong {
+    color: var(--le-slate-900);
+    display: block;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .flow-step p {
+    color: var(--le-slate-500);
+    font-size: 13px;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .subsection-title {
+    color: var(--le-slate-700);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 16px 20px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  @media (max-width: 720px) {
+    .credits-shell {
+      width: calc(100% - 24px);
+      margin-top: 22px;
+    }
+    #leAuthBar {
+      align-items: flex-start;
+    }
+    #leAuthBar > div {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    th, td {
+      min-width: 170px;
+    }
+    .creator-bio,
+    .showcase-item,
+    .flow-step {
+      grid-template-columns: 1fr;
+    }
+    .creator-photo {
+      max-width: 260px;
+      width: 100%;
+    }
+    .creator-photo img {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+{% include "_top_nav.html" %}
+<script>
+  function updateUpgradeNavButton(){
+    var btn = document.querySelector('[data-upgrade-nav]');
+    if(!btn) return;
+    fetch('/payments/status').then(function(r){return r.json()}).then(function(d){
+      btn.style.display = (d && d.ok && !d.is_subscribed) ? '' : 'none';
+    }).catch(function(){ btn.style.display = 'none'; });
+  }
+  fetch('/auth/me').then(function(r){return r.json()}).then(function(d){
+    if(!d.ok||!d.user){window.location.href='/';}
+    else { updateUpgradeNavButton(); }
+  }).catch(function(){});
+</script>
+
+<main class="credits-shell">
+  <header class="credits-head">
+    <h1>About Language Engine</h1>
+  </header>
+
+  <nav class="credits-tabs" aria-label="About sections">
+    <a href="#creator-bio">Creator</a>
+    <a href="#reader-models">Existing tools</a>
+    <a href="#research-stack">Research NLP</a>
+    <a href="#dictionary-resolution">Dictionary matching</a>
+    <a href="#sentence-structure">Sentence structure</a>
+    <a href="#ai-triangulation">Word meaning</a>
+    <a href="#document-handling">Documents</a>
+    <a href="#parting-message">Parting message</a>
+    <a href="#language-curation">Language curation</a>
+    <a href="#dependencies">Dependencies</a>
+  </nav>
+
+  <section id="creator-bio" class="credits-section">
+    <div class="credits-section-head">
+      <h2>Hello From The Creator</h2>
+    </div>
+    <div class="creator-bio">
+      <figure class="creator-photo">
+        <img src="{{ url_for('static', filename='marketing/creator-conrad-stele.jpg') }}" alt="Conrad Compagna beside a Qing-era bilingual stele in Huangshan"/>
+        <figcaption>In Huangshan, beside a Qing-era dismounting stele inscribed in Chinese and Manchu, marking the point where officials, soldiers, and other visitors were expected to dismount.</figcaption>
+      </figure>
+      <div class="creator-copy">
+        <p>Hello from the creator of Language Engine! My name is Conrad Compagna. By way of background, I hold a PhD in history from the University of London. My research specializes in the borderlands between India, China, and Burma, one of the most polyglot geographical locations in the world. I also lived and worked in China for many years, as a teacher and newspaper editor. For professional and personal reasons, I have had to read texts in a variety of foreign languages.</p>
+        <p>This website arose out of my own need first. During the final period of my PhD research, I built a prototype version of this app, using more lightweight neural networks and focused on a single language, Burmese. You can find it at <a class="prototype-link" href="https://burmeseneuralreader.com" target="_blank" rel="noopener">burmeseneuralreader.com</a>.</p>
+        <p>The software proved so useful to me in my research that I decided to generalize it to as many languages as I could. Hence, Language Engine was born.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="reader-models" class="credits-section">
+    <div class="credits-section-head">
+      <h2>Existing Reading Tools</h2>
+    </div>
+    <div class="essay-stack">
+      <div class="essay-block">
+        <p>Applications that allow for the reading of arbitrary text in foreign languages essentially follow two models. The first is the hover dictionary. Second, there are a variety of commercial websites that use large language models or crowdsourcing to assign meanings to words.</p>
+        <p>Both of these methods focus primarily on lexical semantics, and are ill-equipped to handle multiple fundamental linguistic layers necessary for achieving full understanding: orthography, morphology, and especially syntax.</p>
+        <p>Such programs also neglect the professional and academic market. Scholars, translators, and government officials need much higher preservation of meaning, accuracy, and comprehensiveness in a workbench than what existing apps can offer.</p>
+        <p>Language Engine is intended to fill a major and expanding gap in this landscape by using cutting-edge computational linguistics technology to reveal these remaining layers, rendering complex languages transparent for serious analytical work.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="research-stack" class="credits-section">
+    <div class="credits-section-head">
+      <h2>From Research NLP To Practical Reading</h2>
+    </div>
+    <div class="essay-stack">
+      <div class="essay-block">
+        <p>Over the past few years, with advancements in AI architectures, in particular the development of the attention-based transformer, computers have finally learned how to read and understand language with human-like fluency.</p>
+        <p>A number of NLP (natural language processing) pipelines exist that can tokenize, sentence-segment, lemmatize, and parse the grammatical structure of hundreds of dead and living languages.</p>
+        <p>Traditionally these have relied on language-specific models whose weights take up multiple gigabytes of CPU and GPU memory. Bundling more than a few together would quickly become impractical.</p>
+        <p>However, with the advent of massively multilingual transformers such as XLM-RoBERTa, it is finally possible to create a unified NLP pipeline that can comfortably handle the world's languages in a single box.</p>
+        <p>Credit here must go to a team of researchers at the University of Oregon, who created Trankit, a Python library that allows for the training of XLM-RoBERTa by switching in adapter heads for parsing tasks in different languages. This allows the base transformer, a very large in-memory object, to stay unchanged while its language-specific weights are switched out at will, equivalent to switching gears rather than buying a new car whenever you need to go down a new road.</p>
+        <p>Even this infrastructure, however, is too unwieldy to fit on a commercial web server. So the app runs on a modified version, streamlined for production inference: ONNX Runtime, graph optimization, and quantization fuse and shrink XLM-RoBERTa and its task heads down to roughly 25% of their original size, doubling inference speed and allowing the model to comfortably run on CPU while maintaining 95% similarity in output to the research toolkit.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <section id="dictionary-resolution" class="credits-section">
+    <div class="credits-section-head">
+      <h2>Using Transformer Output To Guide Dictionary Matching</h2>
+    </div>
+    <div class="essay-stack">
+      <div class="essay-block">
+        <p>There are many benefits to using a transformer like XLM-RoBERTa as the engine behind a reader app. It pre-breaks words and sentences, expands contracted forms into their multiple underlying syntactic words, and assigns a linguistic identity to each word: its part of speech, its lemma, and its morphological features. XLM-RoBERTa's tokens can be used as the matching unit, and lemma hints and grammatical features can be used to narrow down candidates, which for highly polysemous languages such as Korean can sometimes be in the dozens.</p>
+        <p>The app relies on a large number of stacked dictionaries stored in SQLite databases, extensively postprocessed and funneled into a single canonical format used by all app languages.</p>
+        <p>Dictionary matching takes place over compact word indexes in the user's browser, containing only headwords and inflected forms. For many languages, a single word paradigm has hundreds of related entries.</p>
+        <p>Added to this is a large, hand-curated list of normalization rules tailored to the script of each supported language. For many languages, normalization is easy. For others, such as Sanskrit, Arabic, or Ancient Greek, the process is much more involved, and requires the removal of breathings, accents, diacritics, and other combining marks in order to reveal their base spelling.</p>
+        <p>The app also uses its own dynamic programming algorithm to internally segment tokens for which there is no known exact match. This algorithm is weighted to pull out stems, prefixes, and suffixes, resulting in a morphologically aware analysis of even unknown words.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="sentence-structure" class="credits-section">
+    <div class="credits-section-head">
+      <h2>Making Sentence Structure Visible</h2>
+    </div>
+    <div class="essay-stack">
+      <div class="essay-block">
+        <p>The main draw of Language Engine is in making computational linguistics annotations accessible to readers. It does so primarily in three ways.</p>
+        <p>First, it includes morphological analysis of every word, explaining how inflection changes meaning, crucial in many languages where grammatical structure is contained in word endings rather than in function words. It also tags each word with both its coarse and fine-grained part of speech, as well as its sentence-level role, further giving it grammatical shape.</p>
+        <p>Second, the app uses a variety of visual effects to render sentence structure visible to users. Words hover together that modify each other, making clause and phrase structure transparent.</p>
+        <p>Third, the app tags people, places, organizations, ethnic groups and other named entities in order to make clear who the key actors in each sentence are.</p>
+        <p>Accomplishing this involved the gathering together, and in some cases the construction, of a large number of training datasets from different corners, as well as the institution of a massive translation module that takes tag outputs, which come in abbreviated form, and renders them useable for readers.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="ai-triangulation" class="credits-section">
+    <div class="credits-section-head">
+      <h2>Triangulating Word Meaning</h2>
+    </div>
+    <div class="essay-stack">
+      <div class="essay-block">
+        <p>Finally, the app takes a triangulated approach to finding word meanings. On top of the in-house transformer and dictionary matching system, it calls on the Gemini API to separately annotate words, dictionary entries, and sentence translations.</p>
+        <p>Large language models are invaluable for their vast world and semantic knowledge, but they are probabilistic and general-purpose, and are not reliable as the sole source of truth. In this app, they function primarily as a disambiguation layer: helping to pinpoint meaning in context, and to act as a check on XLM-RoBERTa, itself a probabilistic pattern recognizer.</p>
+        <p>Finally, I have instituted a universal segmenter that breaks all non-Latin scripts down to the grapheme level and provides rules-based transliteration, because often meaning can be inferred from pronunciation, as with loanwords or personal names.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="document-handling" class="credits-section">
+    <div class="credits-section-head">
+      <h2>Document Handling</h2>
+    </div>
+    <div class="essay-stack">
+      <div class="essay-block">
+        <p>A final key component in the app is document handling. Rather than ingesting only plain text, the app is a fully fledged reader that can handle all of the major formats used in professional and academic life: from PDFs and ebooks to Word documents and frozen HTML snapshots computed by the app's sister extension in Chrome.</p>
+        <p>To that effect, I designed, both for PDFs and for HTML-based documents, a pipeline that strips text from a given page and reconstructs the exact layout of the text with precise fidelity, inserting annotations, dictionary entries, and UI effects in a way that preserves original formatting. Text is also chunked using a flood fill algorithm so that tables, captions, and paragraphs are passed to the NLP pipeline in reading order.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="parting-message" class="credits-section">
+    <div class="credits-section-head">
+      <h2>A Parting Message</h2>
+    </div>
+    <div class="essay-stack">
+      <div class="essay-block">
+        <p>I am proud to say that this site is far and away the most advanced computational linguistics platform on the internet. It is a microscope, under which you can see the structure and meaning of the world's great modern and classical languages laid bare. Other apps offer well-developed systems for vocabulary retention. But for achieving deep understanding of difficult texts, Language Engine is currently in a category of its own.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="language-curation" class="credits-section">
+    <div class="credits-section-head">
+      <h2>Language-Specific Curation</h2>
+    </div>
+    <div class="curation-carousel" data-curation-carousel>
+      <div class="curation-tabs" role="tablist" aria-label="Language-specific curation examples">
+        <button class="curation-tab" type="button" role="tab" aria-selected="true" aria-controls="curation-arabic" data-curation-tab="arabic">Arabic</button>
+        <button class="curation-tab" type="button" role="tab" aria-selected="false" aria-controls="curation-lzh" data-curation-tab="lzh">Classical Chinese</button>
+        <button class="curation-tab" type="button" role="tab" aria-selected="false" aria-controls="curation-korean" data-curation-tab="korean">Korean</button>
+        <button class="curation-tab" type="button" role="tab" aria-selected="false" aria-controls="curation-sanskrit" data-curation-tab="sanskrit">Sanskrit</button>
+        <button class="curation-tab" type="button" role="tab" aria-selected="false" aria-controls="curation-greek" data-curation-tab="greek">Ancient Greek</button>
+      </div>
+
+      <article id="curation-arabic" class="curation-panel is-active" role="tabpanel" data-curation-panel="arabic">
+        <h3>Arabic</h3>
+        <p>Arabic was a difficult language to tackle for two primary reasons.</p>
+        <p>First, although Arabic words look space-separated at first glance, this can be deceiving. Often pronouns, conjunctions, and other function words are bundled onto the beginning or end of words; sometimes a word is nothing but multiple fused clitics. This requires a well-trained tokenizer, which I built myself by assembling a synthetic dataset based on raw Wikipedia text.</p>
+        <p>Second, Arabic spelling conventions are highly complex, as is true of other languages such as Persian, Urdu, or others using an Arabic-based writing system, as well as Hebrew. Generally, words are spelled by stringing together only consonants, with vowel marks left out. Dictionary forms, however, are stored with full vocalization. Matching the two with each other required an extensive custom ruleset.</p>
+      </article>
+
+      <article id="curation-lzh" class="curation-panel" role="tabpanel" data-curation-panel="lzh" hidden>
+        <h3>Classical Chinese</h3>
+        <p>Classical Chinese is a difficult language to work with because of how sparse it is in terms of the explicit meaning each word provides. The model used for this language was trained by a team of researchers at Kyoto University, who used fine-grained POS tags to attach hints as to the lexical meaning of words: for instance, verb, action or motion; or noun, descriptive quality or form.</p>
+        <p>However, the tagset is entirely in Japanese, which required a foray into translation. Additionally, the model was trained on text devoid of punctuation, so I had to devise a system to feed it sentences in the length it prefers, effectively single clauses rather than whole sentences, in keeping with the minimalistic, almost shorthand nature of ancient Chinese prose.</p>
+        <p>The language also required the assembly of a custom dictionary layer, based on Chinese Notes, to account for the differences in meaning between identical modern and ancient characters. Filtration of entries based on grammatical tags also helps narrow down to the correct sense of a word, as does LLM integration, which was brought in specifically for Classical Chinese word sense disambiguation and then generalized to the whole app.</p>
+      </article>
+
+      <article id="curation-korean" class="curation-panel" role="tabpanel" data-curation-panel="korean" hidden>
+        <h3>Korean</h3>
+        <p>Korean orthography uses space-separated words, but like Arabic, these are often actually comprised of multiple different words bundled together. Not only that, the underlying words are occasionally spelled differently from the readable surface form. To top it off, Korean merges words together laterally, so two words can share the same syllable space.</p>
+        <p>A simple tokenizer cannot properly handle this. It requires a separate seq2seq model that reads and reconstructs the underlying forms. This produces another problem: how to map the reconstructed underlying forms back to the surface so they can be displayed for a reader. This required a Needleman-Wunsch algorithm, which finds the most similar set of sequences between two nonmatching strings and was originally developed for the analysis of DNA.</p>
+        <p>Finally, Korean is a highly polysemous language. Many of its words are derived from Classical Chinese, but stripped of tone marks. A single syllable can correspond to dozens of possible words. So I include the Chinese characters wherever possible for those who can read them, as they serve a vital disambiguation function. The app's dictionary filtering system was also developed first for Korean, then extended to all languages.</p>
+      </article>
+
+      <article id="curation-sanskrit" class="curation-panel" role="tabpanel" data-curation-panel="sanskrit" hidden>
+        <h3>Sanskrit</h3>
+        <p>Sanskrit was the most difficult of the app's languages. One of its chief characteristics is the construction of giant compound words, sometimes comprised of ten or more underlying words. Furthermore, the spelling of words will change depending on their neighbors, in order to maintain phonetic consonance or harmony.</p>
+        <p>Handling this required the training of a powerful seq2seq model on Oliver Hellwig's Digital Corpus of Sanskrit, containing over five million words. The model splits apart compounds, and then reconstructs the dictionary spellings of words.</p>
+        <p>However, it does not record the original locations of these unsandhied words. I had to construct a Python algorithm that does sequence matching over the compounds, anchoring them back to the underlying text.</p>
+        <p>Sanskrit is also under-resourced in comparison to many modern languages; no high-quality NER dataset exists that is both large enough to train a production model on and consists of actual ancient Sanskrit text. I had to create a large synthetic dataset consisting of in-domain text such as the Bhagavad Gita or Kautilya's Arthashastra, as well as a variety of other ritual and medical texts. The model I trained on it is to my knowledge the only that is truly familiar with and able to annotate such texts.</p>
+      </article>
+
+      <article id="curation-greek" class="curation-panel" role="tabpanel" data-curation-panel="greek" hidden>
+        <h3>Ancient Greek</h3>
+        <p>For Ancient Greek, the largest problem is morphology. Ancient Greek carries much of its grammatical information in inflected word endings, to make up for the fact that actual word order is largely freeform.</p>
+        <p>Morphological analysis is done by a custom-trained model based on the Perseus Ancient Greek corpus, as is lemmatization.</p>
+        <p>Wiktionary was the only dictionary that worked for this language. Other dictionaries may have better coverage, but Wiktionary's database-like coverage of inflected forms, often in the hundreds for a single word, is the only way to reliably patch holes in XLM-RoBERTa's morphological analysis, ensuring maximum coverage over the page.</p>
+      </article>
+    </div>
+  </section>
+
+  <details id="dependencies" class="dependencies-dropdown">
+    <summary>Dependencies</summary>
+    <div class="curation-carousel" data-dependencies-carousel>
+      <div class="curation-tabs" role="tablist" aria-label="Dependency sources">
+        <button class="curation-tab" type="button" role="tab" aria-selected="true" aria-controls="dependencies-dictionaries" data-dependency-tab="dictionaries">Dictionaries</button>
+        <button class="curation-tab" type="button" role="tab" aria-selected="false" aria-controls="dependencies-runtime" data-dependency-tab="runtime">Runtime Dependencies</button>
+      </div>
+
+      <article id="dependencies-dictionaries" class="curation-panel is-active" role="tabpanel" data-dependency-panel="dictionaries">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th>Used for</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a class="source-link" href="https://www.wiktionary.org/" target="_blank" rel="noopener">Wiktionary</a> / <a class="source-link" href="https://kaikki.org/dictionary/" target="_blank" rel="noopener">Kaikki</a></td>
+                <td>Most languages</td>
+              </tr>
+              <tr>
+                <td><a class="source-link" href="https://www.mdbg.net/chinese/dictionary?page=cc-cedict" target="_blank" rel="noopener">CC-CEDICT</a></td>
+                <td>Chinese, Simplified and Traditional</td>
+              </tr>
+              <tr>
+                <td><a class="source-link" href="https://www.edrdg.org/jmdict/j_jmdict.html" target="_blank" rel="noopener">JMDict / EDICT</a></td>
+                <td>Japanese</td>
+              </tr>
+              <tr>
+                <td><a class="source-link" href="https://krdict.korean.go.kr/eng/mainAction" target="_blank" rel="noopener">KRDict / Korean Learners' Dictionary</a></td>
+                <td>Korean</td>
+              </tr>
+              <tr>
+                <td><a class="source-link" href="https://chinesenotes.com/" target="_blank" rel="noopener">Chinese Notes</a></td>
+                <td>Classical Chinese</td>
+              </tr>
+              <tr>
+                <td><a class="source-link" href="https://www.sanskrit-linguistics.org/dcs/" target="_blank" rel="noopener">Digital Corpus of Sanskrit</a></td>
+                <td>Sanskrit</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article id="dependencies-runtime" class="curation-panel" role="tabpanel" data-dependency-panel="runtime" hidden>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th>Runtime use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a class="source-link" href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noopener">PDF.js</a></td>
+                <td>Client-side PDF rendering</td>
+              </tr>
+              <tr>
+                <td><a class="source-link" href="https://github.com/johnfactotum/foliate-js" target="_blank" rel="noopener">Foliate JS</a></td>
+                <td>Browser e-book rendering path</td>
+              </tr>
+              <tr>
+                <td><a class="source-link" href="https://github.com/cure53/DOMPurify" target="_blank" rel="noopener">DOMPurify</a></td>
+                <td>HTML sanitization in browser document handling</td>
+              </tr>
+              <tr>
+                <td><a class="source-link" href="https://github.com/mwilliamson/mammoth.js" target="_blank" rel="noopener">Mammoth.js</a></td>
+                <td>DOCX-to-HTML conversion in the browser</td>
+              </tr>
+              <tr>
+                <td><a class="source-link" href="https://github.com/markedjs/marked" target="_blank" rel="noopener">marked</a></td>
+                <td>Markdown rendering for assistant output</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </details>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      var carousel = document.querySelector('[data-curation-carousel]');
+      if(!carousel) return;
+      var tabs = Array.prototype.slice.call(carousel.querySelectorAll('[data-curation-tab]'));
+      var panels = Array.prototype.slice.call(carousel.querySelectorAll('[data-curation-panel]'));
+      function activate(target){
+        tabs.forEach(function(tab){
+          var selected = tab.getAttribute('data-curation-tab') === target;
+          tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+        });
+        panels.forEach(function(panel){
+          var active = panel.getAttribute('data-curation-panel') === target;
+          panel.classList.toggle('is-active', active);
+          panel.hidden = !active;
+        });
+      }
+      tabs.forEach(function(tab){
+        tab.addEventListener('click', function(){
+          activate(tab.getAttribute('data-curation-tab'));
+        });
+      });
+
+      var dependencyCarousel = document.querySelector('[data-dependencies-carousel]');
+      if(!dependencyCarousel) return;
+      var dependencyTabs = Array.prototype.slice.call(dependencyCarousel.querySelectorAll('[data-dependency-tab]'));
+      var dependencyPanels = Array.prototype.slice.call(dependencyCarousel.querySelectorAll('[data-dependency-panel]'));
+      function activateDependency(target){
+        dependencyTabs.forEach(function(tab){
+          var selected = tab.getAttribute('data-dependency-tab') === target;
+          tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+        });
+        dependencyPanels.forEach(function(panel){
+          var active = panel.getAttribute('data-dependency-panel') === target;
+          panel.classList.toggle('is-active', active);
+          panel.hidden = !active;
+        });
+      }
+      dependencyTabs.forEach(function(tab){
+        tab.addEventListener('click', function(){
+          activateDependency(tab.getAttribute('data-dependency-tab'));
+        });
+      });
+    });
+  </script>
+
+
+</main>
+</body>
+</html>
+

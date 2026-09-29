@@ -1,0 +1,110 @@
+[
+  {
+    "lemma_final_kana": "う",
+    "a_row": "わ",
+    "i_row": "い",
+    "u_row": "う",
+    "e_row": "え",
+    "o_row": "お",
+    "onbin_stem": "っ",
+    "te_form_suffix_realization": "って",
+    "ta_form_suffix_realization": "った",
+    "notes": ""
+  },
+  {
+    "lemma_final_kana": "く",
+    "a_row": "か",
+    "i_row": "き",
+    "u_row": "く",
+    "e_row": "け",
+    "o_row": "こ",
+    "onbin_stem": "い",
+    "te_form_suffix_realization": "いて",
+    "ta_form_suffix_realization": "いた",
+    "notes": "IKU uses special って/った despite final く"
+  },
+  {
+    "lemma_final_kana": "ぐ",
+    "a_row": "が",
+    "i_row": "ぎ",
+    "u_row": "ぐ",
+    "e_row": "げ",
+    "o_row": "ご",
+    "onbin_stem": "い",
+    "te_form_suffix_realization": "いで",
+    "ta_form_suffix_realization": "いだ",
+    "notes": ""
+  },
+  {
+    "lemma_final_kana": "す",
+    "a_row": "さ",
+    "i_row": "し",
+    "u_row": "す",
+    "e_row": "せ",
+    "o_row": "そ",
+    "onbin_stem": "し",
+    "te_form_suffix_realization": "して",
+    "ta_form_suffix_realization": "した",
+    "notes": ""
+  },
+  {
+    "lemma_final_kana": "つ",
+    "a_row": "た",
+    "i_row": "ち",
+    "u_row": "つ",
+    "e_row": "て",
+    "o_row": "と",
+    "onbin_stem": "っ",
+    "te_form_suffix_realization": "って",
+    "ta_form_suffix_realization": "った",
+    "notes": ""
+  },
+  {
+    "lemma_final_kana": "ぬ",
+    "a_row": "な",
+    "i_row": "に",
+    "u_row": "ぬ",
+    "e_row": "ね",
+    "o_row": "の",
+    "onbin_stem": "ん",
+    "te_form_suffix_realization": "んで",
+    "ta_form_suffix_realization": "んだ",
+    "notes": ""
+  },
+  {
+    "lemma_final_kana": "ぶ",
+    "a_row": "ば",
+    "i_row": "び",
+    "u_row": "ぶ",
+    "e_row": "べ",
+    "o_row": "ぼ",
+    "onbin_stem": "ん",
+    "te_form_suffix_realization": "んで",
+    "ta_form_suffix_realization": "んだ",
+    "notes": ""
+  },
+  {
+    "lemma_final_kana": "む",
+    "a_row": "ま",
+    "i_row": "み",
+    "u_row": "む",
+    "e_row": "め",
+    "o_row": "も",
+    "onbin_stem": "ん",
+    "te_form_suffix_realization": "んで",
+    "ta_form_suffix_realization": "んだ",
+    "notes": ""
+  },
+  {
+    "lemma_final_kana": "る",
+    "a_row": "ら",
+    "i_row": "り",
+    "u_row": "る",
+    "e_row": "れ",
+    "o_row": "ろ",
+    "onbin_stem": "っ",
+    "te_form_suffix_realization": "って",
+    "ta_form_suffix_realization": "った",
+    "notes": ""
+  }
+]

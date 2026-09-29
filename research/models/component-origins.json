@@ -1,0 +1,1143 @@
+{
+  "schema_version": 1,
+  "scope": "27 registered language pipelines plus Traditional Chinese; origin is recorded separately for each runtime component.",
+  "counts": {
+    "stock": 62,
+    "not_used": 15,
+    "custom": 61,
+    "identity": 2
+  },
+  "basis": "Stock checkpoints match immutable official upstream release archives byte-for-byte. Custom results link selected checkpoint hashes to original run artifacts and recorded evaluation.",
+  "routing_note": "Korean uses the UD_Korean-Kaist treebank mapping for tokenizer, syntax and lemmatizer; its NER uses the korean-ner alias. The stored Korean-GSD copy is not counted as another active pipeline.",
+  "languages": [
+    {
+      "code": "zh",
+      "language": "Chinese (Simplified)",
+      "runtime_alias": "chinese",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/chinese/chinese.tokenizer.mdl",
+          "sha256": "f3c7224b4f6d667092c8eeefeae4667c80c7511c9278b8772e5aa95f2981dc56",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "archive_member": "chinese.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/chinese/chinese.tagger.mdl",
+          "sha256": "6daae8a6d6f19a437fdd5ca2084a0147bd68d7296de9f84cfe6bd80a1be9ea71",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "archive_member": "chinese.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/chinese/chinese_lemmatizer.pt",
+          "sha256": "059c7c63fe5426ce1348c36fd2773159d4b7aad5198b2e8f3adfbd12271ba7b9",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "archive_member": "chinese_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/chinese/chinese.ner.mdl",
+          "sha256": "5299a84f5ee3fb17b34c9068fbbeaa4ec99a1bacea2dc98e5ffc87eb909a456c",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "archive_member": "chinese.ner.mdl"
+        }
+      }
+    },
+    {
+      "code": "ja",
+      "language": "Japanese",
+      "runtime_alias": "customized-ner",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized-ner/customized-ner.tokenizer.mdl",
+          "sha256": "1d7ab28c0c1c1fe21f750c15a36d46274f6e4772f9814f03120af20d402fc12d",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+          "archive_member": "japanese.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized-ner/customized-ner.tagger.mdl",
+          "sha256": "1906d7f11d1037829b97de5daef57c96653829b5a3550b43355955048e5c7e73",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+          "archive_member": "japanese.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized-ner/customized-ner_lemmatizer.pt",
+          "sha256": "cf27852a6191c3bb42e76f4c2445db2352df1a6ab8be940085827e73da4ff76e",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/japanese.zip",
+          "archive_member": "japanese_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized-ner/customized-ner.ner.mdl",
+          "sha256": "ed2eb0853e1a5e49f4ee929ce811e2721df4e1fe0fc2a69208a44f694722c0a6",
+          "score_record": "../evaluation/results/japanese-ner-development.json",
+          "evaluation_kind": "Fresh development evaluation; exact original training command identifies the retained development file.",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/tc/xlm-roberta-base/customized-ner/customized-ner.ner.mdl"
+        }
+      }
+    },
+    {
+      "code": "ko",
+      "language": "Korean",
+      "runtime_alias": "korean-ner",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean-kaist/korean-kaist.tokenizer.mdl",
+          "sha256": "b4fcd5bd0095c0fd162bd8edfce1f8b85b0420be343729b240fcd98c608782cf",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean-kaist.zip",
+          "archive_member": "korean-kaist.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean-kaist/korean-kaist.tagger.mdl",
+          "sha256": "32779195714c1b84dc5ad1e7fe6ea3a8b1dd26d6451f17c5f852e13312dc2fa0",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean-kaist.zip",
+          "archive_member": "korean-kaist.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean-kaist/korean-kaist_lemmatizer.pt",
+          "sha256": "3e4382271ddcce969dcafd5dd50cac2c5d453db20726c04af92b04ed370df26a",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/korean-kaist.zip",
+          "archive_member": "korean-kaist_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean-ner/korean-ner.ner.mdl",
+          "sha256": "1220fb3d450aa91d413a1c5f6cbdd720baded55d33fa44fa87bf2be81acd052c",
+          "training_result": "ner-training.json",
+          "run": "korean_klue_ner"
+        }
+      }
+    },
+    {
+      "code": "vi",
+      "language": "Vietnamese",
+      "runtime_alias": "vietnamese",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/vietnamese/vietnamese.tokenizer.mdl",
+          "sha256": "3bcef30d6fa0f832a64f5c3ef750805ba855863b291aaa5879f77bab6f16af0b",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/vietnamese.zip",
+          "archive_member": "vietnamese.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/vietnamese/vietnamese.tagger.mdl",
+          "sha256": "9df705af13dce2a21cd5212e16a205942aabea76d6d3f2953a6c4a2ee5a91f7a",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/vietnamese.zip",
+          "archive_member": "vietnamese.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "identity",
+          "description": "Returns the surface form as lemma; no trained lemma checkpoint is used."
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/vietnamese/vietnamese.ner.mdl",
+          "sha256": "63e3c73ad99bc3e58109f66be2eda267009f8621bcce9f96f324bb2f3c7ae285",
+          "training_result": "ner-training.json",
+          "run": "wikiann_vi"
+        }
+      }
+    },
+    {
+      "code": "lzh",
+      "language": "Classical Chinese",
+      "runtime_alias": "classical-chinese",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/classical-chinese/classical-chinese.tokenizer.mdl",
+          "sha256": "24014f6677bd115e0106173c1678072c2bb8e08c48f09ceb57846cb3c6cded31",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/classical-chinese.zip",
+          "archive_member": "classical-chinese.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/classical-chinese/classical-chinese.tagger.mdl",
+          "sha256": "1699f10cfcc3e0ee44a09321564fd5aff3dd8c4c4218c3ee8c4b778faf388363",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/classical-chinese.zip",
+          "archive_member": "classical-chinese.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/classical-chinese/classical-chinese_lemmatizer.pt",
+          "sha256": "3ffebf31e921c495003f3fa41026668534969193c977f1369ca04a8e9d4be4e2",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/classical-chinese.zip",
+          "archive_member": "classical-chinese_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/classical-chinese/classical-chinese.ner.mdl",
+          "sha256": "96c1533cc049138e108eb23584f8ebf41de2c5eac165f4b4455b8f44e5f1cdec",
+          "training_result": "ner-training.json",
+          "run": "lzh_cmag_200k"
+        }
+      }
+    },
+    {
+      "code": "tr",
+      "language": "Turkish",
+      "runtime_alias": "turkish",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish.tokenizer.mdl",
+          "sha256": "df76ab07078f7b6454f225106785912ecd31a0ecc53f545c07b82a7bba328b72",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish_mwt_expander.pt",
+          "sha256": "b25c633734e1c3c3348f1a8a7e8ad6acf8f33c018e1e4c59a0bac1e02bf9559c",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/customized-mwt_mwt_expander.pt",
+          "score_record": "mwt-development-reevaluation.json"
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish.tagger.mdl",
+          "sha256": "b9324f918ca36643807c1937faab220d1c4bcceef606a0c0bac34292438b982f",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish_lemmatizer.pt",
+          "sha256": "5086e54d14f63c0bde838cfcb5d9ab4db40a52fa7ad8138d574eb31f2fb00c77",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish.ner.mdl",
+          "sha256": "3b546395b4bf58769bc4ccd85240e46ecf81d815430669110b82c53996bd037a",
+          "training_result": "ner-training.json",
+          "run": "tur_turkish_wiki_ner"
+        }
+      }
+    },
+    {
+      "code": "fa",
+      "language": "Persian",
+      "runtime_alias": "persian",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian.tokenizer.mdl",
+          "sha256": "c9d0c2bf4a05645d8c70c4b1d64e4712b65cfb2c15458f525ee55abb2fbe1977",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/persian.zip",
+          "archive_member": "persian.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian_mwt_expander.pt",
+          "sha256": "86507d230f3560736b200e4cd58dfd75727e6f1888dc7420ea8119ba4553e216",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/persian.zip",
+          "archive_member": "persian_mwt_expander.pt"
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian.tagger.mdl",
+          "sha256": "998f7cee6942d93c7e1a8e7299a0cacba0256b9420b8d412dbc44c61446c4909",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/persian.zip",
+          "archive_member": "persian.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian_lemmatizer.pt",
+          "sha256": "a4fe7a29b86202ba816e9fea6c162718b9a43b839e38890554dc79817cd0525b",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/persianlemmatizer/xlm-roberta-base/customized/customized_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian.ner.mdl",
+          "sha256": "3e5bde86772a577b0f41c7439cbd3f46083dede9ee41b19e8f02598bb3c9e301",
+          "training_result": "ner-training.json",
+          "run": "fa_multiconer_v2_coarse6"
+        }
+      }
+    },
+    {
+      "code": "id",
+      "language": "Indonesian",
+      "runtime_alias": "indonesian",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/indonesian/indonesian.tokenizer.mdl",
+          "sha256": "176ab446c7eaec6849c08ab34b0479b96abebc8fbf25695c6c3111e5f7897160",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/indonesian.zip",
+          "archive_member": "indonesian.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/indonesian/indonesian.tagger.mdl",
+          "sha256": "e024ee898e66df008560ae5702d583b89602f79eeb78f2bac71083a69812fe47",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/indonesian.zip",
+          "archive_member": "indonesian.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/indonesian/indonesian_lemmatizer.pt",
+          "sha256": "1f7918907f2134a34be04f1560fe019d5fc77a3881eb5b4820367b244551ff06",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/indonesian.zip",
+          "archive_member": "indonesian_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/indonesian/indonesian.ner.mdl",
+          "sha256": "8878d43fd69887b0477a6281013d6137890fea7c5c00c37ceb6d0e091cf1c35b",
+          "training_result": "ner-training.json",
+          "run": "ind_indonlu_nerp"
+        }
+      }
+    },
+    {
+      "code": "hi",
+      "language": "Hindi",
+      "runtime_alias": "hindi",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hindi/hindi.tokenizer.mdl",
+          "sha256": "4e1911889ea92ffe8a37d0c6d05788828181121cf11e24755a05c4862f59edd7",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/hi/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hindi/hindi.tagger.mdl",
+          "sha256": "9c96a669213adcf4ab40656ffe76338859fc83c7b5eb2ea5c6901ceeece26473",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/hi/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hindi/hindi_lemmatizer.pt",
+          "sha256": "e0fa44f75c782efe08c8332e936dc5b1cda92101e4ef3747992f730f4a6b6331",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/hi/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hindi/hindi.ner.mdl",
+          "sha256": "7f665f6992d85b0ea391bba96eeceb514a115c74ad0f4a4da3b567b928f4836f",
+          "training_result": "ner-training.json",
+          "run": "hi_multiconer_v2_coarse6"
+        }
+      }
+    },
+    {
+      "code": "ar",
+      "language": "Arabic",
+      "runtime_alias": "arabic",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic.tokenizer.mdl",
+          "sha256": "fd2a9195aabc1a39f98e339969732c61d37cf994c648f6d8867db0554591bc7f",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/t_ar10k2/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic_mwt_expander.pt",
+          "sha256": "c9e2cd69fa05a44e6b16d56112b1fcec74654bba7e6998e0d9c2877c2273c044",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/t_ar10k2/xlm-roberta-base/customized-mwt/customized-mwt_mwt_expander.pt",
+          "score_record": "mwt-development-reevaluation.json"
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic.tagger.mdl",
+          "sha256": "82e4f2fc3a7afd7a6b7c117ce9a42d1ed9d41560394bf9c26ea27ddf7fb05faf",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/ar/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic_lemmatizer.pt",
+          "sha256": "307039f8a637cc17621c7c63f9011335d6d57245cc67562a3ca75a66d74fb637",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/ar/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic.ner.mdl",
+          "sha256": "0924461350ae081929f957af038c629504c357f67bacba72d5943a99962dea52",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/arabic.zip",
+          "archive_member": "arabic.ner.mdl"
+        }
+      }
+    },
+    {
+      "code": "th",
+      "language": "Thai",
+      "runtime_alias": "thai-ner",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/thai-ner/thai-ner.tokenizer.mdl",
+          "sha256": "8ad8a4a7223977ac21dbcfa9d0787dbd1ecb4bc8fada7edb13d8c74fc96f1fd8",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_th_customized_ner/xlm-roberta-base/customized-ner/customized-ner.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/thai-ner/thai-ner.tagger.mdl",
+          "sha256": "b1c9e9aa83f90263de0c43ad59268c82805cce20279f404e6ff37ed38f61dd2f",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_th_customized_ner/xlm-roberta-base/customized-ner/customized-ner.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "identity",
+          "description": "Returns the surface form as lemma; no trained lemma checkpoint is used."
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/thai-ner/thai-ner.ner.mdl",
+          "sha256": "88620d04b60cbe103a65c9559b843198813a383103cf8dd9c381b5482528d407",
+          "training_result": "ner-training.json",
+          "run": "tha_thai_nner_full_coarse_bio"
+        }
+      }
+    },
+    {
+      "code": "sa",
+      "language": "Sanskrit",
+      "runtime_alias": "sanskrit-vedic",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.tokenizer.mdl",
+          "sha256": "9bce77c36db05a7a84bc435558d2e3f7f49c5f9359dd72f6cc4c16d925213a14",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic_mwt_expander.pt",
+          "sha256": "5d444e53a231c5fcfcd9bd141529b03575cb33dbd250cb50c7c35a00bb5d5c32",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/customized-mwt_mwt_expander.pt",
+          "score_record": "mwt-development-reevaluation.json"
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.tagger.mdl",
+          "sha256": "93532d76a28c787467898d5cbf43d1a555f492cbd865084160b3acb9e8795b78",
+          "training_data": "_deprecated_nonruntime_20260514_184819/training/newsanskritdict/data/conllu/files/newparser/train_10000.conllu",
+          "training_data_evidence": "Every label-to-index mapping regenerated from this 10,000-sentence subset equals the selected checkpoint vocabulary.",
+          "dataset_record": "sanskrit-parser-dataset.json",
+          "score_record": "../evaluation/results/sanskrit-parser-development.json",
+          "evaluation_kind": "Fresh development evaluation; original training log is empty."
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic_lemmatizer.pt",
+          "sha256": "bc70857b80ef8a4812b71be84fb2100e4ed15833773a464e2730372db9381c0f",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.ner.mdl",
+          "sha256": "a987748ad57752fca968f30e26d75fcd39795bffb0ff9c2ce23acf36624d08b0",
+          "training_result": "ner-training.json",
+          "run": "san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5"
+        }
+      }
+    },
+    {
+      "code": "ang",
+      "language": "Old English",
+      "runtime_alias": "customized",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized/customized.tokenizer.mdl",
+          "sha256": "51bde7915f745dc1163ce879653de10d78e9a7fdbe2856774ab03f2d305daa38",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_oldeng_oedt_tokenize_v3/xlm-roberta-base/customized/customized.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized/customized.tagger.mdl",
+          "sha256": "bfc712f596d540852499c3419b64c2db4fe5509533031dcfd8a6f647aba47d66",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_oldeng_oedt_tokenize_v3/xlm-roberta-base/customized/customized.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized/customized_lemmatizer.pt",
+          "sha256": "f339e2ebdb6e893c86293aaa5876023558905298528b64bfda203bac17f53be2",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/oldeng_lemmatizer/xlm-roberta-base/customized/customized_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized/customized.ner.mdl",
+          "sha256": "e56ec21c307e3a42d86d95f1433f7813c36fda4ecbde9ac9ffdd3c4f9cdafdf4",
+          "training_result": "ner-training.json",
+          "run": "ang_oedt"
+        }
+      }
+    },
+    {
+      "code": "fr",
+      "language": "French",
+      "runtime_alias": "french",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french.tokenizer.mdl",
+          "sha256": "8d86215fe315427b23e1f112d6ecaf5c986df5bf9a8eeb3c22ba97099bec6323",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "archive_member": "french.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french_mwt_expander.pt",
+          "sha256": "d9c5f4625f6679725b6e97c11fa3183d1a94588ab17caa99034b2e25994e21f0",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "archive_member": "french_mwt_expander.pt"
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french.tagger.mdl",
+          "sha256": "0e29b5973bdf4030ff9d5fbad10589ad77eae5911a552fe12f54bc46a51841ee",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "archive_member": "french.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french_lemmatizer.pt",
+          "sha256": "9571f1b2ee60ad3a45958a9f39f969407c570e48897b1766d85ede2e8c0fccfd",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "archive_member": "french_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/french/french.ner.mdl",
+          "sha256": "5025f3df00dd447a85fed89dd3354a1417e07cebdab3104e8a459d91d5e0d240",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/french.zip",
+          "archive_member": "french.ner.mdl"
+        }
+      }
+    },
+    {
+      "code": "it",
+      "language": "Italian",
+      "runtime_alias": "italian-twittiro",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro.tokenizer.mdl",
+          "sha256": "37ea18239a3353874ceded46befbb3dd2a4c75146c20c87932a6ddad71b4b27b",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/italian-twittiro.zip",
+          "archive_member": "italian-twittiro.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro_mwt_expander.pt",
+          "sha256": "e452eafd00b39f4db1575196dcc5b16679e2ef994d599cd87e3cc3946246db1e",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/italian-twittiro.zip",
+          "archive_member": "italian-twittiro_mwt_expander.pt"
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro.tagger.mdl",
+          "sha256": "af1a3b18f796b8d12a93e2d819dc83f0356ac082e0cffaa912849358f76578a6",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/italian-twittiro.zip",
+          "archive_member": "italian-twittiro.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro_lemmatizer.pt",
+          "sha256": "dff483392c26126b99a12946c6c66ad26e7481403f6c19170aab3f53adc7a183",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/italian-twittiro.zip",
+          "archive_member": "italian-twittiro_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro.ner.mdl",
+          "sha256": "92aaf6782a87d555492cf21da84556f3d76ae9b34b30f873fb7594af679d363d",
+          "training_result": "ner-training.json",
+          "run": "it_multiconer_v2_coarse6"
+        }
+      }
+    },
+    {
+      "code": "ru",
+      "language": "Russian",
+      "runtime_alias": "russian-gsd",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/russian-gsd/russian-gsd.tokenizer.mdl",
+          "sha256": "ef867f493b21b75c2e54f4eaa1180b18d8548e933784a858486d8b6b62acee50",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/russian-gsd.zip",
+          "archive_member": "russian-gsd.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/russian-gsd/russian-gsd.tagger.mdl",
+          "sha256": "6eb914b13f38827b68fcf264c819744395868924d1fe5ab5e1ca5cb19b75c844",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/russian-gsd.zip",
+          "archive_member": "russian-gsd.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/russian-gsd/russian-gsd_lemmatizer.pt",
+          "sha256": "1ad88550c698e88ba99ff0229d29cc99da4de9d9c001c638ad8e5707b2a8d4c9",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/russian-gsd.zip",
+          "archive_member": "russian-gsd_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/russian-gsd/russian-gsd.ner.mdl",
+          "sha256": "6a905d5ea6a0f844d9c64a7333dfdeb03ba76d2d68c7b586bb3c884482106fd8",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/russian-gsd.zip",
+          "archive_member": "russian-gsd.ner.mdl"
+        }
+      }
+    },
+    {
+      "code": "es",
+      "language": "Spanish",
+      "runtime_alias": "spanish-gsd",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd.tokenizer.mdl",
+          "sha256": "6200b55bb6225fd543749fa4fb505353ea1baa0d5e6b55b3c0afe399f4d2be5e",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "archive_member": "spanish-gsd.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd_mwt_expander.pt",
+          "sha256": "d9870fe453ed308ad14b6e6e19f2b6b75e219fa3d2ac3b563a2109dc7c16c567",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "archive_member": "spanish-gsd_mwt_expander.pt"
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd.tagger.mdl",
+          "sha256": "feeb0cdc2840490620ec030918922aa311d219b92d2a959fe5bb19f9d53b2d07",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "archive_member": "spanish-gsd.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd_lemmatizer.pt",
+          "sha256": "7a99ebe93a595faeb37d64b2155828cdd6a108b2e4105212dee30e9655404f34",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "archive_member": "spanish-gsd_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/spanish-gsd/spanish-gsd.ner.mdl",
+          "sha256": "cdfa9d04bbfbb74d4a2abb832735d047820f1ddf042ecf4c0d27135b2ea12f3a",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/spanish-gsd.zip",
+          "archive_member": "spanish-gsd.ner.mdl"
+        }
+      }
+    },
+    {
+      "code": "de",
+      "language": "German",
+      "runtime_alias": "german",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german.tokenizer.mdl",
+          "sha256": "06843405ac4ee5c6672738b455882760fd4f0aaed0b6410f3d9885c79f131cb4",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "archive_member": "german.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german_mwt_expander.pt",
+          "sha256": "f6b65fd4ba782cd297c50a2a6677ddda9dd3e098b412737fe7a25f88dcfbbf05",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "archive_member": "german_mwt_expander.pt"
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german.tagger.mdl",
+          "sha256": "a703117d373e737e6822e34b9dfce3def79e00f4b0308ba6f496b0c639b492a6",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "archive_member": "german.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german_lemmatizer.pt",
+          "sha256": "c09bd2ca2250968a84ee2ff478a59576dd0e5b3fb607b5416bcb86f161c0e511",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "archive_member": "german_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/german/german.ner.mdl",
+          "sha256": "4c010d3c8145db86a16e00d29123c85f4e36099b0062be37a1b0e7720d87c4fd",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/german.zip",
+          "archive_member": "german.ner.mdl"
+        }
+      }
+    },
+    {
+      "code": "nl",
+      "language": "Dutch",
+      "runtime_alias": "dutch",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch.tokenizer.mdl",
+          "sha256": "62ce9b2a4179fa772f06990af03e349ac55ab93cca16fccd09e63ac875177e24",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "archive_member": "dutch.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch.tagger.mdl",
+          "sha256": "d6c8950879661248eba0bcb8b4995d09021be8d26b4aa3dd6544408a06f9e421",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "archive_member": "dutch.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch_lemmatizer.pt",
+          "sha256": "705057c047da6e5dadfc6837804c53f4a36f4323a9532898a95cd78429937cba",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "archive_member": "dutch_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/dutch/dutch.ner.mdl",
+          "sha256": "aac3de839cceed390df05144061f7aec28562d5c9e9142f0635f90046f94dc0c",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/dutch.zip",
+          "archive_member": "dutch.ner.mdl"
+        }
+      }
+    },
+    {
+      "code": "pt",
+      "language": "Portuguese",
+      "runtime_alias": "portuguese",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese.tokenizer.mdl",
+          "sha256": "8421a029d1895e2469459c4e1c543a3509fd287c6c29a02bbb07768e2d83bf2b",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/portuguese.zip",
+          "archive_member": "portuguese.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese_mwt_expander.pt",
+          "sha256": "1c6383786a09ecf9af0ecab569547d30c8c8deca3c65655eca4f12a9e526d490",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/portuguese.zip",
+          "archive_member": "portuguese_mwt_expander.pt"
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese.tagger.mdl",
+          "sha256": "8ada34be2864fdbdbf0a7eb4407a28307ae5210c95a1bd0d80af9f3d7fdfa7d5",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/portuguese.zip",
+          "archive_member": "portuguese.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese_lemmatizer.pt",
+          "sha256": "f7a32f0a4cb71cafa0fa36f35b140b40a4eedf5b470f784156d009c521593946",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/portuguese.zip",
+          "archive_member": "portuguese_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese.ner.mdl",
+          "sha256": "7e0fed1341b067857d8257b9ea8fb0b57d0a425ad34277d331cd49d3c7690eb1",
+          "training_result": "ner-training.json",
+          "run": "pt_multiconer_v2_coarse6"
+        }
+      }
+    },
+    {
+      "code": "la",
+      "language": "Latin",
+      "runtime_alias": "latin",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/latin/latin.tokenizer.mdl",
+          "sha256": "8d967989c4c187201c535f6810ef24811f969e2f0feaefc60388054d53a4947c",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/la/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/latin/latin.tagger.mdl",
+          "sha256": "1222526b7c650ee39410350a93cccf59125ca5794d616f64e3175f0e3f297fc5",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/la/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/latin/latin_lemmatizer.pt",
+          "sha256": "aa51e0c7cf342df1374d535f03fe39c2c98736010056a328f60daffe33f0ffe2",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/la/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/latin/latin.ner.mdl",
+          "sha256": "f292a9ddb5edbe06cc8517442663150c96d72db131e9bc1cc8d0e16319b7be8c",
+          "training_result": "ner-training.json",
+          "run": "lat_herodotos_latin_ner"
+        }
+      }
+    },
+    {
+      "code": "el",
+      "language": "Greek",
+      "runtime_alias": "greek",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek.tokenizer.mdl",
+          "sha256": "88d064eb4583345e8a1ab3bd27b02fb2e2e0259577f7c005fca64b62f78c4bd7",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/el/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek_mwt_expander.pt",
+          "sha256": "38cfda50e48d8355d6d056e8995b47588aab869352c0bbf24dba1787b65fd820",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/greek.zip",
+          "archive_member": "greek_mwt_expander.pt"
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek.tagger.mdl",
+          "sha256": "a2f1c3273e64e2d22174339fa28fe60ab2a513af2c495d383380826a5c8e88cd",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/el/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek_lemmatizer.pt",
+          "sha256": "87cf0d346bbae40b83d1d10443bf543da12487aa66b314c8e674e4dcda5641e0",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/el/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek.ner.mdl",
+          "sha256": "ae9d8c3655fe3566ae4b2b07c0f3f9df9b0a67b230e8bea8c79b4fbfe8764537",
+          "training_result": "ner-training.json",
+          "run": "ell_greek_ner_nel"
+        }
+      }
+    },
+    {
+      "code": "hy",
+      "language": "Armenian",
+      "runtime_alias": "armenian",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian.tokenizer.mdl",
+          "sha256": "fb864dea321e89b104f6e954804e8c15d26baa14174a6c73f29b9ad45bc4a2e5",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/armenian.zip",
+          "archive_member": "armenian.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian_mwt_expander.pt",
+          "sha256": "972c951d5a265087a31859dde547b591d30b6a83efb6fd49505b93632db889f2",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/armenian.zip",
+          "archive_member": "armenian_mwt_expander.pt"
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian.tagger.mdl",
+          "sha256": "2c4069ad37b29a7151226391493cb908ecd2a1d56436ac28338adfbe16d6c891",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/armenian.zip",
+          "archive_member": "armenian.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian_lemmatizer.pt",
+          "sha256": "d11e0fbb0b051da7a2249589fa70a062db9b555c4ddb98382be93fa33ab04b47",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/armenian.zip",
+          "archive_member": "armenian_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian.ner.mdl",
+          "sha256": "0ab9d8208a3625c902d27d3d942ebd7f53c38fda96cd9ce0b098b88903292e56",
+          "training_result": "ner-training.json",
+          "run": "hye_wikiann"
+        }
+      }
+    },
+    {
+      "code": "grc",
+      "language": "Ancient Greek",
+      "runtime_alias": "ancient-greek",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/ancient-greek/ancient-greek.tokenizer.mdl",
+          "sha256": "7669e6fdd14d348ee1903672e84d85d3251a740248d440d754f6f0b643a432e9",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/t_grc_naturalpara_tok/xlm-roberta-base/customized/customized.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/ancient-greek/ancient-greek.tagger.mdl",
+          "sha256": "c4a31b5ad930e85d62c058b31045a18bf3b05872feb219556d2ed4adf78b45ce",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/t_grc10k_tok1/xlm-roberta-base/customized/customized.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/ancient-greek/ancient-greek_lemmatizer.pt",
+          "sha256": "656f1a044b89636438c4e5a895541c1f5fbfefc0cb201ef2e59ca853b43ee76c",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/t_grc10k_tok1/xlm-roberta-base/customized/customized_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/ancient-greek/ancient-greek.ner.mdl",
+          "sha256": "796874fc7573a9d83d4f707586f502b069e733991347fe55af82a5c0de1347f7",
+          "training_result": "ner-training.json",
+          "run": "grc_pausanias_ethnic_civic_misc"
+        }
+      }
+    },
+    {
+      "code": "he",
+      "language": "Hebrew",
+      "runtime_alias": "hebrew",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew.tokenizer.mdl",
+          "sha256": "defbcaddb392f18bcdce745989a5c875a35559afa78a6ab116044b20c209d656",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew_mwt_expander.pt",
+          "sha256": "d76b0fbc1656d68da00d6de2504023650aec28e320e7b0a511b73d099fc51479",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/customized-mwt_mwt_expander.pt",
+          "score_record": "mwt-development-reevaluation.json"
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew.tagger.mdl",
+          "sha256": "abdbe8615570798b57f16ae86801a3d1cb217fef80b00c80cea35cf9491f8f0c",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew_lemmatizer.pt",
+          "sha256": "ca92446f32839be789f2e727a91e2bef604f3dd7b00a80284329b0172e173b65",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew.ner.mdl",
+          "sha256": "26955ef66dc13e6f589470e9ca293487f4d4897c299ecc1824d404b3a96abbb3",
+          "training_result": "ner-training.json",
+          "run": "heb_nemo_token_single"
+        }
+      }
+    },
+    {
+      "code": "tl",
+      "language": "Tagalog",
+      "runtime_alias": "tagalog-custom",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom.tokenizer.mdl",
+          "sha256": "5102a568d3e1c09e149d5814d8b4c9b007f95a60e06adc18934c3573b7a4722e",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v2/xlm-roberta-base/tagalog-v2/tagalog-v2.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom_mwt_expander.pt",
+          "sha256": "82c2c0414346549dc81c19438d95767994c1d6b6285f11701a2e7fc10c5037b2",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v2/xlm-roberta-base/tagalog-v2/tagalog-v2_mwt_expander.pt",
+          "score_record": "mwt-development-reevaluation.json"
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom.tagger.mdl",
+          "sha256": "b6210ff9306acee1d2a213c6d87fa79461848ed11e798a5f0cdaac389867c98b",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v1/xlm-roberta-base/customized/customized.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom_lemmatizer.pt",
+          "sha256": "ca73c1315fede3cd4c969cb64a5b8ca42286731fc6eafd75623d17828619d018",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v1/xlm-roberta-base/customized/customized_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom.ner.mdl",
+          "sha256": "264283bcc801fe6eb595701a08471f07b3f9c37ba1428ade23bbe916b8304ecc",
+          "training_result": "ner-training.json",
+          "run": "fil_tlunified_ner"
+        }
+      }
+    },
+    {
+      "code": "sw",
+      "language": "Swahili",
+      "runtime_alias": "swahili-custom",
+      "components": {
+        "tokenizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/swahili-custom/swahili-custom.tokenizer.mdl",
+          "sha256": "ba8b0176f0da135207baccadb9115d14ede231e4b5ca6aca96e3570692a8067c",
+          "training_result": "tokenizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_swh_v1/xlm-roberta-base/customized/customized.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/swahili-custom/swahili-custom.tagger.mdl",
+          "sha256": "4996147bf884d6de700b0bdf52e594efa82e4b51fa095f3bc98b05dffff6260f",
+          "training_result": "tagger_parser-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_swh_v1/xlm-roberta-base/customized/customized.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/swahili-custom/swahili-custom_lemmatizer.pt",
+          "sha256": "10c4f7f9f8399d0ba1af037879d9ad24dc69e6943b580cd601f9f87076c33ab5",
+          "training_result": "lemmatizer-training.json",
+          "training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_swh_v1/xlm-roberta-base/customized/customized_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "custom",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/swahili-custom/swahili-custom.ner.mdl",
+          "sha256": "d78bd574f790e56627d1b3f46900268e0d064a1d848847735f599c0e0fc2efb4",
+          "training_result": "ner-training.json",
+          "run": "swh_finerweb_top100_lpo_20260507_201707"
+        }
+      }
+    },
+    {
+      "code": "zh-Hant",
+      "language": "Chinese (Traditional)",
+      "runtime_alias": "traditional-chinese",
+      "components": {
+        "tokenizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/traditional-chinese/traditional-chinese.tokenizer.mdl",
+          "sha256": "0435b0b7bc333897e4bbfe2e6f95b16e8a11696c65c3077a1390e05023fe48f6",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/traditional-chinese.zip",
+          "archive_member": "traditional-chinese.tokenizer.mdl"
+        },
+        "mwt": {
+          "origin": "not_used",
+          "description": "No MWT expander is selected for this language."
+        },
+        "tagger_parser": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/traditional-chinese/traditional-chinese.tagger.mdl",
+          "sha256": "a6306c3b0a219b4f997a782058f9514eea3eb703e1fe39e930a2e779ca5fa6ad",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/traditional-chinese.zip",
+          "archive_member": "traditional-chinese.tagger.mdl"
+        },
+        "lemmatizer": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/traditional-chinese/traditional-chinese_lemmatizer.pt",
+          "sha256": "a0ffdfe914f6230966bb153c5aabe4f2097dbc338ab0d5120acee0c9668e33f5",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/traditional-chinese.zip",
+          "archive_member": "traditional-chinese_lemmatizer.pt"
+        },
+        "ner": {
+          "origin": "stock",
+          "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/traditional-chinese/traditional-chinese.ner.mdl",
+          "sha256": "5299a84f5ee3fb17b34c9068fbbeaa4ec99a1bacea2dc98e5ffc87eb909a456c",
+          "source": "https://huggingface.co/uonlp/trankit/resolve/1add34e3909949dbb98523ed6cfcb4e9393e2c8e/models/v1.0.0/xlm-roberta-base/chinese.zip",
+          "archive_member": "chinese.ner.mdl"
+        }
+      }
+    }
+  ]
+}

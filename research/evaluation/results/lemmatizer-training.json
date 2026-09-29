@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "metric_scale": "0-100; development set; component-stage evaluation, not whole-application accuracy",
+  "results": [
+    {
+      "code": "tr",
+      "language": "Turkish",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish_lemmatizer.pt",
+      "checkpoint_sha256": "5086e54d14f63c0bde838cfcb5d9ab4db40a52fa7ad8138d574eb31f2fb00c77",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/logs/lemmatize.training",
+      "log_sha256": "91745a26a79a3457769b0c6c7ed6dfa60cfaa1ba6dae4262a842cbc58bb85bd9",
+      "selected_table_line": 795,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 79.17
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 79.17
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 78.59
+    },
+    {
+      "code": "fa",
+      "language": "Persian",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian_lemmatizer.pt",
+      "checkpoint_sha256": "a4fe7a29b86202ba816e9fea6c162718b9a43b839e38890554dc79817cd0525b",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/persianlemmatizer/xlm-roberta-base/customized/customized_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/persianlemmatizer/xlm-roberta-base/customized/logs/lemmatize.training",
+      "log_sha256": "7ff483242fbbcf4773b148fa5e30a7fee884a39cb8f361acccb1320f8a431839",
+      "selected_table_line": 5662,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 99.53
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 99.53
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 99.53
+    },
+    {
+      "code": "hi",
+      "language": "Hindi",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hindi/hindi_lemmatizer.pt",
+      "checkpoint_sha256": "e0fa44f75c782efe08c8332e936dc5b1cda92101e4ef3747992f730f4a6b6331",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/hi/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/hi/xlm-roberta-base/customized-mwt/logs/lemmatize.training",
+      "log_sha256": "bec6269fc68334fc0fc250e927f35fc79cc63e454a06d2200c418dc0fe6fae70",
+      "selected_table_line": 201,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 94.59
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 94.59
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 94.59
+    },
+    {
+      "code": "ar",
+      "language": "Arabic",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic_lemmatizer.pt",
+      "checkpoint_sha256": "307039f8a637cc17621c7c63f9011335d6d57245cc67562a3ca75a66d74fb637",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/ar/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/ar/xlm-roberta-base/customized-mwt/logs/lemmatize.training",
+      "log_sha256": "6db5db8b6c3e07fcae4eddee3659c3c6ad33979f554a379fcf9f8d3aa64543ad",
+      "selected_table_line": 179,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 75.04
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 75.04
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 75.04
+    },
+    {
+      "code": "sa",
+      "language": "Sanskrit",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic_lemmatizer.pt",
+      "checkpoint_sha256": "bc70857b80ef8a4812b71be84fb2100e4ed15833773a464e2730372db9381c0f",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/logs/lemmatize.training",
+      "log_sha256": "45b85a1d676c7f243976c1585db7743584cd7cdf57e2041fb9c89af237730ccc",
+      "selected_table_line": 1291,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 95.68
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 95.68
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 95.68
+    },
+    {
+      "code": "ang",
+      "language": "Old English",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized/customized_lemmatizer.pt",
+      "checkpoint_sha256": "f339e2ebdb6e893c86293aaa5876023558905298528b64bfda203bac17f53be2",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/oldeng_lemmatizer/xlm-roberta-base/customized/customized_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/oldeng_lemmatizer/xlm-roberta-base/customized/logs/lemmatize.training",
+      "log_sha256": "5d190eb3b1d79174b60f44931bcf44b67758aa72e14a211c69990c00d3b84dbe",
+      "selected_table_line": 556,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 86.4
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 86.4
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 86.37
+    },
+    {
+      "code": "la",
+      "language": "Latin",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/latin/latin_lemmatizer.pt",
+      "checkpoint_sha256": "aa51e0c7cf342df1374d535f03fe39c2c98736010056a328f60daffe33f0ffe2",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/la/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/la/xlm-roberta-base/customized-mwt/logs/lemmatize.training",
+      "log_sha256": "bddf18929d5973689ecefd82817cd5ea6dabd92927f5ecdd92c26471e7047d5f",
+      "selected_table_line": 491,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 97.76
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 97.76
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 97.76
+    },
+    {
+      "code": "el",
+      "language": "Greek",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek_lemmatizer.pt",
+      "checkpoint_sha256": "87cf0d346bbae40b83d1d10443bf543da12487aa66b314c8e674e4dcda5641e0",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/el/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/el/xlm-roberta-base/customized-mwt/logs/lemmatize.training",
+      "log_sha256": "aea5cefa8f53ed7508830cfe925a1ca213a4168a86cbebed26c35b2e4852442e",
+      "selected_table_line": 190,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 88.03
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 88.03
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 87.7
+    },
+    {
+      "code": "grc",
+      "language": "Ancient Greek",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/ancient-greek/ancient-greek_lemmatizer.pt",
+      "checkpoint_sha256": "656f1a044b89636438c4e5a895541c1f5fbfefc0cb201ef2e59ca853b43ee76c",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/t_grc10k_tok1/xlm-roberta-base/customized/customized_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/t_grc10k_tok1/xlm-roberta-base/customized/logs/lemmatize.training",
+      "log_sha256": "4d2fe111db4ee4c453470dca6452f964d8a3e428edbd2908f08650c8fc9a7dc4",
+      "selected_table_line": 1120,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 95.11
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 95.11
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 95.11
+    },
+    {
+      "code": "he",
+      "language": "Hebrew",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew_lemmatizer.pt",
+      "checkpoint_sha256": "ca92446f32839be789f2e727a91e2bef604f3dd7b00a80284329b0172e173b65",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/customized-mwt_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/logs/lemmatize.training",
+      "log_sha256": "2661f5ff26feffe411bef93dc5d4e55987afe387beb0987f94b56ef5b7a1d9f6",
+      "selected_table_line": 627,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 94.21
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 94.21
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 94.21
+    },
+    {
+      "code": "tl",
+      "language": "Tagalog",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom_lemmatizer.pt",
+      "checkpoint_sha256": "ca73c1315fede3cd4c969cb64a5b8ca42286731fc6eafd75623d17828619d018",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v1/xlm-roberta-base/customized/customized_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v1/xlm-roberta-base/customized/logs/lemmatize.training",
+      "log_sha256": "82ab3675acfaf6c60feef767ce8acc2523eeb1659f3e40e5d3c9849ef7d213b2",
+      "selected_table_line": 292,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 7.6
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 7.6
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 92.83
+    },
+    {
+      "code": "sw",
+      "language": "Swahili",
+      "component": "lemmatizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/swahili-custom/swahili-custom_lemmatizer.pt",
+      "checkpoint_sha256": "10c4f7f9f8399d0ba1af037879d9ad24dc69e6943b580cd601f9f87076c33ab5",
+      "checkpoint_epoch": null,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_swh_v1/xlm-roberta-base/customized/customized_lemmatizer.pt",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_swh_v1/xlm-roberta-base/customized/logs/lemmatize.training",
+      "log_sha256": "95f16b489a914edd1508585d3e88c6c621b13835f83ec8cba773fa8b4076f5db",
+      "selected_table_line": 449,
+      "selected_metrics_f1_percent": {
+        "Lemmas": 86.85
+      },
+      "last_logged_metrics_f1_percent": {
+        "Lemmas": 86.85
+      },
+      "selection_evidence": "Lemma trainer logs the best-so-far score table after saving an improved checkpoint; this is the final retained best-so-far table.",
+      "dictionary_baseline_f1_percent": 86.29
+    }
+  ]
+}

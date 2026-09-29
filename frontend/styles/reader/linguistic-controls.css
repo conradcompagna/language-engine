@@ -1,0 +1,175 @@
+/* ===================== LEGACY LEGEND DROPDOWN (deprecated) ===================== */
+.legend-dropdown {
+  display: none;
+  background: var(--le-white);
+  border: 1px solid var(--le-slate-100);
+  border-radius: var(--le-radius);
+  box-shadow: var(--le-shadow-lg);
+  padding: 14px;
+  min-width: 420px;
+  max-width: 480px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  z-index: 1001;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  margin: 6px 0 0 0;
+}
+@media (max-width: 1100px) {
+  .legend-dropdown {
+    left: 0;
+  }
+}
+
+/* POS Shading Grid */
+.legend-pos-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+.left-menu .legend-pos-grid {
+  grid-template-columns: 1fr;
+}
+.legend-pos-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 5px;
+}
+.legend-pos-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.legend-pos-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--le-slate-700);
+  min-width: 46px;
+}
+.legend-pos-desc {
+  font-size: 11px;
+  color: var(--le-slate-500);
+}
+
+/* UD Dependency Lines */
+.legend-ud-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.legend-ud-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 5px;
+}
+.legend-ud-svg {
+  width: 50px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.legend-ud-label {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 50px;
+}
+.legend-ud-desc {
+  font-size: 11px;
+  color: var(--le-slate-500);
+}
+
+/* DEP Tags List */
+.legend-dep-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.legend-dep-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 4px 6px;
+}
+.legend-dep-pill {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  background-color: var(--le-slate-100);
+  color: var(--le-slate-700);
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  flex-shrink: 0;
+  min-width: 65px;
+  text-align: center;
+}
+.legend-dep-desc {
+  font-size: 11px;
+  color: var(--le-slate-700);
+  line-height: 1.4;
+}
+
+/* NER Tags Grid */
+.legend-ner-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+.left-menu .legend-ner-grid {
+  grid-template-columns: 1fr;
+}
+.legend-ner-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 6px;
+}
+.legend-ner-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: #3b82f6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+.legend-ner-desc {
+  font-size: 11px;
+  color: var(--le-slate-500);
+}
+
+/* Broken Token */
+.legend-broken-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+}
+.legend-broken-token {
+  font-size: 16px;
+  color: #b91c1c;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.legend-broken-desc {
+  font-size: 11px;
+  color: var(--le-slate-500);
+}

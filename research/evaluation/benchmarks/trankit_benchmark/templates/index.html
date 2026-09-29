@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trankit CPU/GPU Benchmark</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='benchmark.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Trankit CPU/GPU Benchmark</h1>
+    <div id="topStatus">Workers starting</div>
+  </header>
+  <main>
+    <section class="controls">
+      <div class="row">
+        <label for="lang">Language</label>
+        <select id="lang">{{ language_options_html | safe }}</select>
+      </div>
+      <div class="row">
+        <label for="trankitOverride">Trankit override</label>
+        <input id="trankitOverride" placeholder="optional, e.g. traditional-chinese">
+      </div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="manualSentence">Manual sentence segmentation</label>
+        <label class="check"><input type="checkbox" id="stripPunctuation">Strip punctuation</label>
+      </div>
+      <div class="row">
+        <label for="text">Text</label>
+        <textarea id="text" spellcheck="false"></textarea>
+      </div>
+      <button id="gpuOptRunBtn">Run Compressed ONNX CPU then Regular GPU</button>
+      <div class="row button-grid">
+        <button id="xlmLoadProbeBtn" class="secondary">Shared XLM Cold-Load Probe</button>
+        <button id="langLoadProbeBtn" class="secondary">Selected Language Modules Probe</button>
+        <button id="fullLoadProbeBtn" class="secondary">Full All-Language Pipeline Probe</button>
+      </div>
+      <p class="note">Compressed ONNX CPU and regular GPU pipelines are loaded in separate worker processes at server start. Inference runs sequentially.</p>
+      <div class="status">
+        <div class="status-item">
+          <div class="status-name">ONNX CPU</div>
+          <div class="status-state" id="gpuOptStatus">starting</div>
+        </div>
+        <div class="status-item">
+          <div class="status-name">GPU</div>
+          <div class="status-state" id="gpuStatus">starting</div>
+        </div>
+      </div>
+    </section>
+    <section class="output">
+      <div class="tabs">
+        <button class="tab active" data-pane="metricsPane">Metrics</button>
+        <button class="tab" data-pane="cpuPane">ONNX CPU JSON</button>
+        <button class="tab" data-pane="gpuPane">GPU JSON</button>
+        <button class="tab" data-pane="diffPane">Diff</button>
+        <button class="tab" data-pane="probePane">Load Probe</button>
+        <button class="tab" data-pane="rawPane">Raw Response</button>
+      </div>
+      <div class="pane active" id="metricsPane">
+        <div class="summary" id="summary"></div>
+        <pre id="metricsOut">No request yet.</pre>
+      </div>
+      <div class="pane" id="cpuPane"><pre id="cpuOut">No request yet.</pre></div>
+      <div class="pane" id="gpuPane"><pre id="gpuOut">No request yet.</pre></div>
+      <div class="pane" id="diffPane"><pre id="diffOut">No compressed CPU comparison yet.</pre></div>
+      <div class="pane" id="probePane">
+        <div class="summary" id="probeSummary"></div>
+        <pre id="probeOut">No load probe yet.</pre>
+      </div>
+      <div class="pane" id="rawPane"><pre id="rawOut">No request yet.</pre></div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='benchmark.js') }}"></script>
+</body>
+</html>

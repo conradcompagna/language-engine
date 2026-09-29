@@ -1,0 +1,307 @@
+{
+  "count": 3,
+  "results": {
+    "read": [
+      {
+        "headword": "read",
+        "pos": "v",
+        "pos_raw": "verb",
+        "reading": "",
+        "etymology": "",
+        "etymology_number": 0,
+        "alt_forms": [],
+        "ipa_variants": [],
+        "audio_urls": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": [],
+        "related": [],
+        "senses_full": [
+          {
+            "glosses": [
+              "interpret text"
+            ]
+          }
+        ],
+        "senses": [
+          "interpret text"
+        ],
+        "_match_source": "headword"
+      }
+    ],
+    "reads": [
+      {
+        "headword": "read",
+        "pos": "v",
+        "pos_raw": "verb",
+        "reading": "",
+        "etymology": "",
+        "etymology_number": 0,
+        "alt_forms": [],
+        "ipa_variants": [],
+        "audio_urls": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": [],
+        "related": [],
+        "senses_full": [
+          {
+            "glosses": [
+              "interpret text"
+            ]
+          }
+        ],
+        "senses": [
+          "interpret text"
+        ],
+        "_match_source": "form",
+        "morph_base": "read",
+        "morph_info": [
+          "third-person;singular"
+        ],
+        "surface_form": "reads"
+      }
+    ],
+    "reading": [
+      {
+        "headword": "read",
+        "pos": "v",
+        "pos_raw": "verb",
+        "reading": "",
+        "etymology": "",
+        "etymology_number": 0,
+        "alt_forms": [],
+        "ipa_variants": [],
+        "audio_urls": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": [],
+        "related": [],
+        "senses_full": [
+          {
+            "glosses": [
+              "interpret text"
+            ]
+          }
+        ],
+        "senses": [
+          "interpret text"
+        ],
+        "_match_source": "form",
+        "morph_base": "read",
+        "morph_info": [
+          "participle"
+        ],
+        "surface_form": "reading"
+      }
+    ],
+    "book": [
+      {
+        "headword": "book",
+        "pos": "n",
+        "pos_raw": "noun",
+        "reading": "",
+        "etymology": "",
+        "etymology_number": 0,
+        "alt_forms": [],
+        "ipa_variants": [],
+        "audio_urls": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": [],
+        "related": [],
+        "senses_full": [
+          {
+            "glosses": [
+              "bound pages"
+            ]
+          }
+        ],
+        "senses": [
+          "bound pages"
+        ],
+        "_match_source": "headword"
+      }
+    ],
+    "reader": [
+      {
+        "headword": "reader",
+        "pos": "",
+        "pos_raw": "",
+        "reading": "",
+        "etymology": "",
+        "etymology_number": 0,
+        "alt_forms": [],
+        "ipa_variants": [],
+        "audio_urls": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": [],
+        "related": [],
+        "senses_full": [
+          {
+            "glosses": [
+              "one who reads"
+            ]
+          },
+          {
+            "glosses": [
+              "reading device"
+            ]
+          }
+        ],
+        "senses": [
+          "one who reads",
+          "reading device"
+        ],
+        "_match_source": "headword"
+      }
+    ],
+    "missing": []
+  },
+  "compactResults": [
+    {
+      "word": "read",
+      "exact": [
+        {
+          "_winner_ref": true,
+          "storage_kind": "sqlite",
+          "db_alias": 1,
+          "entry_row_id": 0,
+          "match_kind": "headword",
+          "match_key": "read",
+          "headword": "read"
+        }
+      ],
+      "fuzzy": {
+        "tier": 0,
+        "stubs": [
+          {
+            "_winner_ref": true,
+            "storage_kind": "sqlite",
+            "db_alias": 1,
+            "entry_row_id": 0,
+            "match_kind": "headword",
+            "match_key": "read",
+            "headword": "read",
+            "fuzzy_tier": 0
+          }
+        ]
+      }
+    },
+    {
+      "word": "reads",
+      "exact": [
+        {
+          "_winner_ref": true,
+          "storage_kind": "sqlite",
+          "db_alias": 1,
+          "entry_row_id": 0,
+          "match_kind": "form",
+          "match_key": "reads",
+          "headword": "reads"
+        }
+      ],
+      "fuzzy": {
+        "tier": 0,
+        "stubs": [
+          {
+            "_winner_ref": true,
+            "storage_kind": "sqlite",
+            "db_alias": 1,
+            "entry_row_id": 0,
+            "match_kind": "form",
+            "match_key": "reads",
+            "headword": "reads",
+            "fuzzy_tier": 0
+          }
+        ]
+      }
+    },
+    {
+      "word": "reed",
+      "exact": [],
+      "fuzzy": {
+        "tier": 1,
+        "stubs": [
+          {
+            "_winner_ref": true,
+            "storage_kind": "sqlite",
+            "db_alias": 1,
+            "entry_row_id": 0,
+            "match_kind": "headword",
+            "match_key": "read",
+            "headword": "read",
+            "fuzzy_tier": 1
+          }
+        ]
+      }
+    },
+    {
+      "word": "boook",
+      "exact": [],
+      "fuzzy": {
+        "tier": 1,
+        "stubs": [
+          {
+            "_winner_ref": true,
+            "storage_kind": "sqlite",
+            "db_alias": 3,
+            "entry_row_id": 0,
+            "match_kind": "headword",
+            "match_key": "book",
+            "headword": "book",
+            "fuzzy_tier": 1
+          }
+        ]
+      }
+    },
+    {
+      "word": "nothing",
+      "exact": [],
+      "fuzzy": {
+        "tier": -1,
+        "stubs": []
+      }
+    }
+  ],
+  "injected": [],
+  "removed": [],
+  "methods": [
+    "_entry_to_fill",
+    "_filter_entries_for_greedy",
+    "_greedy_fill",
+    "_greedy_fill_simple",
+    "_index_hydrated_forms",
+    "_index_tsv_forms",
+    "_loadOneRow",
+    "_lookup_all_raw",
+    "_lookup_key",
+    "_lookup_keys",
+    "_split_matchable_display_entries",
+    "beginHydratedLookup",
+    "constructor",
+    "endHydratedLookup",
+    "fillToken",
+    "fill_token",
+    "filterEntriesByUpos",
+    "filterEntriesByXpos",
+    "filter_entries_by_upos",
+    "filter_entries_by_xpos",
+    "fuzzyLookupKeysTiered",
+    "get_xpos_primary_match_info",
+    "has_xpos_primary_match",
+    "injectGeminiKey",
+    "loadCompactIndex",
+    "loadFromRows",
+    "load_tsv_entries",
+    "lookup",
+    "lookupAll",
+    "lookupDisplayOnly",
+    "lookupViaForms",
+    "lookup_all",
+    "lookup_display_only",
+    "lookup_via_forms",
+    "removeCompactKey"
+  ]
+}

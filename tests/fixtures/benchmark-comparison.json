@@ -1,0 +1,680 @@
+[
+  {
+    "left": {},
+    "right": {},
+    "expected": {
+      "match": true,
+      "diff_count": 0,
+      "truncated": false,
+      "metrics": [
+        {
+          "label": "Sentences",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Sentence token sequences",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Tokens",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Analysis units",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "MWT expansions",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "UPOS",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "XPOS",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Morph feats",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Dependency relations",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Heads",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "NER tags",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Lemmas",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        }
+      ],
+      "text": "Sentences: n/a\nSentence token sequences: n/a\nTokens: n/a\nAnalysis units: n/a\nMWT expansions: n/a\nUPOS: n/a\nXPOS: n/a\nMorph feats: n/a\nDependency relations: n/a\nHeads: n/a\nNER tags: n/a\nLemmas: n/a"
+    }
+  },
+  {
+    "left": {
+      "sentences": [
+        {
+          "text": "語",
+          "tokens": [
+            {
+              "id": 1,
+              "text": "語",
+              "lemma": "語",
+              "upos": "NOUN",
+              "xpos": "NN",
+              "head": 0,
+              "deprel": "root",
+              "ner": "O"
+            }
+          ]
+        }
+      ]
+    },
+    "right": {
+      "sentences": [
+        {
+          "text": "語",
+          "tokens": [
+            {
+              "id": 1,
+              "text": "語",
+              "lemma": "語",
+              "upos": "NOUN",
+              "xpos": "NN",
+              "head": 0,
+              "deprel": "root",
+              "ner": "O"
+            }
+          ]
+        }
+      ]
+    },
+    "expected": {
+      "match": true,
+      "diff_count": 0,
+      "truncated": false,
+      "metrics": [
+        {
+          "label": "Sentences",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Sentence token sequences",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Tokens",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Analysis units",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "MWT expansions",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "UPOS",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "XPOS",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Morph feats",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Dependency relations",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Heads",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "NER tags",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Lemmas",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        }
+      ],
+      "text": "Sentences: 100.0% same / 0.0% diff (1/1)\nSentence token sequences: 100.0% same / 0.0% diff (1/1)\nTokens: 100.0% same / 0.0% diff (1/1)\nAnalysis units: 100.0% same / 0.0% diff (1/1)\nMWT expansions: n/a\nUPOS: 100.0% same / 0.0% diff (1/1)\nXPOS: 100.0% same / 0.0% diff (1/1)\nMorph feats: n/a\nDependency relations: 100.0% same / 0.0% diff (1/1)\nHeads: 100.0% same / 0.0% diff (1/1)\nNER tags: 100.0% same / 0.0% diff (1/1)\nLemmas: 100.0% same / 0.0% diff (1/1)"
+    }
+  },
+  {
+    "left": {
+      "sentences": [
+        {
+          "text": "語",
+          "tokens": [
+            {
+              "id": 1,
+              "text": "語",
+              "lemma": "語",
+              "upos": "NOUN",
+              "xpos": "NN",
+              "head": 0,
+              "deprel": "root",
+              "ner": "O"
+            }
+          ]
+        }
+      ]
+    },
+    "right": {
+      "sentences": [
+        {
+          "text": "語",
+          "tokens": [
+            {
+              "id": 1,
+              "text": "語",
+              "lemma": "語る",
+              "upos": "VERB",
+              "xpos": "NN",
+              "head": 0,
+              "deprel": "root",
+              "ner": "O"
+            }
+          ]
+        }
+      ]
+    },
+    "expected": {
+      "match": false,
+      "diff_count": 2,
+      "truncated": false,
+      "metrics": [
+        {
+          "label": "Sentences",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Sentence token sequences",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Tokens",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Analysis units",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "MWT expansions",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "UPOS",
+          "same": 0,
+          "diff": 1,
+          "total": 1,
+          "same_percent": 0.0,
+          "diff_percent": 100.0
+        },
+        {
+          "label": "XPOS",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Morph feats",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Dependency relations",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Heads",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "NER tags",
+          "same": 1,
+          "diff": 0,
+          "total": 1,
+          "same_percent": 100.0,
+          "diff_percent": 0.0
+        },
+        {
+          "label": "Lemmas",
+          "same": 0,
+          "diff": 1,
+          "total": 1,
+          "same_percent": 0.0,
+          "diff_percent": 100.0
+        }
+      ],
+      "text": "Sentences: 100.0% same / 0.0% diff (1/1)\nSentence token sequences: 100.0% same / 0.0% diff (1/1)\nTokens: 100.0% same / 0.0% diff (1/1)\nAnalysis units: 100.0% same / 0.0% diff (1/1)\nMWT expansions: n/a\nUPOS: 0.0% same / 100.0% diff (0/1)\nXPOS: 100.0% same / 0.0% diff (1/1)\nMorph feats: n/a\nDependency relations: 100.0% same / 0.0% diff (1/1)\nHeads: 100.0% same / 0.0% diff (1/1)\nNER tags: 100.0% same / 0.0% diff (1/1)\nLemmas: 0.0% same / 100.0% diff (0/1)"
+    }
+  },
+  {
+    "left": {
+      "sentences": [
+        {
+          "text": "語",
+          "tokens": [
+            {
+              "id": 1,
+              "text": "語",
+              "lemma": "語",
+              "upos": "NOUN",
+              "xpos": "NN",
+              "head": 0,
+              "deprel": "root",
+              "ner": "O"
+            }
+          ]
+        }
+      ]
+    },
+    "right": {
+      "sentences": []
+    },
+    "expected": {
+      "match": false,
+      "diff_count": 4,
+      "truncated": false,
+      "metrics": [
+        {
+          "label": "Sentences",
+          "same": 0,
+          "diff": 1,
+          "total": 1,
+          "same_percent": 0.0,
+          "diff_percent": 100.0
+        },
+        {
+          "label": "Sentence token sequences",
+          "same": 0,
+          "diff": 1,
+          "total": 1,
+          "same_percent": 0.0,
+          "diff_percent": 100.0
+        },
+        {
+          "label": "Tokens",
+          "same": 0,
+          "diff": 1,
+          "total": 1,
+          "same_percent": 0.0,
+          "diff_percent": 100.0
+        },
+        {
+          "label": "Analysis units",
+          "same": 0,
+          "diff": 1,
+          "total": 1,
+          "same_percent": 0.0,
+          "diff_percent": 100.0
+        },
+        {
+          "label": "MWT expansions",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "UPOS",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "XPOS",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Morph feats",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Dependency relations",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Heads",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "NER tags",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Lemmas",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        }
+      ],
+      "text": "Sentences: 0.0% same / 100.0% diff (0/1)\nSentence token sequences: 0.0% same / 100.0% diff (0/1)\nTokens: 0.0% same / 100.0% diff (0/1)\nAnalysis units: 0.0% same / 100.0% diff (0/1)\nMWT expansions: n/a\nUPOS: n/a\nXPOS: n/a\nMorph feats: n/a\nDependency relations: n/a\nHeads: n/a\nNER tags: n/a\nLemmas: n/a"
+    }
+  },
+  {
+    "left": {
+      "sentences": [
+        {
+          "text": "語",
+          "tokens": [
+            {
+              "id": 1,
+              "text": "語",
+              "lemma": "語",
+              "upos": "NOUN",
+              "xpos": "NN",
+              "head": 0,
+              "deprel": "root",
+              "ner": "O"
+            }
+          ]
+        }
+      ]
+    },
+    "right": {
+      "sentences": [
+        {
+          "text": "語語",
+          "tokens": [
+            {
+              "id": 1,
+              "text": "語",
+              "lemma": "語",
+              "upos": "NOUN",
+              "xpos": "NN",
+              "head": 0,
+              "deprel": "root",
+              "ner": "O"
+            },
+            {
+              "id": 2,
+              "text": "語",
+              "lemma": "語",
+              "upos": "NOUN",
+              "xpos": "NN",
+              "head": 0,
+              "deprel": "root",
+              "ner": "O"
+            }
+          ]
+        }
+      ]
+    },
+    "expected": {
+      "match": false,
+      "diff_count": 4,
+      "truncated": false,
+      "metrics": [
+        {
+          "label": "Sentences",
+          "same": 0,
+          "diff": 1,
+          "total": 1,
+          "same_percent": 0.0,
+          "diff_percent": 100.0
+        },
+        {
+          "label": "Sentence token sequences",
+          "same": 0,
+          "diff": 1,
+          "total": 1,
+          "same_percent": 0.0,
+          "diff_percent": 100.0
+        },
+        {
+          "label": "Tokens",
+          "same": 1,
+          "diff": 1,
+          "total": 2,
+          "same_percent": 50.0,
+          "diff_percent": 50.0
+        },
+        {
+          "label": "Analysis units",
+          "same": 1,
+          "diff": 1,
+          "total": 2,
+          "same_percent": 50.0,
+          "diff_percent": 50.0
+        },
+        {
+          "label": "MWT expansions",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "UPOS",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "XPOS",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Morph feats",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Dependency relations",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Heads",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "NER tags",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        },
+        {
+          "label": "Lemmas",
+          "same": 0,
+          "diff": 0,
+          "total": 0,
+          "same_percent": null,
+          "diff_percent": null
+        }
+      ],
+      "text": "Sentences: 0.0% same / 100.0% diff (0/1)\nSentence token sequences: 0.0% same / 100.0% diff (0/1)\nTokens: 50.0% same / 50.0% diff (1/2)\nAnalysis units: 50.0% same / 50.0% diff (1/2)\nMWT expansions: n/a\nUPOS: n/a\nXPOS: n/a\nMorph feats: n/a\nDependency relations: n/a\nHeads: n/a\nNER tags: n/a\nLemmas: n/a"
+    }
+  }
+]

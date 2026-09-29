@@ -1,0 +1,11 @@
+{
+  "category": "customized-ner",
+  "task": "ner",
+  "save_dir": "training\\t",
+  "train_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\finerweb_plo75_by_language_ready\\vie\\train.bio",
+  "dev_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\finerweb_plo75_by_language_ready\\vie\\dev.bio",
+  "embedding": "xlm-roberta-base",
+  "max_epoch": 100,
+  "batch_size": 16,
+  "gpu": true
+}

@@ -1,0 +1,12 @@
+<div id="leAuthBar">
+  <a href="/"><img src="{{ url_for('static', filename='le-logo.svg') }}" alt="LE" style="height:24px;"></a>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+    <a href="/reader" style="color:var(--le-green-700);font-weight:600;font-size:12px;">Reader</a>
+    <a href="/about" style="color:var(--le-green-700);font-weight:600;font-size:12px;">About</a>
+    <a href="/contact" style="color:var(--le-green-700);font-weight:600;font-size:12px;">Contact</a>
+    <a href="/account">Account</a>
+    <button type="button" class="le-upgrade-btn" data-upgrade-nav style="display:none;" onclick="window.location.href='/account#upgradeBanner'">Upgrade</button>
+    <button onclick="fetch('/auth/logout',{method:'POST'}).then(function(){window.location.href='/'})" class="le-signout-btn">Sign Out</button>
+    <a href="https://chromewebstore.google.com/detail/language-engine-capture/moljdhkmokgdglimghgkenhbeccpognn" class="le-chrome-link">Get Chrome extension</a>
+  </div>
+</div>

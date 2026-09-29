@@ -1,0 +1,28 @@
+{
+    "display_name": "German",
+    "code": "de",
+    "font_family": "\"Noto Sans\", \"Segoe UI\", system-ui, sans-serif",
+    "ner_labels": {
+        "PER": "Person",
+        "PERSON": "Person",
+        "LOC": "Location",
+        "LOCATION": "Location",
+        "ORG": "Organization",
+        "ORGANIZATION": "Organization",
+        "GPE": "Geopolitical Entity",
+        "DATE": "Date",
+        "TIME": "Time",
+        "CARDINAL": "Cardinal Number",
+        "ORDINAL": "Ordinal Number",
+        "MONEY": "Money",
+        "PERCENT": "Percentage",
+        "QUANTITY": "Quantity",
+        "NORP": "Nationality / Religious / Political Group",
+        "EVENT": "Event",
+        "FAC": "Facility",
+        "PRODUCT": "Product",
+        "WORK_OF_ART": "Work of Art",
+        "LAW": "Law",
+        "LANGUAGE": "Language"
+    }
+}

@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "metric_scale": "0-100; development set; component-stage evaluation, not whole-application accuracy",
+  "results": [
+    {
+      "code": "tr",
+      "language": "Turkish",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish.tokenizer.mdl",
+      "checkpoint_sha256": "df76ab07078f7b6454f225106785912ecd31a0ecc53f545c07b82a7bba328b72",
+      "checkpoint_epoch": 26,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/logs/tokenize.training",
+      "log_sha256": "2581081e85830b13b06e9a338fe99bdf7e35f47dae452e429bd122a9a4323248",
+      "selected_table_line": 1335,
+      "selected_metrics_f1_percent": {
+        "Tokens": 99.34,
+        "Sentences": 89.97
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 99.34,
+        "Sentences": 89.97
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "hi",
+      "language": "Hindi",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hindi/hindi.tokenizer.mdl",
+      "checkpoint_sha256": "4e1911889ea92ffe8a37d0c6d05788828181121cf11e24755a05c4862f59edd7",
+      "checkpoint_epoch": 62,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/hi/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/hi/xlm-roberta-base/customized-mwt/logs/tokenize.training",
+      "log_sha256": "b1c1c8f721455f64443dd53f70138bffd8da76d79bcd95d5a6fe4761b115bb82",
+      "selected_table_line": 1497,
+      "selected_metrics_f1_percent": {
+        "Tokens": 99.36,
+        "Sentences": 100.0
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 99.33,
+        "Sentences": 100.0
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "ar",
+      "language": "Arabic",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic.tokenizer.mdl",
+      "checkpoint_sha256": "fd2a9195aabc1a39f98e339969732c61d37cf994c648f6d8867db0554591bc7f",
+      "checkpoint_epoch": 11,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/t_ar10k2/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/t_ar10k2/xlm-roberta-base/customized-mwt/logs/tokenize.training",
+      "log_sha256": "64b853045f27875f2c2ae4560deb97cc613e87054c8ef9a16424d3c4fed5aa2a",
+      "selected_table_line": 9513,
+      "selected_metrics_f1_percent": {
+        "Tokens": 99.86,
+        "Sentences": 97.49
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 99.86,
+        "Sentences": 97.49
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "th",
+      "language": "Thai",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/thai-ner/thai-ner.tokenizer.mdl",
+      "checkpoint_sha256": "8ad8a4a7223977ac21dbcfa9d0787dbd1ecb4bc8fada7edb13d8c74fc96f1fd8",
+      "checkpoint_epoch": 26,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_th_customized_ner/xlm-roberta-base/customized-ner/customized-ner.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_th_customized_ner/xlm-roberta-base/customized-ner/logs/tokenize.training",
+      "log_sha256": "e61aaa16a50ca6e82af4c8b75b8d63bbc7452b3f10dc61a175fd99b66fa61e8b",
+      "selected_table_line": 5925,
+      "selected_metrics_f1_percent": {
+        "Tokens": 85.73,
+        "Sentences": 47.43
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 85.73,
+        "Sentences": 47.43
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "sa",
+      "language": "Sanskrit",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.tokenizer.mdl",
+      "checkpoint_sha256": "9bce77c36db05a7a84bc435558d2e3f7f49c5f9359dd72f6cc4c16d925213a14",
+      "checkpoint_epoch": 20,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_sa_dcs_v1/xlm-roberta-base/customized-mwt/logs/tokenize.training",
+      "log_sha256": "131eeb9c50afcd9bfc9d0f53b0046f81afce8e87893b0a402a7cc79a052236ab",
+      "selected_table_line": 7818,
+      "selected_metrics_f1_percent": {
+        "Tokens": 97.09,
+        "Sentences": 79.39
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 97.09,
+        "Sentences": 79.39
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "ang",
+      "language": "Old English",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized/customized.tokenizer.mdl",
+      "checkpoint_sha256": "51bde7915f745dc1163ce879653de10d78e9a7fdbe2856774ab03f2d305daa38",
+      "checkpoint_epoch": 12,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_oldeng_oedt_tokenize_v3/xlm-roberta-base/customized/customized.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_oldeng_oedt_tokenize_v3/xlm-roberta-base/customized/logs/tokenize.training",
+      "log_sha256": "0bc0dc05469e419334e42583dadec4819ffc78d43b65b5491a19e0843918d2a2",
+      "selected_table_line": 1259,
+      "selected_metrics_f1_percent": {
+        "Tokens": 98.32,
+        "Sentences": 80.7
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 98.32,
+        "Sentences": 80.7
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "la",
+      "language": "Latin",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/latin/latin.tokenizer.mdl",
+      "checkpoint_sha256": "8d967989c4c187201c535f6810ef24811f969e2f0feaefc60388054d53a4947c",
+      "checkpoint_epoch": 30,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/la/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/la/xlm-roberta-base/customized-mwt/logs/tokenize.training",
+      "log_sha256": "cf16c08ea3462161618840d13faaff0dfc556b4613a86c2eeab220961bbaa8da",
+      "selected_table_line": 2558,
+      "selected_metrics_f1_percent": {
+        "Tokens": 99.99,
+        "Sentences": 100.0
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 99.99,
+        "Sentences": 100.0
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "el",
+      "language": "Greek",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek.tokenizer.mdl",
+      "checkpoint_sha256": "88d064eb4583345e8a1ab3bd27b02fb2e2e0259577f7c005fca64b62f78c4bd7",
+      "checkpoint_epoch": 63,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/el/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/el/xlm-roberta-base/customized-mwt/logs/tokenize.training",
+      "log_sha256": "8c7785a023b47a31b90eb0b5059cd5cf857eca67813f56f34581d8ea26311a39",
+      "selected_table_line": 1393,
+      "selected_metrics_f1_percent": {
+        "Tokens": 99.8,
+        "Sentences": 100.0
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 99.71,
+        "Sentences": 100.0
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "grc",
+      "language": "Ancient Greek",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/ancient-greek/ancient-greek.tokenizer.mdl",
+      "checkpoint_sha256": "7669e6fdd14d348ee1903672e84d85d3251a740248d440d754f6f0b643a432e9",
+      "checkpoint_epoch": 18,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/t_grc_naturalpara_tok/xlm-roberta-base/customized/customized.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/t_grc_naturalpara_tok/xlm-roberta-base/customized/logs/tokenize.training",
+      "log_sha256": "e6e2c2f4c630156ea362678ecacb71b7d4a097bd9c5b6f10bfbb349560636c67",
+      "selected_table_line": 12867,
+      "selected_metrics_f1_percent": {
+        "Tokens": 91.99,
+        "Sentences": 86.91
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 91.99,
+        "Sentences": 86.91
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "he",
+      "language": "Hebrew",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew.tokenizer.mdl",
+      "checkpoint_sha256": "defbcaddb392f18bcdce745989a5c875a35559afa78a6ab116044b20c209d656",
+      "checkpoint_epoch": 36,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/customized-mwt.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/logs/tokenize.training",
+      "log_sha256": "af29149a23da43d9045e9d21e180beb639cdb2502e6c941b07a1b61c9c516412",
+      "selected_table_line": 1761,
+      "selected_metrics_f1_percent": {
+        "Tokens": 99.63,
+        "Sentences": 91.7
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 99.59,
+        "Sentences": 90.43
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "tl",
+      "language": "Tagalog",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom.tokenizer.mdl",
+      "checkpoint_sha256": "5102a568d3e1c09e149d5814d8b4c9b007f95a60e06adc18934c3573b7a4722e",
+      "checkpoint_epoch": 12,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v2/xlm-roberta-base/tagalog-v2/tagalog-v2.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v2/xlm-roberta-base/tagalog-v2/logs/tokenize.training",
+      "log_sha256": "dc8fead8a1145e8ebdf02f1a18a7c7514ee71c2ceb1df50d4cb76d166b9007d2",
+      "selected_table_line": 2650,
+      "selected_metrics_f1_percent": {
+        "Tokens": 98.68,
+        "Sentences": 96.27
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 98.68,
+        "Sentences": 96.27
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    },
+    {
+      "code": "sw",
+      "language": "Swahili",
+      "component": "tokenizer",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/swahili-custom/swahili-custom.tokenizer.mdl",
+      "checkpoint_sha256": "ba8b0176f0da135207baccadb9115d14ede231e4b5ca6aca96e3570692a8067c",
+      "checkpoint_epoch": 28,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_swh_v1/xlm-roberta-base/customized/customized.tokenizer.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_swh_v1/xlm-roberta-base/customized/logs/tokenize.training",
+      "log_sha256": "34ddb9056dbcfcfc191744f94c65491bf1d376899c1d6d55e6b348cfe6edaaec",
+      "selected_table_line": 942,
+      "selected_metrics_f1_percent": {
+        "Tokens": 99.63,
+        "Sentences": 85.98
+      },
+      "last_logged_metrics_f1_percent": {
+        "Tokens": 99.63,
+        "Sentences": 85.98
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header."
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "author": "Conrad Compagna",
+  "model_id": "sanskrit-sandhi-tokenizer",
+  "format": "Trankit 1.1.1 native checkpoint",
+  "base_model": "FacebookAI/xlm-roberta-base",
+  "runtime_alias": "sanskrit-vedic",
+  "deployment_identity_checked": "2026-09-23",
+  "files": [
+    {
+      "path": "weights/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.tokenizer.mdl",
+      "bytes": 9515589,
+      "sha256": "9bce77c36db05a7a84bc435558d2e3f7f49c5f9359dd72f6cc4c16d925213a14",
+      "source": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.tokenizer.mdl"
+    },
+    {
+      "path": "weights/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic_mwt_expander.pt",
+      "bytes": 35706757,
+      "sha256": "5d444e53a231c5fcfcd9bd141529b03575cb33dbd250cb50c7c35a00bb5d5c32",
+      "source": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic_mwt_expander.pt"
+    }
+  ],
+  "task": "tokenize",
+  "treebank": "UD_Vedic_Sanskrit-Vedic"
+}

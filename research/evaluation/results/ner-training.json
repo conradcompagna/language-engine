@@ -1,0 +1,862 @@
+{
+  "record_type": "Recovered historical training results for selected custom NER checkpoints",
+  "metric_scope": "Development-set entity F1 on each run's own labels and corpus; not a cross-dataset ranking. Epoch numbers are those stored by the original trainer (zero based).",
+  "selection_evidence": "Each runtime .ner.mdl is SHA-256 identical to the retained training output; its stored epoch equals the final saved best-development summary. TPipeline._train_ner saves on strictly improved development F1.",
+  "trainer_source": "_deprecated_nonruntime_20260514_184819/training/.venv_trankit_gpu/Lib/site-packages/trankit/tpipeline.py:585-627",
+  "results": [
+    {
+      "language_code": "ko",
+      "runtime_target": "korean-ner",
+      "task": "ner",
+      "run_id": "korean_klue_ner",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 88.79,
+      "selected_epoch": 10,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/korean-ner/korean-ner.ner.mdl",
+        "sha256": "1220fb3d450aa91d413a1c5f6cbdd720baded55d33fa44fa87bf2be81acd052c",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/korean/ner/save_dir/xlm-roberta-base/customized-ner/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/korean/ner/save_dir/xlm-roberta-base/customized-ner/logs/ner.training",
+        "sha256": "9e3eb989f008ad10d62cc7cec889649f422d2663886ebe82a2fec8f129748120",
+        "line_count": 29945,
+        "first_selected_best": {
+          "line": 14487,
+          "epoch": 10,
+          "f1": 88.79,
+          "text": "Best dev F1 score: epoch 10, F1: 88.79"
+        },
+        "last_summary": {
+          "line": 28974,
+          "epoch": 10,
+          "f1": 88.79,
+          "text": "Best dev F1 score: epoch 10, F1: 88.79"
+        },
+        "last_started_epoch": 22
+      },
+      "training_config": null
+    },
+    {
+      "language_code": "vi",
+      "runtime_target": "vietnamese",
+      "task": "ner",
+      "run_id": "wikiann_vi",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 91.72,
+      "selected_epoch": 18,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/vietnamese/vietnamese.ner.mdl",
+        "sha256": "63e3c73ad99bc3e58109f66be2eda267009f8621bcce9f96f324bb2f3c7ae285",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/wikiann_vi/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/wikiann_vi/logs/ner.training",
+        "sha256": "84185014f66edde74f41a0745f7fa8e6267f6bc78051975804c776c7e98655f5",
+        "line_count": 91237,
+        "first_selected_best": {
+          "line": 71326,
+          "epoch": 18,
+          "f1": 91.72,
+          "text": "Best dev F1 score: epoch 18, F1: 91.72"
+        },
+        "last_summary": {
+          "line": 90096,
+          "epoch": 18,
+          "f1": 91.72,
+          "text": "Best dev F1 score: epoch 18, F1: 91.72"
+        },
+        "last_started_epoch": 24
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\wikiann_vi\\train.bio",
+        "dev_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\wikiann_vi\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 8,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "lzh",
+      "runtime_target": "classical-chinese",
+      "task": "ner",
+      "run_id": "lzh_cmag_200k",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 80.88,
+      "selected_epoch": 13,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/classical-chinese/classical-chinese.ner.mdl",
+        "sha256": "96c1533cc049138e108eb23584f8ebf41de2c5eac165f4b4455b8f44e5f1cdec",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/lzh_cmag_200k/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/lzh_cmag_200k/logs/ner.training",
+        "sha256": "2de8ab07a93c02ed4dddc9878de5d899548b42ffdd73a5adf7f414675ff4b660",
+        "line_count": 35378,
+        "first_selected_best": {
+          "line": 25396,
+          "epoch": 13,
+          "f1": 80.88,
+          "text": "Best dev F1 score: epoch 13, F1: 80.88"
+        },
+        "last_summary": {
+          "line": 34466,
+          "epoch": 13,
+          "f1": 80.88,
+          "text": "Best dev F1 score: epoch 13, F1: 80.88"
+        },
+        "last_started_epoch": 19
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\lzh_cmag_200k\\train.bio",
+        "dev_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\lzh_cmag_200k\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 4,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "tr",
+      "runtime_target": "turkish",
+      "task": "ner",
+      "run_id": "tur_turkish_wiki_ner",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 78.14,
+      "selected_epoch": 9,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish.ner.mdl",
+        "sha256": "3b546395b4bf58769bc4ccd85240e46ecf81d815430669110b82c53996bd037a",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/tur_turkish_wiki_ner/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/tur_turkish_wiki_ner/logs/ner.training",
+        "sha256": "b09d20e2d1bd56b4c38d846ffede75d7b5615c72858f41c8b0f32a1e02f37be3",
+        "line_count": 42200,
+        "first_selected_best": {
+          "line": 15020,
+          "epoch": 9,
+          "f1": 78.14,
+          "text": "Best dev F1 score: epoch 9, F1: 78.14"
+        },
+        "last_summary": {
+          "line": 42056,
+          "epoch": 9,
+          "f1": 78.14,
+          "text": "Best dev F1 score: epoch 9, F1: 78.14"
+        },
+        "last_started_epoch": 28
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\tur_turkish_wiki_ner\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\tur_turkish_wiki_ner\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 12,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "fa",
+      "runtime_target": "persian",
+      "task": "ner",
+      "run_id": "fa_multiconer_v2_coarse6",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 72.67,
+      "selected_epoch": 15,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/persian/persian.ner.mdl",
+        "sha256": "3e5bde86772a577b0f41c7439cbd3f46083dede9ee41b19e8f02598bb3c9e301",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/fa_multiconer_v2_coarse6/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/fa_multiconer_v2_coarse6/logs/ner.training",
+        "sha256": "65729fec2ddc4dade9abc17bcf589357d94d6fc42998ff4fedded90f1bb7be68",
+        "line_count": 28110,
+        "first_selected_best": {
+          "line": 21840,
+          "epoch": 15,
+          "f1": 72.67,
+          "text": "Best dev F1 score: epoch 15, F1: 72.67"
+        },
+        "last_summary": {
+          "line": 27300,
+          "epoch": 15,
+          "f1": 72.67,
+          "text": "Best dev F1 score: epoch 15, F1: 72.67"
+        },
+        "last_started_epoch": 20
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\multiconer_v2_fa_coarse6\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\multiconer_v2_fa_coarse6\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 12,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "id",
+      "runtime_target": "indonesian",
+      "task": "ner",
+      "run_id": "ind_indonlu_nerp",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 81.6,
+      "selected_epoch": 23,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/indonesian/indonesian.ner.mdl",
+        "sha256": "8878d43fd69887b0477a6281013d6137890fea7c5c00c37ceb6d0e091cf1c35b",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/ind_indonlu_nerp/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/ind_indonlu_nerp/logs/ner.training",
+        "sha256": "69737c7c2949b42fcd19d65f6977b0b5df415437bc689e316c130e54569b9491",
+        "line_count": 8511,
+        "first_selected_best": {
+          "line": 8160,
+          "epoch": 23,
+          "f1": 81.6,
+          "text": "Best dev F1 score: epoch 23, F1: 81.60"
+        },
+        "last_summary": {
+          "line": 8500,
+          "epoch": 23,
+          "f1": 81.6,
+          "text": "Best dev F1 score: epoch 23, F1: 81.60"
+        },
+        "last_started_epoch": 25
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\ind_indonlu_nerp\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\ind_indonlu_nerp\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 20,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "hi",
+      "runtime_target": "hindi",
+      "task": "ner",
+      "run_id": "hi_multiconer_v2_coarse6",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 81.31,
+      "selected_epoch": 16,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hindi/hindi.ner.mdl",
+        "sha256": "7f665f6992d85b0ea391bba96eeceb514a115c74ad0f4a4da3b567b928f4836f",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/hi_multiconer_v2_coarse6/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/hi_multiconer_v2_coarse6/logs/ner.training",
+        "sha256": "8f98fbf1abd2967ec5ddb7e082ab7dd6998c29809032aacd687689067312a24b",
+        "line_count": 11007,
+        "first_selected_best": {
+          "line": 10302,
+          "epoch": 16,
+          "f1": 81.31,
+          "text": "Best dev F1 score: epoch 16, F1: 81.31"
+        },
+        "last_summary": {
+          "line": 10908,
+          "epoch": 16,
+          "f1": 81.31,
+          "text": "Best dev F1 score: epoch 16, F1: 81.31"
+        },
+        "last_started_epoch": 18
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\multiconer_v2_hi_coarse6\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\multiconer_v2_hi_coarse6\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 16,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "th",
+      "runtime_target": "thai-ner",
+      "task": "ner",
+      "run_id": "tha_thai_nner_full_coarse_bio",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 72.39,
+      "selected_epoch": 9,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/thai-ner/thai-ner.ner.mdl",
+        "sha256": "88620d04b60cbe103a65c9559b843198813a383103cf8dd9c381b5482528d407",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/tha_thai_nner_full_coarse_bio/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/tha_thai_nner_full_coarse_bio/logs/ner.training",
+        "sha256": "5c1b2a94dd7a44a9cfc54feabe45fbb8407a2e643a8a9b4c51211d4cfa964fec",
+        "line_count": 14580,
+        "first_selected_best": {
+          "line": 13060,
+          "epoch": 9,
+          "f1": 72.39,
+          "text": "Best dev F1 score: epoch 9, F1: 72.39"
+        },
+        "last_summary": {
+          "line": 14366,
+          "epoch": 9,
+          "f1": 72.39,
+          "text": "Best dev F1 score: epoch 9, F1: 72.39"
+        },
+        "last_started_epoch": 11
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\thai_nner_full_coarse_bio\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\thai_nner_full_coarse_bio\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 8,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "sa",
+      "runtime_target": "sanskrit-vedic",
+      "task": "ner",
+      "run_id": "san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 54.28,
+      "selected_epoch": 29,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/sanskrit-vedic/sanskrit-vedic.ner.mdl",
+        "sha256": "a987748ad57752fca968f30e26d75fcd39795bffb0ff9c2ce23acf36624d08b0",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5/logs/ner.training",
+        "sha256": "8bc0232f85681ac823f849573bc960015b5cd596e9200d90d15101e2e1a0b79d",
+        "line_count": 54057,
+        "first_selected_best": {
+          "line": 36240,
+          "epoch": 29,
+          "f1": 54.28,
+          "text": "Best dev F1 score: epoch 29, F1: 54.28"
+        },
+        "last_summary": {
+          "line": 53152,
+          "epoch": 29,
+          "f1": 54.28,
+          "text": "Best dev F1 score: epoch 29, F1: 54.28"
+        },
+        "last_started_epoch": 44
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\san_gemini_ner_chunks_0001_1800_corrected_supervised_even95_5\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 12,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "ang",
+      "runtime_target": "customized",
+      "task": "ner",
+      "run_id": "ang_oedt",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 88.2,
+      "selected_epoch": 13,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized/customized.ner.mdl",
+        "sha256": "e56ec21c307e3a42d86d95f1433f7813c36fda4ecbde9ac9ffdd3c4f9cdafdf4",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/ang_oedt/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/ang_oedt/logs/ner.training",
+        "sha256": "efd923a3646b3bb6708741b6f728a409fc2a3a941c6234a7858593845ba59456",
+        "line_count": 8814,
+        "first_selected_best": {
+          "line": 8134,
+          "epoch": 13,
+          "f1": 88.2,
+          "text": "Best dev F1 score: epoch 13, F1: 88.20"
+        },
+        "last_summary": {
+          "line": 8715,
+          "epoch": 13,
+          "f1": 88.2,
+          "text": "Best dev F1 score: epoch 13, F1: 88.20"
+        },
+        "last_started_epoch": 15
+      },
+      "training_config": null
+    },
+    {
+      "language_code": "it",
+      "runtime_target": "italian-twittiro",
+      "task": "ner",
+      "run_id": "it_multiconer_v2_coarse6",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 82.9,
+      "selected_epoch": 9,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/italian-twittiro/italian-twittiro.ner.mdl",
+        "sha256": "92aaf6782a87d555492cf21da84556f3d76ae9b34b30f873fb7594af679d363d",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/it_multiconer_v2_coarse6/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/it_multiconer_v2_coarse6/logs/ner.training",
+        "sha256": "7cb02784e055d9d477e0d1382349908357c2d07d5864f91b3dac045bd5501794",
+        "line_count": 12770,
+        "first_selected_best": {
+          "line": 10410,
+          "epoch": 9,
+          "f1": 82.9,
+          "text": "Best dev F1 score: epoch 9, F1: 82.90"
+        },
+        "last_summary": {
+          "line": 12492,
+          "epoch": 9,
+          "f1": 82.9,
+          "text": "Best dev F1 score: epoch 9, F1: 82.90"
+        },
+        "last_started_epoch": 12
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\multiconer_v2_it_coarse6\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\multiconer_v2_it_coarse6\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 16,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "pt",
+      "runtime_target": "portuguese",
+      "task": "ner",
+      "run_id": "pt_multiconer_v2_coarse6",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 78.85,
+      "selected_epoch": 10,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/portuguese/portuguese.ner.mdl",
+        "sha256": "7e0fed1341b067857d8257b9ea8fb0b57d0a425ad34277d331cd49d3c7690eb1",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/pt_multiconer_v2_coarse6/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/pt_multiconer_v2_coarse6/logs/ner.training",
+        "sha256": "80ba8bdbf96954a098c2046b8395ee6b45f759975c315be39b05f4d1e653a4e6",
+        "line_count": 21555,
+        "first_selected_best": {
+          "line": 15147,
+          "epoch": 10,
+          "f1": 78.85,
+          "text": "Best dev F1 score: epoch 10, F1: 78.85"
+        },
+        "last_summary": {
+          "line": 20655,
+          "epoch": 10,
+          "f1": 78.85,
+          "text": "Best dev F1 score: epoch 10, F1: 78.85"
+        },
+        "last_started_epoch": 15
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\multiconer_v2_pt_coarse6\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\multiconer_v2_pt_coarse6\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 12,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "la",
+      "runtime_target": "latin",
+      "task": "ner",
+      "run_id": "lat_herodotos_latin_ner",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 81.3,
+      "selected_epoch": 11,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/latin/latin.ner.mdl",
+        "sha256": "f292a9ddb5edbe06cc8517442663150c96d72db131e9bc1cc8d0e16319b7be8c",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/lat_herodotos_latin_ner/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/lat_herodotos_latin_ner/logs/ner.training",
+        "sha256": "5b4c751c9a49eef547c0a295862b7c8c8740cb90ed3f937f4bcc8aad5bf01064",
+        "line_count": 6638,
+        "first_selected_best": {
+          "line": 5508,
+          "epoch": 11,
+          "f1": 81.3,
+          "text": "Best dev F1 score: epoch 11, F1: 81.30"
+        },
+        "last_summary": {
+          "line": 6426,
+          "epoch": 11,
+          "f1": 81.3,
+          "text": "Best dev F1 score: epoch 11, F1: 81.30"
+        },
+        "last_started_epoch": 14
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\lat_herodotos_latin_ner\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\lat_herodotos_latin_ner\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 20,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "el",
+      "runtime_target": "greek",
+      "task": "ner",
+      "run_id": "ell_greek_ner_nel",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 84.84,
+      "selected_epoch": 7,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek.ner.mdl",
+        "sha256": "ae9d8c3655fe3566ae4b2b07c0f3f9df9b0a67b230e8bea8c79b4fbfe8764537",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/ell_greek_ner_nel/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/ell_greek_ner_nel/logs/ner.training",
+        "sha256": "216b071b4dec1c56e9ff33d39d7b9727af0ff1644e436064e100d6b076376d93",
+        "line_count": 8856,
+        "first_selected_best": {
+          "line": 8720,
+          "epoch": 7,
+          "f1": 84.84,
+          "text": "Best dev F1 score: epoch 7, F1: 84.84"
+        },
+        "last_summary": {
+          "line": 8720,
+          "epoch": 7,
+          "f1": 84.84,
+          "text": "Best dev F1 score: epoch 7, F1: 84.84"
+        },
+        "last_started_epoch": 8
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\ell_greek_ner_nel\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\ell_greek_ner_nel\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 12,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "hy",
+      "runtime_target": "armenian",
+      "task": "ner",
+      "run_id": "hye_wikiann",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 94.12,
+      "selected_epoch": 12,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/armenian/armenian.ner.mdl",
+        "sha256": "0ab9d8208a3625c902d27d3d942ebd7f53c38fda96cd9ce0b098b88903292e56",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/hye_wikiann/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/hye_wikiann/logs/ner.training",
+        "sha256": "144196f9dd3a83479539a6c3013044de67b343f30333515992d94fe0a4620b94",
+        "line_count": 14318,
+        "first_selected_best": {
+          "line": 12246,
+          "epoch": 12,
+          "f1": 94.12,
+          "text": "Best dev F1 score: epoch 12, F1: 94.12"
+        },
+        "last_summary": {
+          "line": 14130,
+          "epoch": 12,
+          "f1": 94.12,
+          "text": "Best dev F1 score: epoch 12, F1: 94.12"
+        },
+        "last_started_epoch": 15
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\wikiann_hye\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\wikiann_hye\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 16,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "grc",
+      "runtime_target": "ancient-greek",
+      "task": "ner",
+      "run_id": "grc_pausanias_ethnic_civic_misc",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 78.81,
+      "selected_epoch": 13,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/ancient-greek/ancient-greek.ner.mdl",
+        "sha256": "796874fc7573a9d83d4f707586f502b069e733991347fe55af82a5c0de1347f7",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/grc_pausanias_ethnic_civic_misc/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/grc_pausanias_ethnic_civic_misc/logs/ner.training",
+        "sha256": "82ffe962103588b4ac06f306bd8a7b3e7fbd4d0d2e36164699b48afb6032d89f",
+        "line_count": 8774,
+        "first_selected_best": {
+          "line": 8750,
+          "epoch": 13,
+          "f1": 78.81,
+          "text": "Best dev F1 score: epoch 13, F1: 78.81"
+        },
+        "last_summary": {
+          "line": 8750,
+          "epoch": 13,
+          "f1": 78.81,
+          "text": "Best dev F1 score: epoch 13, F1: 78.81"
+        },
+        "last_started_epoch": 14
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\grc_pausanias_ethnic_civic_misc\\train.bio",
+        "dev_bio_fpath": "training\\trankit_finerweb_prep\\datasets\\grc_pausanias_ethnic_civic_misc\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 4,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "he",
+      "runtime_target": "hebrew",
+      "task": "ner",
+      "run_id": "heb_nemo_token_single",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 78.22,
+      "selected_epoch": 17,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew.ner.mdl",
+        "sha256": "26955ef66dc13e6f589470e9ca293487f4d4897c299ecc1824d404b3a96abbb3",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/heb_nemo_token_single/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/heb_nemo_token_single/logs/ner.training",
+        "sha256": "0c24c0aeb736adc046bfe75f0bea991d3bd89f970adf39c1419d6e694337abf6",
+        "line_count": 4917,
+        "first_selected_best": {
+          "line": 4518,
+          "epoch": 17,
+          "f1": 78.22,
+          "text": "Best dev F1 score: epoch 17, F1: 78.22"
+        },
+        "last_summary": {
+          "line": 4769,
+          "epoch": 17,
+          "f1": 78.22,
+          "text": "Best dev F1 score: epoch 17, F1: 78.22"
+        },
+        "last_started_epoch": 19
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\heb_nemo_token_single\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\heb_nemo_token_single\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 20,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "tl",
+      "runtime_target": "tagalog-custom",
+      "task": "ner",
+      "run_id": "fil_tlunified_ner",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 89.74,
+      "selected_epoch": 10,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom.ner.mdl",
+        "sha256": "264283bcc801fe6eb595701a08471f07b3f9c37ba1428ade23bbe916b8304ecc",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/fil_tlunified_ner/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/fil_tlunified_ner/logs/ner.training",
+        "sha256": "2cb41416ededb43f96465e99494f9245622994751d2e20e32f845ea786d51eab",
+        "line_count": 5147,
+        "first_selected_best": {
+          "line": 4345,
+          "epoch": 10,
+          "f1": 89.74,
+          "text": "Best dev F1 score: epoch 10, F1: 89.74"
+        },
+        "last_summary": {
+          "line": 5135,
+          "epoch": 10,
+          "f1": 89.74,
+          "text": "Best dev F1 score: epoch 10, F1: 89.74"
+        },
+        "last_started_epoch": 13
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\fil_tlunified_ner\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\fil_tlunified_ner\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 16,
+        "gpu": true
+      }
+    },
+    {
+      "language_code": "sw",
+      "runtime_target": "swahili-custom",
+      "task": "ner",
+      "run_id": "swh_finerweb_top100_lpo_20260507_201707",
+      "metric": "best development entity F1",
+      "scale": "0-100",
+      "f1": 77.6,
+      "selected_epoch": 15,
+      "checkpoint": {
+        "file": "training/trankit_save_ja_ner_v2/xlm-roberta-base/swahili-custom/swahili-custom.ner.mdl",
+        "sha256": "d78bd574f790e56627d1b3f46900268e0d064a1d848847735f599c0e0fc2efb4",
+        "retained_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/swh_finerweb_top100_lpo_20260507_201707/customized-ner.ner.mdl",
+        "same_bytes": true,
+        "stored_epoch_matches_log": true
+      },
+      "source_log": {
+        "file": "_deprecated_nonruntime_20260514_184819/training/trankit_finerweb_prep/trankit_training_run/finished_models/swh_finerweb_top100_lpo_20260507_201707/logs/ner.training",
+        "sha256": "d5e7202b54f3aeaf17dfa13b3ab49060f60de9b23e92990f01f5af053e4b2ad3",
+        "line_count": 20974,
+        "first_selected_best": {
+          "line": 14016,
+          "epoch": 15,
+          "f1": 77.6,
+          "text": "Best dev F1 score: epoch 15, F1: 77.60"
+        },
+        "last_summary": {
+          "line": 20148,
+          "epoch": 15,
+          "f1": 77.6,
+          "text": "Best dev F1 score: epoch 15, F1: 77.60"
+        },
+        "last_started_epoch": 23
+      },
+      "training_config": {
+        "category": "customized-ner",
+        "task": "ner",
+        "save_dir": "training\\t",
+        "train_bio_fpath": "training\\nerdump\\training_data\\swh_finerweb_top100_lpo\\train.bio",
+        "dev_bio_fpath": "training\\nerdump\\training_data\\swh_finerweb_top100_lpo\\dev.bio",
+        "embedding": "xlm-roberta-base",
+        "max_epoch": 100,
+        "batch_size": 12,
+        "gpu": true
+      }
+    }
+  ]
+}

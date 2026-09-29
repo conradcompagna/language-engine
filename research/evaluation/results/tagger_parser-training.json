@@ -1,0 +1,457 @@
+{
+  "schema_version": 1,
+  "metric_scale": "0-100; development set; component-stage evaluation, not whole-application accuracy",
+  "results": [
+    {
+      "code": "tr",
+      "language": "Turkish",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/turkish/turkish.tagger.mdl",
+      "checkpoint_sha256": "b9324f918ca36643807c1937faab220d1c4bcceef606a0c0bac34292438b982f",
+      "checkpoint_epoch": 30,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/tr/xlm-roberta-base/customized-mwt/logs/posdep.training",
+      "log_sha256": "480208ab56d59928cd3b1f8f29302cf8d7f1f282b06b5d8bb85015b2d5079d29",
+      "selected_table_line": 12664,
+      "selected_metrics_f1_percent": {
+        "UPOS": 92.52,
+        "XPOS": 88.43,
+        "UFeats": 82.13,
+        "AllTags": 70.67,
+        "UAS": 81.83,
+        "LAS": 75.25,
+        "CLAS": 73.7
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 92.52,
+        "XPOS": 88.43,
+        "UFeats": 82.13,
+        "AllTags": 70.67,
+        "UAS": 81.83,
+        "LAS": 75.25,
+        "CLAS": 73.7
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 92.52,
+        "XPOS": 88.43,
+        "UFeats": 82.13,
+        "AllTags": 70.67,
+        "UAS": 81.83,
+        "LAS": 75.25,
+        "CLAS": 73.7
+      }
+    },
+    {
+      "code": "hi",
+      "language": "Hindi",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hindi/hindi.tagger.mdl",
+      "checkpoint_sha256": "9c96a669213adcf4ab40656ffe76338859fc83c7b5eb2ea5c6901ceeece26473",
+      "checkpoint_epoch": 36,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/hi/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/hi/xlm-roberta-base/customized-mwt/logs/posdep.training",
+      "log_sha256": "08a7e7aecc457d440afa3093c902946b8f99a634c24c1ec26c24fdcd673ff292",
+      "selected_table_line": 2316,
+      "selected_metrics_f1_percent": {
+        "UPOS": 96.05,
+        "XPOS": 95.8,
+        "UFeats": 87.69,
+        "AllTags": 85.2,
+        "UAS": 89.06,
+        "LAS": 84.38,
+        "CLAS": 80.21
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 95.88,
+        "XPOS": 95.5,
+        "UFeats": 87.3,
+        "AllTags": 84.77,
+        "UAS": 88.59,
+        "LAS": 84.04,
+        "CLAS": 80.11
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 96.05,
+        "XPOS": 95.8,
+        "UFeats": 87.69,
+        "AllTags": 85.2,
+        "UAS": 89.06,
+        "LAS": 84.38,
+        "CLAS": 80.3
+      }
+    },
+    {
+      "code": "ar",
+      "language": "Arabic",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/arabic/arabic.tagger.mdl",
+      "checkpoint_sha256": "82e4f2fc3a7afd7a6b7c117ce9a42d1ed9d41560394bf9c26ea27ddf7fb05faf",
+      "checkpoint_epoch": 59,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/ar/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/ar/xlm-roberta-base/customized-mwt/logs/posdep.training",
+      "log_sha256": "bf6ae663db12401eea216328bfcc45e48092b642bf745c18ffc0325918aa9039",
+      "selected_table_line": 3765,
+      "selected_metrics_f1_percent": {
+        "UPOS": 95.87,
+        "XPOS": 96.48,
+        "UFeats": 87.38,
+        "AllTags": 84.89,
+        "UAS": 90.71,
+        "LAS": 87.85,
+        "CLAS": 85.14
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 95.87,
+        "XPOS": 96.48,
+        "UFeats": 87.38,
+        "AllTags": 84.89,
+        "UAS": 90.71,
+        "LAS": 87.85,
+        "CLAS": 85.14
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 96.01,
+        "XPOS": 96.62,
+        "UFeats": 87.5,
+        "AllTags": 85.01,
+        "UAS": 90.84,
+        "LAS": 87.97,
+        "CLAS": 85.14
+      }
+    },
+    {
+      "code": "th",
+      "language": "Thai",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/thai-ner/thai-ner.tagger.mdl",
+      "checkpoint_sha256": "b1c9e9aa83f90263de0c43ad59268c82805cce20279f404e6ff37ed38f61dd2f",
+      "checkpoint_epoch": 32,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_th_customized_ner/xlm-roberta-base/customized-ner/customized-ner.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_th_customized_ner/xlm-roberta-base/customized-ner/logs/posdep.training",
+      "log_sha256": "8dd889a56a414265670e094c94f9c5d8eee44dacb3e61b5f7942e42b575e63b8",
+      "selected_table_line": 6585,
+      "selected_metrics_f1_percent": {
+        "UPOS": 78.01,
+        "XPOS": 85.73,
+        "UFeats": 85.73,
+        "AllTags": 78.01,
+        "UAS": 61.93,
+        "LAS": 55.08,
+        "CLAS": 50.88
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 77.9,
+        "XPOS": 85.73,
+        "UFeats": 85.73,
+        "AllTags": 77.9,
+        "UAS": 61.34,
+        "LAS": 54.21,
+        "CLAS": 49.96
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 90.99,
+        "XPOS": 100.0,
+        "UFeats": 100.0,
+        "AllTags": 90.99,
+        "UAS": 72.23,
+        "LAS": 64.24,
+        "CLAS": 60.85
+      }
+    },
+    {
+      "code": "ang",
+      "language": "Old English",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/customized/customized.tagger.mdl",
+      "checkpoint_sha256": "bfc712f596d540852499c3419b64c2db4fe5509533031dcfd8a6f647aba47d66",
+      "checkpoint_epoch": 68,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_oldeng_oedt_tokenize_v3/xlm-roberta-base/customized/customized.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_oldeng_oedt_tokenize_v3/xlm-roberta-base/customized/logs/posdep.training",
+      "log_sha256": "7697819b6c2526a1f1d3bf39657f2e54634ceb7017e6cf53c38939458d490707",
+      "selected_table_line": 11094,
+      "selected_metrics_f1_percent": {
+        "UPOS": 91.2,
+        "XPOS": 85.23,
+        "UFeats": 82.28,
+        "AllTags": 74.06,
+        "UAS": 76.81,
+        "LAS": 72.33,
+        "CLAS": 67.5
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 91.27,
+        "XPOS": 84.95,
+        "UFeats": 82.52,
+        "AllTags": 73.91,
+        "UAS": 76.75,
+        "LAS": 72.26,
+        "CLAS": 67.59
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 92.76,
+        "XPOS": 86.69,
+        "UFeats": 83.69,
+        "AllTags": 75.32,
+        "UAS": 78.12,
+        "LAS": 73.57,
+        "CLAS": 68.75
+      }
+    },
+    {
+      "code": "la",
+      "language": "Latin",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/latin/latin.tagger.mdl",
+      "checkpoint_sha256": "1222526b7c650ee39410350a93cccf59125ca5794d616f64e3175f0e3f297fc5",
+      "checkpoint_epoch": 16,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/la/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/la/xlm-roberta-base/customized-mwt/logs/posdep.training",
+      "log_sha256": "2a0dba42546eba3df55234f935baa7f0e63b026a05c19d2b94f3b198daa32722",
+      "selected_table_line": 12684,
+      "selected_metrics_f1_percent": {
+        "UPOS": 99.72,
+        "XPOS": 97.21,
+        "UFeats": 97.34,
+        "AllTags": 96.87,
+        "UAS": 95.95,
+        "LAS": 94.89,
+        "CLAS": 93.59
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 99.72,
+        "XPOS": 97.21,
+        "UFeats": 97.34,
+        "AllTags": 96.87,
+        "UAS": 95.95,
+        "LAS": 94.89,
+        "CLAS": 93.59
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 99.75,
+        "XPOS": 97.24,
+        "UFeats": 97.37,
+        "AllTags": 96.9,
+        "UAS": 95.98,
+        "LAS": 94.92,
+        "CLAS": 93.42
+      }
+    },
+    {
+      "code": "el",
+      "language": "Greek",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/greek/greek.tagger.mdl",
+      "checkpoint_sha256": "a2f1c3273e64e2d22174339fa28fe60ab2a513af2c495d383380826a5c8e88cd",
+      "checkpoint_epoch": 45,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/el/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/el/xlm-roberta-base/customized-mwt/logs/posdep.training",
+      "log_sha256": "9fb83d02c0edc834680a43a68910a50dd196aa56ed7933a3a5473746e76533e1",
+      "selected_table_line": 3067,
+      "selected_metrics_f1_percent": {
+        "UPOS": 98.31,
+        "XPOS": 99.8,
+        "UFeats": 94.53,
+        "AllTags": 93.69,
+        "UAS": 92.58,
+        "LAS": 90.05,
+        "CLAS": 87.33
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 98.5,
+        "XPOS": 99.8,
+        "UFeats": 94.34,
+        "AllTags": 93.62,
+        "UAS": 92.78,
+        "LAS": 89.92,
+        "CLAS": 86.31
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 98.5,
+        "XPOS": 100.0,
+        "UFeats": 94.72,
+        "AllTags": 93.87,
+        "UAS": 92.76,
+        "LAS": 90.22,
+        "CLAS": 87.55
+      }
+    },
+    {
+      "code": "grc",
+      "language": "Ancient Greek",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/ancient-greek/ancient-greek.tagger.mdl",
+      "checkpoint_sha256": "c4a31b5ad930e85d62c058b31045a18bf3b05872feb219556d2ed4adf78b45ce",
+      "checkpoint_epoch": 28,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/t_grc10k_tok1/xlm-roberta-base/customized/customized.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/t_grc10k_tok1/xlm-roberta-base/customized/logs/posdep.training",
+      "log_sha256": "d35c1d8f3f14d16b395742fae1854d300b1972e870b7ddb1c38cc00dc85144b0",
+      "selected_table_line": 29507,
+      "selected_metrics_f1_percent": {
+        "UPOS": 91.48,
+        "XPOS": 84.64,
+        "UFeats": 87.96,
+        "AllTags": 83.63,
+        "UAS": 71.85,
+        "LAS": 64.43,
+        "CLAS": 79.76
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 91.48,
+        "XPOS": 84.64,
+        "UFeats": 87.96,
+        "AllTags": 83.63,
+        "UAS": 71.85,
+        "LAS": 64.43,
+        "CLAS": 79.76
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 94.35,
+        "XPOS": 87.29,
+        "UFeats": 90.71,
+        "AllTags": 86.25,
+        "UAS": 74.1,
+        "LAS": 66.44,
+        "CLAS": 82.01
+      }
+    },
+    {
+      "code": "he",
+      "language": "Hebrew",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/hebrew/hebrew.tagger.mdl",
+      "checkpoint_sha256": "abdbe8615570798b57f16ae86801a3d1cb217fef80b00c80cea35cf9491f8f0c",
+      "checkpoint_epoch": 27,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/customized-mwt.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_commercial_v1/he/xlm-roberta-base/customized-mwt/logs/posdep.training",
+      "log_sha256": "006c09c4219830acd36529cfa3b27248dceda779cf9f4c51637212ac0fc8b3c1",
+      "selected_table_line": 6509,
+      "selected_metrics_f1_percent": {
+        "UPOS": 97.01,
+        "XPOS": 97.01,
+        "UFeats": 93.73,
+        "AllTags": 92.19,
+        "UAS": 94.04,
+        "LAS": 92.1,
+        "CLAS": 88.79
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 97.01,
+        "XPOS": 97.01,
+        "UFeats": 93.73,
+        "AllTags": 92.19,
+        "UAS": 94.04,
+        "LAS": 92.1,
+        "CLAS": 88.79
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 97.01,
+        "XPOS": 97.01,
+        "UFeats": 93.73,
+        "AllTags": 92.19,
+        "UAS": 94.04,
+        "LAS": 92.1,
+        "CLAS": 88.77
+      }
+    },
+    {
+      "code": "tl",
+      "language": "Tagalog",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/tagalog-custom/tagalog-custom.tagger.mdl",
+      "checkpoint_sha256": "b6210ff9306acee1d2a213c6d87fa79461848ed11e798a5f0cdaac389867c98b",
+      "checkpoint_epoch": 17,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v1/xlm-roberta-base/customized/customized.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_tgl_v1/xlm-roberta-base/customized/logs/posdep.training",
+      "log_sha256": "2261faabea229d1849a622d793a4c9512b3d52f5fe308f2e52d7448774d5716d",
+      "selected_table_line": 14367,
+      "selected_metrics_f1_percent": {
+        "UPOS": 95.68,
+        "XPOS": 98.94,
+        "UFeats": 95.2,
+        "AllTags": 92.45,
+        "UAS": 71.22,
+        "LAS": 64.71,
+        "CLAS": 67.99
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 95.68,
+        "XPOS": 98.94,
+        "UFeats": 95.2,
+        "AllTags": 92.45,
+        "UAS": 71.22,
+        "LAS": 64.71,
+        "CLAS": 67.99
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 96.71,
+        "XPOS": 100.0,
+        "UFeats": 96.23,
+        "AllTags": 93.44,
+        "UAS": 71.98,
+        "LAS": 65.41,
+        "CLAS": 72.26
+      }
+    },
+    {
+      "code": "sw",
+      "language": "Swahili",
+      "component": "tagger_parser",
+      "split": "development",
+      "checkpoint": "training/trankit_save_ja_ner_v2/xlm-roberta-base/swahili-custom/swahili-custom.tagger.mdl",
+      "checkpoint_sha256": "4996147bf884d6de700b0bdf52e594efa82e4b51fa095f3bc98b05dffff6260f",
+      "checkpoint_epoch": 27,
+      "matched_training_output": "_deprecated_nonruntime_20260514_184819/training/trankit_save_swh_v1/xlm-roberta-base/customized/customized.tagger.mdl",
+      "log": "_deprecated_nonruntime_20260514_184819/training/trankit_save_swh_v1/xlm-roberta-base/customized/logs/posdep.training",
+      "log_sha256": "b961638b73246bdbaa3a65d0c022df90d16453488c4a1257a4e2068d2793da9c",
+      "selected_table_line": 15497,
+      "selected_metrics_f1_percent": {
+        "UPOS": 93.66,
+        "XPOS": 94.17,
+        "UFeats": 87.08,
+        "AllTags": 82.43,
+        "UAS": 82.68,
+        "LAS": 79.77,
+        "CLAS": 75.29
+      },
+      "last_logged_metrics_f1_percent": {
+        "UPOS": 93.66,
+        "XPOS": 94.17,
+        "UFeats": 87.08,
+        "AllTags": 82.43,
+        "UAS": 82.68,
+        "LAS": 79.77,
+        "CLAS": 75.29
+      },
+      "selection_evidence": "Checkpoint stores this zero-based epoch; the corresponding completed-epoch table is selected by ordinal, not by the misleading repeated best-epoch header.",
+      "selected_aligned_accuracy_percent": {
+        "UPOS": 94.01,
+        "XPOS": 94.53,
+        "UFeats": 87.41,
+        "AllTags": 82.74,
+        "UAS": 82.99,
+        "LAS": 80.07,
+        "CLAS": 76.23
+      }
+    }
+  ]
+}

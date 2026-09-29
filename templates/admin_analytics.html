@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Analytics | Language Engine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='top_nav.css') }}?v={{ mtime('top_nav.css') }}">
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #172033;
+      background: #f7f8fb;
+    }
+    .admin-wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 18px 44px;
+    }
+    .admin-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+    .range-form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .range-form input {
+      width: 72px;
+      padding: 7px 8px;
+      border: 1px solid #cdd5e1;
+      border-radius: 6px;
+      background: #fff;
+    }
+    .range-form button {
+      padding: 8px 12px;
+      border: 0;
+      border-radius: 6px;
+      color: #fff;
+      background: #2563eb;
+      cursor: pointer;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .metric {
+      padding: 14px;
+      border: 1px solid #e1e6ef;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .metric-label {
+      margin-bottom: 7px;
+      color: #607089;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+    .metric-value {
+      font-size: 25px;
+      font-weight: 700;
+    }
+    section {
+      margin-top: 22px;
+    }
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid #e1e6ef;
+      border-radius: 8px;
+      background: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #edf1f6;
+      text-align: right;
+    }
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+    th {
+      color: #536278;
+      background: #fbfcfe;
+      font-weight: 650;
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+{% include "_top_nav.html" %}
+<main class="admin-wrap">
+  <div class="admin-head">
+    <div>
+      <h1>Analytics</h1>
+      <div>{{ analytics.start }} to {{ analytics.end }}</div>
+    </div>
+    <form class="range-form" method="get" action="/admin/analytics">
+      <label for="days">Days</label>
+      <input id="days" name="days" type="number" min="1" max="365" value="{{ analytics.days }}">
+      <button type="submit">Update</button>
+    </form>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric"><div class="metric-label">Landing visits</div><div class="metric-value">{{ analytics.totals.landing_visits }}</div></div>
+    <div class="metric"><div class="metric-label">Unique visitors</div><div class="metric-value">{{ analytics.totals.landing_unique_visitors }}</div></div>
+    <div class="metric"><div class="metric-label">Accounts</div><div class="metric-value">{{ analytics.totals.accounts }}</div></div>
+    <div class="metric"><div class="metric-label">Paid subs</div><div class="metric-value">{{ analytics.totals.paid_subscriptions }}</div></div>
+    <div class="metric"><div class="metric-label">Lookup clicks</div><div class="metric-value">{{ analytics.totals.lookup_requests }}</div></div>
+    <div class="metric"><div class="metric-label">Lookup tokens</div><div class="metric-value">{{ analytics.totals.lookup_tokens }}</div></div>
+    <div class="metric"><div class="metric-label">Checkout attempts</div><div class="metric-value">{{ analytics.totals.checkout_attempts }}</div></div>
+    <div class="metric"><div class="metric-label">Trankit waits</div><div class="metric-value">{{ analytics.totals.trankit_wait_count }}</div></div>
+    <div class="metric"><div class="metric-label">Avg wait ms</div><div class="metric-value">{{ analytics.totals.trankit_avg_wait_ms }}</div></div>
+    <div class="metric"><div class="metric-label">Max wait ms</div><div class="metric-value">{{ analytics.totals.trankit_wait_ms_max }}</div></div>
+    <div class="metric"><div class="metric-label">Avg Trankit ms</div><div class="metric-value">{{ analytics.totals.trankit_avg_run_ms }}</div></div>
+  </div>
+
+  <section>
+    <h2>Daily</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Landing</th>
+            <th>Unique</th>
+            <th>Lookups</th>
+            <th>Tokens</th>
+            <th>Side lookups</th>
+            <th>Checkout</th>
+            <th>Trankit runs</th>
+            <th>Waits</th>
+            <th>Avg wait ms</th>
+            <th>Max wait ms</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in analytics.daily|reverse %}
+          <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.landing_visits }}</td>
+            <td>{{ row.landing_unique_visitors }}</td>
+            <td>{{ row.lookup_requests }}</td>
+            <td>{{ row.lookup_tokens }}</td>
+            <td>{{ row.lookup_dp_only_requests }}</td>
+            <td>{{ row.checkout_attempts }}</td>
+            <td>{{ row.trankit_run_count }}</td>
+            <td>{{ row.trankit_wait_count }}</td>
+            <td>{{ row.trankit_avg_wait_ms }}</td>
+            <td>{{ row.trankit_max_wait_ms }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="11">No analytics rows yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Languages</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Language</th>
+            <th>Lookups</th>
+            <th>Tokens</th>
+            <th>Side lookups</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in analytics.languages %}
+          <tr>
+            <td>{{ row.language }}</td>
+            <td>{{ row.lookup_requests }}</td>
+            <td>{{ row.lookup_tokens }}</td>
+            <td>{{ row.lookup_dp_only_requests }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4">No language rows yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>New Accounts</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>New accounts</th></tr></thead>
+        <tbody>
+          {% for row in analytics.accounts_by_day|reverse %}
+          <tr><td>{{ row.date }}</td><td>{{ row.new_accounts }}</td></tr>
+          {% else %}
+          <tr><td colspan="2">No new accounts in this range.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,149 @@
+[
+  {
+    "state_id": "START",
+    "state_type": "meta",
+    "description": "Initial state before token analysis",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "LEX_V_FIN",
+    "state_type": "lexical",
+    "description": "Lexical verb finite/predicate form",
+    "terminal_allowed": 1,
+    "notes": ""
+  },
+  {
+    "state_id": "V_MIZEN",
+    "state_type": "lexical",
+    "description": "Verb irrealis (mizenkei) stem expecting neg/pass/caus/etc",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "V_RENYO",
+    "state_type": "lexical",
+    "description": "Verb renyou stem expecting auxiliaries/connectives",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "V_ONBIN_T",
+    "state_type": "lexical",
+    "description": "Verb onbin stem expecting ta/te/tari T-series",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "V_ONBIN_D",
+    "state_type": "lexical",
+    "description": "Verb onbin stem expecting ta/te/tari D-series",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "V_KATEI",
+    "state_type": "lexical",
+    "description": "Verb katei stem expecting ば or conditional use",
+    "terminal_allowed": 1,
+    "notes": ""
+  },
+  {
+    "state_id": "A_I_FIN",
+    "state_type": "lexical",
+    "description": "i-adjective finite form",
+    "terminal_allowed": 1,
+    "notes": ""
+  },
+  {
+    "state_id": "A_I_RENYO",
+    "state_type": "lexical",
+    "description": "i-adjective renyou stem",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "A_I_KATEI",
+    "state_type": "lexical",
+    "description": "i-adjective katei stem",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "A_NA_STEM",
+    "state_type": "lexical",
+    "description": "na-adjective nominal stem awaiting copula/adnominal",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "COPULA_SLOT",
+    "state_type": "syntactic",
+    "description": "Slot where copula allomorph can appear",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "COP_FIN",
+    "state_type": "copula",
+    "description": "Copula finite form",
+    "terminal_allowed": 1,
+    "notes": ""
+  },
+  {
+    "state_id": "TE_CHAIN",
+    "state_type": "auxchain",
+    "description": "After te/de connective, can attach aspectual auxiliaries",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "AUX_VERB_FIN",
+    "state_type": "aux",
+    "description": "Finite auxiliary verb form",
+    "terminal_allowed": 1,
+    "notes": ""
+  },
+  {
+    "state_id": "AUX_VERB_RENYO",
+    "state_type": "aux",
+    "description": "Auxiliary renyou stem before another aux",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "PAST_T_SLOT",
+    "state_type": "aux",
+    "description": "Past/perfect auxiliary slot (ta/tari t-series)",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "PAST_D_SLOT",
+    "state_type": "aux",
+    "description": "Past/perfect auxiliary slot (da/dari d-series)",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "POLITE_SLOT",
+    "state_type": "aux",
+    "description": "Polite auxiliary slot after verb renyou",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "NEG_SLOT",
+    "state_type": "aux",
+    "description": "Negative auxiliary slot after mizen or adj stem",
+    "terminal_allowed": 0,
+    "notes": ""
+  },
+  {
+    "state_id": "END",
+    "state_type": "meta",
+    "description": "Terminal accept state",
+    "terminal_allowed": 1,
+    "notes": ""
+  }
+]
